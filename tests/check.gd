@@ -81,13 +81,17 @@ func run() -> void:
 	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
 	await test_ui()
 	if failures == 0:
-		print("PASS · all 51 cards and responses, autosave recovery, full year, UI and arcade")
+		print("PASS · all 51 cards and responses, autosave recovery, full year, UI, arcade and tutorial")
 	quit(1 if failures else 0)
 
 func test_ui() -> void:
 	var app = load("res://main.tscn").instantiate()
 	root.add_child(app)
 	await process_frame
+	check(app.show_tutorial_hint,"New players see the tutorial hint")
+	use_button(app,"Tutorial")
+	check(not FileAccess.file_exists(Campaign.SAVE),"Opening a tutorial creates no campaign save")
+	use_button(app,"Exit")
 	for i in 5:
 		app.change_tab(i)
 		check(app.column.get_child_count() > 0,"Rendered tab %d" % i)
@@ -120,5 +124,39 @@ func test_ui() -> void:
 	check(app.model.s.phase == "incident","Opened the doors through UI")
 	app.choose(0)
 	check(app.model.s.night.wave == 1,"Resolved a card through UI")
+
+	var live_campaign = app.model
+	var save_before := FileAccess.get_file_as_string(Campaign.SAVE)
+	use_button(app,"Tutorial")
+	check(app.model != live_campaign and app.model.s.phase == "plan","Tutorial opens its own practice shift")
+	check(find_button(app,"Open the doors").disabled,"Practice shift waits for stock")
+	use_button(app,app.stock_label())
+	check(not find_button(app,"Open the doors").disabled,"Delivery unlocks opening")
+	use_button(app,"Open the doors")
+	for wave in 2:
+		check(app.model.s.phase == "incident" and app.model.s.night.wave == wave,"Practice wave %d" % (wave + 1))
+		use_button(app,app.model.current_card()[2])
+	check(app.model.s.phase == "report" and app.model.s.night.guests > 0,"Tutorial reaches a real closeout")
+	use_button(app,"Finish tutorial")
+	check(app.model == live_campaign and app.model.s.night.wave == 1,"Tutorial restores the live shift")
+	check(FileAccess.get_file_as_string(Campaign.SAVE) == save_before,"Practice made no changes to the live save")
+	use_button(app,"Tutorial")
+	var escape := InputEventAction.new()
+	escape.action = "ui_cancel"
+	escape.pressed = true
+	app._unhandled_key_input(escape)
+	check(app.model == live_campaign,"Esc exits a replay")
 	app.queue_free()
 	await process_frame
+
+
+func find_button(app: Control, label: String) -> Button:
+	for b: Button in app.root_ui.find_children("*","Button",true,false):
+		if b.text == label: return b
+	check(false,"Missing button " + label)
+	return null
+
+func use_button(app: Control, label: String) -> void:
+	var b := find_button(app,label)
+	if b != null and not b.disabled:
+		b.pressed.emit()

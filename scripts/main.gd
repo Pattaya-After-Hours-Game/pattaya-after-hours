@@ -13,8 +13,11 @@ const MUTED = Color("#b8a9cb")
 const EDGE = Color("#3b2c54")
 const DARK = Color("#151027")
 const TAB_NAMES = ["Service","Events","Tours","Empire","Journal"]
+const PRACTICE_STOCK = 24
 
 var model = Campaign.new()
+var campaign_before_tutorial: Campaign
+var show_tutorial_hint := false
 var tab := 0
 var guide := 2
 var message := ""
@@ -39,7 +42,7 @@ func _ready() -> void:
 	interface_font.fallbacks = [preload("res://assets/DejaVuSans.ttf")]
 	theme = Theme.new()
 	theme.default_font = interface_font
-	model.load_game()
+	show_tutorial_hint = not model.load_game()
 	var config := ConfigFile.new()
 	if config.load("user://settings.cfg") == OK: muted = config.get_value("audio","muted",false)
 	music = AudioStreamPlayer.new()
@@ -126,6 +129,8 @@ func set_sound() -> void:
 	render(true)
 
 func save_state() -> void:
+	if campaign_before_tutorial != null: return
+	show_tutorial_hint = false
 	var error: int = model.save_game()
 	if error != OK: message = "Save failed (%d)." % error
 
@@ -144,17 +149,19 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui = Control.new()
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
+	var practicing := campaign_before_tutorial != null
 	pane(root_ui,Rect2(0,0,960,540),Color("#100c1d"),Color("#100c1d"))
 	pane(root_ui,Rect2(0,0,960,3),PINK,PINK)
 	abs_text(root_ui,Rect2(17,7,360,26),"PATTAYA AFTER HOURS",24,WHITE)
 	var status: String = "%s · %s" % [model.weekday(),Content.WEATHER[int(model.s.weather)]]
-	abs_text(root_ui,Rect2(18,36,244,20),"THE BLUE HOUR   /   "+status,13,TEAL)
+	abs_text(root_ui,Rect2(18,36,320,20),("PRACTICE SHIFT" if practicing else "THE BLUE HOUR")+"   /   "+status,13,GOLD if practicing else TEAL)
 	metric(355,"TILL",cash(model.s.cash) if model.s.cash < 100000 else "฿%.1fk" % (model.s.cash / 1000.0),TEAL)
 	metric(465,"STOCK",str(int(model.s.stock)),GOLD)
 	metric(558,"REPUTATION",str(int(model.s.rep)),TEAL)
 	metric(676,"HEAT",str(int(model.s.heat)),PINK)
 	metric(762,"SHIFT","D%03d" % int(model.s.day),WHITE)
-	at_button(root_ui,Rect2(851,14,94,40),"Muted" if muted else "Sound",set_sound)
+	at_button(root_ui,Rect2(816,14,63,40),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
+	at_button(root_ui,Rect2(883,14,62,40),"Muted" if muted else "Sound",set_sound)
 	pane(root_ui,Rect2(14,66,550,386),DARK)
 	city = City.new()
 	city.position = Vector2(16,68)
@@ -167,20 +174,22 @@ func render(keep_scroll: bool = false) -> void:
 	city.venue = int(model.s.venue)
 	city.rig = int(model.s.rig)
 	city.site.connect(func(index: int):
-		if model.s.phase == "plan": change_tab(index))
+		if not practicing and model.s.phase == "plan": change_tab(index))
 	root_ui.add_child(city)
 	pane(root_ui,Rect2(16,438,546,14),Color("#251a36"),EDGE)
 	abs_text(root_ui,Rect2(24,435,527,19),"BAY DISTRICT   /   %s" % ("SERVICE LIVE" if city.night else "PRE-SHIFT"),10,WHITE)
 	pane(root_ui,Rect2(14,461,550,65),DARK)
-	abs_text(root_ui,Rect2(26,467,265,20),"THE SHIFT LOG",13,GOLD)
-	abs_text(root_ui,Rect2(26,490,410,24),str(model.s.log.front()).left(61),14,MUTED)
-	if model.s.phase == "plan":
+	var first_shift := show_tutorial_hint and not practicing
+	abs_text(root_ui,Rect2(26,467,265,20),"YOUR FIRST SHIFT" if first_shift else "THE SHIFT LOG",13,GOLD)
+	var log_text := "Select Tutorial above to try a practice shift." if first_shift else str(model.s.log.front()).left(61)
+	abs_text(root_ui,Rect2(26,490,410,24),log_text,14,MUTED)
+	if not practicing and model.s.phase == "plan":
 		at_button(root_ui,Rect2(435,473,117,41),"Walk district",walk_district)
 	pane(root_ui,Rect2(576,66,370,460),DARK)
 	for index in TAB_NAMES.size():
-		var b := at_button(root_ui,Rect2(582 + 71*index,72,69,37),TAB_NAMES[index],change_tab.bind(index),tab == index and model.s.phase == "plan")
+		var b := at_button(root_ui,Rect2(582 + 71*index,72,69,37),TAB_NAMES[index],change_tab.bind(index),tab == index and model.s.phase == "plan" and not practicing)
 		b.add_theme_font_size_override("font_size",13)
-		b.disabled = model.s.phase != "plan"
+		b.disabled = model.s.phase != "plan" or practicing
 	scroll = ScrollContainer.new()
 	scroll.position = Vector2(586,119)
 	scroll.size = Vector2(350,330)
@@ -196,24 +205,43 @@ func render(keep_scroll: bool = false) -> void:
 	var action: Callable
 	match model.s.phase:
 		"plan":
-			match tab:
-				0: service_panel()
-				1: events_panel()
-				2: tours_panel()
-				3: empire_panel()
-				4: journal_panel()
+			if practicing:
+				title("1 / 3    Stock the bar")
+				if model.s.stock == PRACTICE_STOCK:
+					body("Check STOCK at the top. Every two guests use one unit. Buy a delivery before opening.")
+					row_button(stock_label(),do_action.bind("buy"),true)
+				else:
+					body("Delivery in. Open the doors to serve two waves of guests.",TEAL)
+				body("Dao, Mali, and Fern are on tonight. In the campaign, give tired staff a night off.")
+			else:
+				match tab:
+					0: service_panel()
+					1: events_panel()
+					2: tours_panel()
+					3: empire_panel()
+					4: journal_panel()
 			action_label = "Open the doors"
 			action = begin
 		"incident":
+			if practicing:
+				title("2 / 3    Run the shift")
+				body("Choose a response to serve the next wave. Spending can help service or relationships.")
 			incident_panel()
 			action_label = "Scale back service"
 			action = func():
 				model.fallback()
 				commit()
 		"report":
+			if practicing:
+				title("3 / 3    Check the books")
+				body("Compare sales with payroll and fees. Check guests turned away and stock used before planning tomorrow.")
 			report_panel()
-			action_label = "Finish the story" if not model.s.end.is_empty() else "Next day"
-			action = advance
+			if practicing:
+				action_label = "Finish tutorial"
+				action = finish_tutorial
+			else:
+				action_label = "Finish the story" if not model.s.end.is_empty() else "Next day"
+				action = advance
 		"end":
 			ending_panel()
 			action_label = "Start a new run" if not confirmation else "Confirm new run"
@@ -226,7 +254,8 @@ func render(keep_scroll: bool = false) -> void:
 	if not message.is_empty():
 		var note := abs_text(root_ui,Rect2(588,454,344,27),message,12,PINK)
 		note.clip_text = true
-	at_button(root_ui,Rect2(585,480,352,37),action_label,action,true)
+	var primary := at_button(root_ui,Rect2(585,480,352,37),action_label,action,true)
+	primary.disabled = practicing and model.s.phase == "plan" and model.s.stock == PRACTICE_STOCK
 	if previous > 0:
 		scroll.set_deferred("scroll_vertical",previous)
 
@@ -293,13 +322,34 @@ func advance() -> void:
 	message = ""
 	commit()
 
+func start_tutorial() -> void:
+	if campaign_before_tutorial != null: return
+	campaign_before_tutorial = model
+	show_tutorial_hint = false
+	confirmation = false
+	message = ""
+	model = Campaign.new(72)
+	model.s.stock = PRACTICE_STOCK
+	model.s.hours = 0
+	render()
+
+func finish_tutorial() -> void:
+	if campaign_before_tutorial == null: return
+	model = campaign_before_tutorial
+	campaign_before_tutorial = null
+	message = ""
+	render()
+
+func stock_label() -> String:
+	var amount := mini(30,105+int(model.s.level)*20-int(model.s.stock))
+	return "Stock +%d · %s" % [amount,cash(amount*model.stock_price())]
+
 func service_panel() -> void:
 	title("Set the shift")
 	body("%s traffic expected. Standard shifts have three waves." % ("Heavy" if model.s.forecast >= 9 else "Light" if model.s.forecast < 0 else "Steady"))
 	row_pair("Hours: "+Campaign.HOURS[int(model.s.hours)],cycle.bind("hours",Campaign.HOURS),
 		Campaign.PROMOS[int(model.s.promo)],cycle.bind("promo",Campaign.PROMOS))
-	var amount := mini(30,105+int(model.s.level)*20-int(model.s.stock))
-	row_pair("Stock +%d · %s" % [amount,cash(amount*model.stock_price())],do_action.bind("buy"),"Hire · ฿980",do_action.bind("hire"))
+	row_pair(stock_label(),do_action.bind("buy"),"Hire · ฿980",do_action.bind("hire"))
 	body("TEAM ROTA    /    FATIGUE · MORALE",GOLD,12)
 	for i in model.s.staff.size():
 		var staff: Dictionary = model.s.staff[i]
@@ -405,6 +455,8 @@ func report_panel() -> void:
 	body("Bar %s · Payroll %s · Fees %s\nStock used %d · Tour tickets %d" % [
 		cash(n.gross),cash(n.wages),cash(n.fees),n.sold,n.tours],WHITE,14)
 	if int(model.s.day)%7 == 0: week_lines(model.s.last_week)
+	if campaign_before_tutorial != null:
+		body("Book guides in Tours or find Toybox sparring under Events. Check Journal for Tuesday's rent and permits.",GOLD,13)
 	for line in model.s.report: body(str(line),MUTED,13)
 
 func ending_panel() -> void:
@@ -485,4 +537,10 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if is_instance_valid(district): close_district()
 		elif is_instance_valid(fight): leave_fight(fight.result if fight.over else false)
+		elif campaign_before_tutorial != null: finish_tutorial()
 		elif tab != 0 and model.s.phase == "plan": change_tab(0)
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if campaign_before_tutorial != null and event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		finish_tutorial()

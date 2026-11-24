@@ -8,6 +8,8 @@ Run the Blue Hour in a fictional neon harbor district. Anong wants a payroll res
 
 ## Play
 
+Select **Tutorial** at the top of the game to run a short practice shift. Learn to restock, make service decisions, and read the closeout. You can exit or replay it any time without changing your campaign.
+
 - **Service.** Set the schedule, buy stock, pick a promotion, and split the rota. Work through early service, the rush, and last call. Review closing figures and Tuesday's rent, payroll, permits, and outstanding bills.
 - **The district.** Walk the bay, market, harbor, and promenade as scooters and pickups pass. Weather affects foot traffic, guide bookings, and power bills.
 - **Tours and events.** Book paid, voluntary short and long tours. Host Toybox Muay Thai, live music, a theme night, or a football screening. Forecasts, capacity, delays, and door cover affect turnout.
