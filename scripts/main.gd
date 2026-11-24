@@ -98,6 +98,7 @@ func button(value: String, call: Callable, primary: bool = false) -> Button:
 	focus.draw_center = false
 	b.add_theme_stylebox_override("focus",focus)
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.mouse_filter = Control.MOUSE_FILTER_PASS
 	b.pressed.connect(func():
 		tone("click")
 		call.call())
@@ -185,6 +186,7 @@ func render(keep_scroll: bool = false) -> void:
 	scroll.size = Vector2(350,330)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
+	scroll.scroll_deadzone = 8
 	root_ui.add_child(scroll)
 	column = VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
