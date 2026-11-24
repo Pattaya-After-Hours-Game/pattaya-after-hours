@@ -51,12 +51,13 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ESCAPE:
+			get_viewport().set_input_as_handled()
 			dismissed.emit()
-			get_viewport().set_input_as_handled()
 		elif (event.keycode == KEY_E or event.keycode == KEY_ENTER) and nearby >= 0:
-			destination.emit(SITES[nearby][2])
 			get_viewport().set_input_as_handled()
+			destination.emit(SITES[nearby][2])
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		get_viewport().set_input_as_handled()
 		var hit: Vector2 = event.position / 3
 		if Rect2(264,4,53,14).has_point(hit): dismissed.emit()
 		elif hit.y >= 43 and hit.y < 151:
@@ -68,7 +69,6 @@ func _input(event: InputEvent) -> void:
 					target = p+Vector2(0,9)
 					break
 			if focus_site < 0: target = hit
-		get_viewport().set_input_as_handled()
 
 func px(x: float,y: float,w: float,h: float,color: Color) -> void:
 	draw_rect(Rect2(floorf(x),floorf(y),w,h),color)

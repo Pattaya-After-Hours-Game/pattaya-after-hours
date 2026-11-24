@@ -38,8 +38,8 @@ func _gui_input(input: InputEvent) -> void:
 		for item in LABELS:
 			var p: Vector2 = item[1]
 			if Rect2(p - Vector2(28,8), Vector2(56,16)).has_point(point):
-				site.emit(item[3])
 				accept_event()
+				site.emit(item[3])
 				return
 
 func px(x: float,y: float,w: float,h: float,col: Color) -> void:

@@ -62,6 +62,7 @@ func _notification(what: int) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and KEYS.has(event.physical_keycode):
 		if event.echo: return
+		get_viewport().set_input_as_handled()
 		var key: String = KEYS[event.physical_keycode]
 		if event.pressed:
 			buffer(key)
@@ -69,25 +70,24 @@ func _input(event: InputEvent) -> void:
 			if over and key == "jab": finished.emit(result)
 		else:
 			held.erase(event.physical_keycode)
-		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		finished.emit(result if over else false)
 		get_viewport().set_input_as_handled()
+		finished.emit(result if over else false)
 	elif event is InputEventScreenTouch:
+		get_viewport().set_input_as_handled()
 		if event.pressed:
 			activate(event.position,event.index)
 		else: touches.erase(event.index)
-		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
 		if touches.has(event.index):
 			touches[event.index] = action_at(event.position)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION:
+		get_viewport().set_input_as_handled()
 		mouse_action = action_at(event.position) if event.pressed else ""
 		if event.pressed:
 			buffer(mouse_action)
 			activate(event.position,-1)
-		get_viewport().set_input_as_handled()
 
 func activate(point: Vector2, index: int) -> void:
 	if Rect2(880,465,72,61).has_point(point):

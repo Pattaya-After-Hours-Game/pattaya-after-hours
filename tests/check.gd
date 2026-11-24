@@ -111,7 +111,11 @@ func test_ui() -> void:
 	f._resolve(f.fighters[0],f.fighters[1],0.23)
 	check(f.fighters[1].hp == 97,"Guard reduces damage")
 	check(not f._attack(f.fighters[1],"super"),"Burst requires charge")
-	app.leave_fight(false)
+	var exit_touch := InputEventScreenTouch.new()
+	exit_touch.position = Vector2(915,490)
+	exit_touch.pressed = true
+	f._input(exit_touch)
+	check(app.fight == null,"Touch exits sparring safely")
 	app.begin()
 	check(app.model.s.phase == "incident","Opened the doors through UI")
 	app.choose(0)
