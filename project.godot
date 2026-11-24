@@ -1,0 +1,27 @@
+config_version=5
+
+[application]
+config/name="Pattaya After Hours"
+config/description="A neon nightlife management sim"
+run/main_scene="res://main.tscn"
+config/quit_on_go_back=false
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://assets/icon.png"
+boot_splash/bg_color=Color(0.063, 0.055, 0.133, 1)
+boot_splash/show_image=false
+
+[display]
+window/size/viewport_width=960
+window/size/viewport_height=540
+window/size/window_width_override=1152
+window/size/window_height_override=648
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+window/handheld/orientation=4
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.027, 0.024, 0.063, 1)

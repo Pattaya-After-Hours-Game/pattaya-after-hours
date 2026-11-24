@@ -1,0 +1,27 @@
+name: Test the campaign
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the pinned Godot editor
+        run: |
+          version="$(cat .godot-version)"
+          name="Godot_v${version}-stable_linux.x86_64"
+          cd "$RUNNER_TEMP"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/godotengine/godot-builds/releases/download/${version}-stable/${name}.zip" \
+            --output "${name}.zip"
+          echo "cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4  ${name}.zip" | sha256sum --check
+          unzip -q "${name}.zip"
+          echo "GODOT_BIN=$RUNNER_TEMP/$name" >> "$GITHUB_ENV"
+      - name: Run campaign and arcade checks
+        run: tools/test.sh

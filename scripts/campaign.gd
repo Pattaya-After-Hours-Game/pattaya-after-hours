@@ -1,0 +1,545 @@
+extends RefCounted
+
+const C = preload("res://scripts/content.gd")
+const SAVE = "user://campaign.json"
+const BACKUP = "user://campaign.backup"
+const MAX_DAY = 365
+const HOURS = ["Early close", "Standard", "Late close"]
+const PROMOS = ["Regular prices", "Happy hour", "Loyalty night", "Big campaign"]
+const SECURITY = ["House team", "Licensed crew", "Shoreline Desk"]
+const WEEKDAYS = ["Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue"]
+const FIGHT_CARD = 41
+var s: Dictionary
+var rng := RandomNumberGenerator.new()
+
+func _init(seed_value: int = 0) -> void:
+	if seed_value == 0:
+		rng.randomize()
+	else:
+		rng.seed = seed_value
+	s = {
+		"version": 1, "day": 1, "phase": "plan", "cash": 6400, "reserve": 0, "debt": 0,
+		"stock": 62, "rep": 15, "regulars": 4, "trust": 38, "heat": 5, "safety": 65,
+		"partner": 63, "visa": 75, "license": 80, "supplier": 58, "rival": 14, "condition": 72,
+		"staff": [], "level": 1, "venue": 1, "rig": 0, "market": 100, "contract": 0,
+		"route": 0, "food": 0, "exit": 0, "weather": 0, "forecast": 0,
+		"hours": 1, "promo": 0, "event": 0, "security": 0, "pay": 1,
+		"bookings": {}, "night": {}, "card": -1, "seen": [], "report": [],
+		"weekly": {}, "last_week": {}, "total_guests": 0, "wins": 0, "end": "", "rng": 0,
+		"log": ["Anong: The pool table can wait. Pay the team first."],
+	}
+	for i in 3:
+		_add_staff(i)
+	_reset_week()
+	_forecast()
+
+func _add_staff(id: int) -> void:
+	s.staff.append({"id":id,"skill":C.STAFF[id][2],"guide":C.STAFF[id][3],"morale":72,"fatigue":12,"work":true,"hurt":0})
+
+func _reset_week() -> void:
+	s.weekly = {"revenue":0,"costs":0,"guests":0,"tours":0,"nights":0,"weeks":week()}
+
+func week() -> int:
+	return int((s.day - 1) / 7.0) + 1
+
+func weekday() -> String:
+	return WEEKDAYS[(int(s.day) - 1) % 7]
+
+func _forecast() -> void:
+	s.weather = rng.randi_range(0, C.WEATHER.size() - 1)
+	if s.day <= 5:
+		s.weather = rng.randi_range(0, 4)
+	s.forecast = rng.randi_range(-4, 10) + (10 if weekday() in ["Fri","Sat"] else 0)
+	s.market = clampi(int(s.market) + rng.randi_range(-23, 25), 38, 210)
+
+func spend(cost: int) -> bool:
+	if s.cash < cost:
+		return false
+	s.cash -= cost
+	s.weekly.costs += cost
+	return true
+
+func log_message(message: String) -> void:
+	s.log.push_front(message)
+	if s.log.size() > 30:
+		s.log.pop_back()
+
+func stock_price() -> int:
+	return 24 - int(s.supplier / 12.0) + (5 if s.weather == 6 else 0)
+
+func tour_offer(index: int, route_id: int) -> String:
+	var staff: Dictionary = s.staff[index]
+	var route: Array = C.ROUTES[route_id]
+	if not staff.work or staff.hurt > 0:
+		return "Off duty."
+	if staff.guide == 0:
+		return "Doesn't take guide shifts."
+	if route[2] == 2 and staff.guide < 4:
+		return "Prefers short routes."
+	if staff.morale < 44 or staff.fatigue > 72 or (route[2] == 2 and staff.fatigue > 55):
+		return "Declines the extra hours."
+	if s.weather == 6 and (route_id == 1 or route_id == 3):
+		return "Declines an exposed route in monsoon rain."
+	return ""
+
+func guide_pay(route_id: int) -> int:
+	var duration: int = C.ROUTES[route_id][2]
+	return duration * [100, 145, 190][int(s.pay)]
+
+func booking(index: int, route_id: int) -> String:
+	if s.phase != "plan":
+		return "Bookings are closed."
+	var key := str(index)
+	if s.bookings.get(key, -1) == route_id:
+		s.bookings.erase(key)
+		return "Booking removed."
+	var declined := tour_offer(index, route_id)
+	if not declined.is_empty():
+		return "%s %s" % [C.STAFF[s.staff[index].id][0], declined]
+	if s.pay == 0 and C.ROUTES[route_id][2] == 2:
+		return "The guide asks for standard split or better on long routes."
+	s.bookings[key] = route_id
+	return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
+
+func action(id: String, index: int = 0) -> String:
+	if s.phase != "plan":
+		return "Finish the current night first."
+	match id:
+		"buy":
+			var amount := mini(30, 105 + int(s.level) * 20 - int(s.stock))
+			if amount <= 0: return "Storage is full."
+			if not spend(amount * stock_price()): return "The till can't cover the delivery."
+			s.stock += amount
+			s.supplier = mini(100, s.supplier + 2)
+			return "%d stock delivered." % amount
+		"rota":
+			var staff: Dictionary = s.staff[index]
+			if staff.hurt > 0: return "On paid recovery leave for %d more nights." % staff.hurt
+			staff.work = not staff.work
+			if not staff.work:
+				s.bookings.erase(str(index))
+			return "%s is %s." % [C.STAFF[staff.id][0], "on the rota" if staff.work else "off tonight"]
+		"train":
+			var staff: Dictionary = s.staff[index]
+			if staff.skill >= 8: return "Already fully trained."
+			if staff.hurt > 0: return "Let them recover first."
+			if not spend(410): return "Training costs ฿410."
+			staff.skill += 1
+			if staff.guide > 0: staff.guide = mini(8, int(staff.guide) + 1)
+			staff.morale = mini(100, staff.morale + 5)
+			return "Session booked and paid."
+		"hire":
+			if s.staff.size() >= C.STAFF.size(): return "All six posts are filled."
+			if not spend(980): return "Recruitment costs ฿980."
+			_add_staff(s.staff.size())
+			return "%s joined the team." % C.STAFF[s.staff.back().id][0]
+		"reno":
+			if s.level >= 4: return "The venue is fully renovated."
+			if not spend(1800 * int(s.level)): return "The renovation needs more cash."
+			s.level += 1
+			s.condition = mini(100, s.condition + 18)
+			s.safety = mini(100, s.safety + 10)
+			return "Renovation complete. More room and safer service."
+		"repair":
+			if s.condition == 100: return "Everything is working."
+			if not spend(500): return "Repairs cost ฿500."
+			s.condition = mini(100, s.condition + 20)
+			s.safety = mini(100, s.safety + 4)
+			return "Repairs complete."
+		"food":
+			if s.food: return "Nok's small plates are already on the menu."
+			if not spend(1050): return "A food counter costs ฿1,050."
+			s.food = 1
+			return "Small plates increase spend and keep quiet shifts viable."
+		"venue":
+			if s.venue == 2: return "Both venues are open."
+			if s.rep < 42 or s.partner < 40: return "Needs 42 reputation and 40 co-owner trust."
+			if not spend(9600): return "The second lease costs ฿9,600."
+			s.venue = 2
+			s.heat += 9
+			return "Anong signs the lease on High Tide."
+		"rig":
+			if s.rig > 0: return "The rig is already installed."
+			if s.day < 12 or s.rep < 25: return "Available from day 12 with 25 reputation."
+			if not spend(5600): return "A starter rig costs ฿5,600."
+			s.rig = 88
+			return "The rig is installed. Watch the power bill and cooling."
+		"cool":
+			if s.rig == 0: return "Install the rig first."
+			if s.rig >= 100: return "Cooling is already at full condition."
+			if not spend(680): return "Maintenance costs ฿680."
+			s.rig = mini(100, int(s.rig) + 32)
+			return "Cooling serviced."
+		"mine_switch":
+			if s.rig == 0: return "Install the rig first."
+			s.contract = (int(s.contract) + 1) % 3
+			if s.contract == 2: s.rival = mini(100, int(s.rival) + 4)
+			return ["Power offline.","Independent mining enabled.","Lantern syndicate deal enabled."][s.contract]
+		"reserve":
+			if not spend(500): return "You need ฿500 in the till."
+			s.weekly.costs -= 500
+			s.reserve += 500
+			s.partner = mini(100, int(s.partner) + 1)
+			return "฿500 moved into reserve."
+		"draw":
+			if s.reserve <= 0: return "Reserve is empty."
+			var amount := mini(500, int(s.reserve))
+			s.reserve -= amount
+			s.cash += amount
+			return "฿%d released from reserve." % amount
+		"paper":
+			if not spend(330): return "Admin time costs ฿330."
+			s.license = mini(100, int(s.license) + 12)
+			s.visa = mini(100, int(s.visa) + 16)
+			s.heat = maxi(0, int(s.heat) - 4)
+			return "Anong and Dao check the folders."
+		"rival":
+			if not spend(420): return "The joint neighborhood night costs ฿420."
+			s.rival = maxi(0, int(s.rival) - 14)
+			s.trust = mini(100, int(s.trust) + 4)
+			return "Anton agrees to share festival dates."
+	return ""
+
+func start() -> String:
+	if s.phase != "plan":
+		return ""
+	var workers := 0
+	for staff in s.staff:
+		if staff.work and staff.hurt == 0: workers += 1
+	if workers == 0:
+		return "Put at least one available team member on the rota."
+	var event: Array = C.EVENTS[int(s.event)]
+	if not spend(event[1]):
+		return "The till can't cover the booking. Try regular service."
+	s.night = {"wave":0,"cash":-event[1],"demand":0,"capacity":0,"tour":0,"mine":100,"guests":0,
+		"event_live":s.event,"gross":0,"sold":0,"turned":0,"tours":0,"wages":0,"fees":0,"fight":0,"notes":[]}
+	if s.event > 0 and rng.randf() < (0.29 if s.weather >= 5 else 0.09):
+		if rng.randf() < 0.38:
+			s.night.event_live = 0
+			s.night.notes.append("%s cancelled · booking deposit lost" % event[0])
+		else:
+			s.night.notes.append("%s delayed · starts at the rush" % event[0])
+			s.night.delayed = true
+	s.phase = "incident"
+	s.card = _draw_card()
+	return ""
+
+func rest() -> void:
+	if s.phase != "plan": return
+	s.bookings.clear()
+	s.event = 0
+	s.night = {"cash":0,"event_live":0,"tour":0,"guests":0,"gross":0,"sold":0,
+		"turned":0,"tours":0,"wages":0,"fees":0,"mine":100,"rest":true,
+		"notes":["Closed for team recovery · utilities and paid leave still due"]}
+	_close()
+
+func _draw_card() -> int:
+	if s.night.wave == 0:
+		for i in C.STORY.size():
+			if C.STORY[i][0] == s.day: return 100 + i
+	if s.day == 6 and s.night.wave == 1: return 20
+	if s.day == 8 and s.night.wave == 1: return FIGHT_CARD
+	if s.day == 13 and s.night.wave == 1: return 42
+	var pool: Array[int] = []
+	var prefer_good := rng.randf() < (0.54 if s.safety > 60 else 0.41)
+	for id in C.GOOD.size() + C.BAD.size():
+		if (id < C.GOOD.size()) != prefer_good or id in s.seen: continue
+		if id == 8 or id == 24 or id == 34:
+			if s.bookings.is_empty(): continue
+		if id == 36 and (s.rig <= 0 or s.contract == 0): continue
+		if id == 38 and s.security != 2: continue
+		if id == FIGHT_CARD and (s.day < 8 or s.rival < 26 or rng.randf() > 0.35): continue
+		if id == 42 and s.weather < 5: continue
+		pool.append(id)
+	if pool.is_empty():
+		s.seen.clear()
+		return _draw_card()
+	return pool[rng.randi_range(0, pool.size() - 1)]
+
+func current_card() -> Array:
+	var id: int = s.card
+	if id >= 100: return C.STORY[id - 100].slice(1)
+	return C.GOOD[id] if id < C.GOOD.size() else C.BAD[id - C.GOOD.size()]
+
+func pick(index: int) -> String:
+	if s.phase != "incident": return ""
+	var card := current_card()
+	var offset := 2 + index * 2
+	if offset < 2 or offset + 1 >= card.size(): return ""
+	var effects: Dictionary = card[offset + 1]
+	if not _apply(effects):
+		return "The till can't cover that response."
+	s.night.notes.append("%s · %s" % [card[0], card[offset]])
+	if s.card < 100:
+		s.seen.append(s.card)
+		if s.seen.size() > 35: s.seen.pop_front()
+	if effects.has("fight"):
+		s.phase = "fight"
+	else:
+		_service()
+	return ""
+
+func _apply(effects: Dictionary) -> bool:
+	if s.cash + effects.get("cash",0) < 0 and effects.get("cash",0) < 0: return false
+	for key in effects:
+		var amount: int = effects[key]
+		match key:
+			"cash":
+				s.cash += amount
+				s.night.cash += amount
+				if amount < 0: s.weekly.costs -= amount
+				else: s.weekly.revenue += amount
+			"demand","capacity","tour","mine","fight":
+				s.night[key] += amount
+			"skill","morale","fatigue":
+				for staff in s.staff:
+					staff[key] = clampi(int(staff[key]) + amount, 0, 8 if key == "skill" else 100)
+			"stock":
+				s.stock = clampi(int(s.stock) + amount, 0, 105 + int(s.level) * 20)
+			"regulars":
+				s.regulars = clampi(int(s.regulars) + amount, 0, 45)
+			"debt","reserve":
+				s[key] = maxi(0, int(s[key]) + amount)
+			"security","food","exit","route":
+				s[key] = clampi(int(s[key]) + amount, 0, 2)
+			_:
+				s[key] = clampi(int(s[key]) + amount, 0, 100)
+	return true
+
+func fallback() -> void:
+	if s.phase != "incident": return
+	s.night.notes.append("%s · reduced service" % current_card()[0])
+	if s.card < 100:
+		s.seen.append(s.card)
+		if s.seen.size() > 35: s.seen.pop_front()
+	_apply({"capacity":-8,"rep":-2,"trust":-1})
+	_service()
+
+func finish_fight(won: bool) -> void:
+	if s.phase != "fight": return
+	if won: s.wins += 1
+	var repair := mini(maxi(0, int(s.cash)), 240 if won else 740)
+	_apply({"cash":-repair,"debt":(240 if won else 740)-repair,"capacity":-7 if won else -16,
+		"heat":6 if won else 12,"safety":-3 if won else -10,"rep":3 if won else -5,
+		"rival":-16 if won else 8,"condition":-3 if won else -9,"morale":2 if won else -8})
+	if not won:
+		s.staff[1].hurt = 3
+		s.staff[1].work = false
+		s.bookings.erase("1")
+	s.night.notes.append("Mali held the floor · repair bill filed" if won else "Mali needs paid recovery leave · room damaged")
+	_service()
+
+func _service() -> void:
+	var n: Dictionary = s.night
+	var wave: int = n.wave
+	var live_event: int = 0 if wave == 0 and n.get("delayed",false) else n.event_live
+	var event: Array = C.EVENTS[live_event]
+	var capacity := 0
+	var fatigue := 0
+	var on_duty := 0
+	for i in s.staff.size():
+		var staff: Dictionary = s.staff[i]
+		if not staff.work or staff.hurt > 0: continue
+		on_duty += 1
+		fatigue += staff.fatigue
+		var role_capacity := 11 + int(staff.skill) * 2 + int(staff.morale / 25.0) - int(staff.fatigue / 13.0)
+		if s.bookings.has(str(i)) and wave < C.ROUTES[int(s.bookings[str(i)])][2]: role_capacity /= 3
+		capacity += role_capacity
+	var seasonal := -7 if int(s.day) % 84 > 63 else 0
+	var demand := 23 + int(s.forecast) + int(s.rep / 10.0) + int(s.regulars / 3.0) + seasonal
+	demand += [0,6,4,11][int(s.promo)] + [0,2,7][int(s.hours)] + int(event[2]) + int(s.food) * 4
+	demand += [0,6,-5][wave] + int(n.demand) + rng.randi_range(-5,6) + (14 if s.venue == 2 else 0)
+	demand -= (8 if s.weather == 6 else 2 if s.weather == 5 else 0) + int(s.rival / 13.0)
+	var room := 39 + int(s.level) * 4 + (22 if s.venue == 2 else 0)
+	if event[3] > 0: room = maxi(room, event[3])
+	if live_event > 0 and s.security == 0: room -= 9
+	if s.condition < 30: room -= 13
+	if s.license < 30: room -= 10
+	room += int(n.capacity)
+	capacity += int(n.capacity)
+	var served := maxi(0, mini(mini(demand, room), mini(capacity, int(s.stock) * 2)))
+	var units := ceili(served / 2.0)
+	var refused := maxi(0, demand - served)
+	var price: int = [57,47,53,58][int(s.promo)] + int(s.food) * 12 + int(s.level) * 4
+	var revenue: int = served * price + (served * (10 if live_event == 1 else 9) if live_event > 0 else 0)
+	s.stock -= units
+	s.cash += revenue
+	n.gross += revenue
+	n.cash += revenue
+	n.sold += units
+	n.guests += served
+	n.turned += refused
+	s.weekly.revenue += revenue
+	var satisfaction := clampi(86 - refused * 2 - maxi(0, int(fatigue / float(maxi(1,on_duty))) - 45) + int(s.safety / 10.0), 0, 100)
+	s.rep = clampi(int(s.rep) + (2 if served > 12 and satisfaction >= 76 else -2 if satisfaction < 56 else 0), 0, 100)
+	n.notes.append("%s · %d served / %d missed · %d%% satisfaction" % [["Early","Peak","Last call"][wave],served,refused,satisfaction])
+	n.demand = 0
+	n.capacity = 0
+	n.wave += 1
+	if n.wave < (2 if s.hours == 0 else 3):
+		s.card = _draw_card()
+		s.phase = "incident"
+	else:
+		_close()
+
+func _bill(amount: int) -> void:
+	s.cash -= amount
+	s.night.cash -= amount
+	s.weekly.costs += amount
+
+func _close() -> void:
+	var n: Dictionary = s.night
+	var rest_night: bool = n.get("rest",false)
+	var wage := 0
+	var tour_net := int(n.tour)
+	for i in s.staff.size():
+		var staff: Dictionary = s.staff[i]
+		if (staff.work and not rest_night) or staff.hurt > 0:
+			wage += C.STAFF[int(staff.id)][4] + (100 if s.hours == 2 and staff.hurt == 0 else 0)
+		if staff.work and staff.hurt == 0 and not rest_night:
+			staff.fatigue = mini(100, int(staff.fatigue) + [2,6,12][int(s.hours)] + (4 if n.turned > 30 else 0))
+			staff.morale = clampi(int(staff.morale) + (2 if n.turned < 24 else -3) - (5 if staff.fatigue > 72 else 0),0,100)
+		else:
+			staff.fatigue = maxi(0, int(staff.fatigue) - 25)
+			staff.morale = mini(100, int(staff.morale) + 4)
+		if staff.hurt > 0: staff.hurt -= 1
+		if s.bookings.has(str(i)):
+			var route_id := int(s.bookings[str(i)])
+			var route: Array = C.ROUTES[route_id]
+			var pay := guide_pay(route_id)
+			wage += pay
+			var groups := clampi(3 + int(staff.guide / 2.0) + rng.randi_range(-2,1) - (2 if s.weather >= 5 else 0) - (1 if s.weather == 4 else 0),1,7)
+			var ticket := int(route[1]) + int(s.route) * 35
+			var chance := 7 + int(route[3]) + (20 if s.weather == 6 else 5 if s.weather >= 4 else 0) - int(staff.guide) * 2
+			if rng.randi_range(0,99) < chance:
+				groups = maxi(0, groups - 3)
+				n.notes.append("%s · disrupted, guide still paid" % route[0])
+			tour_net += groups * ticket
+			n.tours += groups
+			staff.fatigue = mini(100, int(staff.fatigue) + int(route[2]) * 6)
+			staff.morale = mini(100, int(staff.morale) + int(s.pay) * 2)
+	tour_net = maxi(0,tour_net)
+	s.cash += tour_net
+	n.cash += tour_net
+	s.weekly.revenue += tour_net
+	n.wages = wage
+	_bill(wage)
+	var security_fee: int = 0 if rest_night else [0,480,255][int(s.security)]
+	s.safety = clampi(int(s.safety) + [0,4,2][int(s.security)] - int(n.turned / 25.0),0,100)
+	s.heat = clampi(int(s.heat) + int(C.EVENTS[int(n.event_live)][4]) + (2 if s.hours == 2 else -2) + (3 if s.security == 2 else -1 if s.security == 1 else 0) - int(s.license / 45.0),0,100)
+	n.fees = security_fee + 380 + 260 * (int(s.venue) - 1)
+	_bill(n.fees)
+	if s.rig > 0 and s.contract > 0:
+		var output := maxi(0, int((int(s.market) * 9 + rng.randi_range(-170,220)) * int(s.rig) * maxi(0,int(n.mine)) / 10000.0))
+		var power := 560 + (150 if s.weather == 6 else 0)
+		if s.contract == 2:
+			output = int(output * 1.38)
+			power += 110
+			s.heat = mini(100, int(s.heat) + 4)
+			s.rival = mini(100, int(s.rival) + 3)
+		s.cash += output
+		n.cash += output
+		s.weekly.revenue += output
+		_bill(power)
+		s.rig = maxi(1, int(s.rig) - rng.randi_range(2,5))
+		n.notes.append("Rig output ฿%d · power ฿%d" % [output,power])
+	if not rest_night: s.condition = maxi(5, int(s.condition) - (2 if n.guests > 110 else 1))
+	s.license = maxi(0, int(s.license) - (2 if s.heat >= 65 else 0))
+	if s.heat >= 74 and rng.randf() < 0.45:
+		_bill(900)
+		n.notes.append("Surprise compliance visit · ฿900 fine")
+	s.rival = clampi(int(s.rival) + (2 if n.guests > 105 else -1),0,100)
+	s.weekly.guests += n.guests
+	s.weekly.tours += n.tours
+	s.weekly.nights += 1
+	s.total_guests += n.guests
+	if int(s.day) % 7 == 0:
+		var recurring := 2850 * int(s.venue) + 640 + mini(1200,int(s.debt))
+		s.debt = maxi(0, int(s.debt) - 1200)
+		_bill(recurring)
+		s.license = maxi(0, int(s.license) - 7)
+		s.visa = maxi(0, int(s.visa) - 9)
+		n.notes.append("Tuesday rent, permits and installments · ฿%d" % recurring)
+		if s.cash < 0 and s.reserve > 0:
+			var covered := mini(-int(s.cash),int(s.reserve))
+			s.reserve -= covered
+			s.cash += covered
+			n.notes.append("Reserve covered ฿%d" % covered)
+	if s.cash < 0:
+		s.debt -= s.cash
+		n.notes.append("Unpaid balance carried forward · ฿%d" % -int(s.cash))
+		s.cash = 0
+	if s.visa == 0:
+		_bill(450)
+		if s.cash < 0:
+			s.debt -= s.cash
+			s.cash = 0
+		n.notes.append("Paperwork lapsed · Dao covered the floor")
+	if int(s.day) % 7 == 0: s.last_week = s.weekly.duplicate()
+	s.report = n.notes.duplicate()
+	s.phase = "report"
+	if s.debt >= 11500: s.end = "The Final Notice"
+	elif s.day >= MAX_DAY:
+		if s.exit: s.end = "A Different Shore"
+		elif s.partner < 28: s.end = "The Empty Office"
+		elif s.venue == 2 or s.rig > 0: s.end = "The Neon Empire"
+		else: s.end = "The Neighborhood Institution"
+	log_message("Day %d · %+d net · %d guests" % [s.day,n.cash,n.guests])
+
+func next_day() -> void:
+	if s.phase != "report": return
+	if not s.end.is_empty():
+		s.phase = "end"
+		return
+	var reset := int(s.day) % 7 == 0
+	s.day += 1
+	if reset: _reset_week()
+	s.phase = "plan"
+	s.bookings.clear()
+	s.event = 0
+	s.card = -1
+	_forecast()
+
+func save_game() -> int:
+	s.rng = str(rng.state)
+	var temporary := SAVE + ".tmp"
+	var file := FileAccess.open(temporary, FileAccess.WRITE)
+	if file == null: return FileAccess.get_open_error()
+	file.store_string(JSON.stringify(s))
+	file.flush()
+	var error := file.get_error()
+	file.close()
+	if error != OK: return error
+	if FileAccess.file_exists(SAVE) and _read(SAVE) is Dictionary:
+		error = DirAccess.copy_absolute(SAVE, BACKUP)
+		if error != OK: return error
+	return DirAccess.rename_absolute(temporary,SAVE)
+
+func _read(path: String) -> Variant:
+	if not FileAccess.file_exists(path): return null
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
+	var parsed: Variant = json.data
+	if parsed is Dictionary and parsed.get("version") == 1 and parsed.has("staff") and parsed.has("phase"):
+		return parsed
+	return null
+
+func load_game() -> bool:
+	var parsed: Variant = _read(SAVE)
+	if parsed == null: parsed = _read(BACKUP)
+	if parsed == null: return false
+	s = _restore_numbers(parsed)
+	rng.state = int(str(s.rng))
+	return true
+
+
+func _restore_numbers(value: Variant) -> Variant:
+	# The save schema contains whole numbers, while JSON restores numbers as floats.
+	match typeof(value):
+		TYPE_FLOAT:
+			return int(value)
+		TYPE_ARRAY:
+			for i in value.size(): value[i] = _restore_numbers(value[i])
+		TYPE_DICTIONARY:
+			for key in value: value[key] = _restore_numbers(value[key])
+	return value
