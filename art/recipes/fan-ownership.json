@@ -1,0 +1,160 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-11-25",
+  "assets": [
+    {
+      "id": "fan-hidden-beer-1",
+      "edit_target": "assets/art/beer-1.png",
+      "prompt": "Use case: precise-object-edit. Edit target: the attached 960x540 pixel-art beer-bar room. Remove ONLY the circular wall-mounted electric fan centered at (502,122), including its bracket, small control box and hanging cable below it down to y=195. Reconstruct the reddish wooden wall and upper horizontal beam behind it, with matching existing pixel-art texture, lighting and vertical boards. Keep every other feature and its exact position unchanged, especially the shrine immediately to the right, poster below, ceiling wires and lamps. Preserve the original framing and 16:9 aspect ratio; no cropping, no new objects, no text. This is a production game background patch: exact alignment with the original matters.",
+      "crop": [
+        458,
+        78,
+        84,
+        122
+      ],
+      "mask_ellipse": [
+        4,
+        4,
+        82,
+        84
+      ],
+      "mask_mount": [
+        20,
+        70,
+        54,
+        121
+      ],
+      "mask_feather": 1.0
+    },
+    {
+      "id": "fan-hidden-beer-2",
+      "edit_target": "assets/art/beer-2.png",
+      "prompt": "Use case: precise-object-edit. Edit target: the attached 960x540 pixel-art beer-bar room. Remove ONLY the circular wall-mounted electric fan centered at (502,122), including its bracket, small control box and hanging cable below it down to y=195. Reconstruct the reddish wooden wall and upper horizontal beam behind it, with matching existing pixel-art texture, lighting and vertical boards. Keep every other feature and its exact position unchanged, especially the shrine immediately to the right, poster below, ceiling wires and lamps. Preserve the original framing and 16:9 aspect ratio; no cropping, no new objects, no text. This is a production game background patch: exact alignment with the original matters.",
+      "crop": [
+        458,
+        78,
+        84,
+        122
+      ],
+      "mask_ellipse": [
+        4,
+        4,
+        82,
+        84
+      ],
+      "mask_mount": [
+        20,
+        70,
+        54,
+        121
+      ],
+      "mask_feather": 1.0
+    },
+    {
+      "id": "fan-hidden-beer-3",
+      "edit_target": "assets/art/beer-3.png",
+      "prompt": "Use case: precise-object-edit. Edit target: the attached 960x540 pixel-art beer-bar room. Remove ONLY the circular wall-mounted electric fan centered at (502,122), including its bracket, small control box and hanging cable below it down to y=195. Reconstruct the reddish wooden wall and upper horizontal beam behind it, with matching existing pixel-art texture, lighting and vertical boards. Keep every other feature and its exact position unchanged, especially the shrine immediately to the right, poster below, ceiling wires and lamps. Preserve the original framing and 16:9 aspect ratio; no cropping, no new objects, no text. This is a production game background patch: exact alignment with the original matters.",
+      "crop": [
+        458,
+        78,
+        84,
+        122
+      ],
+      "mask_ellipse": [
+        4,
+        4,
+        82,
+        84
+      ],
+      "mask_mount": [
+        20,
+        70,
+        54,
+        121
+      ],
+      "mask_feather": 1.0
+    },
+    {
+      "id": "fan-hidden-gogo-1",
+      "edit_target": "assets/art/gogo-1.png",
+      "prompt": "Use case: precise-object-edit. Edit target: this 960x540 pixel-art gogo room. Remove ONLY the circular wall-mounted electric fan centered at (266,92), including its bracket, small control box and hanging cable below it down to y=154. Reconstruct the reddish wooden pillar and overhead beam behind it with matching pixel-art texture and neon lighting. Keep every other feature and exact position unchanged, including the lantern below, poster, stage truss, curtains, doorway and ceiling cables. Preserve original framing and 16:9 aspect ratio; no cropping, no new objects, no text. This is a production game background patch: exact alignment with the original matters.",
+      "crop": [
+        235,
+        60,
+        62,
+        96
+      ],
+      "mask_ellipse": [
+        3,
+        1,
+        60,
+        62
+      ],
+      "mask_mount": [
+        9,
+        53,
+        33,
+        96
+      ],
+      "mask_feather": 1.0
+    },
+    {
+      "id": "fan-hidden-gogo-2",
+      "edit_target": "assets/art/gogo-2.png",
+      "prompt": "Use case: precise-object-edit. Edit target: this 960x540 pixel-art gogo room. Remove ONLY the circular wall-mounted electric fan centered at (266,92), including its bracket, small control box and hanging cable below it down to y=154. Reconstruct the reddish wooden pillar and overhead beam behind it with matching pixel-art texture and neon lighting. Keep every other feature and exact position unchanged, including the lantern below, poster, stage truss, curtains, doorway and ceiling cables. Preserve original framing and 16:9 aspect ratio; no cropping, no new objects, no text. This is a production game background patch: exact alignment with the original matters.",
+      "crop": [
+        235,
+        60,
+        62,
+        96
+      ],
+      "mask_ellipse": [
+        3,
+        1,
+        60,
+        62
+      ],
+      "mask_mount": [
+        9,
+        53,
+        33,
+        96
+      ],
+      "mask_feather": 1.0
+    },
+    {
+      "id": "fan-hidden-gogo-3",
+      "edit_target": "assets/art/gogo-3.png",
+      "prompt": "Use case: precise-object-edit. Edit target: this 960x540 pixel-art gogo room. Remove ONLY the circular wall-mounted electric fan centered at (266,92), including its bracket, small control box and hanging cable below it down to y=154. Reconstruct the reddish wooden pillar and overhead beam behind it with matching pixel-art texture and neon lighting. Keep every other feature and exact position unchanged, including the lantern below, poster, stage truss, curtains, doorway and ceiling cables. Preserve original framing and 16:9 aspect ratio; no cropping, no new objects, no text. This is a production game background patch: exact alignment with the original matters.",
+      "crop": [
+        235,
+        60,
+        62,
+        96
+      ],
+      "mask_ellipse": [
+        3,
+        1,
+        60,
+        62
+      ],
+      "mask_mount": [
+        9,
+        53,
+        33,
+        96
+      ],
+      "mask_feather": 1.0
+    },
+    {
+      "id": "wall-fan",
+      "edit_target": "assets/art/beer-1.png",
+      "prompt": "Use case: background-extraction. Edit target: attached pixel-art bar room. Extract ONLY the bronze circular wall-mounted electric fan centered at original image coordinate (502,122), with its short mounting bracket and small switch box below. Output this single fan as an isolated production pixel-art prop on a genuinely transparent background. Preserve the original fan's pixel-art style, copper/bronze wire cage, frontal slightly angled perspective and warm pink highlights. Fan disc dominates the prop; retain a short bracket underneath. No wall, no ceiling wire, no room, no shadow rectangle, no text, no border. Center it with generous transparent padding, roughly square canvas.",
+      "transparent_background": true,
+      "output_size": [
+        56,
+        84
+      ]
+    }
+  ]
+}

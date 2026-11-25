@@ -4,6 +4,15 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## 25 November 2026 — Fans follow equipment ownership
+
+- Hide the wall fan until Fans & comfortable seats is purchased, in both the
+  room and property thumbnail. Installed fans stop spinning when closed.
+- Preserve the original room artwork, using small generated wall patches for
+  unowned fans and a transparent purchased fan for Soi venues.
+- Add purchase/save/renovation ownership checks, pixel-preservation checks and
+  before/after previews for every venue stage.
+
 ## 25 November 2026 — Street passerby variety
 
 - Replaced the repeating single-man street loop with three distinct existing

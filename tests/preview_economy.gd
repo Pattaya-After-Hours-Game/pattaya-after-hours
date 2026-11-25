@@ -46,6 +46,11 @@ func run() -> void:
 	await capture(app,"economy-opening")
 	app.model.s.cash = 250000
 	var first: Dictionary = app.model.street.selected()
+	app.drawer_open = false
+	await capture(app,"fan-before-purchase")
+	app.model.street.action("equipment",1)
+	await capture(app,"fan-after-purchase")
+	app.drawer_open = true
 	first.equipment.pool = 1
 	first.equipment.seating = 1
 	for guest in first.customers: guest.pool = true

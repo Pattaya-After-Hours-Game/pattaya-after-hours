@@ -28,6 +28,8 @@ Inside the scene, customers stand on the public side of the bar, bartenders
 work behind the counters, and gold dots above customers mark waiting orders.
 The smaller passerby in the left street opening is background traffic, not an
 extra customer. Messages sit above the room so the floor remains visible.
+Wall fans appear only after buying **Fans & comfortable seats**, including in
+the property thumbnail; renovation alone does not install them.
 
 Save for signage, seating, a bartender and a pool table. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
@@ -100,7 +102,7 @@ practice campaign and never overwrites your campaign.
 
 ## Project status
 
-The integrated build includes 61 runtime textures, twenty animation atlases with
+The integrated build includes 68 runtime textures, twenty animation atlases with
 136 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, art integrity, input and nine fresh-campaign pacing simulations
 passed during the completed-art integration. Linux startup and Android debug
