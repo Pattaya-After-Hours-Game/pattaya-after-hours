@@ -5,6 +5,7 @@ const Content = preload("res://scripts/content.gd")
 const City = preload("res://scripts/city.gd")
 const District = preload("res://scripts/district.gd")
 const Fight = preload("res://scripts/fight.gd")
+const WindowsUpdates = preload("res://scripts/windows_updates.gd")
 const TEAL = Color("#71f9d2")
 const PINK = Color("#ff80b2")
 const GOLD = Color("#ffd083")
@@ -59,8 +60,17 @@ var shot_delay := 0.0
 var godzilla_meter: ProgressBar
 var godzilla_meter_label: Label
 var godzilla_clock: Label
+var windows_updates: WindowsUpdates
+var update_button: Button
 
 func _ready() -> void:
+	if WindowsUpdates.is_worker():
+		WindowsUpdates.apply_update(get_tree())
+		return
+	if WindowsUpdates.supported():
+		windows_updates = WindowsUpdates.new()
+		add_child(windows_updates)
+		windows_updates.update_available.connect(_update_available)
 	var interface_font := FontVariation.new()
 	interface_font.base_font = ThemeDB.fallback_font
 	interface_font.fallbacks = [preload("res://assets/DejaVuSans.ttf")]
@@ -82,6 +92,14 @@ func _ready() -> void:
 	if not muted and DisplayServer.get_name() != "headless": music.play()
 	render()
 	if model.s.phase == "fight": enter_fight(false)
+	if windows_updates != null:
+		windows_updates.confirm_restart()
+		if DisplayServer.get_name() != "headless": windows_updates.check()
+
+func _update_available() -> void:
+	update_button.show()
+	if model.s.phase == "plan" and campaign_before_tutorial == null and not is_instance_valid(district):
+		windows_updates.ask()
 
 func box(fill: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -179,6 +197,11 @@ func render(keep_scroll: bool = false) -> void:
 	abs_text(root_ui,Rect2(17,7,360,26),"PATTAYA AFTER HOURS",24,WHITE)
 	var status: String = "%s · %s" % [model.weekday(),Content.WEATHER[int(model.s.weather)]]
 	abs_text(root_ui,Rect2(18,36,320,20),("PRACTICE SHIFT" if practicing else "THE BLUE HOUR")+"   /   "+status,13,GOLD if practicing else TEAL)
+	if windows_updates != null:
+		update_button = at_button(root_ui,Rect2(296,14,55,40),"Update",windows_updates.ask,true)
+		update_button.add_theme_font_size_override("font_size",12)
+		update_button.visible = not windows_updates.tag.is_empty()
+		update_button.disabled = model.s.phase == "godzilla"
 	metric(355,"TILL",cash(model.s.cash) if model.s.cash < 100000 else "฿%.1fk" % (model.s.cash / 1000.0),TEAL)
 	metric(465,"STOCK",str(int(model.s.stock)),GOLD)
 	metric(558,"REPUTATION",str(int(model.s.rep)),TEAL)

@@ -34,7 +34,7 @@ The game plays offline and autosaves after decisions, including during a shift. 
 
 - **Android.** Use the Obtainium button, or add `https://github.com/rknell/pattaya-after-hours` as the source in Obtainium. The signed APK supports Android 7.0 and later on ARM64 and x86-64. Package ID is `io.github.rknell.pattayaafterhours`.
 - **Linux x86-64.** Extract the ZIP and run `PattayaAfterHours.x86_64`.
-- **Windows x86-64.** Extract the ZIP and run `PattayaAfterHours.exe`. The executable is unsigned.
+- **Windows x86-64.** Right-click the ZIP, choose **Extract All**, then open `PattayaAfterHours.exe` in the new folder. Starting with v1.0.7, the game checks for updates when it opens. Choose **Update & restart** to install a new release. The executable is unsigned.
 - **macOS Intel and Apple Silicon.** Extract the ZIP and open the app. The build is ad-hoc signed and has no Apple notarization.
 
 APK signing certificate SHA-256
@@ -50,6 +50,6 @@ GODOT_BIN=/path/to/godot tools/test.sh
 GODOT_BIN=/path/to/godot tools/release.sh
 ```
 
-For a signed Android export, set `ANDROID_HOME`, `JAVA_HOME`, `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. Keep the same signing key and increase Android's `version/code` for each published update. The script writes packages and checksums to `dist/`.
+For a signed Android export, set `ANDROID_HOME`, `JAVA_HOME`, `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. Keep the same signing key and increase Android's `version/code` for each published update. Keep the version in `project.godot` and the export presets in sync with the release tag. Windows updates use the published ZIP and `SHA256SUMS.txt`. The script writes packages and checksums to `dist/`.
 
 The streets, businesses, characters, artwork, and arcade moves are original fictional content. The game and original assets are [MIT licensed](LICENSE). Godot and the bundled [DejaVu font](assets/DejaVu-LICENSE.txt) have their own notices.

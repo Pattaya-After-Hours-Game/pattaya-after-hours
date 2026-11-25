@@ -2,6 +2,7 @@ config_version=5
 
 [application]
 config/name="Pattaya After Hours"
+config/version="1.0.7"
 config/description="A neon nightlife management sim"
 run/main_scene="res://main.tscn"
 config/quit_on_go_back=false
