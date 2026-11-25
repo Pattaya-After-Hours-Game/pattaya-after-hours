@@ -43,21 +43,25 @@ claiming behaviour exists; update the relevant documentation when it changes.
   space and options; it does not automatically raise every drink's price.
   Local satisfaction, regulars and healthy operation matter alongside cash.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.
-  Bartender/host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped/offline
-  time. Training belongs to the person and survives expiry/rehire. Base bartender
+  Bartender contracts cost ฿1,200; host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped/offline
+  time. Switching a bartender to a specialist role charges the positive contract
+  price difference prorated to the remaining term, with a shift reserve; no refund
+  for switching back. Training belongs to the person and survives expiry/rehire. Base bartender
   service is one drink per 25 seconds, improving to 20/15 through training.
   Quiet trading still has costs. Preserve rotas, temporary closure and recovery
   instead of forcing idle-mode debt or an unrecoverable failure.
 - Nida uses one separate frontage slot: ฿1,200/ten days plus 10% of actual drink
   receipts, no hourly wage and no serving. Preserve existing visit/order commission
   commitments after rota/expiry and the saved fractional carry; exclude pool fees.
-  Welcome and promoter attraction never stack. Audience training is stage-gated,
+  Welcome and promoter attraction never stack. Faster Welcome only helps while
+  the promoter is off duty/expired; it does not speed Chat or boost her appeal. Audience training is stage-gated,
   separate from service training, and persists after rehire.
-- Buy stock in complete six-drink packs, requiring cash and room. Supplier
-  levels 1–5 cost ฿900/1,200/2,400/4,800/9,600 and price packs at
-  ฿84/72/60/48/36. Preserve inventory purchase costs; discounts never refund old stock. Supplier
+- Buy stock in complete packs requiring cash and room: six for ฿84 at supplier
+  levels 0/1, twelve for ฿144/120/96/72 at levels 2/3/4/5. Supplier upgrades
+  cost ฿900/1,200/2,400/4,800/9,600. Preserve inventory purchase costs; discounts never refund old stock. Supplier
   automation retains its next operating charge. Bo’s consignment remains the
-  recovery exception. Third beer-bar seating must hold twelve with pool and fans.
+  recovery exception. Each fridge tier earns +1 extra reputation per ten happy
+  departures, capped at 100, with no purchase/reload reward. Third beer-bar seating must hold twelve with pool and fans.
   Schema 7 preserves paid manager/supplier appointments as level 1 and grants no
   free music/auto-serve or higher levels. Manager income is an explicit exception
   to customer-based receipts: ฿10/20/40 per trading second at levels 1/2/3, with

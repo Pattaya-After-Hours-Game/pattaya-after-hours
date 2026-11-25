@@ -82,7 +82,7 @@ const CHAT_THRESHOLD = 10
 const EQUIPMENT = [
 	{"id":"sign", "name":"Better frontage", "cost":900, "max":1, "help":"More passersby consider entering; no extra service speed."},
 	{"id":"comfort", "name":"Fans & comfortable seats", "cost":900, "max":1, "help":"Guests stay longer and wait more patiently; uses one seat and adds ฿4/min overhead."},
-	{"id":"fridge", "name":"Better fridge", "cost":800, "max":2, "help":"Store 40 more drinks; it cannot create customers."},
+	{"id":"fridge", "name":"Better fridge", "cost":800, "max":2, "help":"Store 40 more drinks. Each fridge tier adds +1 reputation per ten satisfied visits: colder beer, happier regulars."},
 	{"id":"pool", "name":"Pool table", "cost":2000, "max":2, "help":"฿50 per 45-second game; replaces two seats. Beer bars only."},
 	{"id":"seating", "name":"Extra seating", "cost":400, "max":3, "help":"Two more seats. Beer bars gain a third compact layout, recovering up to three furniture places."},
 	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
@@ -115,6 +115,7 @@ const ORDER_SECONDS = 35
 const PATIENCE_SECONDS = 25
 const REGULAR_CHANCE = 20
 const STAFF_CONTRACT_COST = 4500
+const BARTENDER_CONTRACT_COST = 1200
 const STAFF_CONTRACT_DAYS = 10
 const STAFF_CONTRACT_MINUTES = STAFF_CONTRACT_DAYS * DAY_MINUTES
 const STAFF_SERVICE_SECONDS = [25,20,15] # One drink, per bartender; training stays with the person.

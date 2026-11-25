@@ -63,23 +63,23 @@ func run(test: SceneTree) -> void:
 	e = m.street.economy
 	m.street.action("restock")
 	m.street.action("restock")
-	test.check(b.supplier_level==2 and e.pack_price(b)==72,"Supplier level two reduces pack price from 84 to 72")
+	test.check(b.supplier_level==2 and e.pack_price(b)==144,"Supplier level two buys twelve drinks at 12 each for 144")
 	b.stage = 3
 	for i in 3: m.street.action("restock")
-	test.check(b.supplier_level==5 and e.pack_price(b)==36,"Each supplier level reduces cost, down to 36 per six-pack")
+	test.check(b.supplier_level==5 and e.pack_price(b)==72,"Each supplier level reduces cost, down to 72 per twelve-drink delivery")
 	var cash_before: int = m.s.cash
 	m.street.action("restock")
 	test.check(m.s.cash==cash_before,"Maxed supplier cannot charge repeatedly")
 	m.street.action("stock")
-	test.check(b.stock==24 and m.s.cash==cash_before-36,"Discounted restocking still buys a complete six-pack")
+	test.check(b.stock==30 and m.s.cash==cash_before-72,"Discounted restocking still buys a complete twelve-drink delivery")
 	for i in 18: test.check(Economy.consume_stock(b)==14,"Previously purchased drinks keep their old cost")
 	test.check(Economy.consume_stock(b)==6,"New discounted stock uses its actual purchase cost")
 	b.stock = 0
 	b.stock_lots.clear()
-	m.s.cash = 36
+	m.s.cash = 72
 	test.check(not e.restock(b,true) and b.stock==0,"Discounted supplier retains the operating reserve")
-	m.s.cash = 37
-	test.check(e.restock(b,true) and b.stock==6 and m.s.cash==1,"Supplier settlement uses the discounted atomic pack price")
+	m.s.cash = 73
+	test.check(e.restock(b,true) and b.stock==12 and m.s.cash==1,"Supplier settlement uses the discounted atomic pack price")
 	# Passive manager income is separate from real drinks and promotion results.
 	m = fresh()
 	b = m.street.selected()

@@ -220,3 +220,7 @@ system receives an engine-drawn playing/off indicator beneath the venue sign.
 The till gains a compact five-second net-trading readout; all amounts and
 automation states come from the shared model. Use the `automation-*` economy
 preview filter for controls, supplier/manager tiers, refills and closure.
+
+The `bulk-*` economy preview group checks bartender pricing, Nida's Welcome
+explanation, fridge reputation text and six-to-twelve delivery boundaries against
+the same production scene. It adds no textures or decorative customers.

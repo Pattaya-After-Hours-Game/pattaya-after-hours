@@ -16,7 +16,7 @@ func run(test: SceneTree) -> void:
 	m.street.action("hire",0)
 	m.s.street.pass_credit = -10000000
 	m.street.tick(60)
-	test.check(bar.sold==0 and m.s.cash<1000,"Idle staff incur payroll without minting sales")
+	test.check(bar.sold==0 and m.s.cash<7600,"Idle staff incur payroll without minting sales")
 	var paused_cash := int(m.s.cash)
 	m.street.action("open")
 	m.street.tick(60)

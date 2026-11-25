@@ -75,8 +75,8 @@ git status --short
 Set `GODOT_BIN` if the pinned editor is not the default `godot` command.
 The test script imports assets, then runs `tests/check.gd`, nine target campaigns plus six no-chat comparisons in
 `tests/economy_balance.gd`, and twelve feature/alternative campaigns in
-`tests/promoter_balance.gd`, plus twelve music/automation/supplier campaigns in
-`tests/automation_balance.gd` (39 total). It uses temporary
+`tests/promoter_balance.gd`, plus fifteen music/automation/supplier/early-hire campaigns in
+`tests/automation_balance.gd` (42 total). It uses temporary
 data and configuration directories, preserving your campaign and editor
 settings. Run this wrapper rather than running the test script directly:
 the tests deliberately create, corrupt, and remove test saves.

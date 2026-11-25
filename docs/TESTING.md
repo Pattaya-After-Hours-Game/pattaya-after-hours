@@ -3,7 +3,37 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current music/automation verification — 25 November 2026
+## Current affordable-staff and bulk-delivery verification — 25 November 2026
+
+Godot 4.7.2 `tools/test.sh` passed all regressions and **42 fresh campaigns**: the existing 39 routes plus three
+early-bartender routes that save for a contract before other equipment. Hiring
+policies use the actual ฿1,200 bartender price. The earliest active stage-three
+results move below three hours by less than a minute, so that lower-bound check
+now allows 179 minutes; other baseline bounds remain unchanged. This is an
+explicit consequence of the requested cheaper contracts, not a new waiting timer.
+The new first-hire route reaches a bartender in 4.2–4.7 minutes across three
+seeds, with no injected cash or offline earnings. Measured ranges are recorded in [ECONOMY.md](ECONOMY.md#balance-verification).
+
+`tests/bulk_stock_check.gd` covers six-to-twelve supplier terms, exact cash/space
+boundaries, automatic operating reserves, save/reload, fridge reputation only
+from happy departures and its cap, specialist reassignment fees, offline delivery
+size and repeat safety. A short offline claim protects its opening cash and can
+buy less stock than one long claim; the comparison checks no extra value is
+minted, rather than promising identical working capital across claim boundaries.
+Staff checks retain expiry, rehire, training and independent 25/20/15-second clocks.
+
+Eight `bulk-*` economy previews were rendered at 960 × 540 and 1280 × 720.
+Visual review covered all eight states across those resolutions:
+hiring, Nida’s Welcome explanation, fridge description, supplier terms, blocked
+cash/space and successful delivery. The graphics refresh is unchanged. Godot
+4.7.2 is the pinned engine; the wrapper isolates all test saves. Local Markdown
+links and `git diff --check` are checked before commit.
+
+Publication repeats the full suite and exports signed packages through the main
+release workflow. Android device play and Windows/macOS execution remain
+unverified; previews and successful exports do not substitute for device play.
+
+## Previous v1.0.15 music/automation verification — 25 November 2026
 
 Godot 4.7.2 `tools/test.sh` passed the shared-economy regressions and **39 fresh campaigns**:
 15 baseline/no-Chat runs, 12 promoter/alternative runs and 12 music/automation/

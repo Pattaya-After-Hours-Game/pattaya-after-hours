@@ -21,7 +21,8 @@ campaign using the original decision lessons; it does not spend your real till.
    Manual serving helps when staff are absent or cannot keep up. “Forecast automatic net” is
    not a prediction that you will earn nothing while actively serving.
 4. Restock before the fridge empties. **Buy 6 drinks** starts at ฿84 and requires room for all
-   six and the full price. Failed purchases change nothing. Stock costs money when delivered, while
+   six and the full price. Supplier level 2 changes this to **Buy 12 drinks for ฿144**:
+   cheaper per drink, but you need twelve free spaces and the entire bill. Failed purchases change nothing. Stock costs money when delivered, while
    wages and overhead accrue during open trading.
 5. Buy the improvement that addresses your current limit. Keep money for the
    next shift rather than spending the till down to zero.
@@ -173,7 +174,9 @@ is an estimate, not extra customers or income credited to you.
 
 ## Staff, management and growth
 
-Each bartender, host or dancer hire costs **฿4,500 for ten game days**, plus wages while on duty.
+Bartender contracts cost **฿1,200 for ten game days**, the same upfront as Nida.
+Hosts and dancers remain ฿4,500. All floor staff retain wages while on duty;
+bartenders do not take Nida’s drink commission.
 A base bartender serves one real drink order every **25 seconds** (2.4/min), so
 keep serving alongside them during rushes. **Train** on their individual card
 costs ฿800 for level 1 (20 seconds) and ฿1,600 for level 2 (15 seconds). Training
@@ -181,7 +184,7 @@ does not create customers and is retained across contracts and role changes.
 
 **Service → Team & Payroll** shows the remaining contract time. When it expires,
 the person stops working and stops drawing wages. Their card stays available;
-**Rehire** costs ฿4,500 for another ten days and keeps their training. Rehiring is
+**Rehire** costs ฿1,200 for bartenders (฿4,500 for hosts/dancers) for another ten days and keeps their training. Rehiring is
 manual, never an automatic charge. Existing saves retain their hires and apply
 previous venue-wide training to those people; new hires start untrained.
 
@@ -193,12 +196,15 @@ The manager appointment and supplier agreement remain permanent purchases.
 
 Adult hosts and dancers attract their audience and use the same contracts; they
 do not serve drinks. Use each person's rota to pause wages, not their contract.
-At Soi venues and gogos, role reassignment changes service and payroll.
+At Soi venues and gogos, role reassignment changes service and payroll. Switching
+a bartender to a host/dancer charges the contract-price difference for the
+remaining term, keeping training and requiring the next shift’s reserve. Switching
+back does not refund it.
 Hosts' preferences still apply, and only an actual customer request can produce
 a bar fine. An accepting host is unavailable for the remainder of the shift.
 
-Automatic deliveries are a paid supplier agreement. They buy one complete six-pack at your supplier price
-when stock is below six and orders are waiting, retaining the next operating
+Automatic deliveries are a paid supplier agreement. They buy one complete delivery at your supplier price
+when stock is below the delivery quantity and orders are waiting, retaining the next operating
 charge. They cannot buy a partial pack or fill an idle bar speculatively. A manager needs stage 2, an on-duty bartender, deliveries and eight healthy
 shifts, plus the hiring fee and operating reserve. Managers enable the offline
 estimate. Check the current prices and requirements in **Service**.
@@ -209,7 +215,7 @@ leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
 The combined active-play checks reach pool around 16–19 minutes, stage 2 around
-34–40 minutes and a second property around 135–147 minutes. After stage 2, the
+34–40 minutes and a second property around 127–138 minutes. After stage 2, the
 active policy improves pouring, trains staff and then saves for expansion.
 The first Soi lease is ฿16,000 plus opening reserves. These are
 simulation results for a particular investment strategy, not timers or promises
@@ -236,7 +242,7 @@ limited demand, stock, saved dirt, each venue's peak windows and costs. An unvia
 of consuming your starting cash. It does not advance the visible clock, cleaning,
 heat, raids, promotions, disasters or local milestones. **Journal** distinguishes
 time away from eligible trading time and reports the estimate and limiting factors.
-Owned stock is consumed; further six-packs must be funded by earnings from that
+Owned stock is consumed; further whole deliveries must be funded by earnings from that
 claim, never your opening cash. Manager income can fund that next pack;
 leaving stock in the fridge lets drink service begin sooner.
 Commission is included. Short claims retain fractional sales and costs, although
@@ -261,6 +267,9 @@ when you serve whenever ready. If service is already limiting sales, improve it
 before paying to attract a longer queue.
 
 Welcome reads **Nida is welcoming** while she works; you can still Serve and Chat.
+Faster Welcome does nothing extra during her shift. Buy it only if you want faster
+manual welcoming while she is off duty or out of contract. It does not improve
+her attraction or shorten Chat’s twenty-second recovery.
 Her rota stops new attraction, but commission committed to existing visits/orders
 still settles. Pool games and bar fines do not pay drink commission. The card
 shows commission paid and fractional carry; it is not another fee. At expiry,
@@ -285,7 +294,7 @@ from four seconds to two. Current refills finish normally. Welcome still caps
 at four seconds and Chat still takes twenty.
 
 Supplier upgrades cost ฿900/1,200/2,400/4,800/9,600 for levels 1–5. Packs then
-cost ฿84/72/60/48/36. Levels three/four need venue stage two; level five needs
+cost ฿84 for six, then ฿144/120/96/72 for twelve. Levels three/four need venue stage two; level five needs
 stage three. Discounts affect new stock, including manual purchases. Previously
 bought drinks keep their paid cost in profit reports.
 
@@ -321,3 +330,15 @@ first if you want to keep it. [Developer setup](../DEVELOPMENT.md) lists save pa
 The source branch and a published release may be different builds. Use the
 checkout containing the changes you want to play, and avoid running two versions
 against the same campaign at once.
+
+## Cold beer and bulk terms
+
+Each better fridge tier adds forty stock spaces and one extra reputation point
+per ten satisfied visits at that bar. With no upgrade that milestone earns +1;
+with fridge levels one/two it earns +2/+3, up to 100 reputation. Buying the fridge
+alone grants no reputation. Existing fridges benefit from future happy visits.
+
+Supplier levels 0/1 buy six drinks for ฿84. Levels 2/3/4/5 buy twelve for
+฿144/120/96/72. The button shows the current quantity and total bill. Eleven empty
+spaces or ฿143 cannot buy a level-two delivery. Auto-stock also keeps cash for
+the next operating charge; managed offline deliveries use their own earned funds.

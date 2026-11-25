@@ -23,7 +23,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("promoter-") or name_text.begins_with("automation-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -72,6 +72,24 @@ func run() -> void:
 	await capture(app,"actions-closed")
 	app.model = Campaign.new(72)
 
+	app.model.s.cash = 10000
+	await capture(app,"bulk-hiring","TEAM & PAYROLL")
+	app.model.street.action("hire",3)
+	await capture(app,"bulk-welcome","YOUR ACTION UPGRADES")
+	await capture(app,"bulk-fridge","Better fridge")
+	app.model.street.action("restock")
+	await capture(app,"bulk-level-one","SUPPLIER AGREEMENT")
+	app.model.street.action("restock")
+	app.model.street.selected().stock = 19
+	await capture(app,"bulk-no-space","Buy 12 drinks")
+	app.model.street.selected().stock = 18
+	app.model.s.cash = 143
+	await capture(app,"bulk-no-cash","Buy 12 drinks")
+	app.model.s.cash = 144
+	await capture(app,"bulk-ready","Buy 12 drinks")
+	app.model.street.action("stock")
+	await capture(app,"bulk-delivered","Buy 12 drinks")
+	app.model = Campaign.new(72)
 	app.model.s.cash = 50000
 	app.model.street.action("hire",0)
 	await capture(app,"staff-base","Train Bartender 1")

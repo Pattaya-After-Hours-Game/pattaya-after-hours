@@ -102,7 +102,7 @@ Local, tourist and nightlife groups choose among the venues and outside options.
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.
-A bartender contract is a larger investment at ฿4,500. Base service is one drink
+A bartender contract costs ฿1,200, matching Nida’s upfront fee without her commission. Base service is one drink
 per 25 real seconds (2.4/min); individual training costs ฿800 then ฿1,600 and
 reduces this to 20s (3/min) then 15s (4/min). Each bartender has a saved work timer;
 empty queues and stockouts cannot bank future service or generate sales. Manual
@@ -128,20 +128,26 @@ stage-one combination holds twelve. Stage two holds eighteen with one table and
 comfort, sixteen with two. Other venue types retain two seating upgrades.
 Purchases preserve the next shift's operating reserve and show actual capacity.
 
-`stock_offer` and `restock` settle exactly six drinks at the current supplier
-price (initially ฿84), never a partial pack or a full-fridge purchase. Manual
-buying needs six free spaces and the full pack price;
+`pack_quantity`, `stock_offer` and `restock` settle six drinks for ฿84 at supplier
+levels 0/1, then twelve drinks at level 2 and above (initially ฿144). Neither
+manual nor automatic delivery permits partial purchases. Manual buying needs
+room for the entire delivery and its full price;
 it shows cash afterward and the next operating charge. Supplier deliveries buy
-one pack below six stock when orders are pending, retaining the next one-second
+one pack below the current pack quantity when orders are pending, retaining the next one-second
 operating charge. Bo's six recovery drinks remain a consignment exception, paid
 once on sale in live or offline accounting. Fridge sizes and saved stock remain
-unchanged; a 70-unit fridge can have four unusable spaces for the next pack.
+unchanged; eleven spare spaces cannot accept a twelve-drink delivery. Each fridge
+tier also adds +1 to the base +1 reputation earned per ten satisfied departures
+at that venue, capped at 100 street reputation. Purchases grant no immediate
+reputation; already-owned fridges benefit on future milestones.
 
 Nida costs ฿1,200 for ten game days plus 10% of drink receipts, with no additional
 hourly wage. One frontage slot is separate from seats and floor staffing. While
 contracted/on duty, her attraction weight is +4.8; the model uses the greater of
 her bonus and owner Welcome, never their sum. Welcome is disabled while she
-works; Chat retains its existing social timer. She does not serve, stock, manage
+works; Chat retains its existing social timer. Welcome upgrades only benefit
+owner welcoming when Nida is off duty or expired. They do not boost her attraction
+or shorten Chat’s twenty seconds; the upgrade panel explains this. She does not serve, stock, manage
 or accept host requests. Closure and expiry remove her from the entrance.
 
 Stage two unlocks audience training for ฿800; stage three unlocks another tier
@@ -168,8 +174,8 @@ attraction into a service bottleneck can reduce net profit.
 
 ## Staff contracts and alerts
 
-Bartender, host and dancer contracts last 14,400 game minutes (ten days) and
-cost ฿4,500 per hire or rehire. Nida uses the separate ฿1,200 promoter contract. Remaining minutes are stored per person, alongside their training and
+Bartender, host and dancer contracts last 14,400 game minutes (ten days).
+Bartenders cost ฿1,200 per hire or rehire; hosts/dancers remain ฿4,500. Nida uses the separate ฿1,200 promoter contract. Remaining minutes are stored per person, alongside their training and
 service timer. Foreground clock ticks, skipped overnight minutes and the full
 offline gap consume time, including closed/off-duty periods. Only live simulation
 phases advance contracts in the foreground. Backward wall clocks never extend
@@ -179,7 +185,11 @@ Expiry switches the person off, clears their partial work and removes any host
 absence. Their stable roster slot, role and training remain. Expired staff cannot
 serve, attract, accept bar fines, draw wages or be reactivated through the rota.
 Rehire starts a fresh term and resets work progress without resetting training.
-Role changes retain training; service training only benefits bartenders. Training
+Role changes retain training and remaining term; service training only benefits
+bartenders. A switch to a more expensive role charges the positive contract-price
+difference × remaining minutes / 14,400, rounded up, and requires a full shift’s
+operating reserve afterward. Switching back grants no refund. This prevents
+cheap bartender contracts from bypassing host/dancer pricing. Training
 and rehire require the next shift's operating reserve. Rosters retain at most two
 floor workers per stage, plus one frontage promoter; rehire an expired slot
 rather than replacing its person. Promoters cannot be reassigned into cheaper
@@ -206,17 +216,17 @@ satisfaction or bypass stock/service. Already-running repeat timers stay intact.
 Forecast demand remains the conservative two-orders-per-visit capacity estimate;
 actual timing and losses determine whether music improves sales.
 
-| Supplier level | Incremental purchase | Unit / six-pack cost | Minimum venue stage |
-| --- | ---: | ---: | ---: |
-| 1 | ฿900 | ฿14 / ฿84 | 1 |
-| 2 | ฿1,200 | ฿12 / ฿72 | 1 |
-| 3 | ฿2,400 | ฿10 / ฿60 | 2 |
-| 4 | ฿4,800 | ฿8 / ฿48 | 2 |
-| 5 | ฿9,600 | ฿6 / ฿36 | 3 |
+| Supplier level | Incremental purchase | Drinks per delivery | Unit / delivery cost | Minimum venue stage |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | ฿900 | 6 | ฿14 / ฿84 | 1 |
+| 2 | ฿1,200 | 12 | ฿12 / ฿144 | 1 |
+| 3 | ฿2,400 | 12 | ฿10 / ฿120 | 2 |
+| 4 | ฿4,800 | 12 | ฿8 / ฿96 | 2 |
+| 5 | ฿9,600 | 12 | ฿6 / ฿72 | 3 |
 
 Level zero has no automated deliveries and the same ฿14 unit cost as level one.
 Discounts apply to both manual and automatic future packs; no retroactive refund.
-Automatic deliveries still require waiting orders, stock below six, space and
+Automatic deliveries still require waiting orders, stock below the current delivery quantity, space and
 cash for a complete pack plus the next operating charge. Supplier purchases
 preserve one shift's operating reserve. Old inventory migrates at ฿14 per unit.
 Consignment drinks retain Bo's original ฿14 repayment regardless of supplier tier.
@@ -283,7 +293,7 @@ The cash report separately records inventory purchases when paid.
 
 Milestones belong to the venue. Renovation also requires its fee and the next
 shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿50,000. New
-leases additionally require a float for a ฿4,500 contract, stock and existing street payroll.
+leases additionally require a float for a ฿1,200 bartender contract, stock and existing street payroll.
 The first Soi lease is ฿16,000: a cheaper entry from the retiring owner, balanced
 against its higher overhead. This leaves room for contracts, individual training
 and action upgrades without delaying the second property past the active target.
@@ -339,7 +349,7 @@ stop contributing service, attraction and payroll at the correct projected minut
 Consume contract time across the full absence, even beyond the eight-hour earning
 cap, and include expiry notices in the offline report. Never auto-renew contracts.
 Expected sales are bounded by shared demand, space, service and stock. Estimated
-sales consume owned stock; supplier purchases add complete six-packs at the
+sales consume owned stock; supplier purchases add complete six- or twelve-drink deliveries at the
 venue’s current supplier price.
 Only surplus generated within that claim funds packs: existing cash is protected,
 so an empty fridge needs newly generated manager income before an offline pack
@@ -358,7 +368,7 @@ prevent repeat rewards, including clock rollback.
 
 Run `tools/test.sh` with Godot 4.7.2. It uses temporary save directories and runs
 the regression suite, `tests/economy_balance.gd`, `tests/promoter_balance.gd` and
-`tests/automation_balance.gd`: 39 fresh campaigns in total.
+`tests/automation_balance.gd`: 42 fresh campaigns in total.
 
 The combined balance runner uses fresh campaigns with seeds 11, 72 and 291,
 without injected cash or offline income. Attentive players check ready actions
@@ -373,7 +383,7 @@ staff-first comparisons use no action upgrades; six additional campaigns disable
 Chat. Closed-hour cleaning and skipping use actual player actions. An existing
 staff order is allowed to finish while the owner's Serve button refills.
 
-The integration retains ฿4,500 contracts, 25/20/15-second staff service, ten-second
+The current tuning uses ฿1,200 bartender contracts, 25/20/15-second staff service, ten-second
 base owner actions and ฿900/1,400/2,800 action upgrade prices. Combining those
 investments required lowering the first Soi lease from ฿26,000 to ฿16,000.
 Existing money, properties and upgrades are never reset; no refunds are minted.
@@ -383,12 +393,13 @@ Existing money, properties and upgrades are never reset; no refunds are minted.
 | First useful purchase | 2–5 min | 2.5–4.4 min |
 | Pool table | 10–20 min | 15.9–18.5 min |
 | First stage 2 | 30–45 min | 33.6–36.8 min |
-| Second property | 90–150 min | 135.4–146.8 min |
-| First stage 3 | 180–300 min | 186.2–198.1 min |
+| Second property | 90–150 min | 127.2–137.1 min |
+| First stage 3 | 180–300 min | 179.1–189.3 min |
 
-Mostly-idle campaigns reach stage 3 in 258–268 minutes. No-chat manual-upgrade
-campaigns take 189–196 minutes; no-chat staff-first campaigns take 210–212 minutes.
-The six active target runs must satisfy every original window; the other nine
+Mostly-idle campaigns reach stage 3 in 230–239 minutes. No-chat manual-upgrade
+campaigns take 178–187 minutes; no-chat staff-first campaigns take 192–195 minutes.
+The six active target runs use the original windows with a one-minute allowance
+below the three-hour stage-3 lower bound for the explicitly cheaper contracts; the other nine
 must remain viable and complete within the ten-hour simulation limit. All target
 runs also check sales against orders and arrivals against shared street supply.
 This is a reproducible purchase policy, not a promise for every human
@@ -405,14 +416,14 @@ These optional investments are not forced into the baseline milestone windows:
 
 | Purchase route | Stage 2 | Second property | Stage 3 |
 | --- | ---: | ---: | ---: |
-| Promoter before renovation | 47.3–47.5 min | 152.4–156.3 min | 205.0–207.8 min |
-| Service first, promoter after renovation | 43.4–44.0 min | 146.7–152.2 min | 200.2–206.5 min |
-| Compact layout, no promoter | 38.7–42.2 min | 142.3–145.3 min | 193.6–196.2 min |
+| Promoter before renovation | 47.3–47.5 min | 138.0–142.9 min | 190.9–197.0 min |
+| Service first, promoter after renovation | 43.4–44.0 min | 137.3–143.8 min | 189.5–197.2 min |
+| Compact layout, no promoter | 38.7–42.2 min | 131.2–133.1 min | 181.9–183.4 min |
 
 The early promoter route buys pouring level two and compact seating before Nida,
 yet still delays renovation: automatic welcoming is a convenience with a real
-cost, not a compulsory profit upgrade. The original six active target runs still
-pass every original pacing window. Promoter contract/commission terms and shared traffic remain unchanged.
+cost, not a compulsory profit upgrade. The six active target runs retain the early milestone windows, with the
+one-minute stage-3 allowance described above. Promoter contract/commission terms and shared traffic remain unchanged.
 The new manager income is priced separately as described above. Dancer stage gates/retained skills and service separation
 have regression coverage, not a new full-gogo campaign balancing claim.
 
@@ -422,17 +433,24 @@ stop pressing Serve once it is purchased; they still pay for every upgrade.
 
 | Route | Stage 2 | Second property | Stage 3 |
 | --- | ---: | ---: | ---: |
-| Music first | 41.2–42.5 min | 143.8–148.1 min | 195.9–200.4 min |
-| Auto-serve and two-second pouring | 35.5–36.3 min | 168.0–171.7 min | 223.2–228.8 min |
-| Supplier first | 35.5–36.3 min | 142.6–153.2 min | 193.7–203.6 min |
-| Automation bundle | 41.2–42.5 min | 172.6–178.7 min | 226.1–231.9 min |
+| Music first | 41.2–42.5 min | 133.8–137.5 min | 185.8–188.9 min |
+| Auto-serve and two-second pouring | 35.5–36.3 min | 154.2–163.2 min | 207.6–216.9 min |
+| Supplier first | 35.5–36.3 min | 135.0–137.5 min | 185.7–188.5 min |
+| Automation bundle | 41.2–42.5 min | 163.4–168.1 min | 213.7–219.2 min |
 
 Optional convenience spending delays expansion; it is not required for the
 baseline targets. All strategies remain solvent and respect orders/shared demand.
 The initial ฿24,000 manager price delayed baseline expansion beyond 150 minutes;
-฿18,000 preserves every original active window without raising drink prices or
+฿18,000 keeps active expansion inside the target range without raising drink prices or
 inventing customer sales. Larger manager tiers have settlement/gate coverage,
 not a claim of fully balanced post-stage-three play.
+
+Three further campaigns save for a bartender before other investments. The first
+hire is affordable at **4.2–4.7 minutes**; pool follows at 23.1–24.1 minutes,
+stage 2 at 55.5–57.8, the second property at 138.9–142.0 and stage 3 at
+190.1–193.4. Early wages and delayed owner upgrades make this a convenience
+choice, not a guaranteed acceleration of every milestone. All three remain
+solvent and respect demand; the first-hire acceptance ceiling is ten minutes.
 
 The graphical preview harness renders the opening, pool, free-pool report,
 recovery, all nine venue stages and festival states. It consumes the current

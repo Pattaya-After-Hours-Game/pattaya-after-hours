@@ -1,21 +1,22 @@
 # Current implementation and release handoff
 
-Updated **25 November 2026**. The music/automation work is on
-**`codex/music-and-automation`**, based on `e20864d` (published v1.0.14).
-The previous seating/Nida/TV changes are already on main; their handoff is no
-longer a pending integration. Other worktrees and user attachments are preserved.
+Updated **25 November 2026**. Affordable bartenders, cold-beer reputation and
+bulk deliveries are on **`codex/early-staff-and-bulk-stock`**, based on main
+`1dc96ff` (published v1.0.15). Music/automation and the prior seating/Nida/TV work
+are already integrated. Other worktrees and user attachments are preserved.
 
-This slice implements the user's music add-on, reversed Nida facing, purchased
-auto-serve with a shared cooldown, two-second pouring, manager income tiers,
-supplier discounts and a five-second net-trading readout. Manager income is
-confirmed by the user as extra income while open, with a higher purchase price;
-it is kept separate from actual sales.
+Bartender hire/rehire now costs ฿1,200; specialist roles retain ฿4,500 contracts
+with a prorated adjustment when reassigned from service. Staff training, wages
+and timers remain intact. Fridge tiers earn extra reputation per ten satisfied
+visits. Supplier level 2 switches manual/automatic/offline delivery to twelve
+units for ฿144; higher levels keep twelve and lower the bill. The UI explains
+why faster Welcome only helps while Nida is off duty or expired.
 
-Schema 7 retains paid supplier/manager appointments as level one, old inventory
-costs, timers and ownership. It grants no unpurchased auto-serve/music. Assets
-remain 72 textures/22 atlases/149 frames; scene facing and indicators use Godot.
+Save schema remains 7. Existing cash, contract terms, equipment, stock quantities
+and paid inventory costs remain; there are no refunds or instant reputation
+bonuses. Assets remain 72 textures/22 atlases/149 frames.
 
-`tools/test.sh` covers regressions and 39 fresh campaigns. The [testing record](TESTING.md)
+`tools/test.sh` covers regressions and 42 fresh campaigns. The [testing record](TESTING.md)
 and [economy evidence](ECONOMY.md#balance-verification) record the outcome and
 limits. Publication is the signed main-branch release workflow; check its run
 and [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
@@ -65,7 +66,7 @@ feedback and maintainer review remain outstanding verification, not running chat
 - Keep schema 5 and fractional owner-action timers. Staff work uses independent
   saved timers. Contracts consume skipped/offline time; owner-action cooldowns
   do not. The paused menu consumes neither and claims offline time only on Resume.
-- Keep ฿4,500 contracts and 25/20/15-second bartender service. For the combined
+- Keep ฿1,200 bartender / ฿4,500 host/dancer contracts and 25/20/15-second bartender service. For the combined
   investment curve, lower the Soi starter lease to ฿16,000. Existing owned assets
   and cash are preserved; no refund or migration reward is created.
 - Preserve both test suites, including a bartender completing work during the

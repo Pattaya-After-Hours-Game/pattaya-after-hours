@@ -188,7 +188,7 @@ func run(test: SceneTree) -> void:
 	whole.street.claim_offline(1700)
 	var report: Dictionary = whole.s.street.offline_report
 	test.check(whole.s.cash>=initial_cash and report.net==report.income-report.costs and bar.stock>=0 and bar.stock<6,"Offline pack purchases preserve cash and reconcile the projected ledger")
-	test.check(str(report.notes).contains("six-packs") and bar.commission_paid>0,"Offline report discloses packs and settled commission")
+	test.check(str(report.notes).contains("deliveries of 6") and bar.commission_paid>0,"Offline report discloses packs and settled commission")
 	whole = offline_model()
 	split = offline_model()
 	whole.street.selected().consignment = 6

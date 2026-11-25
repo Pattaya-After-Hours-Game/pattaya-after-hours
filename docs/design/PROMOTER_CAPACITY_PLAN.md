@@ -1,5 +1,9 @@
 # More room, six-packs and a face out front
 
+> Historical implementation plan. Later tuning makes bartender contracts ฿1,200
+> and supplier levels 2+ deliver twelve units. See [current economy rules](../ECONOMY.md)
+> for authoritative quantities, prices and fridge reputation.
+
 **Status: implemented in `codex/promoter-implementation`, including schema-six
 migration and production artwork. The design below retains its original
 analytical examples; current rules and measured campaign outcomes are in

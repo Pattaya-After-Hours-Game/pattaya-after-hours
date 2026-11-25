@@ -13,9 +13,9 @@ func run(test: SceneTree) -> void:
 	var eco = m.street.economy
 	m.street.action("hire",0)
 	var person: Dictionary = bar.team[0]
-	test.check(m.s.cash==195500 and person.contract_left==14400,"A ten-day contract costs exactly 4,500 once")
+	test.check(m.s.cash==198800 and person.contract_left==14400,"A ten-day contract costs exactly 1,200 once")
 	m.street.action("rehire",0)
-	test.check(m.s.cash==195500,"An active contract cannot be bought twice")
+	test.check(m.s.cash==198800,"An active contract cannot be bought twice")
 	bar.customers.clear()
 	m.s.street.pass_credit = -10000000
 	eco.admit(bar,false,true)
@@ -55,7 +55,7 @@ func run(test: SceneTree) -> void:
 	test.check(not person.on,"Rota cannot reactivate an expired contract")
 	cash_before = m.s.cash
 	m.street.action("rehire",0)
-	test.check(m.s.cash==cash_before-4500 and bar.team.size()==2 and person.training==2 and person.on and person.contract_left==14400,"Rehire keeps identity, training and a fresh ten-day contract")
+	test.check(m.s.cash==cash_before-1200 and bar.team.size()==2 and person.training==2 and person.on and person.contract_left==14400,"Rehire keeps identity, training and a fresh ten-day contract")
 	person.contract_left = 650
 	m.s.street.minute = 60
 	m.street.action("skip")

@@ -57,8 +57,10 @@ budget or behaviour. A better bar changes in visible ways: buying fans installs
 fans, and buying a sports screen gives the regulars a match to argue over.
 Renovating alone does not give away the equipment; fitted beer-bar screens
 stay dark until the sports upgrade is bought. Compact benches make room for
-twelve people without losing the pool table or fans. Bo now sells whole six-packs;
-“almost enough room in the fridge” is not a delivery agreement.
+twelve people without losing the pool table or fans. Bo starts with six-packs, then offers twelve-drink deliveries at a cheaper unit
+price. “Almost enough room in the fridge” is still not a delivery agreement.
+Better refrigeration earns its reputation through satisfied visits: colder beer
+gives the regulars something good to tell their friends.
 
 Nida, 28, is the adult promoter at the entrance: friendly, practical and fond of
 music nights. She welcomes passersby while the owner pours. Her ten-day contract
@@ -73,7 +75,10 @@ brings the next round forward; the bartender still has to pour it. Auto-serve
 buys the owner relief from constant tapping, not extra time on the clock.
 Dao’s management tiers bring predictable income while the venue trades, alongside
 the ordinary customers’ tabs. Better supplier agreements make future deliveries
-cheaper; Bo does not refund yesterday’s fridge.
+cheaper; Bo does not refund yesterday’s fridge. The first bartender now costs
+the same upfront as Nida, making a colleague within reach sooner. They still need
+wages and a full queue to be useful. Nida handles the doorway while on duty;
+practising the owner’s welcome only helps when she takes time off.
 
 This is her playable role, not a new scripted quest. She leaves her post when
 off duty or out of contract, and keeps her training if she returns.

@@ -93,6 +93,7 @@ func run() -> void:
 	load("res://tests/staff_check.gd").new().run(self)
 	load("res://tests/promoter_check.gd").new().run(self)
 	load("res://tests/automation_check.gd").new().run(self)
+	load("res://tests/bulk_stock_check.gd").new().run(self)
 	test_risk()
 	test_windows_updates()
 	load("res://tests/boot_menu_check.gd").new().run(self)
@@ -119,7 +120,7 @@ func test_ui() -> void:
 	use_button(app,"Serve a drink")
 	check(app.model.s.street.served == 1 and app.model.s.cash > opening_cash,"Main clicker button serves and earns")
 	app.model.s.cash = 50000
-	use_button(app,"Hire bartender · ฿4,500")
+	use_button(app,"Hire bartender · ฿1,200")
 	app.model.street.tick(25)
 	check(app.model.s.street.served == 2,"Hired staff serve without tapping")
 	app.model.street.announce(3)
@@ -134,7 +135,7 @@ func test_ui() -> void:
 	check(app.model.street.selected().team[0].training==1,"Individual training control works")
 	app.model.street.economy.advance_contracts(14400)
 	app.render()
-	use_button(app,"Rehire Bartender 1 · ฿4,500")
+	use_button(app,"Rehire Bartender 1 · ฿1,200")
 	check(app.model.street.selected().team[0].training==1 and app.model.street.selected().team[0].on,"Rehire control retains training")
 	for i in 5:
 		app.change_tab(i)

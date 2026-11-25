@@ -9,7 +9,7 @@ Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build th
 This source includes the full customer cast, New Game / Resume, the day/night
 clock, owner cooldowns/Chat and retained staff training. Recent updates add music, auto-serve, two-second pouring, supplier discounts,
 manager income and a five-second ฿/s display, alongside
-a twelve-person compact beer-bar layout, six-pack deliveries and Nida, an adult
+a twelve-person compact beer-bar layout, whole-pack deliveries and Nida, an adult
 promoter who works outside the entrance. Purchased TVs appear on the wall and
 waiting-order dots turn red as patience runs out. Source and release downloads
 are tracked separately; the download links above select the latest published build.
@@ -47,9 +47,11 @@ the property thumbnail; renovation alone does not install them.
 Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.
 Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
-Buy stock in complete **six-drink packs, starting at ฿84**. You need room for all six and
-enough cash; the button explains any shortfall. Supplier automation uses the
-same pack size; supplier levels 2–5 reduce pack prices to ฿72/60/48/36. Stage-1 beer bars can buy a third seating level, **Compact layout
+Stock starts in **six-drink packs for ฿84**. Supplier level 2 switches both manual
+and automatic deliveries to **twelve drinks for ฿144** (฿12 each). Levels 3–5
+keep twelve-drink deliveries and lower the bill to ฿120/96/72. Every purchase
+needs room and cash for the whole delivery; the button explains any shortfall.
+Each fridge tier adds +1 reputation per ten satisfied visits, on top of the base +1. Stage-1 beer bars can buy a third seating level, **Compact layout
 for ฿1,200**, reaching twelve customers even with pool and fans installed.
 
 Save for signage, seating and a pool table, then invest in staff contracts. Pool is available at
@@ -58,8 +60,9 @@ Night attracts visitors but gives up pool fees; Happy Hour, Pool Tournament and
 Sports Night have their own costs and trade-offs. Promotions last two minutes,
 then have a two-minute cooldown.
 
-Bartenders serve orders; hosts and dancers attract visitors. Their hiring or rehiring
-costs **฿4,500 for ten game days**, plus on-duty wages. A base bartender serves
+Bartenders serve orders; hosts and dancers attract visitors. Bartender hiring or rehiring
+costs **฿1,200 for ten game days**, matching Nida’s upfront price; hosts and dancers
+remain ฿4,500. Floor staff retain on-duty wages, and bartenders have no drink commission. A base bartender serves
 one drink every **25 seconds**; individual training improves this to 20 and then
 15 seconds. Help serve during a rush. Contracts expire, but each person's training
 stays with them when rehired. Service shows the remaining term and rehire controls.
@@ -88,7 +91,7 @@ cash for the next shift—not just a large bank balance.
 | Auto-serve | ฿6,000 per venue; automatically uses the existing Serve timer. Manual taps share it. Toggle it in Service. |
 | Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
 | Manager levels 1 / 2 / 3 | ฿18,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
-| Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; six-pack prices ฿84 / ฿72 / ฿60 / ฿48 / ฿36. |
+| Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; delivery prices ฿84 for 6, then ฿144 / ฿120 / ฿96 / ฿72 for 12. |
 
 Manager income is separate from drink/pool receipts, uses no stock and pays no
 drink commission. It stops on closure and does not grant satisfied customers.
@@ -206,8 +209,8 @@ The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
 are checked together with thirty-nine fresh-campaign simulations. Baseline active
-runs reach stage 2 in 34–37 minutes, a second venue in 135–147 minutes and stage 3
-in 186–199 minutes. Optional promoter-first investment takes longer to repay;
+runs reach stage 2 in 34–37 minutes, a second venue in 127–138 minutes and stage 3
+in 179–190 minutes. Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
@@ -240,7 +243,7 @@ The streets, businesses, characters, artwork, and arcade moves are original fict
 
 This update adds ten-day staff contracts, individual training that survives
 rehiring, measured 25/20/15-second service, and a waiting-order bell. Hiring and
-rehiring use the agreed ฿4,500 fee; the first Soi lease is ฿16,000 to accommodate
+rehiring now cost ฿1,200 for bartenders (hosts/dancers remain ฿4,500); the first Soi lease is ฿16,000 to accommodate
 the new hiring reserve and training costs. Existing hires and training migrate,
 and offline projections stop crediting staff service at contract expiry. See the
 [player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).
@@ -252,3 +255,16 @@ economy, including guided shifts, save migration and managed estimates. Her four
 production poses and portrait join the existing art; compact benches visibly mark
 the third seating purchase. This update also brings the earlier TV installation
 and urgent-order marker fixes into the same release branch.
+
+## Easier first hire, colder beer and bulk buying
+
+Bartender contracts now match Nida’s ฿1,200 upfront price, including renewals.
+Saving for the bartender first reaches the hire in 4.2–4.7 minutes in three fresh
+campaign tests. Existing training and contract time are preserved. Fridges earn extra reputation
+through satisfied visits. Supplier level 2 buys twelve drinks at a cheaper unit
+price, requiring all twelve spaces and the full ฿144 bill. Higher levels retain
+the twelve-unit minimum. Saved inventory keeps its original paid cost.
+
+Once Nida is on duty, faster Welcome offers no extra attraction. Those upgrades
+only help when she is off duty or out of contract; Chat still recovers in twenty
+seconds. Service now explains this beside the upgrade.
