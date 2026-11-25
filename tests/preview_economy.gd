@@ -23,7 +23,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -72,6 +72,38 @@ func run() -> void:
 	await capture(app,"actions-closed")
 	app.model = Campaign.new(72)
 
+	app.model.s.day = 6
+	app.drawer_open = false
+	await capture(app,"party-tomorrow-scene")
+	app.tab = 1
+	app.drawer_open = true
+	await capture(app,"party-countdown")
+	app.model.s.day = 7
+	app.model.s.cash = 10000
+	app.model.street.action("equipment",2)
+	app.model.street.action("equipment",8)
+	app.model.street.action("hire",0)
+	app.model.street.celebration_tick()
+	app.drawer_open = false
+	await capture(app,"party-live-scene")
+	app.drawer_open = true
+	await capture(app,"party-live-panel")
+	for second in 180:
+		app.model.street.action("serve")
+		if app.model.street.selected().stock<12: app.model.street.action("stock")
+		app.model.street.tick(1)
+	await capture(app,"party-trading","PARTY TRADING")
+	app.model.s.day = 8
+	app.model.s.street.minute = 60
+	app.model.street.celebration_tick()
+	app.model.street.reconcile_closures()
+	await capture(app,"party-finished","PARTY TRADING")
+	app.model.s.day = 14
+	app.model.s.street.minute = 720
+	app.model.street.celebration_tick()
+	await capture(app,"party-next-week")
+	app.model = Campaign.new(72)
+	app.tab = 0
 	app.model.s.cash = 10000
 	await capture(app,"bulk-hiring","TEAM & PAYROLL")
 	app.model.street.action("hire",3)

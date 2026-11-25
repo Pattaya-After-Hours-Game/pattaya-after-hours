@@ -4,6 +4,30 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Source update — A reason to reach day seven
+
+- Added Anong's free day-seven birthday opening, with a two-day reminder,
+  countdown, temporary room bunting and actual trading report.
+- Added bounded extra shared traffic, stronger host appeal, third drinks within
+  customer budgets, faster repeat timing and a little extra visitor patience.
+- Weekly regulars' reunions, Pim's mixtape parties and Bo's thank-you nights
+  follow. No real-world login requirement, cash claim or offline party bonus.
+- Clarified reputation: it helps attract visitors; it does not increase budgets
+  or repeat frequency. Music remains useful during parties.
+- Schema eight retains party accounting and guest patience without removing
+  existing progress. Added lifecycle/migration/boot-menu tests, 60 paired party
+  scenarios, visual previews and updated story/design/player/agent documentation.
+
+## v1.0.16 source — Affordable help and bulk terms
+
+- Bartender hire/rehire now costs ฿1,200 for ten days, retaining wages, training
+  and service timing. Hosts/dancers stay ฿4,500, with prorated role adjustments.
+- Each fridge tier adds +1 reputation per ten satisfied visits, capped at 100.
+- Supplier level two switches to twelve drinks for ฿144; later levels buy twelve
+  for ฿120/96/72, requiring full cash and space. Old stock retains its paid cost.
+- Explained Welcome upgrades while Nida is working. Added three first-hire
+  campaign comparisons and atomic stock, offline, reputation and renewal tests.
+
 ## Source update — Music and automation
 
 - Music costs ฿1,200 and reduces repeat-order time from 35 to 25 seconds.

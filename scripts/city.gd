@@ -11,6 +11,7 @@ var clock := 0.0
 var street_state: Dictionary = {}
 var arrival_time := 0.0
 var night := false
+var celebrating := false
 var godzilla := ""
 var shot_flash := 0.0
 var weather := 0
@@ -44,6 +45,7 @@ func _draw() -> void:
 	var stage := int(bar.stage)
 	var backdrop := Art.venue(kind,stage,fan_owned(bar),screen_owned(bar))
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
+	if celebrating: _draw_celebration()
 	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
 	# Only the street opening contains ambient traffic. Interior sprites come
 	# from the actual customers and available team, sorted by their floor depth.
@@ -129,6 +131,15 @@ func _draw() -> void:
 		var state := 3 if godzilla == "asleep" else 2 if shot_flash > .1 else 1 if arrival_time > 1.0 else int(arrival_time*4)%2
 		Art.frame(self,"monster",state,Vector2(400-maxf(0,1-arrival_time)*500,460),1.2,false,Vector2(320,320),Color.WHITE,Vector2(1,1+.012*sin(clock*(1.5 if state==3 else 3))))
 		if shot_flash > .1: draw_circle(Vector2(445,255),9*shot_flash,Color(1,.8,.3,shot_flash*.6))
+
+func _draw_celebration() -> void:
+	# Temporary bunting, with no decorative customers or replacement room plate.
+	for i in 12:
+		var x := 240.0+i*52.0
+		var y := 12.0+sin(float(i)/11.0*PI)*12.0
+		var end := Vector2(x+52,12.0+sin(float(i+1)/11.0*PI)*12.0)
+		draw_line(Vector2(x,y),end,GOLD,1.5)
+		draw_colored_polygon(PackedVector2Array([Vector2(x+7,y+2),Vector2(x+37,y+4),Vector2(x+22,y+18)]),[PINK,TEAL,GOLD][i%3])
 
 func _draw_compact_layout() -> void:
 	# Fitted wall benches leave the pool aisle clear; actual guests draw above.

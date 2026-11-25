@@ -22,14 +22,14 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Affordable bartenders, cold-beer reputation and bulk deliveries |
-| Status | Verified locally; ready for main release after v1.0.15 |
+| Active feature | Day-seven birthday and weekly neighbourhood celebrations |
+| Status | Verified locally; ready for main release after v1.0.16 |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Maintainer and invited device testers; not yet assigned |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/early-staff-and-bulk-stock`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Bartender pricing, fridge reputation, twelve-unit supplier packs, controls, tests and docs |
-| Next handoff / blocker | 42 campaigns and UI previews passed; signed release workflow and device playtesting remain |
+| Working branch / chat / PR | `codex/week-seven-celebrations`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Calendar anticipation, bounded party demand, real trading reports, story, tests and docs |
+| Next handoff / blocker | 42 campaigns, 60 paired party scenarios and previews passed; signed release and device feedback remain |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-25 |
 

@@ -6,6 +6,7 @@ var s: Dictionary
 func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
 	var st: Dictionary = s.street
+	st.merge({"celebration":{"day":0,"report":{},"last_report":{}}})
 	st.merge({"earnings_seconds":0,"earnings_net":0,"net_per_second":0.0})
 	if not st.has("economy_seed"): st.economy_seed = 1
 	if not st.has("next_group"): st.next_group = 1
@@ -111,7 +112,7 @@ static func action_fields() -> Dictionary:
 	return {"action_levels":{"pouring":0,"welcoming":0},"serve_duration":10.0,"welcome_duration":10.0}
 
 static func customer_action_fields() -> Dictionary:
-	return {"chatted":false,"chat_until":0.0,"commission_visit":false,"commission_order":false}
+	return {"party_patience":0,"chatted":false,"chat_until":0.0,"commission_visit":false,"commission_order":false}
 
 static func new_fields() -> Dictionary:
 	var fields := {"customers":[],"team":[],"equipment":{"sign":0,"comfort":0,"fridge":0,"pool":0,"seating":0,"screen":0,"training":0,"menu":0,"music":0},
@@ -328,6 +329,35 @@ func price(bar: Dictionary, premium: bool = false) -> int:
 	if bar.promo.get("kind",-1) == 1: amount = int(amount*.8)
 	return amount
 
+# The opening's date owns the party through midnight, ending at normal 1am close.
+func trading_day() -> int:
+	return int(s.day)-(1 if int(s.street.minute)<C.OPEN_MINUTE else 0)
+
+func celebration_window() -> bool:
+	return trading_day()>0 and trading_day()%C.CELEBRATION_INTERVAL==0 and (s.street.minute>=C.OPEN_MINUTE or s.street.minute<C.CLOSE_MINUTE)
+
+func celebrating(bar: Dictionary, offline: bool = false) -> bool:
+	return not offline and celebration_window() and int(s.street.celebration.day)==trading_day() and not s.street.celebration.report.is_empty() and bar.name==s.street.bars[0].name and is_trading(bar)
+
+func party_add(bar: Dictionary, field: String, amount: int = 1) -> void:
+	if celebrating(bar): s.street.celebration.report[field] += amount
+
+static func celebration_report(day: int) -> Dictionary:
+	return {"day":day,"arrivals":0,"sales":0,"drink_income":0,"drink_cost":0,"commission":0,"pool_income":0,"operating":0,"promo_cost":0,"fines":0,"happy":0,"regulars":0,"lost_full":0,"lost_service":0,"lost_stock":0}
+
+static func celebration_name(day: int) -> String:
+	return str(C.CELEBRATIONS[celebration_index(day)][0])
+
+static func celebration_index(day: int) -> int:
+	return 0 if day<=7 else 1+(int(day/7)-2)%3
+
+static func celebration_contribution(report: Dictionary) -> int:
+	return int(report.drink_income)+int(report.pool_income)-int(report.drink_cost)-int(report.commission)-int(report.operating)-int(report.promo_cost)-int(report.fines)
+
+func repeat_order_seconds(bar: Dictionary) -> int:
+	var normal := C.MUSIC_ORDER_SECONDS if bar.equipment.get("music",0)>0 else C.ORDER_SECONDS
+	return roundi(normal*C.CELEBRATION_ORDER_FACTOR) if celebrating(bar) else normal
+
 func event_id() -> int:
 	return int(s.street.event.get("id",-1)) if s.street.event.get("phase","") == "active" else -1
 
@@ -343,6 +373,7 @@ func traffic_rate(offline: bool = false) -> float:
 		4: rate *= 1.7
 		5,9: rate *= 2.0
 		6: rate *= .7
+	if celebrating(s.street.bars[0]): rate = minf(rate*C.CELEBRATION_TRAFFIC,(C.TRAFFIC_PER_MINUTE+maxi(0,kinds.size()-1)*C.AUDIENCE_TRAFFIC_BONUS)*C.CELEBRATION_TRAFFIC_CAP)
 	if s.weather >= 5: rate *= .8
 	return rate
 
@@ -359,6 +390,7 @@ func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minu
 			value += (.9+performance)*C.DANCER_TRAINING[int(person.get("audience_training",0))]
 	value += maxf(0.0 if offline else int(bar.welcome)*.4,promoter_bonus(bar,offset))
 	if not offline:
+		if celebrating(bar): value += C.CELEBRATION_ATTRACTION
 		if not bar.promo.is_empty(): value += float(C.PROMOTIONS[int(bar.promo.kind)].boost)/int(bar.promo.repetition)
 		if event_id() == 6: value *= .95 if bar.type == 0 else .55
 		if event_id() == 7: value *= 1.2 if s.street.event.prepared else .65
@@ -386,8 +418,9 @@ func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minut
 		var total := 5.0
 		for other in s.street.bars: total += attraction(bar if other==original else replacement.get("bar") if not replacement.is_empty() and other==replacement.original else other,offline,audience,minute,offset)
 		arrivals += traffic_rate(offline)*float(mix[audience])/100.0*attraction(bar,offline,audience,minute,offset)/total
-	var space_limit := seats(bar)/1.5 # Typical 90-second stay.
-	var demand := minf(arrivals,space_limit)*2.0
+	var party := celebrating(bar,offline)
+	var space_limit := seats(bar)/((C.VISIT_SECONDS+C.CELEBRATION_EXTRA_STAY if party else C.VISIT_SECONDS)/60.0)
+	var demand: float = minf(arrivals,space_limit)*(C.CELEBRATION_DRINK_LIMIT if party else 2.0)
 	var service := service_rate(bar,offset)+(60.0/action_cooldown(bar,"serve") if automatic_service(bar) or (owner_active and not offline) else 0.0)
 	var sales := minf(demand,service)
 	if bar.stock == 0 and not bar.restock: sales = 0
@@ -431,6 +464,7 @@ func cost(bar: Dictionary, amount: int, category: String) -> bool:
 	s.weekly.costs += amount
 	s.street.earnings_net -= amount
 	bar.shift[category] += amount
+	if category in ["operating","promo_cost","fines"]: party_add(bar,category,amount)
 	return true
 
 func income(bar: Dictionary, amount: int) -> void:
@@ -451,7 +485,7 @@ func restock(bar: Dictionary, automatic: bool = false) -> bool:
 
 func order(bar: Dictionary, customer: Dictionary) -> void:
 	if not is_trading(bar): return
-	if customer.order or customer.drinks >= 2 or customer.missed: return
+	if customer.order or customer.drinks >= (C.CELEBRATION_DRINK_LIMIT if celebrating(bar) else 2) or customer.missed: return
 	var amount := price(bar,customer.premium)
 	if customer.budget < amount: return
 	customer.order = true
@@ -468,16 +502,19 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 	if bar.customers.size() >= seats(bar):
 		bar.lost_full += 1
 		bar.shift.lost_full += 1
+		party_add(bar,"lost_full")
 		if promoted and not bar.promo.is_empty(): bar.promo.lost += 1
 		return false
-	var customer := {"id":int(s.street.next_customer),"life":C.VISIT_SECONDS+(20 if bar.equipment.comfort else 0),"order":false,"wait":0,"quoted":0,"drinks":0,"next":0,
+	var customer := {"id":int(s.street.next_customer),"life":C.VISIT_SECONDS+(20 if bar.equipment.comfort else 0)+(C.CELEBRATION_EXTRA_STAY if celebrating(bar) else 0),"order":false,"wait":0,"quoted":0,"drinks":0,"next":0,
 		"audience":audience,"fine_budget":600*int(bar.stage) if audience==2 else 0,"budget":int(C.TYPES[int(bar.type)].drink)*2+100,"premium":roll(100)<[15,50,35][audience],"pool":roll(100)<(85 if bar.promo.get("kind",-1) in [0,2] else 40),
 		"pool_wait":0,"played":false,"playing":false,"missed":false,"opening":opening,"promo":int(bar.promo.get("id",0)) if promoted else 0}
 	customer.merge(customer_action_fields())
+	customer.party_patience = C.CELEBRATION_PATIENCE if celebrating(bar) else 0
 	customer.commission_visit = promoter_bonus(bar)>0
 	s.street.next_customer += 1
 	bar.customers.append(customer)
 	bar.arrivals += 1
+	party_add(bar,"arrivals")
 	bar.shift.arrivals += 1
 	s.street.arrivals += 1
 	s.total_guests += 1
@@ -511,7 +548,11 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		customer.budget -= customer.quoted
 		customer.order = false
 		customer.drinks += 1
-		customer.next = C.MUSIC_ORDER_SECONDS if bar.equipment.get("music",0)>0 else C.ORDER_SECONDS
+		customer.next = repeat_order_seconds(bar)
+		party_add(bar,"sales")
+		party_add(bar,"drink_income",int(customer.quoted))
+		party_add(bar,"drink_cost",consumed)
+		party_add(bar,"commission",commission)
 		bar.dirt = mini(C.DIRT_LIMIT,int(bar.dirt)+(C.PEAK_DIRT_PER_DRINK if peak(int(bar.type),int(s.street.minute)) else 1))
 		bar.sold += 1
 		bar.shift.sales += 1
@@ -542,7 +583,7 @@ func start_cooldown(bar: Dictionary, id: String, duration: float) -> void:
 	bar[id+"_ready"] = action_time()+duration
 
 static func patience(bar: Dictionary, customer: Dictionary) -> int:
-	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)
+	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)+int(customer.get("party_patience",0))
 
 static func order_seconds_left(bar: Dictionary, customer: Dictionary) -> int:
 	return mini(patience(bar,customer)-int(customer.wait),int(customer.life))
@@ -603,9 +644,11 @@ func depart(bar: Dictionary, customer: Dictionary) -> void:
 	if customer.drinks >= 2 and not customer.missed:
 		bar.happy += 1
 		bar.shift.happy += 1
+		party_add(bar,"happy")
 		if int(bar.happy)%10 == 0: s.rep = mini(100,int(s.rep)+1+int(bar.equipment.fridge))
 		if roll(100) < C.REGULAR_CHANCE:
 			bar.regulars += 1
+			party_add(bar,"regulars")
 			s.regulars += 1
 			var report := promotion_record(bar,int(customer.promo))
 			if not report.is_empty(): report.regulars += 1
@@ -646,6 +689,7 @@ func pool_tick(bar: Dictionary) -> void:
 		bar.games.append({"table":table,"players":ids,"remaining":C.POOL_SECONDS,"fee":fee})
 		bar.pool_games += 1
 		bar.pool_income += fee
+		party_add(bar,"pool_income",fee)
 		bar.shift.pool_income += fee
 		income(bar,fee)
 		if fee == 0:
@@ -939,6 +983,7 @@ func tick() -> void:
 					var reason := "lost_stock" if bar.stock==0 else "lost_service"
 					bar[reason] += 1
 					bar.shift[reason] += 1
+					party_add(bar,reason)
 					var report := promotion_record(bar,int(customer.promo))
 					if not report.is_empty(): report.lost += 1
 					customer.life = mini(int(customer.life),5)

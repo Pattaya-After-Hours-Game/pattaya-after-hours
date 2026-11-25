@@ -335,6 +335,7 @@ func render(keep_scroll: bool = false) -> void:
 		city.street_state = model.s.street
 		city.selected_bar = int(model.s.street.selected)
 		city.street_event = model.s.street.event
+		city.celebrating = model.street.economy.celebrating(model.street.selected())
 	root_ui.add_child(city)
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
@@ -355,12 +356,14 @@ func render(keep_scroll: bool = false) -> void:
 	tutorial_button.disabled = model.s.phase == "godzilla"
 	at_button(root_ui,Rect2(848,5,98,37),"Muted" if muted else "Sound",set_sound)
 	event_banner = null
-	if not practicing and not model.s.street.event.is_empty():
+	if not practicing and (not model.s.street.event.is_empty() or model.street.celebration_info().days_left<=2 or model.street.celebration_info().active):
 		event_banner = at_button(root_ui,Rect2(14,56,540,36),"",change_tab.bind(1))
 		event_banner.add_theme_color_override("font_color",PINK)
 		var banner_text := func() -> String:
 			var e: Dictionary = model.s.street.event
-			if e.is_empty(): return ""
+			if e.is_empty():
+				var party: Dictionary = model.street.celebration_info()
+				return "%s · %s · FREE  ›" % ["TONIGHT" if party.active else "DAY %d" % party.day,party.name]
 			return "%s · %s · %ds  ›" % ["SOON" if e.phase == "warning" else "LIVE",StreetContent.EVENTS[int(e.id)][0],e.remaining]
 		event_banner.text = banner_text.call()
 		live_labels.append([event_banner,banner_text])
@@ -669,6 +672,7 @@ func service_panel() -> void:
 
 func events_panel() -> void:
 	street_event_panel()
+	celebration_panel()
 	title("Venue promotions")
 	var bar: Dictionary = model.street.selected()
 	body("One promotion for two minutes, then a two-minute cooldown. Repeated promotions have less pull. Check your seats and service first.")
@@ -830,6 +834,10 @@ func street_panel() -> void:
 	body("%s · Stage %d/3\n%s" % [info.name,bar.stage,info.stages[int(bar.stage)-1][0]],TEAL,16)
 	live_body(func() -> String: return "%s · %s" % [model.street.clock_text(),eco.status(bar)],TEAL,14)
 	live_body(func() -> String: return eco.peak_status(bar),TEAL,12)
+	live_body(func() -> String:
+		var party: Dictionary = model.street.celebration_info()
+		return "%s · %s at the Blue Hour · details in Events" % ["Party tonight" if party.active else "Next: day %d" % party.day,party.name],PINK,12)
+	body("Reputation helps attract visitors from shared street traffic. Music speeds up repeat orders; reputation does not change order timing or budgets.",MUTED,12)
 	body("YOUR ACTION UPGRADES",GOLD,14)
 	body("Per venue · prices preserve next shift’s reserve.",MUTED,12)
 	row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off") if bar.auto_serve else "Buy auto-serve · ฿6,000",street_action.bind("auto_serve"))
@@ -954,6 +962,23 @@ func shift_report(bar: Dictionary) -> void:
 	body("LAST SHIFT",GOLD,14)
 	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s · fines %s · commission %s\nManager income %s (included in revenue)\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.get("fines",0)),cash(report.get("commission",0)),cash(report.get("manager_income",0)),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
 
+func celebration_panel() -> void:
+	var info: Dictionary = model.street.celebration_info()
+	title(info.name,PINK)
+	body("FREE neighbourhood celebration · Blue Hour",TEAL,14)
+	live_body(func() -> String:
+		var current: Dictionary = model.street.celebration_info()
+		return "LIVE until 1am · day %d opening" % current.day if current.active else "Day %d at noon · %s" % [current.day,"today" if current.days_left==0 else "tomorrow" if current.days_left==1 else "%d game days to go" % current.days_left],GOLD,14)
+	body(StreetContent.CELEBRATIONS[model.street.Economy.celebration_index(int(info.day))][1],WHITE,14)
+	body("+40% shared street traffic and extra Blue Hour appeal. Up to 3 drinks per visit if budgets allow; next round in 26s, or 19s with music. Visitors stay 15s longer and wait 10s longer. Traffic boosts cap at 2.4× normal. Normal prices, pool fees, wages and Nida's commission still apply.",MUTED,13)
+	body("Prepare: clean the bar, fill the fridge, check staff contracts and leave room for deliveries. Serve the queue or use Chat before advertising harder. No entry fee or paid preparation; offline time cannot use up the party.",WHITE,13)
+	var report: Dictionary = model.s.street.celebration.report
+	if report.is_empty(): report = model.s.street.celebration.last_report
+	if not report.is_empty():
+		body("PARTY TRADING · "+model.street.Economy.celebration_name(int(report.day)),GOLD,14)
+		live_body(func() -> String: return "%d visitors · %d drinks · %d happy visits · %d new regulars\nDrinks %s · pool %s\nStock consumed %s · commission %s\nOperating %s · promotions %s · fines %s\nTrading contribution %s\nLost: full %d · slow %d · stock %d" % [report.arrivals,report.sales,report.happy,report.regulars,cash(report.drink_income),cash(report.pool_income),cash(report.drink_cost),cash(report.commission),cash(report.operating),cash(report.promo_cost),cash(report.fines),cash(model.street.Economy.celebration_contribution(report)),report.lost_full,report.lost_service,report.lost_stock],WHITE,13)
+		body("Actual Blue Hour trading during the celebration, not estimated extra income. Contribution deducts consumed stock and venue trading costs; excludes managers, street-wide charges, investments and unused deliveries. No bonus is paid again when this report opens.",MUTED,12)
+
 func street_event_panel() -> void:
 	var event: Dictionary = model.s.street.event
 	if event.is_empty(): return
@@ -983,6 +1008,7 @@ func street_event_panel() -> void:
 func journal_panel() -> void:
 	character_card("anong","Anong","The street, the stories, and the books.")
 	chapter_panel()
+	celebration_panel()
 	body("STREET STORIES",GOLD,12)
 	for line in model.s.street.history: body(str(line),WHITE,13)
 	if not model.s.street.offline_report.is_empty():

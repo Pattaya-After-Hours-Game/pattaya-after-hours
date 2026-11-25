@@ -39,7 +39,24 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			bar.merge(Economy.clock_fields(),true)
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	economy = Economy.new(s,fresh)
-	s.version = 7
+	s.version = 8
+
+func celebration_info() -> Dictionary:
+	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()
+	var day := int(s.street.celebration.day) if active else maxi(7,ceili(float(s.day)/7.0)*7)
+	if not active and day==economy.trading_day() and int(s.street.celebration.day)==day: day += 7
+	return {"day":day,"active":active,"name":Economy.celebration_name(day),"days_left":maxi(0,day-int(s.day))}
+
+func celebration_tick() -> void:
+	var party: Dictionary = s.street.celebration
+	if not party.report.is_empty() and not economy.celebration_window():
+		party.last_report = party.report.duplicate(true)
+		party.report = {}
+		record("PARTY REPORT · %s: %d drinks, %d new regulars, ฿%d trading contribution. Full report in Events." % [Economy.celebration_name(int(party.day)),party.last_report.sales,party.last_report.regulars,Economy.celebration_contribution(party.last_report)])
+	if economy.celebration_window() and int(party.day)!=economy.trading_day():
+		party.day = economy.trading_day()
+		party.report = Economy.celebration_report(int(party.day))
+		record("TONIGHT AT THE BLUE HOUR · %s · %s" % [Economy.celebration_name(int(party.day)),C.CELEBRATIONS[Economy.celebration_index(int(party.day))][1]])
 
 func make_bar(kind: int, slot: int) -> Dictionary:
 	return {"type":kind, "stage":1, "name":C.NAMES[slot], "crew":0,
@@ -274,6 +291,9 @@ func next_calendar_day() -> void:
 		s.last_week = s.weekly.duplicate()
 		s.weekly = {"revenue":0,"costs":0,"guests":0,"tours":0,"nights":0,"weeks":int(s.day/7.0)+1}
 	s.day += 1
+	if int(s.day)%C.CELEBRATION_INTERVAL==5:
+		var party_day := int(s.day)+2
+		record("SAVE THE DATE · Day %d: %s at the Blue Hour. Anong: Two days to fill the fridge and sort the rota. The invitations are on us." % [party_day,Economy.celebration_name(party_day)])
 
 func reconcile_closures() -> void:
 	for bar in s.street.bars:
@@ -330,6 +350,7 @@ func tick(seconds: int) -> void:
 	if not s.phase in ["plan","guided"]: return
 	for _second in clampi(seconds,0,60):
 		if not s.phase in ["plan","guided"]: break
+		celebration_tick()
 		reconcile_closures()
 		var trading_now := any_trading()
 		if trading_now: s.street.seconds += 1
@@ -346,7 +367,7 @@ func tick(seconds: int) -> void:
 				if event.remaining<=0:
 					if event.phase=="warning": start_event()
 					else: finish_event(not int(event.id) in [8,9])
-			elif s.street.chapter>=1:
+			elif s.street.chapter>=1 and not economy.celebration_window():
 				s.street.event_wait -= 1
 				if s.street.event_wait<=0:
 					announce(1+int(s.street.event_index)%8)
@@ -355,6 +376,7 @@ func tick(seconds: int) -> void:
 		s.street.minute = (int(s.street.minute)+1)%C.DAY_MINUTES
 		if s.street.minute==0: next_calendar_day()
 		if s.street.minute==C.OPEN_MINUTE: reopen_noon()
+		celebration_tick()
 		s.street.offline_cursor = s.street.minute
 		reconcile_closures()
 		if s.street.seconds>=SHIFT_SECONDS:

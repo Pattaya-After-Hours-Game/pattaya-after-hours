@@ -62,7 +62,7 @@ claiming behaviour exists; update the relevant documentation when it changes.
   automation retains its next operating charge. Bo’s consignment remains the
   recovery exception. Each fridge tier earns +1 extra reputation per ten happy
   departures, capped at 100, with no purchase/reload reward. Third beer-bar seating must hold twelve with pool and fans.
-  Schema 7 preserves paid manager/supplier appointments as level 1 and grants no
+  The schema-7 migration preserves paid manager/supplier appointments as level 1 and grants no
   free music/auto-serve or higher levels. Manager income is an explicit exception
   to customer-based receipts: ฿10/20/40 per trading second at levels 1/2/3, with
   purchase prices ฿18,000/36,000/72,000. Keep it separate from drink/pool sales,
@@ -72,6 +72,15 @@ claiming behaviour exists; update the relevant documentation when it changes.
   Serve deadline as manual clicks. Never award extra service for toggles/reloads.
   Till ฿/s is a five-second sample of actual net trading, excluding investments
   and offline claims; no simulation or accounting belongs in the HUD.
+- Day seven's Blue Hour opening hosts Anong's Birthday, noon to normal 1am close.
+  Later seventh-day openings rotate reunions, mixtape and thank-you nights. Keep
+  the countdown/warning, free entry, finite shared traffic, real orders/budgets,
+  normal prices and actual report. Only the flagship gets the third drink and
+  faster repeat timing; closed venues gain no party attraction. Never replay
+  party income offline or advance a party on the menu. Schema 8 preserves its
+  ledger/date and guest patience, with no retroactive migration reward.
+  Reputation boosts attraction only; it does not speed drinking. Music still
+  improves party repeat timing. Birthday stories do not imply personal quests.
 - The economy's pacing targets are acceptance criteria, not mandatory waiting
   timers. Use fresh campaigns for balance tests; preserve existing owned progress.
 - Offline drink earnings remain demand/cost limited; manager income is separate.

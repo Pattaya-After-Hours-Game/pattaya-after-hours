@@ -9,6 +9,33 @@ it. Resume is disabled when no readable save is available.
 The main street is the live business. **Tutorial** is an optional practice
 campaign using the original decision lessons; it does not spend your real till.
 
+## Look ahead to day seven
+
+Open **Events** to see the next free neighbourhood celebration. **Anong's
+Birthday** starts at noon on day seven and ends at the normal 1am close the
+following calendar day. A banner appears two game days ahead. No hire, manager,
+entry fee or paid preparation is required.
+
+Clean the Blue Hour, fill its fridge, check contracts and prepare to serve. The
+party adds 40% shared street traffic and more appeal for the host bar. Visitors
+can request up to three drinks if affordable, with repeat timing of 26 seconds
+or 19 with music. They stay fifteen seconds longer and wait ten seconds longer.
+Full venues still turn people away, and slow or empty bars still lose orders.
+Drinks and pool retain their prices; free-pool promotions remain separate.
+
+The actual party report in Events and Journal shows receipts, consumed-stock
+costs, wages/overhead, commission, contribution and new regulars. It excludes
+manager income and unused stock purchases and does not pay another bonus.
+Next come the Regulars' Reunion, Pim's Mixtape Party and Bo's Thank-You Night,
+on days fourteen, twenty-one and twenty-eight, then rotating weekly.
+
+Offline time does not advance the live date, consume the party or earn its
+bonus. Later saves get the next scheduled event rather than retroactive cash.
+
+**Reputation attracts visitors; it does not speed their drinking.** More visitors
+can mean more total orders, but stock, seats and service still limit sales. Music
+and parties shorten repeat timing. Fridges earn reputation through happy visits.
+
 ## Your first shift
 
 1. Serve the three opening customers. A yellow/gold dot marks an order; red means
@@ -215,7 +242,7 @@ leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
 The combined active-play checks reach pool around 16–19 minutes, stage 2 around
-34–40 minutes and a second property around 127–138 minutes. After stage 2, the
+34–40 minutes and a second property around 119–126 minutes. After stage 2, the
 active policy improves pouring, trains staff and then saves for expansion.
 The first Soi lease is ฿16,000 plus opening reserves. These are
 simulation results for a particular investment strategy, not timers or promises
@@ -316,7 +343,8 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Save schema 7 preserves music, auto-serve, supplier/manager tiers, stock purchase
+Save schema 8 also retains celebration dates, reports and visitor patience.
+The schema-7 fields preserve music, auto-serve, supplier/manager tiers, stock purchase
 costs and the five-second net sample alongside existing timers and commission.
 Existing manager/supplier appointments become level one without another fee. Migration does not
 grant a promoter, compact layout or audience training for free. Migration from

@@ -83,6 +83,58 @@ practising the owner’s welcome only helps when she takes time off.
 This is her playable role, not a new scripted quest. She leaves her post when
 off duty or out of contract, and keeps her training if she returns.
 
+## Something to look forward to: Anong's birthday
+
+By day six, the Blue Hour should feel like a place the player knows. The next
+reason to open is personal: **Anong's Birthday on day seven**. From the start,
+Events lists the date; two game days beforehand the street banner and Anong's
+reminder ask the owner to fill the fridge and sort the rota.
+
+> **Anong:** “No presents. Bring your friends. And please, this year, cold beer.”
+
+The invitations and bunting cost nothing. From noon until the normal 1am close,
+the street gets more visitors and the Blue Hour is the gathering place. Guests
+stay a little longer, give the team more patience and may buy a third drink.
+Pim's purchased music brings the next round forward again. Nobody conjures
+stock, customers still have budgets, and serving the room earns the night's money.
+A crowded party can expose a slow bar; Chat, a colleague and a prepared fridge
+still matter. Nida earns her usual commission, not a birthday surcharge.
+
+At closing, the player sees the actual party trading: visitors, drinks, costs,
+contribution, new regulars and people lost to queues. There is no extra envelope
+of money for opening the report. Good service leaves something that lasts: people
+who want to return, and the ordinary happy-visit milestones toward renovation.
+
+The next dates are **the Regulars' Reunion (day fourteen)**, **Pim's Mixtape Party
+(day twenty-one)** and **Bo's Thank-You Night (day twenty-eight)**. Those three
+neighbourhood gatherings rotate afterward. Anong does not age a year every week.
+These parties use the same bounded traffic and real orders, alongside the wider
+street's unpredictable events. New random incidents wait until after the party;
+already-announced incidents keep their promises.
+
+The calendar belongs to the campaign. Putting the game away does not use up the
+party, require a real-world appointment or break a streak. Existing campaigns
+past the first birthday get the next scheduled gathering without a cash handout.
+
+## What the improvements mean in the story
+
+| Improvement | Playable meaning |
+| --- | --- |
+| Reputation and colder beer | Reputation helps the street consider your venues. Each fridge tier adds +1 extra reputation per ten satisfied visits, up to 100. It does not make an individual drink faster. |
+| A bigger local | Seating, fans, pool and screens give real visitors space and reasons to stay. The compact stage-one beer bar fits twelve even with its pool table and fans. |
+| Pool and promotions | Pool charges ฿50 once per game per table. Free pool swaps fees for appeal; promotions still need space, service and stock. |
+| A colleague behind the bar | Bartenders cost ฿1,200 for ten days, plus wages. They serve every 25/20/15 seconds as trained; skills stay through rehire. |
+| Nida at the door | Her ฿1,200 ten-day contract plus 10% drink commission replaces welcoming while she works. Owner Welcome upgrades only help during her absence. |
+| Bo's bulk terms | Six drinks initially cost ฿84. Supplier level two requires twelve spaces and ฿144, with later twelve-drink bills of ฿120/96/72. Old stock keeps its paid cost. |
+| Music and automatic pouring | Music costs ฿1,200 and normally brings repeat orders forward from 35 to 25 seconds. ฿6,000 auto-serve uses the owner's existing cooldown; the stage-two pouring tier can reduce it to two seconds. |
+| Management | ฿18,000/36,000/72,000 incremental appointments earn separate ฿10/20/40 per trading second and enable bounded offline estimates. They do not fabricate customer visits. |
+| The till and the books | The five-second ฿/s sample shows actual net trading. Shift, promotion and party reports explain why a busy room did or did not pay. |
+
+These are implemented mechanics, not new personal-quest promises. Equipment,
+contracts and stories should keep reinforcing the same business: attract,
+retain, serve and reinvest. [Economy rules](docs/ECONOMY.md) are authoritative for
+exact settlement and [the player guide](docs/PLAYER_GUIDE.md) explains controls.
+
 ## Noon, last orders and tomorrow's mop
 
 The playable day now has a clock: noon opening, 1am closing, and an optional

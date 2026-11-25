@@ -58,7 +58,7 @@ func run(test: SceneTree) -> void:
 	test.check(m.s.cash==money+50 and bar.commission_paid==5 and bar.commission_carry==50,"First beer settles gross receipt and commission with fractional carry")
 	m.save_game()
 	var loaded = Campaign.new(4)
-	test.check(loaded.load_game() and loaded.s.version==7,"Schema seven reloads promoter commission state")
+	test.check(loaded.load_game() and loaded.s.version==8,"Schema eight reloads promoter commission state")
 	loaded.street.economy.serve(loaded.street.selected(),1)
 	test.check(loaded.street.selected().commission_paid==11 and loaded.street.selected().commission_carry==0,"Reload cannot erase half-baht carry or pending commission")
 	test.check(loaded.street.selected().shift.commission==11,"Commission is visible in the actual shift ledger")

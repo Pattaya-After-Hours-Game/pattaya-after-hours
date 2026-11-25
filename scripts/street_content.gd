@@ -141,3 +141,18 @@ const SUPPLIER_STAGES = [1,1,2,2,3]
 const MANAGER_PRICES = [18000,36000,72000]
 const MANAGER_INCOME = [0,10,20,40]
 const MANAGER_STAGES = [2,3,3]
+
+# Foreground calendar celebrations, not real-world login rewards.
+const CELEBRATION_INTERVAL = 7
+const CELEBRATION_TRAFFIC = 1.4
+const CELEBRATION_TRAFFIC_CAP = 2.4
+const CELEBRATION_ATTRACTION = 2.0
+const CELEBRATION_ORDER_FACTOR = 0.75
+const CELEBRATION_DRINK_LIMIT = 3
+const CELEBRATION_EXTRA_STAY = 15
+const CELEBRATION_PATIENCE = 10
+const CELEBRATIONS = [
+	["Anong's Birthday", "Anong: No presents. Bring your friends. And please, this year, cold beer."],
+	["The Regulars' Reunion", "Mali: The regulars have invited their regulars. Apparently that's a thing."],
+	["Pim's Mixtape Party", "Pim: One night, no requests for the same song six times. Five is negotiable."],
+	["Bo's Thank-You Night", "Bo: The drinks arrived on time. We thought that deserved a party."]]

@@ -130,9 +130,9 @@ func run() -> void:
 			if result.cash<0 or result.sales>result.orders or result.arrivals>result.offered+3:
 				printerr("ECONOMY FAIL: strategy bypassed cash or customer limits")
 				failures += 1
-			# Affordable contracts move the earliest stage-three result just under
-			# three hours; accept one minute below the original approximate target.
-			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,9000],"stage3":[10740,18000]}
+			# Free weekly celebrations intentionally accelerate mid-game investment.
+			# Allow up to fifteen minutes below the original three-hour target.
+			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,9000],"stage3":[9900,18000]}
 			for milestone in bounds:
 				var seconds := int(result[milestone])
 				# Mostly-idle is intentionally slower; still must remain solvent and finish.

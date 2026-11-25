@@ -224,3 +224,11 @@ preview filter for controls, supplier/manager tiers, refills and closure.
 The `bulk-*` economy preview group checks bartender pricing, Nida's Welcome
 explanation, fridge reputation text and six-to-twelve delivery boundaries against
 the same production scene. It adds no textures or decorative customers.
+
+## Weekly celebration presentation
+
+The `party-*` economy preview group covers anticipation, the live party and its
+closeout. City draws temporary coloured bunting near the ceiling only while the
+selected host is trading in its celebration window. Existing room plates,
+portraits and atlases are unchanged; all visible visitors remain actual customers.
+The countdown and actual contribution report are model-driven UI.

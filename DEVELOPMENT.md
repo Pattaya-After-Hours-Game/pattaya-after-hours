@@ -76,7 +76,8 @@ Set `GODOT_BIN` if the pinned editor is not the default `godot` command.
 The test script imports assets, then runs `tests/check.gd`, nine target campaigns plus six no-chat comparisons in
 `tests/economy_balance.gd`, and twelve feature/alternative campaigns in
 `tests/promoter_balance.gd`, plus fifteen music/automation/supplier/early-hire campaigns in
-`tests/automation_balance.gd` (42 total). It uses temporary
+`tests/automation_balance.gd` (42 total), then 60 paired ordinary/party scenarios
+in `tests/celebration_balance.gd`. It uses temporary
 data and configuration directories, preserving your campaign and editor
 settings. Run this wrapper rather than running the test script directly:
 the tests deliberately create, corrupt, and remove test saves.
@@ -339,3 +340,13 @@ The economy-specific preview runner is selected with
 It covers pool timers, promotions, recovery and the same real-customer UI. Both
 preview runners use realistic role assignments and customer fixtures; they do
 not substitute decorative crowds for actual occupancy.
+
+## Calendar celebrations and save schema eight
+
+Street owns celebration start/end, the two-day reminder and story rotation.
+Economy applies the flagship's temporary demand/timing rules and records actual
+transactions. The UI reads countdown/report state and City draws temporary
+bunting over existing art. Keep menu/countdown reads pure and exclude calendar
+bonuses from offline forecasts. Current save schema 8 adds the active/last ledger
+and guest patience; v7 ownership and money remain intact. Use the `party-*`
+economy preview group and celebration regressions when changing this flow.

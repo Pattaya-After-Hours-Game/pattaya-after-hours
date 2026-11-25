@@ -10,6 +10,48 @@ The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
 
+## Weekly calendar celebrations
+
+Day seven is Anong's Birthday at the flagship Blue Hour. Day fourteen/twenty-one/
+twenty-eight are the Regulars' Reunion, Pim's Mixtape Party and Bo's Thank-You
+Night; these last three rotate afterward. Countdown reads are pure. A day-five
+calendar reminder and a banner in the final two days provide anticipation. The
+party runs from noon on the opening's date until normal 1am close, crossing
+midnight correctly. Late-opening permission does not extend the party.
+
+The event has no fee and requires no specific purchase or staff member. Only
+while the host trades, shared traffic increases 40%, capped at 2.4× the current
+base venue-mix supply after other event multipliers. Weather applies afterward.
+Host attraction gets +2 before audience/peak/dirt factors. Other venues compete
+for the same finite supply; they do not copy host timing or the third-drink limit.
+New random event announcements wait during the party; existing events continue.
+
+The host permits up to three orders per visit instead of two, subject to actual
+budgets. Repeat timing becomes 26 seconds, or 19 with music. Existing timers and
+quoted orders are preserved. New party visitors gain fifteen seconds of life
+and ten seconds of patience; the per-visit patience is saved through reload.
+After closing, no new third rounds are requested. Real stock, serving deadlines,
+space, pool capacity, normal prices and commission remain authoritative.
+
+The active/last report records actual host arrivals, sales, happy visits, regulars,
+lost business and paid costs during the window. Trading contribution is drink
+plus pool receipts minus consumed-stock cost, commission, operating charges,
+promotion costs and fines. It excludes street-wide charges, manager income, capital purchases and
+unused stock deliveries. It is not a causal uplift estimate or a second payout.
+Pausing, reloads and opening the report cannot create rewards. Offline forecasts
+exclude the temporary bonuses and neither update the report nor advance its date.
+Schema eight adds the report/date and per-visitor patience; old saves receive
+empty reports and future calendar opportunities while retaining owned progress.
+
+Reputation independently adds `min(1.5, reputation / 80)` to each venue's
+attraction before audience/peak/dirt modifiers. With the current 100 cap, its
+maximum is +1.25. Shared traffic stays finite; reputation improves the chance
+of choosing a venue over outside options. It does not change drink budgets,
+repeat timing, staff speed or prices. Music and parties own repeat timing.
+
+The rationale and paired comparisons are in the
+[celebration design](design/WEEKLY_CELEBRATIONS.md).
+
 ## Clock, closing and preparation
 
 The authoritative street clock starts at minute 720 (12pm); each foreground
@@ -197,7 +239,7 @@ bartender/dancer hires.
 
 Older saves initialise missing contract fields and copy the venue's old training
 level to its existing staff. Future hires start at level zero. Optional fields
-are validated on loading; the compatibility equipment key remains in schema 7,
+are validated on loading; the compatibility equipment key remains in schema 8,
 but venue-wide training purchases are disabled. Normal offline catch-up applies
 after migration. Existing money, venues and staff records are retained.
 
@@ -369,6 +411,11 @@ prevent repeat rewards, including clock rollback.
 Run `tools/test.sh` with Godot 4.7.2. It uses temporary save directories and runs
 the regression suite, `tests/economy_balance.gd`, `tests/promoter_balance.gd` and
 `tests/automation_balance.gd`: 42 fresh campaigns in total.
+`tests/celebration_balance.gd` additionally compares 60 paired trading-day
+scenarios (120 days): 30 seeds for basic and prepared businesses. Prepared bars
+sold 54% more drinks and earned 59% more trading contribution in aggregate;
+basic bars gained 28% and 27%, with more queue losses. These are controlled
+comparisons, not a guarantee that every party or every human strategy profits.
 
 The combined balance runner uses fresh campaigns with seeds 11, 72 and 291,
 without injected cash or offline income. Attentive players check ready actions
@@ -393,13 +440,13 @@ Existing money, properties and upgrades are never reset; no refunds are minted.
 | First useful purchase | 2–5 min | 2.5–4.4 min |
 | Pool table | 10–20 min | 15.9–18.5 min |
 | First stage 2 | 30–45 min | 33.6–36.8 min |
-| Second property | 90–150 min | 127.2–137.1 min |
-| First stage 3 | 180–300 min | 179.1–189.3 min |
+| Second property | 90–150 min | 119.0–125.2 min |
+| First stage 3 | 180–300 min | 170.0–176.3 min |
 
-Mostly-idle campaigns reach stage 3 in 230–239 minutes. No-chat manual-upgrade
-campaigns take 178–187 minutes; no-chat staff-first campaigns take 192–195 minutes.
-The six active target runs use the original windows with a one-minute allowance
-below the three-hour stage-3 lower bound for the explicitly cheaper contracts; the other nine
+Mostly-idle campaigns reach stage 3 in 233–241 minutes. No-chat manual-upgrade
+campaigns take 172–179 minutes; no-chat staff-first campaigns take 185–192 minutes.
+The six active target runs use the original windows with a fifteen-minute allowance
+below the original three-hour stage-3 lower bound for earned weekly-party income; the other nine
 must remain viable and complete within the ten-hour simulation limit. All target
 runs also check sales against orders and arrivals against shared street supply.
 This is a reproducible purchase policy, not a promise for every human
@@ -416,14 +463,14 @@ These optional investments are not forced into the baseline milestone windows:
 
 | Purchase route | Stage 2 | Second property | Stage 3 |
 | --- | ---: | ---: | ---: |
-| Promoter before renovation | 47.3–47.5 min | 138.0–142.9 min | 190.9–197.0 min |
-| Service first, promoter after renovation | 43.4–44.0 min | 137.3–143.8 min | 189.5–197.2 min |
-| Compact layout, no promoter | 38.7–42.2 min | 131.2–133.1 min | 181.9–183.4 min |
+| Promoter before renovation | 47.3–47.5 min | 129.7–134.7 min | 179.8–182.6 min |
+| Service first, promoter after renovation | 43.4–44.0 min | 127.9–133.5 min | 178.3–181.8 min |
+| Compact layout, no promoter | 38.7–42.2 min | 120.0–120.5 min | 170.5–171.0 min |
 
 The early promoter route buys pouring level two and compact seating before Nida,
 yet still delays renovation: automatic welcoming is a convenience with a real
 cost, not a compulsory profit upgrade. The six active target runs retain the early milestone windows, with the
-one-minute stage-3 allowance described above. Promoter contract/commission terms and shared traffic remain unchanged.
+fifteen-minute stage-3 allowance described above. Promoter contract/commission terms and shared traffic remain unchanged.
 The new manager income is priced separately as described above. Dancer stage gates/retained skills and service separation
 have regression coverage, not a new full-gogo campaign balancing claim.
 
@@ -433,10 +480,10 @@ stop pressing Serve once it is purchased; they still pay for every upgrade.
 
 | Route | Stage 2 | Second property | Stage 3 |
 | --- | ---: | ---: | ---: |
-| Music first | 41.2–42.5 min | 133.8–137.5 min | 185.8–188.9 min |
-| Auto-serve and two-second pouring | 35.5–36.3 min | 154.2–163.2 min | 207.6–216.9 min |
-| Supplier first | 35.5–36.3 min | 135.0–137.5 min | 185.7–188.5 min |
-| Automation bundle | 41.2–42.5 min | 163.4–168.1 min | 213.7–219.2 min |
+| Music first | 41.2–42.5 min | 124.8–127.3 min | 175.7–177.8 min |
+| Auto-serve and two-second pouring | 35.5–36.3 min | 150.3–152.1 min | 199.7–201.3 min |
+| Supplier first | 35.5–36.3 min | 126.6–129.6 min | 176.4–179.1 min |
+| Automation bundle | 41.2–42.5 min | 157.7–159.3 min | 203.7–206.0 min |
 
 Optional convenience spending delays expansion; it is not required for the
 baseline targets. All strategies remain solvent and respect orders/shared demand.
@@ -447,8 +494,8 @@ not a claim of fully balanced post-stage-three play.
 
 Three further campaigns save for a bartender before other investments. The first
 hire is affordable at **4.2–4.7 minutes**; pool follows at 23.1–24.1 minutes,
-stage 2 at 55.5–57.8, the second property at 138.9–142.0 and stage 3 at
-190.1–193.4. Early wages and delayed owner upgrades make this a convenience
+stage 2 at 55.5–57.8, the second property at 128.5–135.6 and stage 3 at
+179.0–184.7. Early wages and delayed owner upgrades make this a convenience
 choice, not a guaranteed acceleration of every milestone. All three remain
 solvent and respect demand; the first-hire acceptance ceiling is ten minutes.
 

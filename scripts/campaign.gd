@@ -666,7 +666,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -772,6 +772,21 @@ func _read(path: String) -> Variant:
 				if not _finite_number(bar.equipment.get("music"),0,1): return null
 				for lot in bar.stock_lots:
 					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),6,14): return null
+		if int(parsed.version)>=8:
+			for bar in parsed.street.bars:
+				for customer in bar.customers:
+					if not _finite_number(customer.get("party_patience"),0,Street.C.CELEBRATION_PATIENCE): return null
+			var party: Variant = parsed.street.get("celebration")
+			if not party is Dictionary or not _finite_number(party.get("day"),0,1e9): return null
+			if float(party.day)!=floorf(party.day) or int(party.day)%7!=0: return null
+			for field in ["report","last_report"]:
+				if not party.get(field) is Dictionary: return null
+				if party[field].is_empty(): continue
+				for key in Street.Economy.celebration_report(0):
+					if not _finite_number(party[field].get(key),0,1e15): return null
+					if float(party[field][key])!=floorf(party[field][key]): return null
+				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
+			if not party.report.is_empty() and party.report.day!=party.day: return null
 		return parsed
 	return null
 

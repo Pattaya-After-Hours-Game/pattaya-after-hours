@@ -3,7 +3,38 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current affordable-staff and bulk-delivery verification — 25 November 2026
+## Current day-seven / weekly celebration verification — 25 November 2026
+
+Godot 4.7.2 `tools/test.sh` passed all regressions, 42 fresh campaigns and 60 paired celebration scenarios
+(120 trading days). The paired prepared bar sold 54% more drinks and earned 59%
+more contribution in aggregate, while basic service produced more queue losses.
+Full active campaigns reach the second property in 119.0–125.2 minutes and stage
+three in 170.0–176.3 minutes. The new event intentionally rewards the middle of
+the campaign; the stage-three lower acceptance bound is now 165 minutes versus
+the original approximate 180. Other early milestone and expansion bounds remain.
+This explicit tuning change is not a waiting timer or a claim of proven retention.
+
+`tests/celebration_check.gd` checks the day-five warning, noon start, midnight
+continuity, 1am cutoff, pure countdown reads, real orders/budgets, music timing,
+extra visit patience, bounded shared traffic, no duplicated host bonus across
+properties, actual report accounting, repeat-safe reload/close, different weekly
+stories, closed-host behaviour, reputation's role, offline exclusion, v7-to-v8
+migration and rejection of incomplete reports. Startup tests now load a day-seven
+save to verify that the menu cannot start its pending celebration or age staff.
+
+Seven `party-*` economy previews cover the day-six banner, countdown, live room
+and bunting, live details, trading report, closeout and the next week's story.
+They are rendered at 960 × 540 and 1280 × 720. Visual review covers the affected
+controls and scene states across both sizes; no production image asset changes.
+The actual economy supplies customers and orders. Local links and whitespace
+are checked before commit. Saves are isolated by `tools/test.sh` and preview tools.
+
+Signed release CI repeats the suite, builds all four platforms, checks APK
+identity/checksums and smoke-tests Linux. Android device play, Windows/macOS
+execution and whether human players stay interested after day seven remain
+unverified. Final source/release status is tracked in [the handover](MERGE_HANDOFF.md).
+
+## Previous v1.0.16 affordable-staff and bulk-delivery verification — 25 November 2026
 
 Godot 4.7.2 `tools/test.sh` passed all regressions and **42 fresh campaigns**: the existing 39 routes plus three
 early-bartender routes that save for a contract before other equipment. Hiring

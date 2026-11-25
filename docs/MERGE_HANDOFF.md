@@ -1,27 +1,31 @@
 # Current implementation and release handoff
 
-Updated **25 November 2026**. Affordable bartenders, cold-beer reputation and
-bulk deliveries are on **`codex/early-staff-and-bulk-stock`**, based on main
-`1dc96ff` (published v1.0.15). Music/automation and the prior seating/Nida/TV work
-are already integrated. Other worktrees and user attachments are preserved.
+Updated **25 November 2026**. The day-seven/weekly celebration feature is on
+**`codex/week-seven-celebrations`**, based on main `fe0068d` (published v1.0.16).
+Affordable bartenders, bulk stocking, fridge reputation and prior music/Nida/
+graphics work are already integrated. Other worktrees and attachments are preserved.
 
-Bartender hire/rehire now costs ฿1,200; specialist roles retain ฿4,500 contracts
-with a prorated adjustment when reassigned from service. Staff training, wages
-and timers remain intact. Fridge tiers earn extra reputation per ten satisfied
-visits. Supplier level 2 switches manual/automatic/offline delivery to twelve
-units for ฿144; higher levels keep twelve and lower the bill. The UI explains
-why faster Welcome only helps while Nida is off duty or expired.
+Anong's Birthday runs at the Blue Hour on the day-seven opening, noon to 1am.
+Day-five warning, countdown, temporary bunting, bounded traffic, faster repeat
+orders, an optional third drink and real trading reports give the mid-game a
+predictable reward. Weekly reunions/mixtape/thank-you nights follow. There is no
+fee, instant cash gift or offline event multiplier. New random announcements
+wait during the party; already announced events continue. Reputation still
+changes attraction, not per-visitor spending or order timing.
 
-Save schema remains 7. Existing cash, contract terms, equipment, stock quantities
-and paid inventory costs remain; there are no refunds or instant reputation
-bonuses. Assets remain 72 textures/22 atlases/149 frames.
+Schema 8 preserves active/last party ledgers and per-visitor patience. Migration
+keeps existing ownership, contracts, cash and inventory costs; no retroactive
+party payout. Existing v7 campaigns at/past day seven get their current/upcoming
+calendar opportunity. Production textures/atlases remain unchanged.
 
-`tools/test.sh` covers regressions and 42 fresh campaigns. The [testing record](TESTING.md)
-and [economy evidence](ECONOMY.md#balance-verification) record the outcome and
-limits. Publication is the signed main-branch release workflow; check its run
-and [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for the actual published tag and source revision. Source commits alone are not
-released downloads. Android device and Windows/macOS playtesting remain separate.
+`tools/test.sh` covers regressions, 42 fresh campaigns and 60 paired celebration
+scenarios. The [testing record](TESTING.md), [economy evidence](ECONOMY.md#balance-verification)
+and [design rationale](design/WEEKLY_CELEBRATIONS.md) record results and limits.
+The user explicitly requested commit, build and deployment. Main's signed release
+workflow supplies publication; verify its run and
+[latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+for the actual tag and source commit. Android device play and human retention
+feedback remain separate from successful builds and simulations.
 
 The earlier PR #4/#5 review scope is unchanged. This is a feature handoff, not a
 new audit of every conversation. The consolidation audit below is historical.

@@ -33,7 +33,7 @@ func run(test: SceneTree) -> void:
 	test.check(not app.boot_menu and app.show_tutorial_hint and app.model.s.cash==200,"New Game opens the fresh Blue Hour")
 	test.check(FileAccess.file_exists(Campaign.SAVE),"New Game persists immediately")
 	app.model.s.cash = 4321
-	app.model.s.day = 12
+	app.model.s.day = 7 # The pending birthday must not start on the menu.
 	app.model.street.selected().equipment.pool = 1
 	app.save_state()
 	app.save_state()
@@ -59,7 +59,7 @@ func run(test: SceneTree) -> void:
 	app._unhandled_key_input(escape)
 	test.check(not app.new_game_confirmation,"Escape cancels replacement")
 	test.use_button(app,"Resume")
-	test.check(not app.boot_menu and app.model.s.cash==4321 and app.model.s.day==12 and app.model.street.selected().equipment.pool==1,"Resume restores money, date and equipment")
+	test.check(not app.boot_menu and app.model.s.cash==4321 and app.model.s.day==7 and app.model.street.selected().equipment.pool==1,"Resume restores money, date and equipment")
 	var resumed := JSON.stringify(app.model.s)
 	app.resume_game()
 	test.check(JSON.stringify(app.model.s)==resumed,"Repeated Resume cannot claim or reload twice")

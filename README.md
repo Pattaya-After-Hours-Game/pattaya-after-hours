@@ -7,7 +7,8 @@ Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build th
 ![The Blue Hour and its neighborhood at dusk](docs/blue-hour.png)
 
 This source includes the full customer cast, New Game / Resume, the day/night
-clock, owner cooldowns/Chat and retained staff training. Recent updates add music, auto-serve, two-second pouring, supplier discounts,
+clock, owner cooldowns/Chat and retained staff training. Day seven now brings a
+free Anong’s Birthday celebration, followed by weekly neighbourhood parties. Recent updates add music, auto-serve, two-second pouring, supplier discounts,
 manager income and a five-second ฿/s display, alongside
 a twelve-person compact beer-bar layout, whole-pack deliveries and Nida, an adult
 promoter who works outside the entrance. Purchased TVs appear on the wall and
@@ -169,9 +170,10 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 7.
+retain money, staff, venues and owned stages when migrated to save schema 8.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
-Schema 7 adds purchased automation, music, supplier/manager levels, inventory
+Schema 8 retains celebration dates, active/last reports and visitor patience,
+without retroactive party payouts. Schema 7 added purchased automation, music, supplier/manager levels, inventory
 purchase costs and the five-second earnings sample. Existing supplier/manager
 appointments become level 1; new upgrades must be bought. Schema 6 added
 promoter contracts, audience training, commission commitments and
@@ -208,9 +210,9 @@ practice campaign and never overwrites your campaign.
 The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
-are checked together with thirty-nine fresh-campaign simulations. Baseline active
-runs reach stage 2 in 34–37 minutes, a second venue in 127–138 minutes and stage 3
-in 179–190 minutes. Optional promoter-first investment takes longer to repay;
+are checked together with 42 fresh-campaign simulations plus 60 paired celebration scenarios. Baseline active
+runs reach stage 2 in 34–37 minutes, a second venue in 119–126 minutes and stage 3
+in 170–177 minutes. Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
@@ -268,3 +270,21 @@ the twelve-unit minimum. Saved inventory keeps its original paid cost.
 Once Nida is on duty, faster Welcome offers no extra attraction. Those upgrades
 only help when she is off duty or out of contract; Chat still recovers in twenty
 seconds. Service now explains this beside the upgrade.
+
+## A reason to reach day seven
+
+**Anong's Birthday** is free, runs from noon on day seven until 1am, and is
+advertised beforehand in Service, Events and the street banner. The Blue Hour
+gets extra appeal, +40% shared street traffic, quicker repeat orders and up to
+three drinks per visitor if their budget permits. New party visitors stay and
+wait a little longer. Fill the fridge and prepare your service; normal prices,
+costs, capacity and Nida's commission still apply.
+
+Regulars' reunions, Pim's mixtape parties and Bo's thank-you nights follow every
+seven game days. Events and Journal show actual party trading and new regulars;
+there is no payout button. Offline time cannot spend the event or replay its bonus.
+[Design and balance](docs/design/WEEKLY_CELEBRATIONS.md) explain the trade-offs.
+
+**Does reputation help?** Yes: it improves your share of visiting customers,
+which can create more total orders. It does not increase each customer's budget
+or order frequency. Music and celebrations affect repeat-order timing.
