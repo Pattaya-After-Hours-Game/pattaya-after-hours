@@ -3,6 +3,23 @@ const Campaign = preload("res://scripts/campaign.gd")
 const City = preload("res://scripts/city.gd")
 
 func run(test: SceneTree) -> void:
+	# Successive crossings must not replay the same person or change their
+	# appearance halfway through. Rebuilding the view uses the same clock.
+	var street_looks := {}
+	for crossing in 6:
+		var first := City.passerby_at(crossing*24+2)
+		var middle := City.passerby_at(crossing*24+10)
+		var last := City.passerby_at(crossing*24+18)
+		street_looks[middle.pose] = true
+		test.check(first.pose==last.pose and first.flip==last.flip,"Passerby identity and facing stay stable during a crossing")
+		test.check(middle==City.passerby_at(crossing*24+10),"Scene refresh preserves the current passerby")
+		test.check(middle.pose!=City.passerby_at((crossing+1)*24+10).pose,"Consecutive crossings use different people")
+		test.check((last.foot.x<first.foot.x)==first.flip,"Passerby faces their travel direction")
+		for sample in 25:
+			var walker := City.passerby_at(crossing*24+sample)
+			test.check(walker.foot.x>=120 and walker.foot.x<=185,"Passerby remains in the outside lane")
+		test.check(City.passerby_at(crossing*24+22).alpha==0,"Street has a clear gap between passersby")
+	test.check(street_looks.size()==3,"Street cycles through three distinct patron appearances")
 	var model := Campaign.new(72)
 	var city := City.new()
 	city.bars = model.s.street.bars

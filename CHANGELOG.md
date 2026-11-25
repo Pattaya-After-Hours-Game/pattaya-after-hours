@@ -4,6 +4,14 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## 25 November 2026 — Street passerby variety
+
+- Replaced the repeating single-man street loop with three distinct existing
+  patron appearances, alternating directions and a short gap between crossings.
+- Kept each appearance stable throughout a crossing, independent of customer
+  counts, saves and gameplay randomness. Added crossing previews and regression
+  coverage for variety, continuity and outside-lane bounds.
+
 ## 25 November 2026 — Bar-scene perspective and layout
 
 - Unified interior character scale, reduced Anong's foreground size, and placed
