@@ -61,6 +61,16 @@ Never overwrite an existing claim or abandon another contributor's unfinished wo
    tests, playtest result, and remaining issues. Clear the active claim, then choose
    the next feature. Finishing code alone does not free the slot.
 
+## New user-requested design, 25 November 2026
+
+The [seating, six-pack and promoter plan](design/PROMOTER_CAPACITY_PLAN.md) is a
+design-only follow-up to the TV/patience fix (`0d7bb90`). It records confirmed
+twelve-person furnished capacity and 10% all-drink commission, provisional tuning,
+reproducible estimates and a frontage concept. It does not claim a gameplay
+implementation slot or replace the historical shared claim above. Reconcile that
+claim and pending changes with the maintainer before implementing this requested
+slice; do not start other backlog items alongside it.
+
 ## What the research supports
 
 Successful examples suggest a useful pattern: **make progress understandable,

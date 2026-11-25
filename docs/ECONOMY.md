@@ -6,6 +6,10 @@ advances this model once per foreground second and settles reports every 120
 seconds of street trading, plus one partial report at overnight closure. UI and artwork consume this state; they never award sales themselves.
 Balance and purchase definitions live in `scripts/street_content.gd`.
 
+The [seating/six-pack/promoter proposal](design/PROMOTER_CAPACITY_PLAN.md) records
+the next requested design and its analytical estimates. It is not implemented;
+the rules below still describe the current game.
+
 ## Clock, closing and preparation
 
 The authoritative street clock starts at minute 720 (12pm); each foreground

@@ -155,6 +155,7 @@ practice campaign and never overwrites your campaign.
 | [Art pipeline](art/README.md) | Asset provenance, packing, animation catalog and visual review |
 | [Merge handover](docs/MERGE_HANDOFF.md) | Current chat audit, included branches and build handoff |
 | [Research roadmap](docs/INCREMENTAL_GAME_ROADMAP.md) | Design research, future proposals and one-feature-at-a-time coordination |
+| [Seating, six-packs and promoter plan](docs/design/PROMOTER_CAPACITY_PLAN.md) | Proposed twelve-person layout, pack purchases, commission/training balance and frontage concept; not implemented |
 | [Changelog](CHANGELOG.md) | Progression, economy, graphics and documentation changes |
 
 ## Project status

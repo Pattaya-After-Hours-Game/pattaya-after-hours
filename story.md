@@ -264,6 +264,10 @@ Let customers remember good service, and let failure lead to another shift.
 
 Future hooks, not implemented quests:
 
+- Nida, an adult street promoter, welcomes passersby outside the Blue Hour while
+  the owner handles service. Her proposed contract and commission make attracting
+  a crowd a business decision. See the [design plan](docs/design/PROMOTER_CAPACITY_PLAN.md)
+  and concept art; she is not yet part of the playable roster.
 - June's cafe fund becomes a neighbourhood collaboration rather than a purchase
   of her loyalty.
 - Pim attempts a first original-music night with a budget the business can afford.

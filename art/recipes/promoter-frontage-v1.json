@@ -1,0 +1,18 @@
+{
+  "status": "Design concept only; not a runtime asset",
+  "tool": "Built-in image_gen.imagegen",
+  "date": "2026-11-25",
+  "prompt": "Use case: precise-object-edit. Asset type: game design concept, not a replacement runtime background. Edit reference 1 (the Blue Hour beer-bar interior) by adding ONE clearly adult Thai woman, approximately 28 years old, working as the bar's paid street promoter at the outside edge of the left doorway. Reference 2 is only a character rendering/style reference, not her identity. Preserve the room, camera, street, stools, fridge, neon palette and existing artwork. She stands out front on the street side of the doorway, with feet around image position (190,365), about 145 pixels tall within this 960x540 composition; do not put her behind the bar or in the indoor customer positions. Three-quarter view turned toward passing pedestrians, welcoming wave with one hand and a small menu/flyer in the other. Friendly confident adult face, dark hair in a high ponytail, teal fitted sleeveless collared staff top with gold trim, tailored high-waisted dark shorts, practical white trainers, small gold hoop earrings. Covered, tasteful nightlife uniform; no nudity, no school styling. Sharp illustrated pixel-art edges, warm skin shading, matching existing mature adult staff proportions and cyan/magenta rim light. Keep the walkway visibly passable. No additional crowds, no invented UI, no labels, no text or watermark. Keep the full scene visible in landscape format.",
+  "reference_roles": {
+    "assets/art/beer-1.png": "Edit target / environment reference",
+    "art/sources/dao-0.png": "Character rendering style only; not identity"
+  },
+  "source_output": "/home/zak/.codex/generated_images/01a21041-6023-7780-a8a2-477e04f47d85/exec-3394b41e-79d3-4e23-8bb6-4dbc4a147f38.png",
+  "saved_artifact": "art/concepts/promoter-frontage-v1.png",
+  "transparent_background": false,
+  "limitations": [
+    "Concept exaggerates character scale for review. Production placement and animation require engine previews.",
+    "No model version or random seed was exposed."
+  ],
+  "artifact_sha256": "ce8b21cd29ec75820b3ff0df66acf33711945c18a733d34e0a5c3bbfa90b57dd"
+}

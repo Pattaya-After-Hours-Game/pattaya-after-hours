@@ -1,0 +1,118 @@
+{
+  "status": "Analytical estimates only; campaign simulation still required",
+  "source_commit": "0d7bb90",
+  "commission_basis": "All drink receipts in steady on-duty trading",
+  "price": 55,
+  "stock_cost": 14,
+  "contract": 1200,
+  "bonuses": [
+    4.8,
+    6.0,
+    7.2
+  ],
+  "assumptions": [
+    "Continuous demand and capacity, perfect replenishment, no queue abandonment",
+    "No dirt, regulars, peaks, discounts, premium orders or pool income",
+    "Unchanged overhead/wages cancel in the incremental comparison",
+    "130 trading minutes assumes ten complete noon-to-1am days with overnight skips",
+    "Low-season row varies traffic only; real event also changes audience/attraction"
+  ],
+  "scenarios": [
+    {
+      "name": "Base owner; no extra service",
+      "arrivals_before": 3.367,
+      "arrivals_after": 4.652,
+      "sales_before": 6,
+      "sales_after": 6,
+      "delta_margin_per_min": -33.0,
+      "payback_open_minutes": null,
+      "ten_day_delta_at_130_open_minutes": -5490.0
+    },
+    {
+      "name": "Six-second pouring; spare seats",
+      "arrivals_before": 3.367,
+      "arrivals_after": 4.652,
+      "sales_before": 6.735,
+      "sales_after": 9.305,
+      "delta_margin_per_min": 54.19,
+      "payback_open_minutes": 22.1,
+      "ten_day_delta_at_130_open_minutes": 5844.07
+    },
+    {
+      "name": "Same owner already welcoming continuously",
+      "arrivals_before": 3.798,
+      "arrivals_after": 4.652,
+      "sales_before": 7.596,
+      "sales_after": 9.305,
+      "delta_margin_per_min": 18.87,
+      "payback_open_minutes": 63.6,
+      "ten_day_delta_at_130_open_minutes": 1253.23
+    },
+    {
+      "name": "Full layout limits sales",
+      "arrivals_before": 3.367,
+      "arrivals_after": 4.652,
+      "sales_before": 4.0,
+      "sales_after": 4.0,
+      "delta_margin_per_min": -22.0,
+      "payback_open_minutes": null,
+      "ten_day_delta_at_130_open_minutes": -4060.0
+    },
+    {
+      "name": "Base bartender alone",
+      "arrivals_before": 3.367,
+      "arrivals_after": 4.652,
+      "sales_before": 2.4,
+      "sales_after": 2.4,
+      "delta_margin_per_min": -13.2,
+      "payback_open_minutes": null,
+      "ten_day_delta_at_130_open_minutes": -2916.0
+    },
+    {
+      "name": "Sign and pool; base promoter",
+      "arrivals_before": 4.398,
+      "arrivals_after": 5.154,
+      "sales_before": 8.797,
+      "sales_after": 10.307,
+      "delta_margin_per_min": 5.24,
+      "payback_open_minutes": 229.2,
+      "ten_day_delta_at_130_open_minutes": -519.38
+    },
+    {
+      "name": "Sign and pool; trained promoter",
+      "arrivals_before": 4.398,
+      "arrivals_after": 5.284,
+      "sales_before": 8.797,
+      "sales_after": 10.567,
+      "delta_margin_per_min": 14.47,
+      "payback_open_minutes": 82.9,
+      "ten_day_delta_at_130_open_minutes": 681.35
+    },
+    {
+      "name": "Low season approximation; sign",
+      "arrivals_before": 2.824,
+      "arrivals_after": 3.475,
+      "sales_before": 5.648,
+      "sales_after": 6.951,
+      "delta_margin_per_min": 15.17,
+      "payback_open_minutes": 79.1,
+      "ten_day_delta_at_130_open_minutes": 772.57
+    },
+    {
+      "name": "Second similar bar competes",
+      "arrivals_before": 2.278,
+      "arrivals_after": 3.561,
+      "sales_before": 4.557,
+      "sales_after": 7.122,
+      "delta_margin_per_min": 66.02,
+      "payback_open_minutes": 18.2,
+      "ten_day_delta_at_130_open_minutes": 7383.09
+    }
+  ],
+  "packs": {
+    "size": 6,
+    "price": 84
+  },
+  "break_even_extra_sales_at_baseline_6": 1.19,
+  "standalone_contract_margin_drinks": 34
+}

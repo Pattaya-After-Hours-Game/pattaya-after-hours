@@ -4,6 +4,11 @@ This directory contains authoring material only. `.gdignore` and the export
 presets keep it out of the game. Runtime PNGs are in `assets/art/`; there are no
 concept-board textures in the runtime catalog.
 
+The proposed adult promoter Nida has a [frontage concept](concepts/promoter-frontage-v1.png)
+and [generation receipt](recipes/promoter-frontage-v1.json). This is design-only
+art, not a replacement room plate or runtime sprite. Production poses and exact
+engine placement remain work in the [implementation plan](../docs/design/PROMOTER_CAPACITY_PLAN.md).
+
 ## Provenance
 
 Artwork was generated with the built-in image-generation tool in this Codex
