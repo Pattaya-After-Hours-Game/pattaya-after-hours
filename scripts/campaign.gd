@@ -9,6 +9,8 @@ const PROMOS = ["Regular prices", "Happy hour", "Loyalty night", "Big campaign"]
 const SECURITY = ["House team", "Licensed crew", "Shoreline Desk"]
 const WEEKDAYS = ["Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue"]
 const FIGHT_CARD = 41
+# Temporary test schedule. Move this trigger when making the encounter rare.
+const GODZILLA_TEST_DAY = 3
 var s: Dictionary
 var rng := RandomNumberGenerator.new()
 
@@ -220,9 +222,25 @@ func start() -> String:
 		else:
 			s.night.notes.append("%s delayed · starts at the rush" % event[0])
 			s.night.delayed = true
-	s.phase = "incident"
-	s.card = _draw_card()
+	if s.day == GODZILLA_TEST_DAY:
+		s.night.godzilla = "attack"
+		s.phase = "godzilla"
+	else:
+		s.phase = "incident"
+		s.card = _draw_card()
 	return ""
+
+func finish_godzilla(won: bool) -> void:
+	if s.phase != "godzilla": return
+	if won:
+		s.night.godzilla = "asleep"
+		s.night.notes.append("Godzilla passed out on the curb. The bar stayed open.")
+		s.phase = "incident"
+		s.card = _draw_card()
+	else:
+		s.night.godzilla = "scared"
+		s.night.notes.append("Godzilla scared off the crowd. No bar sales tonight.")
+		_close()
 
 func rest() -> void:
 	if s.phase != "plan": return
@@ -493,6 +511,7 @@ func next_day() -> void:
 		return
 	var reset := int(s.day) % 7 == 0
 	s.day += 1
+	s.night.erase("godzilla")
 	if reset: _reset_week()
 	s.phase = "plan"
 	s.bookings.clear()

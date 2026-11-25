@@ -52,6 +52,7 @@ func run() -> void:
 	var saw_week := false
 	var saw_rush := false
 	var saw_flood := false
+	var saw_godzilla := false
 	while model.s.phase != "end" and clean_days < 365:
 		if model.s.stock < 85:
 			model.action("buy")
@@ -63,6 +64,10 @@ func run() -> void:
 		if model.s.condition < 34: model.action("repair")
 		if model.s.staff[2].work: model.booking(2,0)
 		model.start()
+		if model.s.phase == "godzilla":
+			check(not saw_godzilla and model.s.day <= 3,"One early Godzilla encounter")
+			saw_godzilla = true
+			model.finish_godzilla(true)
 		check(model.s.phase == "incident","Started day %d" % model.s.day)
 		while model.s.phase == "incident":
 			saw_rush = saw_rush or model.s.card == 20
@@ -78,10 +83,10 @@ func run() -> void:
 		clean_days += 1
 		model.next_day()
 	check(clean_days == 365 and model.s.phase == "end","Campaign completes the first year")
-	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
+	check(saw_week and saw_rush and saw_flood and saw_godzilla and model.s.wins > 0,"Weekly ledger and anchor incidents")
 	await test_ui()
 	if failures == 0:
-		print("PASS · all 51 cards and responses, autosave recovery, full year, UI, arcade and tutorial")
+		print("PASS · all 51 cards and responses, autosave recovery, full year, UI, arcade, tutorial and Godzilla")
 	quit(1 if failures else 0)
 
 func test_ui() -> void:
@@ -146,6 +151,7 @@ func test_ui() -> void:
 	escape.pressed = true
 	app._unhandled_key_input(escape)
 	check(app.model == live_campaign,"Esc exits a replay")
+	test_godzilla(app)
 	app.queue_free()
 	await process_frame
 
@@ -160,3 +166,37 @@ func use_button(app: Control, label: String) -> void:
 	var b := find_button(app,label)
 	if b != null and not b.disabled:
 		b.pressed.emit()
+
+
+func test_godzilla(app: Control) -> void:
+	app.model = Campaign.new(104)
+	app.model.s.day = Campaign.GODZILLA_TEST_DAY
+	app.begin()
+	check(app.model.s.phase == "godzilla" and app.city.godzilla == "attack","Godzilla appears before guests are served")
+	var reloaded = Campaign.new(302)
+	check(reloaded.load_game() and reloaded.s.phase == "godzilla","Pending encounter resumes from save")
+	app._process(11.0)
+	check(app.model.s.phase == "godzilla","Timer waits for the first shot")
+	use_button(app,"Serve a shot")
+	use_button(app,"Serve a shot")
+	check(app.godzilla_shots == 1 and app.godzilla_meter.value == 1,"Cooldown prevents double counting")
+	for i in range(1,app.SHOT_GOAL):
+		app._process(app.SHOT_INTERVAL + 0.01)
+		use_button(app,"Serve a shot")
+	check(app.model.s.phase == "incident" and app.city.godzilla == "asleep","Filling the meter resumes service and shows Godzilla asleep")
+	check(reloaded.load_game() and reloaded.s.night.godzilla == "asleep","Sleeping Godzilla survives a reload")
+	while app.model.s.phase == "incident":
+		app.model.fallback()
+	app.render()
+	check(app.city.godzilla == "asleep" and app.model.s.night.gross > 0,"Normal sales and sleeping sprite through closeout")
+	app.advance()
+	check(app.city.godzilla.is_empty() and not app.model.s.night.has("godzilla"),"Godzilla is gone the next day")
+
+	app.model = Campaign.new(104)
+	app.model.s.day = Campaign.GODZILLA_TEST_DAY
+	app.begin()
+	use_button(app,"Serve a shot")
+	app._process(app.GODZILLA_SECONDS + 0.01)
+	check(app.model.s.phase == "report" and app.model.s.night.godzilla == "scared","Timeout goes straight to closeout")
+	check(app.model.s.night.gross == 0 and app.model.s.night.guests == 0 and app.model.s.night.wages > 0,
+		"Frightened patrons buy nothing but staff are paid")

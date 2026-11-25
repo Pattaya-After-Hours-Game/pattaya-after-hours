@@ -14,6 +14,7 @@ Select **Tutorial** at the top of the game to run a short practice shift. Learn 
 - **The district.** Walk the bay, market, harbor, and promenade as scooters and pickups pass. Weather affects foot traffic, guide bookings, and power bills.
 - **Tours and events.** Book paid, voluntary short and long tours. Host Toybox Muay Thai, live music, a theme night, or a football screening. Forecasts, capacity, delays, and door cover affect turnout.
 - **The campaign.** Play through the Blue Hour's first year and its 51 incident cards and 15 scheduled story beats. Co-owner Anong has a say in the reserve, family commitments, paperwork, and expansion. Endings reflect the shape of the business and the partnership.
+- **Godzilla test encounter.** Open the Blue Hour on day 3. Tap **Serve a shot** or press **Space** to fill the intoxication meter within ten seconds. A win leaves Godzilla asleep outside until the next day. A timeout costs the night’s bar sales.
 - **Expansion.** Train and hire staff, renovate, add a food counter, lease a second venue, or manage a volatile mining rig. Work with licensed security, local contacts, and fictional competitors. All transactions use in-game money.
 - **Toybox arcade.** Play Mali in best-of-three bouts with jabs, kicks, jumps, guards, a chargeable Burst, and three opponents. Head to Events for sparring or the full circuit. Campaign bouts change the shift budget, reputation, and staff availability.
 

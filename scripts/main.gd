@@ -14,6 +14,9 @@ const EDGE = Color("#3b2c54")
 const DARK = Color("#151027")
 const TAB_NAMES = ["Service","Events","Tours","Empire","Journal"]
 const PRACTICE_STOCK = 24
+const SHOT_GOAL = 10
+const SHOT_INTERVAL = 0.60
+const GODZILLA_SECONDS = 10.0
 
 var model = Campaign.new()
 var campaign_before_tutorial: Campaign
@@ -35,6 +38,12 @@ var training := false
 var arcade_circuit := false
 
 var confirmation := false
+var godzilla_shots := 0
+var godzilla_time := 0.0
+var shot_delay := 0.0
+var godzilla_meter: ProgressBar
+var godzilla_meter_label: Label
+var godzilla_clock: Label
 
 func _ready() -> void:
 	var interface_font := FontVariation.new()
@@ -160,14 +169,16 @@ func render(keep_scroll: bool = false) -> void:
 	metric(558,"REPUTATION",str(int(model.s.rep)),TEAL)
 	metric(676,"HEAT",str(int(model.s.heat)),PINK)
 	metric(762,"SHIFT","D%03d" % int(model.s.day),WHITE)
-	at_button(root_ui,Rect2(816,14,63,40),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
+	var tutorial_button := at_button(root_ui,Rect2(816,14,63,40),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
+	tutorial_button.disabled = model.s.phase == "godzilla"
 	at_button(root_ui,Rect2(883,14,62,40),"Muted" if muted else "Sound",set_sound)
 	pane(root_ui,Rect2(14,66,550,386),DARK)
 	city = City.new()
 	city.position = Vector2(16,68)
 	city.size = Vector2(546,370)
 	city.clip_contents = true
-	city.night = model.s.phase in ["incident","fight","report"]
+	city.night = model.s.phase in ["incident","fight","report","godzilla"]
+	city.godzilla = model.s.night.get("godzilla","") if city.night else ""
 	city.guests = model.s.night.get("guests",0) if city.night else 0
 	city.weather = int(model.s.weather)
 	city.level = int(model.s.level)
@@ -177,7 +188,12 @@ func render(keep_scroll: bool = false) -> void:
 		if not practicing and model.s.phase == "plan": change_tab(index))
 	root_ui.add_child(city)
 	pane(root_ui,Rect2(16,438,546,14),Color("#251a36"),EDGE)
-	abs_text(root_ui,Rect2(24,435,527,19),"BAY DISTRICT   /   %s" % ("SERVICE LIVE" if city.night else "PRE-SHIFT"),10,WHITE)
+	var district_status := "SERVICE LIVE" if city.night else "PRE-SHIFT"
+	match city.godzilla:
+		"attack": district_status = "GODZILLA AT THE DOOR"
+		"asleep": district_status = "GODZILLA ASLEEP OUT FRONT"
+		"scared": district_status = "BAR EMPTY"
+	abs_text(root_ui,Rect2(24,435,527,19),"BAY DISTRICT   /   "+district_status,10,WHITE)
 	pane(root_ui,Rect2(14,461,550,65),DARK)
 	var first_shift := show_tutorial_hint and not practicing
 	abs_text(root_ui,Rect2(26,467,265,20),"YOUR FIRST SHIFT" if first_shift else "THE SHIFT LOG",13,GOLD)
@@ -246,6 +262,10 @@ func render(keep_scroll: bool = false) -> void:
 			ending_panel()
 			action_label = "Start a new run" if not confirmation else "Confirm new run"
 			action = restart
+		"godzilla":
+			godzilla_panel()
+			action_label = "Serve a shot"
+			action = serve_godzilla
 		"fight":
 			title("Toybox showdown")
 			body("Mali is ready to return to the floor.")
@@ -275,13 +295,14 @@ func _group_digits(value: int) -> String:
 func title(value: String, tint: Color = TEAL) -> void:
 	body(value,tint,21)
 
-func body(value: String,tint: Color = MUTED, px: int = 15) -> void:
+func body(value: String,tint: Color = MUTED, px: int = 15) -> Label:
 	var element := Label.new()
 	element.text = value
 	element.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	element.add_theme_color_override("font_color",tint)
 	element.add_theme_font_size_override("font_size",px)
 	column.add_child(element)
+	return element
 
 func row_button(value: String, call: Callable, primary: bool = false) -> void:
 	column.add_child(button(value,call,primary))
@@ -448,10 +469,64 @@ func choose(index: int) -> void:
 	commit()
 	if model.s.phase == "fight": enter_fight(false)
 
+func godzilla_panel() -> void:
+	title("Godzilla attacks!",PINK)
+	body("Godzilla is blocking the door. Feed it shots until it passes out, or the bar will lose tonight's customers.",WHITE)
+	godzilla_meter_label = body("",GOLD,14)
+	godzilla_meter = ProgressBar.new()
+	godzilla_meter.custom_minimum_size.y = 22
+	godzilla_meter.max_value = SHOT_GOAL
+	godzilla_meter.show_percentage = false
+	godzilla_meter.add_theme_stylebox_override("background",box(Color("#241638"),EDGE))
+	godzilla_meter.add_theme_stylebox_override("fill",box(PINK,PINK))
+	column.add_child(godzilla_meter)
+	godzilla_clock = body("",TEAL,19)
+	body("Tap Serve a shot or press Space. Give the glass a moment to refill between shots.",MUTED,14)
+	update_godzilla_panel()
+
+func update_godzilla_panel() -> void:
+	godzilla_meter.value = godzilla_shots
+	city.shot_flash = shot_delay / SHOT_INTERVAL
+	godzilla_meter_label.text = "INTOXICATION  ·  %d%%" % (godzilla_shots * 100 / SHOT_GOAL)
+	if godzilla_shots == 0:
+		godzilla_clock.text = "%d seconds from the first shot" % int(GODZILLA_SECONDS)
+	else:
+		godzilla_clock.text = "%.1fs   ·   %s" % [godzilla_time,"READY" if shot_delay <= 0 else "REFILLING"]
+
+func serve_godzilla() -> void:
+	if model.s.phase != "godzilla" or shot_delay > 0: return
+	if godzilla_shots == 0: godzilla_time = GODZILLA_SECONDS
+	godzilla_shots += 1
+	shot_delay = SHOT_INTERVAL
+	if godzilla_shots >= SHOT_GOAL:
+		resolve_godzilla(true)
+	else:
+		update_godzilla_panel()
+
+func _process(delta: float) -> void:
+	if model.s.phase != "godzilla" or godzilla_shots == 0: return
+	godzilla_time = maxf(0.0,godzilla_time - delta)
+	shot_delay = maxf(0.0,shot_delay - delta)
+	if godzilla_time <= 0:
+		resolve_godzilla(false)
+	else:
+		update_godzilla_panel()
+
+func resolve_godzilla(won: bool) -> void:
+	model.finish_godzilla(won)
+	godzilla_shots = 0
+	godzilla_time = 0.0
+	shot_delay = 0.0
+	message = "Godzilla passed out. Open for service." if won else ""
+	tone("gong")
+	commit()
+
 func report_panel() -> void:
 	var n: Dictionary = model.s.night
 	title("Closeout  /  Day %d" % model.s.day)
 	body("%s net    ·    %d served    ·    %d missed" % [cash(n.cash),n.guests,n.turned],TEAL,17)
+	if n.get("godzilla","") == "scared":
+		body("The crowd fled. No bar sales tonight.",PINK)
 	body("Bar %s · Payroll %s · Fees %s\nStock used %d · Tour tickets %d" % [
 		cash(n.gross),cash(n.wages),cash(n.fees),n.sold,n.tours],WHITE,14)
 	if int(model.s.day)%7 == 0: week_lines(model.s.last_week)
@@ -541,6 +616,9 @@ func _notification(what: int) -> void:
 		elif tab != 0 and model.s.phase == "plan": change_tab(0)
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if campaign_before_tutorial != null and event.is_action_pressed("ui_cancel"):
+	if model.s.phase == "godzilla" and event is InputEventKey and event.physical_keycode == KEY_SPACE and event.pressed and not event.echo:
+		get_viewport().set_input_as_handled()
+		serve_godzilla()
+	elif campaign_before_tutorial != null and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		finish_tutorial()
