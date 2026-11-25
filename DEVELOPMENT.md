@@ -28,7 +28,7 @@ a 960 × 540 logical canvas, and landscape mobile orientation.
 Clone the repository, then run from its root:
 
 ```sh
-git clone https://github.com/rknell/pattaya-after-hours.git
+git clone https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours.git
 cd pattaya-after-hours
 tools/setup-linux.sh --templates
 export PATH="$HOME/.local/bin:$PATH"

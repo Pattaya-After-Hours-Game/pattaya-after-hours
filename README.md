@@ -2,7 +2,7 @@
 
 Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build the Blue Hour into a thriving beer bar, then own a mixed street of Soi-style bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
 
-**[Get it on Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522io.github.rknell.pattayaafterhours%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252Frknell%252Fpattaya-after-hours%2522%252C%2522author%2522%253A%2522rknell%2522%252C%2522name%2522%253A%2522Pattaya%2520After%2520Hours%2522%257D)** · **[Android APK](https://github.com/rknell/pattaya-after-hours/releases/latest/download/PattayaAfterHours.apk)** · **[Desktop downloads](https://github.com/rknell/pattaya-after-hours/releases/latest)**
+**[Get it on Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522io.github.rknell.pattayaafterhours%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FPattaya-After-Hours-Game%252Fpattaya-after-hours%2522%252C%2522author%2522%253A%2522Pattaya-After-Hours-Game%2522%252C%2522name%2522%253A%2522Pattaya%2520After%2520Hours%2522%257D)** · **[Android APK](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest/download/PattayaAfterHours.apk)** · **[Desktop downloads](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)**
 
 ![The Blue Hour and its neighborhood at dusk](docs/blue-hour.png)
 
@@ -105,7 +105,7 @@ record and scope; export success is not device certification.
 
 ## Install
 
-- **Android.** Use the Obtainium button, or add `https://github.com/rknell/pattaya-after-hours` as the source in Obtainium. The signed APK supports Android 7.0 and later on ARM64 and x86-64. Package ID is `io.github.rknell.pattayaafterhours`.
+- **Android.** Use the Obtainium button, or add `https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours` as the source in Obtainium. The signed APK supports Android 7.0 and later on ARM64 and x86-64. Package ID is `io.github.rknell.pattayaafterhours`.
 - **Linux x86-64.** Extract the ZIP and run `PattayaAfterHours.x86_64`.
 - **Windows x86-64.** Right-click the ZIP, choose **Extract All**, then open `PattayaAfterHours.exe` in the new folder. Starting with v1.0.7, the game checks for updates when it opens. Choose **Update & restart** to install a new release. The executable is unsigned.
 - **macOS Intel and Apple Silicon.** Extract the ZIP and open the app. The build is ad-hoc signed and has no Apple notarization.
