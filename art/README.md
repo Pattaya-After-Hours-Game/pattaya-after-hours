@@ -65,7 +65,11 @@ remaining hosts work the floor. Interior adults share a floor-depth scale, inclu
 The foreground counter occludes Anong's legs; crops of the original venue plate
 occlude bartenders behind the illustrated counters. Customers and pool tables
 are drawn in floor-depth order, with waiting-order dots above customer heads.
-Both pool tables stay indoors. Street traffic follows the visible outside lane;
+Both pool tables stay indoors. Street traffic follows the visible outside lane,
+cycling through the three distinct existing patron appearances on successive
+crossings, alternating direction and leaving a short gap. Each appearance stays
+fixed throughout its crossing; the patron cells are not a walking-animation cycle.
+The visual clock does not consume gameplay RNG or count as customer arrivals;
 the furnished beer-bar terrace does not receive a passerby sprite. Event effects
 do not add an indoor decorative crowd. The message strip sits above the room,
 leaving customers' feet clear of the property selector.

@@ -145,12 +145,25 @@ static func counter_regions(kind: int, stage: int) -> Array[Rect2]:
 func _draw_passerby(kind: int, stage: int) -> void:
 	# The stage-three beer bar has a furnished terrace in this opening.
 	if kind==0 and stage==3: return
-	# The illuminated street is x=40..200. The standing patron atlas has no
-	# walking cycle, so let the distant passerby cross slowly without fake steps.
-	var progress := fposmod(clock*.045,1.0)
-	var foot := Vector2(183,278).lerp(Vector2(122,355),progress)
-	var tint := Color(.72,.80,.92,smoothstep(0,.12,progress)*(1-smoothstep(.88,1,progress)))
-	Art.frame(self,"patrons",2,foot,lerpf(.36,.56,progress),false,Vector2.ZERO,tint)
+	var passerby := passerby_at(clock)
+	var tint := Color(.72,.80,.92,passerby.alpha)
+	Art.frame(self,"patrons",passerby.pose,passerby.foot,passerby.scale,passerby.flip,Vector2.ZERO,tint)
+
+static func passerby_at(time: float) -> Dictionary:
+	# Cells 0 and 2 depict the same man. Choose distinct appearances per
+	# crossing, never per animation frame, and leave a gap between people.
+	# This visual clock does not consume campaign RNG or create customers.
+	var cycle := int(maxf(0,time)/24.0)
+	var progress := clampf(fposmod(maxf(0,time),24.0)/20.0,0,1)
+	var approaching := cycle%2==0
+	var depth := progress if approaching else 1-progress
+	return {
+		"pose":[2,3,1][cycle%3],
+		"foot":Vector2(183,278).lerp(Vector2(122,355),depth),
+		"scale":lerpf(.36,.56,depth),
+		"flip":approaching,
+		"alpha":smoothstep(0,.12,progress)*(1-smoothstep(.88,1,progress))
+	}
 
 func scene_people(bar: Dictionary) -> Array:
 	var people: Array = []

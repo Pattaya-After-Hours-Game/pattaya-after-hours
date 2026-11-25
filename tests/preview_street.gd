@@ -100,6 +100,12 @@ func run() -> void:
 	app.windows_updates.queue_free()
 	app.windows_updates = null
 	fresh(app)
+	for crossing in 6:
+		app.scene_clock = crossing*24+10
+		await capture(app,"passerby-%d" % crossing)
+	app.scene_clock = 22
+	await capture(app,"passerby-gap")
+	app.scene_clock = 3.4
 	for kind in 3:
 		if kind > 0: app.model.street.action("buy",kind)
 		for stage in range(1,4):

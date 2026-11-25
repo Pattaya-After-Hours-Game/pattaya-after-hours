@@ -54,6 +54,9 @@ Review these behaviours, not just whether a PNG exists:
 - Use `empty-*`, `full-*` and `closed-*` general-preview filters for all three
   venue types, including the 24-customer maximum. Check character proportions,
   visible feet, counter/table occlusion and a clear outside lane.
+- Use `passerby-*` to inspect six consecutive crossings and the empty gap.
+  Appearances change between crossings, remain stable during each crossing, and
+  face their travel direction without entering the bar.
 - Empty venues look empty, waiting-order markers match customers, and closed or
   off-duty staff do not appear to be working.
 - Beer-bar pool states distinguish paid, free, idle and not-open facilities.
