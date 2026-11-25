@@ -4,6 +4,20 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Unreleased — Completed-chat consolidation and builds
+
+- Combined the completed customer cast, New Game / Resume, day/clock, cooldown
+  upgrades/Chat, staff contracts and current main's fan/passerby fixes.
+- Added ฿4,500 ten-day contracts, personal 25/20/15-second service training and
+  waiting-order audio; retained trained staff records after expiry for rehiring.
+- Reconciled schema-five timers, boot-menu isolation, contracts and all test suites.
+- Balanced the combined investment path with a ฿16,000 Soi starter lease. Preserved
+  original active targets across six runs, plus nine idle/no-chat comparisons.
+- Updated README, story, economy/player/developer/art guides and agent instructions;
+  restored the completed research roadmap and replaced the stale merge handover.
+- Prepared local multi-platform test builds; publication and device playtesting
+  remain separate. See the handover and build manifest for revision and scope.
+
 ## Unreleased — Active service and customer chat
 
 - Serve and Welcome now show ten-second base refills. Each venue can buy separate
@@ -61,10 +75,10 @@ player-facing overview is in [README.md](README.md).
   messages away from customers' feet. Kept existing production artwork.
 - Added full/empty/closed visual fixtures and scene regression checks.
 
-## Unreleased — Branch consolidation
+## Historical — Earlier branch consolidation
 
 - Combined the progression and customer-economy histories with current upstream
-  `main` (`87a0107`) on `codex/ready-for-main`; `main` itself is unchanged.
+  `main` (`87a0107`) on `codex/ready-for-main`; `main` itself was unchanged at that historical handoff.
 - Preserved the Windows update feature while fitting its control into the new
   header. Kept current release metadata with the finished artwork icon paths.
 - Prevented the headless update worker from running or autosaving a fresh street

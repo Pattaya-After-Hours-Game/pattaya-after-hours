@@ -122,7 +122,7 @@ people per stage; rehire an expired slot rather than replacing its person.
 
 Older saves initialise missing contract fields and copy the venue's old training
 level to its existing staff. Future hires start at level zero. Optional fields
-are validated on loading; the compatibility equipment key remains in schema 4,
+are validated on loading; the compatibility equipment key remains in schema 5,
 but venue-wide training purchases are disabled. Normal offline catch-up applies
 after migration. Existing money, venues and staff records are retained.
 
@@ -167,7 +167,9 @@ The cash report separately records inventory purchases when paid.
 Milestones belong to the venue. Renovation also requires its fee and the next
 shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿50,000. New
 leases additionally require a float for a ฿4,500 contract, stock and existing street payroll.
-The first Soi lease is ฿26,000, offsetting the larger contract reserve and training.
+The first Soi lease is ฿16,000: a cheaper entry from the retiring owner, balanced
+against its higher overhead. This leaves room for contracts, individual training
+and action upgrades without delaying the second property past the active target.
 Money earned elsewhere can fund the building but cannot buy its loyal clientele.
 There are no mandatory waiting timers. Renovation adds space, staffing positions
 and operating options; it does not increase ordinary beer prices.
@@ -222,36 +224,38 @@ prevent repeat rewards, including clock rollback.
 Run `tools/test.sh` with Godot 4.7.2. It uses temporary save directories and runs
 both the regression suite and `tests/economy_balance.gd`.
 
-The balance runner uses fresh campaigns with seeds 11, 72 and 291 and no offline
-income or injected money. Attentive players check ready actions each second,
-balanced players every two seconds, and mostly-idle players every fifteen seconds.
-These are decision checks, not successful sales: all actions obey their cooldowns.
+The combined balance runner uses fresh campaigns with seeds 11, 72 and 291,
+without injected cash or offline income. Attentive players check ready actions
+each second, balanced players every two seconds, and mostly-idle players every
+fifteen seconds. Every serve still obeys its cooldown, actual orders and stock.
 
-Active players buy the first pouring upgrade, frontage, seating and pool, then
-hire a bartender. They manually restock and defer the supplier agreement and
-larger fridge until stage 2; after management they buy the first welcoming upgrade.
-Mostly-idle players follow the signage/staff/deliveries route without action
-upgrades or Chat. Policies clean and skip through real actions, with prep seconds
-counted. Prices, traffic, wages and progression gates are otherwise unchanged.
-The first upgrade was tuned from ฿650 to ฿900 to retain the 2–5 minute opening target.
+Active players buy pouring level 1, signage, seating and pool, then renovate.
+They buy remaining pouring levels after stage 2, hire and train a bartender,
+arrange deliveries/management, and buy welcoming level 1 before expanding.
+Expired staff are rehired through the same paid action when affordable. Idle and
+staff-first comparisons use no action upgrades; six additional campaigns disable
+Chat. Closed-hour cleaning and skipping use actual player actions. An existing
+staff order is allowed to finish while the owner's Serve button refills.
 
-All six active target runs must meet every window; the three mostly-idle runs
-must finish without becoming stuck. Six additional balanced runs compare manual
-upgrades and staff-first automation without Chat; both routes must finish within
-300 minutes. This makes Chat and manual upgrades optional, not progression gates.
+The integration retains ฿4,500 contracts, 25/20/15-second staff service, ten-second
+base owner actions and ฿900/1,400/2,800 action upgrade prices. Combining those
+investments required lowering the first Soi lease from ฿26,000 to ฿16,000.
+Existing money, properties and upgrades are never reset; no refunds are minted.
 
-| Milestone | Active target | Measured active range |
+| Milestone | Original active target | Measured combined active range |
 | --- | --- | --- |
 | First useful purchase | 2–5 min | 2.7–4.4 min |
-| Pool table | 10–20 min | 15.9–18.6 min |
-| First stage 2 | 30–45 min | 38.7–41.9 min |
-| Second property | 90–150 min | 137.9–147.0 min |
-| First stage 3 | 180–300 min | 221.8–236.9 min |
+| Pool table | 10–20 min | 15.8–18.6 min |
+| First stage 2 | 30–45 min | 33.6–39.2 min |
+| Second property | 90–150 min | 132.2–143.4 min |
+| First stage 3 | 180–300 min | 260.6–277.8 min |
 
-Mostly-idle runs reach stage 3 in approximately 471–513 minutes. They serve every
-fifteen seconds and, under this conservative purchase policy, do not hire until
-stage 2; they lose many more waiting orders. Active help materially speeds growth.
-The active policy's first hire occurs around 48–52 minutes. These are deterministic policy tests, not a claim about every human
+Mostly-idle campaigns reach stage 3 in 420–434 minutes. No-chat manual-upgrade
+campaigns take 268–273 minutes; no-chat staff-first campaigns take 309–313 minutes.
+The six active target runs must satisfy every original window; the other nine
+must remain viable and complete within the ten-hour simulation limit. All target
+runs also check sales against orders and arrivals against shared street supply.
+This is a reproducible purchase policy, not a promise for every human
 strategy. Across thirty paired scenario seeds, free pool improved aggregate quiet
 night contribution and reduced full-house contribution. Regression coverage also
 includes empty-order clicks, stockouts, service queues, shared demand, timed wages,

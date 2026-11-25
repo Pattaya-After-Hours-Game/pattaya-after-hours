@@ -40,8 +40,8 @@ its own timers. Bartenders keep serving while your own Serve button refills.
 Near the top of **Service**, **Faster pouring** and **Better welcoming** each have
 three purchases: **10 → 8 → 6 → 4 seconds**, costing **฿900 / ฿1,400 / ฿2,800**.
 The menu shows cash still needed, including the next shift’s operating reserve.
-Buying a level changes the next use; it does not clear an active refill. Existing
-Service training improves bartenders separately.
+Buying a level changes the next use; it does not clear an active refill. Individual
+staff training improves bartenders separately and survives rehiring.
 
 **Have a chat** helps the eligible guest nearest walking out, when they have ten
 seconds or less left to wait. It adds ten seconds of patience and visit time,
@@ -201,9 +201,10 @@ The wealth of another property cannot satisfy those milestones. **Empire** shows
 leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
-The tested active-play curve reaches a first pool table around 12–16 minutes,
-stage 2 around 34–38 minutes and a second property around 142–148 minutes.
-The first Soi lease is ฿26,000 plus opening reserves. These are
+The combined active-play checks reach pool around 16–19 minutes, stage 2 around
+34–40 minutes and a second property around 132–144 minutes. After stage 2, the
+active policy improves pouring, trains staff and then saves for expansion.
+The first Soi lease is ฿16,000 plus opening reserves. These are
 simulation results for a particular investment strategy, not timers or promises
 for every play style. [Economy details](ECONOMY.md) include the full measurements.
 

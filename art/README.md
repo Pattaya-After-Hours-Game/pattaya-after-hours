@@ -133,7 +133,8 @@ were added. Only actual admitted customers are drawn; closures still empty rooms
 Use the `customers-men-*` preview filter to see the cast in each venue type,
 or `customer-beard-glasses-*` for a small group led by the reference guest.
 
-The current catalog has 62 runtime textures, 21 sprite atlases and 145 frames.
+The consolidated catalog has 69 runtime textures, 21 sprite atlases and 145 frames,
+including the fan ownership overlays and nine additional male customers.
 See [the cast lineup](../docs/customer-cast.png) and
 [testing notes](../docs/TESTING.md) for review coverage.
 

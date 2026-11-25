@@ -44,6 +44,18 @@ than removing their agency.
 “Rent is due on Tuesday” expresses the opening pressure. It is not a mandatory
 real-time deadline or a separate Tuesday rent mechanic in the live economy.
 
+## A shift has a rhythm
+
+The owner can pour a drink, step outside to welcome passersby, or reassure a guest
+who is about to leave. Pouring and welcoming begin with ten-second recovery;
+practice and equipment improve that rhythm. A chat buys ten seconds of patience,
+not a guaranteed sale or a new friendship. The bell means a real order is waiting.
+
+The crowd includes familiar faces and visitors with different clothes and looks.
+Their appearance stays with them throughout a visit; it does not decide their
+budget or behaviour. A better bar changes in visible ways: buying fans installs
+fans, while renovating alone does not give away the equipment.
+
 ## Noon, last orders and tomorrow's mop
 
 The playable day now has a clock: noon opening, 1am closing, and an optional
@@ -131,7 +143,9 @@ into a business that can operate without your hand on every bottle.
 
 The regulars recognise you. So do the suppliers and rivals. Anong begins looking
 past the Blue Hour's doorway. Another owner announces his retirement for the
-fourth time, creating the opportunity to buy a Soi-style property.
+fourth time, creating the opportunity to buy a Soi-style property. His discounted
+lease leaves room in the budget for a team; the higher running costs and a new
+customer base still need work.
 
 The second lease is not a second guaranteed crowd. It needs its own reputation
 with customers. The player learns that financing a building and establishing a

@@ -6,9 +6,11 @@ Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build th
 
 ![The Blue Hour and its neighborhood at dusk](docs/blue-hour.png)
 
-The current source combines the customer economy and completed graphics refresh.
-Release downloads are published separately; this README describes the source in
-this checkout.
+This consolidated source includes the new customer cast, owned fans, varied street
+passersby, New Game / Resume, a saved day/night clock, action cooldown upgrades,
+customer chat, and ten-day staff contracts with retained training. Latest work is
+on `codex/consolidated-build`; released downloads can lag behind this checkout.
+See [the current handover](docs/MERGE_HANDOFF.md) for chat and branch status.
 
 ## Start playing
 
@@ -25,7 +27,7 @@ Both actions refill over ten seconds. In **Service**, buy **Faster pouring** and
 **Better welcoming** to reduce each venue’s cooldowns to eight, six, then four
 seconds. **Have a chat** buys an urgent waiting guest ten more seconds; it shares
 Welcome’s timer and takes twenty seconds to recover. No order means no sale. Open **Service** to see demand, service speed, occupancy,
-stock, payroll and recent actual profit.
+stock, payroll and recent actual profit. Waiting-order bells respect Sound / Muted.
 
 Inside the scene, customers stand on the public side of the bar, bartenders
 work behind the counters, and gold dots above customers mark waiting orders.
@@ -147,18 +149,20 @@ practice campaign and never overwrites your campaign.
 | [Developer setup](DEVELOPMENT.md) | Engine installation, code map, saves and platform builds |
 | [Testing and release checks](docs/TESTING.md) | Automated coverage, visual checks and remaining device verification |
 | [Art pipeline](art/README.md) | Asset provenance, packing, animation catalog and visual review |
-| [Merge handover](docs/MERGE_HANDOFF.md) | Combined branch, test results and maintainer review notes |
+| [Merge handover](docs/MERGE_HANDOFF.md) | Current chat audit, included branches and build handoff |
+| [Research roadmap](docs/INCREMENTAL_GAME_ROADMAP.md) | Design research, future proposals and one-feature-at-a-time coordination |
 | [Changelog](CHANGELOG.md) | Progression, economy, graphics and documentation changes |
 
 ## Project status
 
 The current source includes 69 runtime textures, twenty-one sprite atlases with
 145 frames, nine interiors and nine matching exterior illustrations. Gameplay,
-save migration, art integrity, input and nine fresh-campaign pacing simulations
-passed during the completed-art integration. Linux startup and Android debug
-export/signature checks passed. Android device and Windows/macOS execution still
-need target-platform playtesting. See the testing document for the verification
-record and scope; export success is not device certification.
+save migration, boot-menu isolation, action/staff timing and art/input regressions
+are checked together with fifteen fresh-campaign simulations. Active target runs
+reach stage 2 in 34–40 minutes, a second venue in 132–144 minutes and stage 3 in
+261–278 minutes. Mostly-idle play takes longer; upgrades and Chat remain optional.
+Device playtesting is still separate from tests and exports. See the
+[verification record](docs/TESTING.md).
 
 ## Install
 
@@ -188,7 +192,7 @@ The streets, businesses, characters, artwork, and arcade moves are original fict
 
 This update adds ten-day staff contracts, individual training that survives
 rehiring, measured 25/20/15-second service, and a waiting-order bell. Hiring and
-rehiring use the agreed ฿4,500 fee; the first Soi lease is ฿26,000 to accommodate
+rehiring use the agreed ฿4,500 fee; the first Soi lease is ฿16,000 to accommodate
 the new hiring reserve and training costs. Existing hires and training migrate,
 and offline projections stop crediting staff service at contract expiry. See the
 [player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).

@@ -271,7 +271,7 @@ matching templates and run tests plus exports before handing over.
 Prepared on **25 November 2026**, Ubuntu 26.04.1 x86-64:
 
 - Original graphics workspace: `/home/zak/projects/pattaya-after-hours`.
-- Combined gameplay/art checkout: `/home/zak/projects/pattaya-after-hours-economy`.
+- Consolidated gameplay/art/build checkout: `/home/zak/projects/pattaya-release-integration`.
   Check `git branch --show-current` before editing or building.
 - Godot: `/home/zak/.local/bin/godot-4.7.2` (also available as `godot`).
 - Matching templates installed in the standard user template directory.
@@ -296,7 +296,7 @@ do not publish a release.
 Open the application shortcut or run:
 
 ```sh
-godot-4.7.2 --editor --path /home/zak/projects/pattaya-after-hours-economy
+godot-4.7.2 --editor --path /home/zak/projects/pattaya-release-integration
 ```
 
 ## Artwork and visual checks

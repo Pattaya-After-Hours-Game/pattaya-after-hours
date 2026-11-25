@@ -1,82 +1,73 @@
-# Merge handover for rknell
+# Consolidated game and build handoff
 
-The consolidated branch is **`codex/ready-for-main`**. It contains the complete
-progression, customer economy, finished artwork and documentation, plus the
-latest upstream Windows updater. Merge this branch once; the older feature
-branches do not need separate merges afterward. `main` has not been changed by
-this integration, and no release/tag has been published.
+Checked on **25 November 2026**. The integration branch is
+**`codex/consolidated-build`**, based on the completed local clock/perspective
+work and merged with upstream `main` at `06cc3cb`. The original shared checkout
+was preserved; this build uses `/home/zak/projects/pattaya-release-integration`.
+This is a source/build handoff, not a claim that the latest downloads contain it.
 
-## Included histories
+## Chat audit
 
-| Input | Tested revision | Relationship |
-| --- | --- | --- |
-| `codex/pattaya-idle-progression` | `93735b4` | Already an ancestor of customer-economy; preserved in the combined history |
-| `codex/customer-economy` | `750a1e4` | Economy, complete graphics and the new documentation commit |
-| Upstream `main` | `87a0107` | Windows updater and release metadata, explicitly merged into the integration branch |
+Every related chat found had a completed latest turn and was idle/not loaded at
+the audit. None was still implementing work. Completion in a chat did not always
+mean the files had been committed or included in main.
 
-The original graphics checkout had uncommitted work. Its finished art was
-integrated in `1f97b70`; the original checkout was left intact. No unrelated
-uncommitted workspace changes were discarded or swept into this merge.
-
-## Merge decisions
-
-- Keep the customer-driven economy, version-three saves, role-aware staff,
-  guided shifts and finished full-width graphics interface.
-- Keep upstream's Windows updater and version `1.0.7` / Android code `8`, using
-  the new `assets/art/` icon paths. A subsequent release still needs a new version
-  and tag; the merge does not claim to publish one.
-- Place Update in the new header without covering the till or serving controls.
-- Disable the live clock and save notifications inside the headless update
-  worker. Without this integration fix, the worker could advance and autosave
-  an uninitialised campaign while waiting to replace the executable.
-- Keep both test sets: customer economy/art/input/pacing and Windows update
-  validation, executable staging and restart-path checks.
-
-## Verification
-
-Verified on 25 November 2026 with Godot 4.7.2:
-
-| Target | Result |
+| Chat title | Result included or disposition |
 | --- | --- |
-| Progression branch's `tools/test.sh` | Passed |
-| Customer-economy branch's `tools/test.sh` | Passed, including all nine pacing simulations |
-| Upstream main's `tools/test.sh` | Passed, including Windows updater unit checks |
-| Combined branch's `tools/test.sh` | Passed, including art integrity, update-worker isolation, input and all nine pacing simulations |
-| Updated header | Rendered and inspected; update, till, tutorial and live service controls remain accessible |
-| Linux, Windows and macOS exports | All built; package checksums produced |
-| Exported Linux executable | Passed isolated headless startup |
-| Documentation | Local links checked; `git diff --check` clean |
+| Build out Pattaya bar game | ฿4,500 ten-day contracts, individual training, waiting-order bell; `39c9862` |
+| Redo game graphics and sprites | Nine added male customers including the supplied-reference guest; completed uncommitted files captured in `a503602` |
+| Add service and welcome cooldowns | 10-second actions, 8/6/4 upgrades, Chat and schema-five saves; captured in `a503602` |
+| Check whether progress persists | Paused New Game / Resume, confirmation and backup handling; captured in `a503602` |
+| Add bar hours and raid risk | Clock, prep, peaks and raids (`85777c1`/`1273636`); day counter merged from `69afb4b` |
+| Fix main bar scene scale | Perspective work plus varied passersby and owned-fan visuals; latest fixes already in main (`305fe89`, `60bec29`) |
+| Build Windows test release | Earlier test package completed; superseded by this combined build |
+| Assess organization impact on pushing | Organization remote and cleanup completed; original checkout and backups preserved |
+| Research incremental game success | Completed research roadmap restored from backup and updated for current mechanics; proposals remain future work |
+| Collect Pattaya reference images | Concept collection/mockups completed; intentionally gitignored authoring references, not runtime assets |
+| Inspect Pattaya bar simulator | Setup and initial verification already integrated; no remaining implementation task |
 
-Tests used isolated saves and editor configuration. Input branches were tested
-separately; their suites intentionally describe their own historical behaviour.
-The combined suite verifies the final endless customer-economy campaign.
+No new gameplay feature was delegated or silently started from the research
+backlog. Windows/macOS execution, Android device playtesting, human balance
+feedback and maintainer review remain outstanding verification, not running chats.
 
-Remaining platform checks: actual Windows updating/restart/rollback, Windows and
-macOS playtesting, and Android device playtesting. Unit checks and successful
-exports do not establish those behaviours on real devices. See
-[TESTING.md](TESTING.md) for the broader release checklist.
+## Integration decisions
 
-## Review and try it
+- Keep all completed customer artwork, fans, street variety, boot-menu controls,
+  clock/day, staff contracts and owner actions together. The catalog contains
+  69 runtime textures and 145 frames across 21 sprite atlases.
+- Keep schema 5 and fractional owner-action timers. Staff work uses independent
+  saved timers. Contracts consume skipped/offline time; owner-action cooldowns
+  do not. The paused menu consumes neither and claims offline time only on Resume.
+- Keep ฿4,500 contracts and 25/20/15-second bartender service. For the combined
+  investment curve, lower the Soi starter lease to ฿16,000. Existing owned assets
+  and cash are preserved; no refund or migration reward is created.
+- Preserve both test suites, including a bartender completing work during the
+  owner's cooldown. Fifteen fresh campaigns test active, idle and no-chat paths.
+- Upstream PRs [#4](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/pull/4)
+  (mobile sparring) and [#5](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/pull/5)
+  (individual drink inventory), authored by rknell, remain separate review work.
+  They were not part of these completed chats and are not claimed as integrated.
+
+## Verify and build
 
 ```sh
 git fetch origin
-git switch --track origin/codex/ready-for-main
+git switch --track origin/codex/consolidated-build
 tools/test.sh
-godot --path .
+env -u ANDROID_HOME -u JAVA_HOME tools/release.sh
 ```
 
-If that local branch already exists, switch to it and fast-forward from origin
-instead of creating it again. The local integration checkout on this machine is
-`/home/zak/projects/pattaya-after-hours-economy`; its current branch is
-`codex/ready-for-main`.
+Use an existing local branch if already created. `tools/test.sh` isolates saves;
+the release script exports Linux/Windows/macOS, checksums the archives and smoke
+tests Linux. Signed Android release builds require the existing key; local debug
+APKs are test artifacts, not updates to the signed production application.
 
-Start with [README.md](../README.md) and [story.md](../story.md). Important code
-review areas are `scripts/economy.gd`, save migration in `scripts/campaign.gd`,
-the live clock in `scripts/street.gd`, and worker-mode handling in
-`scripts/main.gd`. Older released binaries do not understand version-three saves;
-back up a campaign before testing a downgrade or rollback.
+Local test exports may use an isolated staging copy with a `test-<commit>`
+application version and a separate Android test package ID. These metadata
+changes are recorded in `dist/BUILD_INFO.txt`; they do not change committed
+release numbering. The Windows release checker ignores non-release version
+labels, preventing a test build from offering an older public build as an update.
 
-Review the combined branch against `main`, then merge through the repository's
-normal PR process. If `main` advances, merge the new upstream commits into the
-integration branch and repeat affected checks before approval. Source branches
-have been retained; there is no need to delete them as part of review.
+Source commits do not publish a release. A subsequent approved merge/push to
+main runs the existing signed multi-platform release workflow. Do not discard
+other working trees or replace current user saves as part of that handoff.

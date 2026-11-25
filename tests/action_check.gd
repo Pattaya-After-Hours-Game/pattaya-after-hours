@@ -66,9 +66,10 @@ func cooldowns(test: SceneTree) -> void:
 	m = fresh()
 	b = m.street.selected()
 	m.s.cash = 10000
-	m.street.action("serve")
 	m.street.action("hire",0)
-	m.street.advance(6)
+	m.street.advance(20)
+	m.street.action("serve")
+	m.street.advance(5)
 	test.check(b.sold==2 and not m.street.economy.action_status(b,"serve").enabled,"Bartenders serve during the owner's cooldown")
 	# Owner-run recovery remains viable without chat, upgrades or free income.
 	m = fresh()

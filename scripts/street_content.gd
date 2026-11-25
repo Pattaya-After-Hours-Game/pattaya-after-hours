@@ -100,7 +100,7 @@ const ROLE_NAMES = ["Bartender", "Adult host", "Adult dancer"]
 const ROLE_WAGES = [24,20,36] # per minute, including quiet periods
 const OVERHEAD = [18,45,90]
 const RENOVATIONS = [[4800,50000],[18000,80000],[45000,150000]]
-const LEASES = [21000,26000,85000] # Soi entry offsets the first contract reserve and individual training.
+const LEASES = [21000,16000,85000] # The retired owner's Soi lease leaves room for staff and action investments.
 const STAGE_GOALS = [
 	{"happy":70,"regulars":10,"healthy":8},
 	{"happy":600,"regulars":70,"healthy":40}

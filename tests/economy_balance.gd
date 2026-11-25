@@ -51,6 +51,8 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if bar.equipment.pool>0 and times.pool<0: times.pool = second
 		if bar.stage==1 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
 		if bar.stage>=2 and times.stage2<0: times.stage2 = second
+		if owner_first and bar.stage>=2 and bar.action_levels.pouring<3:
+			st.action("action_upgrade",0)
 		# A contract is a late investment: do not block smaller purchases while saving.
 		if bar.stage>=2 and model.s.cash>=C.STAFF_CONTRACT_COST+1000:
 			if bar.team.is_empty(): st.action("hire",0)
@@ -114,7 +116,7 @@ func run() -> void:
 		for seed_value in [11,72,291]:
 			var result := simulate(seed_value,"balanced",600,opening,false)
 			print(JSON.stringify(result))
-			if result.stage3<0 or (opening=="manual" and (result.pouring!=1 or result.welcoming!=1)):
+			if result.stage3<0 or (opening=="manual" and (result.pouring!=3 or result.welcoming!=1)):
 				printerr("OPTIONAL ACTION FAIL: %s without chat / seed %d" % [opening,seed_value])
 				failures += 1
 	print("PACING · %d failures across nine target campaigns and six no-chat comparisons" % failures)

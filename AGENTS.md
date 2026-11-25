@@ -79,6 +79,19 @@ Guided shifts use the same live customers, stock and clock. The practice tutoria
 is isolated. Preserve save migrations and paid/free game identity. The Windows
 update worker must never run the live economy or autosave a fresh campaign.
 
+## Coordinating the next feature
+
+Read [the current handover](docs/MERGE_HANDOFF.md) before assuming a chat's work
+has reached main. Use the [research roadmap](docs/INCREMENTAL_GAME_ROADMAP.md) to
+coordinate one gameplay feature at a time. Existing research proposals are not
+shipped features or permission to implement the whole backlog. Changes made in
+separate chats must pass combined tests before a build is called ready.
+
+Owner actions start at ten seconds, with per-venue 8/6/4-second upgrades. Chat
+shares Welcome's timer and always takes twenty seconds to recover. Staff clocks
+remain independent. New Game / Resume must stay read-only and paused until the
+player selects an option; no contract ageing, offline claim or autosave on the menu.
+
 ## Working and verifying
 
 Inspect `git status`, the current branch and relevant worktrees first. Preserve

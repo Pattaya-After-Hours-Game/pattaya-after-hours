@@ -3,6 +3,29 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
+## Combined verification — 25 November 2026
+
+The current integration includes all completed chats listed in
+[the handover](MERGE_HANDOFF.md). Individual-feature records below are historical;
+use [the economy table](ECONOMY.md#balance-verification) for combined pacing.
+
+- Full Godot 4.7.2 regression suite, including staff, cooldowns, startup isolation,
+  schema-five migration, artwork, pool, clock/raids and Windows updater checks.
+- Fifteen fresh campaigns: six active target runs, three mostly-idle runs and six
+  no-chat/manual-versus-staff comparisons. The original active milestone windows
+  remain the acceptance criteria; alternative routes have a ten-hour horizon.
+- Standard economy captures cover action refills/chat, contract expiry/rehire,
+  fans, pool, all venue types/stages, closure, festival and saved day display.
+- Thirty-four wide captures cover startup/confirmation, customer cast, full rooms,
+  purchased/unpurchased fans and changing street passersby. Captures were inspected
+  at 960 × 540 and 1280 × 720 actual captured pixels (the desktop clamped the
+  requested 1560-pixel window). They are layout checks, not target-device playtests.
+- Local export identity and package checksums are recorded beside the build in
+  `dist/BUILD_INFO.txt` and `dist/SHA256SUMS.txt`. Exports are not a public release.
+
+Remaining checks: Windows/macOS execution, Android on-device input and lifecycle,
+Windows update/restart/rollback on Windows, and human balance/audio feedback.
+
 ## Automated suite
 
 Run from the repository root with Godot 4.7.2:
