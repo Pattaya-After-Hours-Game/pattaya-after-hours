@@ -48,7 +48,8 @@ real-time deadline or a separate Tuesday rent mechanic in the live economy.
 
 The playable day now has a clock: noon opening, 1am closing, and an optional
 extension to 3am chosen separately for each venue each night. One real second
-is one game minute. Anong's short business reports are not whole calendar days.
+is one game minute. The visible DAY counter follows the campaign from Day 1,
+advancing at midnight. Anong's short business reports are not whole calendar days.
 
 The street gets busy in waves: beer-bar peaks run from 5–9pm, Soi venues from
 7–11pm, and gogos from 10pm–2am. The extra attraction still competes for real

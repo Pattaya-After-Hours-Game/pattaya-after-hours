@@ -4,6 +4,11 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Unreleased — Visible campaign day counter
+
+- Show an explicit DAY number above the clock, starting at Day 1 and using the
+  existing saved calendar. Midnight advances it; offline estimates do not.
+
 ## Unreleased — Game clock and overnight preparation
 
 - Added a one-game-minute-per-second clock, noon opening, 1am closing and nightly

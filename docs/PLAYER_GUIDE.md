@@ -24,7 +24,10 @@ capacity cannot sell drinks to customers who are not there.
 
 ## The clock and tomorrow's opening
 
-**TIME** advances one game minute per real second. Every venue type opens at
+The clock advances one game minute per real second. **DAY** above it shows your
+current in-game campaign day, starting at **Day 1** and continuing across saves.
+Offline estimates and skipping from closing to noon do not add extra days.
+Every venue type opens at
 12pm and normally shuts at 1am. Dates change at midnight; two-minute business
 reports and the 45-second pool timer still use real seconds. Financial rates
 are shown per real minute.

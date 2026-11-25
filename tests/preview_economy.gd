@@ -129,6 +129,8 @@ func run() -> void:
 		app.model.s.street.minute = int(app.model.street.C.PEAK_HOURS[kind].start)
 		await capture(app,"clock-peak-%d" % kind)
 	clock_bar.type = 0
+	app.model.s.day = 1234
+	await capture(app,"clock-day-counter")
 	app.model.s.day = 2
 	app.model.s.street.minute = 30
 	await capture(app,"clock-warning")

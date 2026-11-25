@@ -239,7 +239,7 @@ func render(keep_scroll: bool = false) -> void:
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
 	abs_text(root_ui,Rect2(14,4,170 if windows_updates != null else 235,24),"AFTER HOURS" if windows_updates != null else "PATTAYA / AFTER HOURS",19,GOLD)
-	var date_label := abs_text(root_ui,Rect2(14,27,170 if windows_updates != null else 245,16),"PRACTICE SHIFT" if practicing else "D%d · %s · %s" % [model.s.day,model.weekday(),model.street.selected().name],12,TEAL)
+	var date_label := abs_text(root_ui,Rect2(14,27,170 if windows_updates != null else 245,16),"PRACTICE SHIFT" if practicing else "%s · %s" % [model.weekday(),model.street.selected().name],12,TEAL)
 	date_label.clip_text = true
 	if windows_updates != null:
 		update_button = at_button(root_ui,Rect2(190,5,66,37),"Update",windows_updates.ask,true)
@@ -430,7 +430,11 @@ func close_drawer() -> void:
 	render()
 
 func metric(x: int,name_text: String,value: String,tint: Color) -> void:
-	abs_text(root_ui,Rect2(x,3,105,15),name_text,11,MUTED)
+	var heading := abs_text(root_ui,Rect2(x,3,105,15),"DAY %d" % model.s.day if name_text=="TIME" else name_text,12 if name_text=="TIME" else 11,GOLD if name_text=="TIME" else MUTED)
+	if name_text=="TIME":
+		heading.clip_text = true
+		heading.tooltip_text = "In-game day of this campaign. Starts at Day 1 and advances at midnight."
+		live_labels.append([heading,func() -> String: return "DAY %d" % model.s.day])
 	var label := abs_text(root_ui,Rect2(x,20,105,24),value,18,tint)
 	if campaign_before_tutorial == null:
 		live_labels.append([label,func() -> String:
