@@ -61,7 +61,7 @@ func run(test: SceneTree) -> void:
 	m.s.street.bars.pop_back()
 	m.save_game()
 	var loaded = Campaign.new(11)
-	test.check(loaded.load_game() and loaded.s.version==8 and JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reload preserves one active party ledger")
+	test.check(loaded.load_game() and loaded.s.version==9 and JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reload preserves one active party ledger")
 	loaded.street.celebration_tick()
 	test.check(JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reloading cannot restart or clear party results")
 	m.s.day = 8

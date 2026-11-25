@@ -4,6 +4,18 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Source update — Ready bartenders and affordable auto-serve
+
+- Reduced owner auto-serve from ฿6,000 to ฿3,000; existing ownership is preserved.
+- Bartenders start ready, automatically settle a real order, then recover for
+  25/20/15 seconds. Empty queues and owner clicks no longer reset a warmup.
+- Added the bottom-right staff sales/readiness/countdown indicator and linked
+  serving poses to actual sales. Staff get first chance before owner automation.
+- Schema nine preserves deadlines, fractional timing and actual-sale counters;
+  old partial work migrates without resetting skills or contract time.
+- Added regression and HUD checks, readiness previews and updated player,
+  economy, story, development and agent documentation.
+
 ## Source update — A reason to reach day seven
 
 - Added Anong's free day-seven birthday opening, with a two-day reminder,

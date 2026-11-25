@@ -19,10 +19,13 @@ func run(test: SceneTree) -> void:
 	bar.customers.clear()
 	m.s.street.pass_credit = -10000000
 	eco.admit(bar,false,true)
-	advance(m,24)
-	test.check(bar.sold==0 and is_equal_approx(eco.service_rate(bar),2.4),"Base staff cannot serve before 25 seconds; forecast is 2.4/min")
 	advance(m,1)
-	test.check(bar.sold==1 and bar.stock==17,"Base staff completes one real order at 25 seconds")
+	test.check(bar.sold==1 and bar.stock==17 and is_equal_approx(eco.service_rate(bar),2.4),"Ready staff serves immediately; sustained forecast stays 2.4/min")
+	eco.admit(bar,false,true)
+	advance(m,24)
+	test.check(bar.sold==1,"Base bartender cooldown cannot finish before 25 seconds")
+	advance(m,1)
+	test.check(bar.sold==2 and person.drinks_served==2,"Base staff serves the next waiting order after 25 seconds")
 	m.street.action("hire",0)
 	m.street.action("train_staff",0)
 	test.check(person.training==1 and bar.team[1].training==0 and eco.service_seconds(person)==20,"Training belongs only to the selected bartender")
@@ -33,15 +36,24 @@ func run(test: SceneTree) -> void:
 	test.check(m.s.cash==cash_before,"Maxed training cannot be charged again")
 	bar.team[1].on = false
 	bar.customers.clear()
-	person.service_clock = 0
+	var existing_deadline: float = person.service_ready
 	eco.admit(bar,false,true)
 	advance(m,14)
-	test.check(bar.sold==1,"Training does not instantly settle an order")
+	test.check(bar.sold==2 and person.service_ready==existing_deadline,"Training preserves the cooldown already running")
+	advance(m,11)
+	test.check(bar.sold==3,"Existing cooldown finishes before the new trained interval applies")
+	bar.customers.clear()
+	eco.admit(bar,false,true)
+	advance(m,14)
+	test.check(bar.sold==3,"Trained cooldown still needs fifteen seconds")
 	advance(m,1)
-	test.check(bar.sold==2,"Trained staff serves at the measured interval")
+	test.check(bar.sold==4,"Trained staff serves after the measured fifteen-second cooldown")
 	bar.customers.clear()
 	advance(m,30)
-	test.check(bar.sold==2 and person.service_clock==0,"No customer means no auto sale or banked service")
+	test.check(bar.sold==4 and eco.staff_status(bar,person).remaining==0,"Quiet time readies one serve, never a stockpile of sales")
+	eco.admit(bar)
+	advance(m,1)
+	test.check(bar.sold==5,"A ready bartender serves a new arrival without a fresh warmup")
 	# Contracts expire even while off duty, closed or skipping prep.
 	bar.open = false
 	person.on = false

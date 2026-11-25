@@ -3,7 +3,32 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current day-seven / weekly celebration verification — 25 November 2026
+## Current ready-bartender / auto-serve verification — 25 November 2026
+
+The full Godot 4.7.2 suite passes regressions, 42 fresh campaigns and 60 paired
+party scenarios. Active baseline second-property times are 117.7–122.2 minutes;
+stage three takes 166.9–172.4, inside the existing celebration-adjusted bounds.
+Owner auto-serve routes now reach their second venue in 142.5–144.6 minutes with
+the lower purchase price. Sustained bartender capacity remains 2.4/3/4 drinks
+per minute, with immediate ready service replacing repeatedly cancelled warmup.
+
+`tests/staff_ready_check.gd` and updated staff tests cover first readiness,
+25/20/15-second recovery, training with an existing deadline, quiet queues,
+stockouts, toggles/closure, shared orders, owner priority separation, actual staff
+counters, pure HUD reads, fractional save/reload and v8 migration. UI tests check
+the indicator's counter and Service navigation. Auto-serve settlement verifies
+exactly ฿3,000 and the unchanged manual deadline. Startup/offline isolation remains.
+
+Nine `staff-ready-*` economy previews were rendered at 960 × 540 and 1280 × 720.
+Visual review covers the bottom-right counter, sale confirmation, countdown,
+quiet/stockout/rota/expired states and the new price across those sizes. Serving
+poses use existing production frames after actual staff sales. No art is replaced.
+
+Docs/local links and `git diff --check` are checked before commit. Release CI
+repeats tests and verifies signed exports. Android device play and Windows/macOS
+execution remain unverified; a successful build is not a device playtest.
+
+## Previous v1.0.17 day-seven / weekly celebration verification — 25 November 2026
 
 Godot 4.7.2 `tools/test.sh` passed all regressions, 42 fresh campaigns and 60 paired celebration scenarios
 (120 trading days). The paired prepared bar sold 54% more drinks and earned 59%

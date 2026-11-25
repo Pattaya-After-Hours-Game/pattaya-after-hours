@@ -37,6 +37,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			if not person.has("training"): person.training = int(bar.equipment.training)
 			if not person.has("service_clock"): person.service_clock = 0
 			if not person.has("audience_training"): person.audience_training = 0
+			ensure_staff_service(person)
 			if person.contract_left<=0: person.on = false
 	if fresh:
 		s.cash = C.STARTING_CASH
@@ -306,16 +307,64 @@ func service_rate(bar: Dictionary, offset: int = 0) -> float:
 			rate += 60.0/service_seconds(person)
 	return rate
 
+func ensure_staff_service(person: Dictionary) -> void:
+	if not person.has("service_ready"):
+		var old_progress := int(person.get("service_clock",0))
+		person.service_ready = action_time()+maxi(0,service_seconds(person)-old_progress) if old_progress>0 else 0.0
+	person.merge({"last_served":-1.0,"drinks_served":0})
+	person.service_ready = float(person.service_ready)
+	person.last_served = float(person.last_served)
+
+func staff_status(bar: Dictionary, person: Dictionary) -> Dictionary:
+	var left := maxf(0.0,float(person.get("service_ready",0))-action_time())
+	var reason := "Ready · waiting for orders" if pending(bar)==0 else "Ready · serving next order"
+	if not contracted(person): reason = "Contract finished"
+	elif not person.on: reason = "Off duty"
+	elif person.role!=0: reason = "Attracts visitors; does not serve"
+	elif bar.team.find(person) in bar.away: reason = "Away for this shift"
+	elif not is_trading(bar): reason = "Venue closed"
+	elif left>0: reason = "Recovering · %ds" % ceili(left)
+	elif bar.stock==0: reason = "Ready · out of stock"
+	return {"text":reason,"remaining":left,"served":int(person.get("drinks_served",0)),"recent":float(person.get("last_served",-1))>=0 and action_time()-float(person.last_served)<2.0}
+
+func staff_indicator(bar: Dictionary) -> String:
+	var bartenders := 0
+	var served := 0
+	var available := 0
+	var ready := 0
+	var next := 1e15
+	var recent := false
+	for person in bar.team:
+		served += int(person.get("drinks_served",0))
+		if person.role!=0: continue
+		bartenders += 1
+		var view := staff_status(bar,person)
+		recent = recent or view.recent
+		if contracted(person) and person.on and not bar.team.find(person) in bar.away:
+			available += 1
+			next = minf(next,view.remaining)
+			if view.remaining<=0: ready += 1
+	if bartenders==0: return "BAR STAFF\nNo bartender · hire in Service"
+	var text := "%d ready · next order is automatic" % ready
+	if not is_trading(bar): text = "Venue closed"
+	elif available==0: text = "Off duty / contract finished"
+	elif ready==0: text = "Recovering · next ready in %ds" % ceili(next)
+	elif bar.stock==0: text = "%d ready · out of stock" % ready
+	elif pending(bar)==0: text = "%d ready · waiting for orders" % ready
+	return "BAR STAFF · drinks served: %d\n%s%s" % [served,"Served a drink!\n" if recent and is_trading(bar) else "",text]
+
 func staff_service(bar: Dictionary) -> void:
+	if not is_trading(bar): return
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
-		if not contracted(person) or not person.on or person.role!=0 or i in bar.away or pending(bar)==0 or bar.stock==0:
-			person.service_clock = 0
-			continue
-		person.service_clock = int(person.get("service_clock",0))+1
-		if person.service_clock>=service_seconds(person):
-			serve(bar,1)
-			person.service_clock = 0
+		ensure_staff_service(person)
+		if not contracted(person) or not person.on or person.role!=0 or i in bar.away: continue
+		if action_time()<float(person.service_ready): continue
+		if serve(bar,1)>0:
+			person.service_ready = action_time()+service_seconds(person)
+			person.last_served = action_time()
+			person.drinks_served += 1
+			person.service_clock = 0 # Retained only for old-save compatibility.
 
 func operating_rate(bar: Dictionary, offset: int = 0) -> int:
 	if bar.get("recovery",0)>0: return 0
@@ -745,7 +794,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if bar.auto_serve:
 				bar.auto_serve_on = not bar.auto_serve_on
 				return "Auto-serve %s. The existing Serve cooldown is unchanged." % ("on" if bar.auto_serve_on else "off")
-			if s.cash<C.AUTO_SERVE_COST+operating_rate(bar)*2: return "Keep the next shift's reserve after the ฿6,000 auto-serve purchase."
+			if s.cash<C.AUTO_SERVE_COST+operating_rate(bar)*2: return "Keep the next shift's reserve after the ฿3,000 auto-serve purchase."
 			s.cash -= C.AUTO_SERVE_COST
 			s.weekly.costs += C.AUTO_SERVE_COST
 			bar.auto_serve = true
@@ -844,6 +893,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			s.weekly.costs += amount
 			var host := free_host(bar) if index==1 else -1
 			bar.team.append({"role":index,"on":true,"host":host,"training":0,"audience_training":0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES})
+			ensure_staff_service(bar.team.back())
 			bar.crew = bar.team.size()
 			commit_orders(bar)
 			return "Nida hired: ten days, ฿1,200 plus 10% drink commission. She welcomes; you serve." if index==3 else "%s hired for ten game days (฿%d). Wages: ฿%d/real min while trading on duty." % [C.ROLE_NAMES[index],amount,C.ROLE_WAGES[index]]
@@ -998,8 +1048,8 @@ func tick() -> void:
 					if not pool_report.is_empty(): pool_report.lost += 1
 			if customer.life<=0 and not customer.playing: depart(bar,customer)
 		if bar.restock and bar.stock<pack_quantity(bar) and pending(bar)>0: restock(bar,true)
-		if automatic_service(bar): serve(bar,1,true)
 		staff_service(bar)
+		if automatic_service(bar): serve(bar,1,true)
 		pool_tick(bar)
 
 func offline(now: int, cap_seconds: int) -> int:

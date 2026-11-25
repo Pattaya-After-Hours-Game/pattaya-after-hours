@@ -111,6 +111,7 @@ func run(test: SceneTree) -> void:
 	bar.restock = true
 	bar.equipment.sign = 1
 	bar.team = [{"role":0,"on":true,"host":-1}]
+	for person in bar.team: managed.street.economy.ensure_staff_service(person)
 	bar.crew = 1
 	managed.s.cash = 10000
 	managed.s.street.last_seen = int(Time.get_unix_time_from_system())-3600

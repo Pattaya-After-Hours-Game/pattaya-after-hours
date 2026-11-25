@@ -347,6 +347,17 @@ Street owns celebration start/end, the two-day reminder and story rotation.
 Economy applies the flagship's temporary demand/timing rules and records actual
 transactions. The UI reads countdown/report state and City draws temporary
 bunting over existing art. Keep menu/countdown reads pure and exclude calendar
-bonuses from offline forecasts. Current save schema 8 adds the active/last ledger
+bonuses from offline forecasts. Save schema 8 added the active/last ledger
 and guest patience; v7 ownership and money remain intact. Use the `party-*`
 economy preview group and celebration regressions when changing this flow.
+
+## Staff readiness and save schema nine
+
+Staff recovery is a saved `service_ready` deadline on the foreground action clock.
+Economy settles one real order, then records that person's next deadline,
+`last_served` and `drinks_served`. UI and City only read these fields. Keep staff
+before owner auto-serve in the live tick, without changing manual action timers.
+Schema 9 preserves fractional deadlines and converts old partial work once.
+`tests/staff_ready_check.gd` covers ready service, toggle/reload protection, stock,
+queue sharing, owner separation and migration. The `staff-ready-*` economy preview
+group checks the bottom-right indicator, real serving poses and purchase price.

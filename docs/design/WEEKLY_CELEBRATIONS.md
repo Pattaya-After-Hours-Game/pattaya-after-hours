@@ -68,7 +68,7 @@ compact seating, music, a trained bartender and faster owner service; a basic
 bar retains manual base service. These are controlled scenarios, not fresh-game
 pacing runs or a guarantee of human results.
 
-Prepared bars sold 54% more drinks and earned 59% more trading contribution in
+With ready-bartender cooldowns, prepared bars sold 51% more drinks and earned 57% more trading contribution in
 aggregate. Basic bars sold 28% more and earned 27% more, with substantially more
 lost customers. Preparation matters; advertising cannot substitute for service.
 The same normal prices, costs, shared-demand limits and customer budgets apply.

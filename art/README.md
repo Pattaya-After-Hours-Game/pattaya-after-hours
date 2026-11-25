@@ -232,3 +232,11 @@ closeout. City draws temporary coloured bunting near the ceiling only while the
 selected host is trading in its celebration window. Existing room plates,
 portraits and atlases are unchanged; all visible visitors remain actual customers.
 The countdown and actual contribution report are model-driven UI.
+
+## Actual bartender service feedback
+
+The bottom-right BAR STAFF indicator uses the model's actual staff sales and
+cooldown/readiness. Bartender atlases enter their existing serve animation only
+for two seconds after a real staff sale; the old decorative six-second loop is
+removed. No textures or atlas frames are replaced. Use `staff-ready-*` economy
+previews for ready, served, cooldown, quiet, stockout, rota and expiry states.

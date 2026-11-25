@@ -39,7 +39,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			bar.merge(Economy.clock_fields(),true)
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	economy = Economy.new(s,fresh)
-	s.version = 8
+	s.version = 9
 
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()

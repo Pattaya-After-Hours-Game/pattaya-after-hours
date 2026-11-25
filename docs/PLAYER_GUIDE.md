@@ -36,6 +36,26 @@ bonus. Later saves get the next scheduled event rather than retroactive cash.
 can mean more total orders, but stock, seats and service still limit sales. Music
 and parties shorten repeat timing. Fridges earn reputation through happy visits.
 
+## Is my bartender working?
+
+Look at **BAR STAFF** in the bottom right. It shows drinks staff have actually
+served, flashes **Served a drink!**, and counts down to the next serve. It also
+shows **waiting for orders**, **out of stock**, **off duty / contract finished**
+or **venue closed**. Tap it for Service and each person's detailed status.
+Counts start when hired or when this update is installed, excluding your taps
+and offline estimates.
+
+She starts ready and automatically serves a waiting customer on the next live
+tick if stock is available. Then she recovers for 25 seconds, improving to 20/15
+with training. Your clicks and a temporarily empty queue cannot restart her wait.
+An empty bar can leave her ready, but it never banks multiple drinks. Her serving
+pose now follows an actual sale. Ready staff get the first order before owner
+auto-serve; both still respect the same real stock and customers.
+
+**Owner auto-serve now costs ฿3,000.** It automates your Serve button at its current
+speed, separately from hired bartenders. Existing purchases remain owned; there
+is no refund or new purchase required.
+
 ## Your first shift
 
 1. Serve the three opening customers. A yellow/gold dot marks an order; red means
@@ -242,7 +262,7 @@ leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
 The combined active-play checks reach pool around 16–19 minutes, stage 2 around
-34–40 minutes and a second property around 119–126 minutes. After stage 2, the
+34–40 minutes and a second property around 117–123 minutes. After stage 2, the
 active policy improves pouring, trains staff and then saves for expansion.
 The first Soi lease is ฿16,000 plus opening reserves. These are
 simulation results for a particular investment strategy, not timers or promises
@@ -314,7 +334,7 @@ round after 25 seconds rather than 35; they still need money and service. The
 Music indicator shows playing while open and off while closed. Muting the game
 does not remove the upgrade's effect.
 
-**Buy auto-serve · ฿6,000** replaces repeated Serve taps. It uses the same timer,
+**Buy auto-serve · ฿3,000** replaces repeated Serve taps. It uses the same timer,
 stock and real orders, with an on/off toggle. It does not make that timer faster.
 At stage two, the final **Faster pouring · ฿5,600** purchase reduces future refills
 from four seconds to two. Current refills finish normally. Welcome still caps
@@ -343,7 +363,8 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Save schema 8 also retains celebration dates, reports and visitor patience.
+Save schema 9 retains staff cooldowns and actual service counters; older partial
+work keeps its remaining wait. Schema 8 also retains celebration dates, reports and visitor patience.
 The schema-7 fields preserve music, auto-serve, supplier/manager tiers, stock purchase
 costs and the five-second net sample alongside existing timers and commission.
 Existing manager/supplier appointments become level one without another fee. Migration does not

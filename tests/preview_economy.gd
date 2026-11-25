@@ -23,7 +23,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -72,6 +72,28 @@ func run() -> void:
 	await capture(app,"actions-closed")
 	app.model = Campaign.new(72)
 
+	app.drawer_open = false
+	await capture(app,"staff-ready-unhired")
+	app.model.s.cash = 10000
+	app.model.street.action("hire",0)
+	await capture(app,"staff-ready-waiting-order")
+	app.model.street.tick(1)
+	await capture(app,"staff-ready-served")
+	app.model.street.tick(10)
+	await capture(app,"staff-ready-cooldown")
+	app.model.street.selected().customers.clear()
+	app.model.s.street.pass_credit = -1000000
+	app.model.street.tick(30)
+	await capture(app,"staff-ready-quiet")
+	app.model.street.selected().stock = 0
+	await capture(app,"staff-ready-stockout")
+	app.model.street.action("rota",0)
+	await capture(app,"staff-ready-off-duty")
+	app.model.street.economy.advance_contracts(14400)
+	await capture(app,"staff-ready-expired")
+	app.drawer_open = true
+	await capture(app,"staff-ready-price","YOUR ACTION UPGRADES")
+	app.model = Campaign.new(72)
 	app.model.s.day = 6
 	app.drawer_open = false
 	await capture(app,"party-tomorrow-scene")

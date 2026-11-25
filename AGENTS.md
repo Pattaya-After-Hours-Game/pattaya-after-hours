@@ -47,7 +47,12 @@ claiming behaviour exists; update the relevant documentation when it changes.
   time. Switching a bartender to a specialist role charges the positive contract
   price difference prorated to the remaining term, with a shift reserve; no refund
   for switching back. Training belongs to the person and survives expiry/rehire. Base bartender
-  service is one drink per 25 seconds, improving to 20/15 through training.
+  service starts ready: sell one real order, then recover for 25 seconds, improving
+  to 20/15 through training. Keep the saved deadline through queue changes, owner
+  clicks, rota/role changes and reloads. Staff precede purchased owner auto-serve.
+  Schema 9 preserves fractional staff deadlines and actual-sale counters; the
+  bottom-right indicator and serving poses must reflect those sales, not decorative
+  timer loops or offline estimates.
   Quiet trading still has costs. Preserve rotas, temporary closure and recovery
   instead of forcing idle-mode debt or an unrecoverable failure.
 - Nida uses one separate frontage slot: ฿1,200/ten days plus 10% of actual drink
@@ -68,7 +73,7 @@ claiming behaviour exists; update the relevant documentation when it changes.
   purchase prices ฿18,000/36,000/72,000. Keep it separate from drink/pool sales,
   commission, customer counters and healthy-service milestones. No closed income.
 - Music costs ฿1,200 and shortens repeat-order timing 35→25 seconds; budgets and
-  visit limits still apply. Auto-serve costs ฿6,000 per venue and uses the SAME
+  visit limits still apply. Auto-serve costs ฿3,000 per venue and uses the SAME
   Serve deadline as manual clicks. Never award extra service for toggles/reloads.
   Till ฿/s is a five-second sample of actual net trading, excluding investments
   and offline claims; no simulation or accounting belongs in the HUD.

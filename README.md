@@ -89,7 +89,7 @@ cash for the next shift—not just a large bank balance.
 | Purchase | Price and effect |
 | --- | --- |
 | Music system | ฿1,200; repeat drink orders after 25 seconds instead of 35. Visitors still need budget, stock and service. |
-| Auto-serve | ฿6,000 per venue; automatically uses the existing Serve timer. Manual taps share it. Toggle it in Service. |
+| Auto-serve | ฿3,000 per venue; automatically uses the existing Serve timer. Manual taps share it. Toggle it in Service. |
 | Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
 | Manager levels 1 / 2 / 3 | ฿18,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
 | Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; delivery prices ฿84 for 6, then ฿144 / ฿120 / ฿96 / ฿72 for 12. |
@@ -170,9 +170,10 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 8.
+retain money, staff, venues and owned stages when migrated to save schema 9.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
-Schema 8 retains celebration dates, active/last reports and visitor patience,
+Schema 9 preserves staff cooldown deadlines and actual service counters. Older
+partial work is converted once; existing purchases get no refund. Schema 8 retains celebration dates, active/last reports and visitor patience,
 without retroactive party payouts. Schema 7 added purchased automation, music, supplier/manager levels, inventory
 purchase costs and the five-second earnings sample. Existing supplier/manager
 appointments become level 1; new upgrades must be bought. Schema 6 added
@@ -211,8 +212,8 @@ The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
 are checked together with 42 fresh-campaign simulations plus 60 paired celebration scenarios. Baseline active
-runs reach stage 2 in 34–37 minutes, a second venue in 119–126 minutes and stage 3
-in 170–177 minutes. Optional promoter-first investment takes longer to repay;
+runs reach stage 2 in 34–37 minutes, a second venue in 117–123 minutes and stage 3
+in 166–173 minutes. Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
@@ -288,3 +289,17 @@ there is no payout button. Offline time cannot spend the event or replay its bon
 **Does reputation help?** Yes: it improves your share of visiting customers,
 which can create more total orders. It does not increase each customer's budget
 or order frequency. Music and celebrations affect repeat-order timing.
+
+## See your bartender working
+
+The bottom-right **BAR STAFF** indicator shows actual staff drinks served,
+a short confirmation after each sale, readiness, cooldown and stock/rota problems.
+Tap it to open Service. Staff sprites use their serving pose after actual sales.
+Counters begin at hiring or this update and exclude owner taps and offline estimates.
+
+A bartender starts ready. If an order and stock are available, she serves on the
+next simulation tick, then recovers for 25 seconds (20/15 with training). Empty
+queues and owner clicks do not restart her cooldown. Quiet time readies one
+serve, never a burst of banked sales. Staff get first chance at an order when
+purchased owner auto-serve is also ready; owner manual taps retain their own timer.
+Auto-serve now costs **฿3,000**. Previously owned automation stays owned.

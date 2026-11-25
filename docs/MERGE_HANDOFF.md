@@ -1,31 +1,28 @@
 # Current implementation and release handoff
 
-Updated **25 November 2026**. The day-seven/weekly celebration feature is on
-**`codex/week-seven-celebrations`**, based on main `fe0068d` (published v1.0.16).
-Affordable bartenders, bulk stocking, fridge reputation and prior music/Nida/
-graphics work are already integrated. Other worktrees and attachments are preserved.
+Updated **25 November 2026**. Ready bartenders and the reduced auto-serve price
+are on **`codex/bartender-ready-indicator`**, based on main `fb8ee0f` (published
+v1.0.17). The birthday, bulk deliveries, affordable contracts and earlier graphics
+work are already integrated. Other worktrees and user attachments are preserved.
 
-Anong's Birthday runs at the Blue Hour on the day-seven opening, noon to 1am.
-Day-five warning, countdown, temporary bunting, bounded traffic, faster repeat
-orders, an optional third drink and real trading reports give the mid-game a
-predictable reward. Weekly reunions/mixtape/thank-you nights follow. There is no
-fee, instant cash gift or offline event multiplier. New random announcements
-wait during the party; already announced events continue. Reputation still
-changes attraction, not per-visitor spending or order timing.
+Owner auto-serve costs ฿3,000. Bartenders serve when ready, then recover for
+25/20/15 seconds. Clearing a queue no longer resets their wait. Rotas, closing,
+training and reloads preserve the deadline. Staff precede purchased owner
+automation, sharing real orders and stock. The bottom-right HUD and actual serving
+poses expose their work; no new production assets are introduced.
 
-Schema 8 preserves active/last party ledgers and per-visitor patience. Migration
-keeps existing ownership, contracts, cash and inventory costs; no retroactive
-party payout. Existing v7 campaigns at/past day seven get their current/upcoming
-calendar opportunity. Production textures/atlases remain unchanged.
+Schema 9 retains fractional deadlines, last-serve timestamps and staff sale
+counts. Existing contracts, training and owned equipment remain; old partial
+work keeps the remaining wait and historical sales are not invented. There is
+no retroactive refund for the lower auto-serve price. Offline estimates retain
+sustained demand-limited service and do not inflate live counters.
 
-`tools/test.sh` covers regressions, 42 fresh campaigns and 60 paired celebration
-scenarios. The [testing record](TESTING.md), [economy evidence](ECONOMY.md#balance-verification)
-and [design rationale](design/WEEKLY_CELEBRATIONS.md) record results and limits.
-The user explicitly requested commit, build and deployment. Main's signed release
-workflow supplies publication; verify its run and
+Verification uses the full regression/pacing suite, paired celebration scenarios
+and readiness previews. See [testing](TESTING.md) and [economy](ECONOMY.md) for
+measured results. Publication follows the authorized main-branch signed build
+workflow; verify its run and
 [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for the actual tag and source commit. Android device play and human retention
-feedback remain separate from successful builds and simulations.
+for the actual tag/source. Device play and human balance feedback remain separate.
 
 The earlier PR #4/#5 review scope is unchanged. This is a feature handoff, not a
 new audit of every conversation. The consolidation audit below is historical.

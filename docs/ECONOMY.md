@@ -115,7 +115,7 @@ Bartenders continue serving independently during manual recovery.
 Each venue buys separate Faster pouring and Better welcoming levels in Service:
 10 → 8 → 6 → 4 seconds, at incremental prices of ฿900, ฿1,400 and ฿2,800.
 Pouring alone adds a stage-two 4 → 2 second tier for ฿5,600. Welcome still caps
-at four seconds. Auto-serve is a separate ฿6,000 purchase, using the same saved
+at four seconds. Auto-serve is a separate ฿3,000 purchase, using the same saved
 Serve deadline, actual-order/stock checks and current cooldown as manual serving.
 It runs per venue during live ticks, including guided play; it does not stack a
 second owner timer, reset an active deadline or advance through paused screens.
@@ -146,8 +146,9 @@ An empty bar needs appeal; a queue needs service; a full bar needs more space.
 Useful early investments include signage, seating, deliveries, pool and a fridge.
 A bartender contract costs ฿1,200, matching Nida’s upfront fee without her commission. Base service is one drink
 per 25 real seconds (2.4/min); individual training costs ฿800 then ฿1,600 and
-reduces this to 20s (3/min) then 15s (4/min). Each bartender has a saved work timer;
-empty queues and stockouts cannot bank future service or generate sales. Manual
+reduces this to 20s (3/min) then 15s (4/min). Each bartender has a saved cooldown deadline. She starts ready, serves one
+actual order on the next live tick, and only then begins recovery. Empty queues
+and stockouts do not restart that deadline or bank multiple future sales. Manual
 serving remains useful alongside staff. Hosts and dancers attract
 visitors instead. Gogos perform between seconds 40 and 80 of each shift; drinks
 and premium-menu orders are priced independently of renovation stage.
@@ -214,6 +215,30 @@ and whole-street impact. These are capacity estimates, not promises of revenue;
 they account for other properties losing some shared visitors. Hiring more
 attraction into a service bottleneck can reduce net profit.
 
+## Ready staff and visible service
+
+Staff cooldowns are independent of owner Serve/auto-serve. `staff_service` checks
+eligibility, deadline, real orders and stock; a successful settlement records
+`service_ready`, `last_served` and `drinks_served` on that person. Ready staff are
+processed before owner auto-serve so the purchase cannot continually pre-empt
+them. Multiple workers share the same queue and cannot sell one order twice.
+
+The base cooldown is 25 seconds; training makes subsequent cooldowns 20/15.
+Training preserves a deadline already running. Owner clicks, empty queues,
+stockouts, rotas, closure, reassignments and reloads never reset it. Foreground
+closed/off-duty time can finish recovery; paused/menu/offline time does not
+advance the live deadline. Overnight skips retain it, like owner action timers.
+Offline projections retain demand-limited sustained service estimates and do not
+add to live staff counters or fake a recent serving animation.
+
+The bottom-right indicator and Service roster read the authoritative state.
+Counts are actual staff sales since hiring or this update, not reconstructed
+historical totals. Serving poses follow actual settlement for two seconds.
+The HUD cannot award money or run service. Save schema nine preserves fractional
+deadlines and counters; old nonzero `service_clock` progress becomes its remaining
+cooldown once. An idle old bartender becomes ready. Old training, contracts,
+stock, cash and purchased auto-serve remain; the lower price grants no refund.
+
 ## Staff contracts and alerts
 
 Bartender, host and dancer contracts last 14,400 game minutes (ten days).
@@ -223,10 +248,10 @@ offline gap consume time, including closed/off-duty periods. Only live simulatio
 phases advance contracts in the foreground. Backward wall clocks never extend
 them. Managers remain a separate permanent appointment with operating costs.
 
-Expiry switches the person off, clears their partial work and removes any host
+Expiry switches the person off and removes any host
 absence. Their stable roster slot, role and training remain. Expired staff cannot
 serve, attract, accept bar fines, draw wages or be reactivated through the rota.
-Rehire starts a fresh term and resets work progress without resetting training.
+Rehire starts a fresh term without resetting training or an outstanding cooldown.
 Role changes retain training and remaining term; service training only benefits
 bartenders. A switch to a more expensive role charges the positive contract-price
 difference × remaining minutes / 14,400, rounded up, and requires a full shift’s
@@ -239,7 +264,7 @@ bartender/dancer hires.
 
 Older saves initialise missing contract fields and copy the venue's old training
 level to its existing staff. Future hires start at level zero. Optional fields
-are validated on loading; the compatibility equipment key remains in schema 8,
+are validated on loading; the compatibility equipment key remains in schema 9,
 but venue-wide training purchases are disabled. Normal offline catch-up applies
 after migration. Existing money, venues and staff records are retained.
 
@@ -413,7 +438,7 @@ the regression suite, `tests/economy_balance.gd`, `tests/promoter_balance.gd` an
 `tests/automation_balance.gd`: 42 fresh campaigns in total.
 `tests/celebration_balance.gd` additionally compares 60 paired trading-day
 scenarios (120 days): 30 seeds for basic and prepared businesses. Prepared bars
-sold 54% more drinks and earned 59% more trading contribution in aggregate;
+sold 51% more drinks and earned 57% more trading contribution in aggregate;
 basic bars gained 28% and 27%, with more queue losses. These are controlled
 comparisons, not a guarantee that every party or every human strategy profits.
 
@@ -440,11 +465,11 @@ Existing money, properties and upgrades are never reset; no refunds are minted.
 | First useful purchase | 2–5 min | 2.5–4.4 min |
 | Pool table | 10–20 min | 15.9–18.5 min |
 | First stage 2 | 30–45 min | 33.6–36.8 min |
-| Second property | 90–150 min | 119.0–125.2 min |
-| First stage 3 | 180–300 min | 170.0–176.3 min |
+| Second property | 90–150 min | 117.7–122.2 min |
+| First stage 3 | 180–300 min | 166.9–172.4 min |
 
-Mostly-idle campaigns reach stage 3 in 233–241 minutes. No-chat manual-upgrade
-campaigns take 172–179 minutes; no-chat staff-first campaigns take 185–192 minutes.
+Mostly-idle campaigns reach stage 3 in 227–234 minutes. No-chat manual-upgrade
+campaigns take 171–173 minutes; no-chat staff-first campaigns take 180–188 minutes.
 The six active target runs use the original windows with a fifteen-minute allowance
 below the original three-hour stage-3 lower bound for earned weekly-party income; the other nine
 must remain viable and complete within the ten-hour simulation limit. All target
@@ -463,9 +488,9 @@ These optional investments are not forced into the baseline milestone windows:
 
 | Purchase route | Stage 2 | Second property | Stage 3 |
 | --- | ---: | ---: | ---: |
-| Promoter before renovation | 47.3–47.5 min | 129.7–134.7 min | 179.8–182.6 min |
-| Service first, promoter after renovation | 43.4–44.0 min | 127.9–133.5 min | 178.3–181.8 min |
-| Compact layout, no promoter | 38.7–42.2 min | 120.0–120.5 min | 170.5–171.0 min |
+| Promoter before renovation | 47.3–47.5 min | 128.7–131.4 min | 178.7–179.6 min |
+| Service first, promoter after renovation | 43.4–44.0 min | 128.7–130.0 min | 177.4–178.4 min |
+| Compact layout, no promoter | 38.7–42.2 min | 119.0–122.1 min | 167.3–170.5 min |
 
 The early promoter route buys pouring level two and compact seating before Nida,
 yet still delays renovation: automatic welcoming is a convenience with a real
@@ -480,10 +505,10 @@ stop pressing Serve once it is purchased; they still pay for every upgrade.
 
 | Route | Stage 2 | Second property | Stage 3 |
 | --- | ---: | ---: | ---: |
-| Music first | 41.2–42.5 min | 124.8–127.3 min | 175.7–177.8 min |
-| Auto-serve and two-second pouring | 35.5–36.3 min | 150.3–152.1 min | 199.7–201.3 min |
-| Supplier first | 35.5–36.3 min | 126.6–129.6 min | 176.4–179.1 min |
-| Automation bundle | 41.2–42.5 min | 157.7–159.3 min | 203.7–206.0 min |
+| Music first | 41.2–42.5 min | 123.9–127.5 min | 173.3–176.4 min |
+| Auto-serve and two-second pouring | 35.5–36.3 min | 142.5–144.6 min | 190.5–191.8 min |
+| Supplier first | 35.5–36.3 min | 122.9–126.5 min | 169.8–174.3 min |
+| Automation bundle | 41.2–42.5 min | 144.9–147.8 min | 188.4–190.7 min |
 
 Optional convenience spending delays expansion; it is not required for the
 baseline targets. All strategies remain solvent and respect orders/shared demand.
@@ -493,9 +518,9 @@ inventing customer sales. Larger manager tiers have settlement/gate coverage,
 not a claim of fully balanced post-stage-three play.
 
 Three further campaigns save for a bartender before other investments. The first
-hire is affordable at **4.2–4.7 minutes**; pool follows at 23.1–24.1 minutes,
-stage 2 at 55.5–57.8, the second property at 128.5–135.6 and stage 3 at
-179.0–184.7. Early wages and delayed owner upgrades make this a convenience
+hire is affordable at **4.2–4.7 minutes**; pool follows at 22.6–23.2 minutes,
+stage 2 at 53.6–57.0, the second property at 127.6–130.2 and stage 3 at
+177.8–179.0. Early wages and delayed owner upgrades make this a convenience
 choice, not a guaranteed acceleration of every milestone. All three remain
 solvent and respect demand; the first-hire acceptance ceiling is ten minutes.
 

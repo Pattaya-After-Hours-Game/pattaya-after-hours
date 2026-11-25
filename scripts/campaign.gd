@@ -666,7 +666,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -787,6 +787,11 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=9:
+			for bar in parsed.street.bars:
+				for person in bar.team:
+					if not _finite_number(person.get("service_ready"),0,1e15) or not _finite_number(person.get("last_served"),-1,1e15): return null
+					if not _finite_number(person.get("drinks_served"),0,1e15) or float(person.drinks_served)!=floorf(person.drinks_served): return null
 		return parsed
 	return null
 
@@ -810,7 +815,7 @@ func _restore_numbers(value: Variant, field: String = "") -> Variant:
 	# Preserve explicit fractional action clocks; legacy numeric fields stay integers.
 	match typeof(value):
 		TYPE_FLOAT:
-			if field in ["tick_fraction","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
+			if field in ["tick_fraction","service_ready","last_served","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
 			return int(value)
 		TYPE_ARRAY:
 			for i in value.size(): value[i] = _restore_numbers(value[i])

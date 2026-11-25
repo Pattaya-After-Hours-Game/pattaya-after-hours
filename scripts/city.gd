@@ -237,7 +237,7 @@ func scene_people(bar: Dictionary) -> Array:
 			else:
 				foot = Vector2(695+(bartender_index%3)*55,340-(bartender_index/3)*18)
 			bartender_index += 1
-			state = "serve" if fposmod(clock+i,6)>3 else "idle"
+			state = "serve" if bar.has("team") and i<bar.team.size() and float(bar.team[i].get("last_served",-1))>=0 and float(street_state.get("elapsed",0))-float(bar.team[i].last_served)<2.0 else "idle"
 		else:
 			foot = Vector2(565+(floor_index%3)*66,364-(floor_index/3)*12)
 			floor_index += 1

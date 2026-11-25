@@ -403,6 +403,15 @@ func render(keep_scroll: bool = false) -> void:
 	var walk := at_button(root_ui,Rect2(328,490,76,40),"Walk\ndistrict",walk_district)
 	walk.add_theme_font_size_override("font_size",12)
 	walk.disabled = practicing or model.s.phase != "plan"
+	if not practicing:
+		var staff_hud := at_button(root_ui,Rect2(666,408,278,68),"",change_tab.bind(0))
+		staff_hud.name = "StaffIndicator"
+		staff_hud.add_theme_font_size_override("font_size",13)
+		staff_hud.add_theme_color_override("font_color",TEAL)
+		staff_hud.tooltip_text = "Actual staff sales since hiring or this update. Bartenders serve whenever ready; owner auto-serve is a separate purchase. Tap for Service."
+		var staff_text := func() -> String: return model.street.economy.staff_indicator(model.street.selected())
+		staff_hud.text = staff_text.call()
+		live_labels.append([staff_hud,staff_text])
 	drawer = Control.new()
 	drawer.position = Vector2(570,54)
 	drawer.size = Vector2(380,422)
@@ -840,7 +849,7 @@ func street_panel() -> void:
 	body("Reputation helps attract visitors from shared street traffic. Music speeds up repeat orders; reputation does not change order timing or budgets.",MUTED,12)
 	body("YOUR ACTION UPGRADES",GOLD,14)
 	body("Per venue · prices preserve next shift’s reserve.",MUTED,12)
-	row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off") if bar.auto_serve else "Buy auto-serve · ฿6,000",street_action.bind("auto_serve"))
+	row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off") if bar.auto_serve else "Buy auto-serve · "+cash(StreetContent.AUTO_SERVE_COST),street_action.bind("auto_serve"))
 	body("Uses your existing Serve cooldown, real orders and stock. Manual taps share that timer. Staff work independently.",MUTED,12)
 	for i in StreetContent.ACTION_UPGRADES.size():
 		var button := row_button("",street_action.bind("action_upgrade",i))
@@ -921,7 +930,8 @@ func street_panel() -> void:
 			row_button("Rehire %s · %s" % [name_text,cash(eco.contract_cost(int(person.role)))],street_action.bind("rehire",i))
 			continue
 		if person.role==0:
-			body("One drink every %ds (%.1f/min). You can serve alongside them." % [eco.service_seconds(person),60.0/eco.service_seconds(person)],MUTED,12)
+			live_body(func() -> String: return eco.staff_status(bar,person).text+" · %d staff drinks served" % int(person.get("drinks_served",0)),TEAL,12)
+			body("Ready staff serve immediately, then recover for %ds (%.1f/min). You can serve alongside them." % [eco.service_seconds(person),60.0/eco.service_seconds(person)],MUTED,12)
 			if int(person.get("training",0))<StreetContent.STAFF_SERVICE_SECONDS.size()-1:
 				row_button("Train %s · %s" % [name_text,cash(StreetContent.STAFF_TRAINING_COST*(int(person.get("training",0))+1))],street_action.bind("train_staff",i))
 		if person.role in [2,3]:
