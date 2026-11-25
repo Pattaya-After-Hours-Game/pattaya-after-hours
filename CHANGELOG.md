@@ -19,6 +19,16 @@ player-facing overview is in [README.md](README.md).
 - Kept original pacing windows with a small traffic adjustment and prep-aware
   fresh-campaign policies. Updated gameplay, story, save and testing documentation.
 
+## 25 November 2026 — Bar-scene perspective and layout
+
+- Unified interior character scale, reduced Anong's foreground size, and placed
+  bartenders behind the illustrated counters instead of on stools.
+- Kept customers and both pool tables inside, placed passersby in the outside
+  lane, and removed event crowds that did not represent actual customers.
+- Sorted people and tables by depth, raised order dots above heads, and moved
+  messages away from customers' feet. Kept existing production artwork.
+- Added full/empty/closed visual fixtures and scene regression checks.
+
 ## Unreleased — Branch consolidation
 
 - Combined the progression and customer-economy histories with current upstream

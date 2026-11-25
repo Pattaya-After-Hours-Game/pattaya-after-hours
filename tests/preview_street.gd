@@ -106,6 +106,22 @@ func run() -> void:
 			var bar: Dictionary = app.model.street.selected()
 			populate(app,bar,stage)
 			await capture(app,"type-%d-stage-%d" % [kind,stage])
+	# Occupancy extremes reveal clipping and layering hidden by light fixtures.
+	for kind in 3:
+		app.model.s.street.selected = kind
+		var bar: Dictionary = app.model.street.selected()
+		populate(app,bar,3)
+		bar.customers.clear()
+		bar.games.clear()
+		bar.equipment.pool = 0
+		await capture(app,"empty-%d" % kind)
+		bar.equipment.seating = 2
+		while bar.customers.size()<app.model.street.economy.seats(bar):
+			app.model.street.economy.admit(bar)
+		await capture(app,"full-%d" % kind)
+		bar.open = false
+		await capture(app,"closed-%d" % kind)
+		bar.open = true
 	while app.model.s.street.bars.size()<8: app.model.street.action("buy",app.model.s.street.bars.size()%3)
 	for i in 8:
 		app.model.s.street.selected = i

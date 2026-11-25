@@ -6,7 +6,7 @@ campaign using the original decision lessons; it does not spend your real till.
 
 ## Your first shift
 
-1. Serve the three opening customers. A gold dot marks an order. Each successful
+1. Serve the three opening customers. A gold dot above a customer marks an order. Each successful
    click sells one drink and consumes one unit of stock.
 2. When no orders are waiting, welcome passersby. Welcoming has a cooldown and a
    capped effect; it cannot create an unlimited crowd.
@@ -69,6 +69,11 @@ again, but preserves owner closures and cash-shortage shutdowns. Use **Enable
 opening** when ready, or the existing owner-run recovery option after a raid
 has ended. Street-event countdowns pause while all venues are shut; temporary
 closure and cleaning timers still run during foreground prep time.
+
+Customers appear inside the doorway, in front of the furniture and service
+counters; bartenders work behind the counters. Smaller passersby stay in the
+street opening and do not count toward occupancy. Pool players stay beside
+their assigned table, with its paid/free timer on the table front.
 
 ## Read the bottleneck
 

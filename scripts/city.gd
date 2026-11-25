@@ -44,66 +44,54 @@ func _draw() -> void:
 	var backdrop := Art.venue(kind,stage)
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
 	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
-	# Reuse the existing illustrated table as an equipment layer at stage one.
-	# A second purchased table is another instance; artwork never awards income.
-	if kind==0 and bar.has("equipment"):
-		for table in int(bar.equipment.pool):
-			if stage>1 and table==0: continue
-			draw_texture_rect_region(Art.venue(0,2),Rect2(300-table*150,274,155,72),Rect2(300,274,155,72))
-	# Background traffic stays outside the open frontage.
-	Art.frame(self,"patrons",2,Vector2(fposmod(clock*18,145),355-absf(sin(clock*7))),.38)
-	# Venue workers are separate sprites; absence removes them immediately.
-	if not closed:
-		var dancer_index := 0
-		for i in int(bar.crew):
-			if i in bar.away or (bar.has("team") and i < bar.team.size() and not bar.team[i].on): continue
-			var role: int = int(bar.team[i].role) if bar.has("team") and i < bar.team.size() else (2 if kind==2 else 0)
-			var who: String = Art.worker_id(bar,i)
-			if bars.is_empty() and i < legacy_staff.size():
-				if not legacy_staff[i].work or legacy_staff[i].hurt: continue
-				who = Art.STAFF[int(legacy_staff[i].id)]
-			var base := Vector2(270+(i%3)*155,345+(i/3)*32)
-			var cycle := fposmod(clock+i*1.7,9.0)
-			var state := "idle"
-			var flip := false
-			if role == 2 and dancer_index < stage and (street_state.is_empty() or int(street_state.seconds) in range(40,80)):
-				var poles: Array = [[478],[402,545],[400,476,549]][stage-1]
-				base = Vector2(poles[dancer_index]-19,303)
-				dancer_index += 1
-				state = "dance"
-			elif cycle<4:
-				base.x += (cycle if cycle<2 else 4-cycle)*22
-				state = "walk"
-				flip = cycle>=2
-			elif cycle<7: state = "serve"
-			var pose := Art.animation_frame(who,state,clock+i,2 if state=="dance" else 1.6 if state=="walk" else 2)
-			Art.frame(self,who,pose,base,.64,flip,Vector2.ZERO,Color.WHITE,Vector2(1,1+.006*sin(clock*3+i)))
-		var crowd: int = bar.customers.size() if bar.has("customers") else mini(8,guests)
-		for i in crowd:
-			var place := Vector2(185+(i%8)*53,365+(i/8)*23)
-			if bar.has("customers") and bar.customers[i].playing:
-				for game in bar.games:
-					var player: int = game.players.find(bar.customers[i].id)
-					if player>=0: place = Vector2(315-int(game.get("table",0))*150+player*110,335)
-			Art.frame(self,"patrons",i%4,place,.55, i%2 == 1,Vector2.ZERO,Color.WHITE,Vector2(1,1+.008*sin(clock*2+i)))
-			if bar.has("customers") and bar.customers[i].order: draw_circle(place+Vector2(0,-53),3,GOLD)
+	# Only the street opening contains ambient traffic. Interior sprites come
+	# from the actual customers and available team, sorted by their floor depth.
+	_draw_passerby(kind,stage)
+	var people := scene_people(bar)
+	for person in people:
+		if person.behind_bar: _draw_person(person)
+	# Reuse the bar fronts from the same production plate to hide staff legs.
+	# Customers are drawn afterwards, on the public side of the counter.
+	if backdrop:
+		for region in counter_regions(kind,stage):
+			draw_texture_rect_region(backdrop,region,region)
+	# Tables and people share the depth order. The original illustrated table
+	# remains visible (but labelled not open) when it is not owned.
+	var floor_items := people.filter(func(person: Dictionary) -> bool: return not person.behind_bar)
+	if kind==0:
+		var table_count := int(bar.get("equipment",{}).get("pool",0))
+		if stage>1: table_count = maxi(1,table_count)
+		for table in table_count:
+			floor_items.append({"table":table,"foot":pool_rect(table).end})
+	floor_items.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.foot.y<b.foot.y)
+	for item in floor_items:
+		if item.has("table"):
+			draw_texture_rect_region(Art.venue(0,2),pool_rect(item.table),Rect2(270,274,165,78))
+		else:
+			_draw_person(item)
+	# Markers are drawn after the people so a nearer guest cannot hide an order.
+	for person in people:
+		if person.order:
+			var marker := order_position(person)
+			draw_circle(marker,6,INK)
+			draw_circle(marker,4,GOLD)
 	if bar.has("games") and bar.equipment.pool>0:
 		# Status is model-owned; the artwork never creates a pool fee.
 		for i in int(bar.equipment.pool):
-			var p := Vector2(300-i*150,306)
-			draw_style_box(_sign_box(),Rect2(p,Vector2(145,31)))
+			var p := pool_rect(i).position+Vector2(5,37)
+			draw_style_box(_sign_box(),Rect2(p,Vector2(145,23)))
 			var label := "POOL / CLOSED" if closed else "POOL / ฿50"
 			for game in bar.games:
 				if int(game.get("table",0))==i: label = "%ds / %s" % [game.remaining,"FREE" if game.fee==0 else "PAID"]
-			draw_string(font,p+Vector2(7,21),label,HORIZONTAL_ALIGNMENT_LEFT,135,16,GOLD)
+			draw_string(font,p+Vector2(7,17),label,HORIZONTAL_ALIGNMENT_LEFT,135,13,GOLD)
 	if kind==0 and stage>1 and bar.has("equipment") and bar.equipment.pool==0:
 		draw_style_box(_sign_box(),Rect2(300,306,155,31))
 		draw_string(font,Vector2(307,327),"POOL / NOT OPEN",HORIZONTAL_ALIGNMENT_LEFT,145,14,GOLD)
 	# Anong remains available at the service position even before the first hire.
 	var idle := 0 if service_flash <= 0 or closed else 3
-	Art.frame(self,"anong-service",idle,Vector2(760,470),1.35,false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
+	Art.frame(self,"anong-service",idle,Vector2(817,418),person_scale(418),false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
 	# Foreground bar layer occludes the bartender's legs, never the interface.
-	Art.image(self,"counter",Rect2(560,365,400,118))
+	Art.image(self,"counter",Rect2(650,344,310,92))
 	# Exact signage is live text, not lettering baked into generated artwork.
 	var sign_name: String = "BLUE HO" if selected_bar == 0 and stage == 1 else str(bar.name).to_upper()
 	draw_style_box(_sign_box(),Rect2(665,73,230,40))
@@ -122,7 +110,7 @@ func _draw() -> void:
 		draw_string(font,Vector2(160,250),reason,HORIZONTAL_ALIGNMENT_CENTER,390,23,GOLD)
 		if bar.get("clean_remaining",0)>0:
 			draw_string(font,Vector2(160,280),"CLEANING / %ds" % bar.clean_remaining,HORIZONTAL_ALIGNMENT_CENTER,390,18,TEAL)
-	if bar.get("raided",false): Art.image(self,"event-inspection",Rect2(140,290,90,110))
+	if bar.get("raided",false): Art.frame(self,"event-inspection",0,Vector2(505,365),person_scale(365))
 	_draw_event(closed)
 	if weather >= 5:
 		for i in 65:
@@ -132,6 +120,101 @@ func _draw() -> void:
 		var state := 3 if godzilla == "asleep" else 2 if shot_flash > .1 else 1 if arrival_time > 1.0 else int(arrival_time*4)%2
 		Art.frame(self,"monster",state,Vector2(400-maxf(0,1-arrival_time)*500,460),1.2,false,Vector2(320,320),Color.WHITE,Vector2(1,1+.012*sin(clock*(1.5 if state==3 else 3))))
 		if shot_flash > .1: draw_circle(Vector2(445,255),9*shot_flash,Color(1,.8,.3,shot_flash*.6))
+
+static func pool_rect(table: int) -> Rect2:
+	return Rect2(270+table*200,274+table*12,165,78)
+
+# All adult silhouettes are packed to 180px at rest. Use one perspective
+# rule for guests, staff and Anong, rather than a different size per role.
+static func person_scale(floor_y: float) -> float:
+	return clampf(.75+(floor_y-300)*.0022,.70,1.04)
+
+static func order_position(person: Dictionary) -> Vector2:
+	return person.foot-Vector2(0,180*person_scale(person.foot.y)+10)
+
+func _draw_person(person: Dictionary) -> void:
+	var foot: Vector2 = person.foot
+	var scale_value := person_scale(foot.y)
+	# Small contact shadows make the common floor plane visible.
+	draw_set_transform(foot*size/Vector2(960,540),0,Vector2(1,.24)*size/Vector2(960,540))
+	if not person.behind_bar: draw_circle(Vector2.ZERO,18*scale_value,Color(0,0,0,.24))
+	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
+	Art.frame(self,person.who,person.pose,foot,scale_value,person.flip)
+
+static func counter_regions(kind: int, stage: int) -> Array[Rect2]:
+	if kind==0:
+		if stage==1: return [Rect2(250,270,300,85),Rect2(665,290,180,110)]
+		return [Rect2(440,278,400,120)]
+	return [Rect2(665,290,180,110)]
+
+func _draw_passerby(kind: int, stage: int) -> void:
+	# The stage-three beer bar has a furnished terrace in this opening.
+	if kind==0 and stage==3: return
+	# The illuminated street is x=40..200. The standing patron atlas has no
+	# walking cycle, so let the distant passerby cross slowly without fake steps.
+	var progress := fposmod(clock*.045,1.0)
+	var foot := Vector2(183,278).lerp(Vector2(122,355),progress)
+	var tint := Color(.72,.80,.92,smoothstep(0,.12,progress)*(1-smoothstep(.88,1,progress)))
+	Art.frame(self,"patrons",2,foot,lerpf(.36,.56,progress),false,Vector2.ZERO,tint)
+
+func scene_people(bar: Dictionary) -> Array:
+	var people: Array = []
+	if not Economy.trading(bar,int(street_state.get("minute",720))): return people
+	var kind := int(bar.type)
+	var stage := int(bar.stage)
+	var dancer_index := 0
+	var floor_index := 0
+	var bartender_index := 0
+	for i in int(bar.crew):
+		if i in bar.away or (bar.has("team") and i < bar.team.size() and not bar.team[i].on): continue
+		var role: int = int(bar.team[i].role) if bar.has("team") and i < bar.team.size() else (2 if kind==2 else 0)
+		var who := Art.worker_id(bar,i)
+		if bars.is_empty() and i < legacy_staff.size():
+			if not legacy_staff[i].work or legacy_staff[i].hurt: continue
+			who = Art.STAFF[int(legacy_staff[i].id)]
+		var foot: Vector2
+		var state := "idle"
+		var flip := false
+		if role == 2 and dancer_index < stage and (street_state.is_empty() or int(street_state.seconds) in range(40,80)):
+			var poles: Array = [[478],[402,545],[400,476,549]][stage-1]
+			foot = Vector2(poles[dancer_index]-19,303)
+			dancer_index += 1
+			state = "dance"
+		elif role == 0:
+			# Service positions follow each venue's illustrated counters.
+			if kind==0:
+				var stations: Array = [280,360,440,520,705,785] if stage==1 else [475,540,605,670,735,800]
+				foot = Vector2(stations[bartender_index%6],340)
+			else:
+				foot = Vector2(695+(bartender_index%3)*55,340-(bartender_index/3)*18)
+			bartender_index += 1
+			state = "serve" if fposmod(clock+i,6)>3 else "idle"
+		else:
+			foot = Vector2(565+(floor_index%3)*66,364-(floor_index/3)*12)
+			floor_index += 1
+			var cycle := fposmod(clock+i*1.7,9.0)
+			if cycle<4:
+				foot.x += (cycle if cycle<2 else 4-cycle)*8
+				state = "walk"
+				flip = cycle>=2
+		people.append({"who":who,"pose":Art.animation_frame(who,state,clock+i,2),"foot":foot,"flip":flip,"order":false,"customer":false,"behind_bar":role==0})
+	var crowd: int = bar.customers.size() if bar.has("customers") else mini(8,guests)
+	for i in crowd:
+		# Fill spaced positions first; busy venues add staggered rows. All slots
+		# stay inside the doorway and above the property dock (scene y=373).
+		var columns := [300,440,580,370,510,650,720,790]
+		var row := i/8
+		var foot := Vector2(columns[i%8]+(15 if row%2 else 0),362-row*19)
+		if kind==2:
+			# Keep guests off the raised performance stage.
+			foot.y = 366-row*9
+		if bar.has("customers") and bar.customers[i].playing:
+			for game in bar.games:
+				var player: int = game.players.find(bar.customers[i].id)
+				if player>=0: foot = Vector2(250+int(game.get("table",0))*200+player*205,355+int(game.get("table",0))*12)
+		people.append({"who":"patrons","pose":i%4,"foot":foot,"flip":i%2==1,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"behind_bar":false})
+	people.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.foot.y<b.foot.y)
+	return people
 
 func _sign_box() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
@@ -147,13 +230,11 @@ func _draw_event(closed: bool) -> void:
 		0:
 			if not street_event.get("prepared",false): draw_rect(Rect2(0,0,960,540),Color(0.02,.01,.06,.65))
 		1:
-			if not closed:
-				for i in 4: Art.frame(self,"patrons",i,Vector2(90+i*44,395),.52)
 			for i in 7:
 				var p := Vector2(14+i*25,85+sin(clock*2+i)*2)
 				draw_colored_polygon(PackedVector2Array([p,p+Vector2(18,3),p+Vector2(9,24)]),Color("#bcdbe3") if i%2 else Color("#27467a"))
 		2:
-			Art.image(self,"event-inspection",Rect2(140,290,90,110))
+			Art.frame(self,"event-inspection",0,Vector2(250,365),person_scale(365))
 		3:
 			draw_rect(Rect2(0,350,960,190),Color(.12,.52,.64,.42))
 			for i in 20:
@@ -171,8 +252,7 @@ func _draw_event(closed: bool) -> void:
 		5:
 			if closed: return
 			for i in 4:
-				var p := Vector2(90+i*44,395)
-				Art.frame(self,"patrons",i,p,.52)
+				var p := Vector2(60+i*36,310)
 				var burst := maxf(0,sin(clock*3+i*7)-.92)*12
 				if burst>0:
 					p += Vector2(14,-60)

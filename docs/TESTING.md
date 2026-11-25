@@ -56,6 +56,10 @@ Review these behaviours, not just whether a PNG exists:
 
 - Clock, peak hours, 12:30am warning and raid notices remain legible; financial
   rates clearly use real minutes. Prep exposes cleaning, stock and optional skip.
+
+- Use `empty-*`, `full-*` and `closed-*` general-preview filters for all three
+  venue types, including the 24-customer maximum. Check character proportions,
+  visible feet, counter/table occlusion and a clear outside lane.
 - Empty venues look empty, waiting-order markers match customers, and closed or
   off-duty staff do not appear to be working.
 - Beer-bar pool states distinguish paid, free, idle and not-open facilities.
@@ -141,5 +145,32 @@ windows remain unchanged. These simulations include normal 1am closing and prep;
 late-trading risk is covered separately by deterministic gameplay tests.
 
 Android touch/device play, Windows/macOS execution and a human multi-session
-balance study remain unverified for this change. No merge, release publication
-or export was performed as part of this work.
+balance study remain unverified for this change. The initial feature verification
+did not publish a release or create exports; integration is recorded below.
+
+## Bar-scene perspective correction — 25 November 2026
+
+The scene uses one depth-based scale for interior adults, counter occlusion for
+bartenders, indoor customer/table positions, and overhead order markers. The
+message strip no longer covers the floor. Production textures are unchanged.
+
+Verified with Godot 4.7.2: `tools/test.sh` (including all nine pacing campaigns),
+65 general captures, the complete economy preview, and six wider-window views.
+The added scene checks cover real occupancy/orders, available staff, closure,
+read-only rendering, floor bounds and surviving pool-table identity. Visual review
+included all nine stages, empty/full rooms, inspection and other event treatments,
+management drawers and pool states. Device playtesting remains outstanding.
+
+## Clock and perspective integration — 25 November 2026
+
+Combined clock/peak/prep feature commit `85777c1` with upstream main `ac8a4d6`
+(bar-scene perspective commit `9d232ea`). Retained both documentation updates,
+scene depth/scale changes and the clock's shared trading-availability checks.
+New scene regressions cover scheduled closure, late opening and raid closure.
+
+The combined `tools/test.sh` passed, including all nine pacing campaigns.
+The complete economy preview and seven focused general previews were rendered;
+opening, peak trade, prep and raid closure were inspected. Raid artwork uses the
+new perspective scale and sits clear of the closure notice. Diff formatting and
+local documentation links passed. This integration is merged to local `main`;
+no push, release publication or export is part of this merge.
