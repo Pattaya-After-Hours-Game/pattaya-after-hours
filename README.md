@@ -6,28 +6,100 @@ Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build th
 
 ![The Blue Hour and its neighborhood at dusk](docs/blue-hour.png)
 
-## Play
+The current source combines the customer economy and completed graphics refresh.
+Release downloads are published separately; this README describes the source in
+this checkout.
 
-Incident cards show odds and effects at a glance. Tap **Story** to read the setup. Results appear below the map, and **Shift log** in closeout opens the full decision history.
+## Start playing
 
-- **Attract → retain → serve → profit → reinvest.** Tap **Serve a drink** to fulfil a waiting order. An empty queue earns nothing and consumes no stock. **Welcome customers** competes for existing street traffic. Bartenders serve; hosts and dancers attract visitors. Arrange deliveries and appoint a manager for offline operation. Select properties by tapping their buildings or through **Empire**.
-- **Three types, three stages each.** Beer bars grow from plastic stools to live-music institutions. Soi-style bars add hosted drinks, bar fines and upstairs rooms. Gogos grow from a single pole to a headline showroom. Each stage has different artwork, earning power and a story beat. Adult activity stays off-screen; hosts choose whether to accept requests and are unavailable for the rest of the shift after accepting.
-- **Own the soi.** Acquire up to eight separate properties. Beer bars stay beer bars; unlock Soi venues at 20 reputation and gogos at 45. Finish the opening chapter before expanding. Tours and crypto are never required.
-- **Milestone story.** Reopen the Blue Hour, give Dao the keys, buy another bar, enter Anton's neon arms race, then bring all three types to stage 3 for the **After Hours Street Festival**. Completing the festival leaves the street open for continued play and repeat events. There is no forced one-year ending.
-- **Prepare for the unexpected.** Blackouts, Navy shore leave, inspections, floods, Songkran, a viral bar crawl, low season, Anton's promotions and Godzilla arrive with a 60-second warning. Tap the pink event banner or open **Events** to prepare. Ordinary events last 90 seconds. Monster events offer a timed serving challenge; damage causes a short, recoverable closure.
-- **Idle income.** A foreground street shift lasts two minutes; host availability resets at the next shift. Viable managed venues receive up to eight hours of demand-limited estimated offline net profit; Journal shows customers, income, costs and limiting factors. Offline time never advances events or the calendar. Existing closures and unavailable hosts remain paused while away. Forecast rates include stock, wages and overhead; actual net is shown separately; restocking still needs cash in the till.
-- **Optional managed shifts.** Scroll down in **Service** to **Open managed shift** for three decisions across the same two-minute simulation. It shares customers, stock, costs and clock with the street. Choices cannot create another income stream or fast-forward progression. **Tutorial** retains the original decision lessons in an isolated practice save.
-- **Keep exploring.** Walk the district, book voluntary tours, or visit Events for Toybox sparring and the arcade circuit. Existing mining rigs remain available under Empire.
+Open `project.godot` in **Godot 4.7.2** and press **F5**, or run from the checkout:
 
-The game plays offline and autosaves after decisions and every 15 seconds. Version-one and version-two campaigns migrate to version three, retaining their finances, staff, owned stages and properties. Existing stage-2+ beer bars receive a pool table; migrated customer queues begin empty. Previously ended campaigns reopen. Saves retain a backup; the tutorial never overwrites your campaign.
+```sh
+godot --path .
+```
+
+**Attract customers → give them a reason to stay → fulfil orders → earn a profit
+→ reinvest.** You start with ฿200, eighteen drinks and three opening customers.
+Tap **Serve a drink** for a waiting order; use **Welcome customers** when quiet.
+No order means no sale. Open **Service** to see demand, service speed, occupancy,
+stock, payroll and recent actual profit.
+
+Save for signage, seating, a bartender and a pool table. Pool is available at
+beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
+Night attracts visitors but gives up pool fees; Happy Hour, Pool Tournament and
+Sports Night have their own costs and trade-offs. Promotions last two minutes,
+then have a two-minute cooldown.
+
+Bartenders serve orders; hosts and dancers attract visitors. Staff cost money
+while on duty, even when the bar is quiet. Use the rota or temporarily close if
+costs outrun sales. An owner-run recovery shift offers a way back from an empty
+till. Renovations need satisfied customers, local regulars, healthy shifts and
+cash for the next shift—not just a large bank balance.
+
+## Build the street
+
+| Venue | Identity | Three stages |
+| --- | --- | --- |
+| Beer bar | Affordable drinks, pool and regulars | Plastic Chairs & Big Dreams → The Local Favourite → Soi Institution |
+| Soi 6-style bar | Hosted nightlife and repeat visitors | Something Upstairs → The Busy Staircase → Soi Royalty |
+| Gogo | Performances, tourist demand and premium orders | First Spotlight → Neon Showroom → Walking Street Headliner |
+
+Own up to eight properties. Beer bars remain useful after new types unlock;
+venues compete for shared street traffic. The five-chapter story takes you from
+the Blue Hour reopening to the **After Hours Street Festival**, with Anong, Dao,
+Pim, Mali, Bo and rival owner Anton. The street continues after the festival;
+there is no forced one-year ending. All staff are adults, private activity stays
+off-screen, and hosts retain control over bar-fine participation.
+
+Street events include Navy visits, inspections, floods, Songkran, viral crowds,
+low season, rival promotions and Godzilla. Warnings give time to prepare, and
+setbacks are recoverable. Walk the district or visit **Events** for optional
+Toybox sparring. Tours and legacy mining investments are not progression gates.
+
+![Toybox with the finished fighter artwork](docs/toybox.png)
+
+## Controls and saving
 
 | Where | Controls |
 | --- | --- |
-| Street | Tap **Serve a drink** for waiting orders or **Welcome customers** for walk-ins; tap a property to select it. Scroll the right panel for upgrades and management. |
-| Street events | Tap the pink banner or open **Events**. Prepare before the countdown; use **Face Godzilla** when a monster arrives. |
-| District | WASD/arrows to walk, E to enter, Esc to return. On touch, tap a destination. |
-| Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J to jab, K to kick, L to Burst. Android has touch controls. |
-| Godzilla | Click/tap **Serve a shot** or press Space. Ten shots before the timer expires; preparation adds four seconds. |
+| Street | **Serve a drink**, **Welcome customers**, property cards and the scrollable management tabs |
+| Events | Pink warning banner or **Events**; prepare before the countdown, then **Face Godzilla** for a monster challenge |
+| District | WASD/arrows to walk, E to enter, Esc to return; touch a destination on mobile |
+| Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J/K/L to jab/kick/Burst; mobile touch controls |
+| Godzilla | **Serve a shot** or Space; ten shots before the timer ends |
+
+The game autosaves after decisions and every fifteen seconds. Older campaigns
+retain money, staff, venues and owned stages when migrated. A fresh campaign is
+needed to experience the revised progression from the beginning.
+
+Foreground shifts last two minutes. Viable managed venues receive up to eight
+hours of estimated offline net profit, limited by demand, stock, service and
+costs. Offline time does not advance disasters or calendar time. See **Journal**
+for the estimate. Optional **Open managed shift** guidance uses the same live
+customers and clock. **Tutorial** runs the older decision lessons in an isolated
+practice campaign and never overwrites your campaign.
+
+## Documentation
+
+| Read this | For |
+| --- | --- |
+| [Story reference](story.md) | Premise, cast, chapters, venue identities, events and future story hooks |
+| [Player guide](docs/PLAYER_GUIDE.md) | First shift, pool, promotions, expansion and recovery |
+| [Economy specification](docs/ECONOMY.md) | Model rules, costs, local milestones, offline projection and measured pacing |
+| [Developer setup](DEVELOPMENT.md) | Engine installation, code map, saves and platform builds |
+| [Testing and release checks](docs/TESTING.md) | Automated coverage, visual checks and remaining device verification |
+| [Art pipeline](art/README.md) | Asset provenance, packing, animation catalog and visual review |
+| [Changelog](CHANGELOG.md) | Progression, economy, graphics and documentation changes |
+
+## Project status
+
+The integrated build includes 61 runtime textures, twenty animation atlases with
+136 frames, nine interiors and nine matching exterior illustrations. Gameplay,
+save migration, art integrity, input and nine fresh-campaign pacing simulations
+passed during the completed-art integration. Linux startup and Android debug
+export/signature checks passed. Android device and Windows/macOS execution still
+need target-platform playtesting. See the testing document for the verification
+record and scope; export success is not device certification.
 
 ## Install
 
@@ -40,9 +112,9 @@ APK signing certificate SHA-256
 
 `4a72524dbe76197f4c5122f0f99c6967f7c969ac978fcae37d48dbd6432827c0`
 
-## Build from source
+## Development commands
 
-Open `project.godot` in Godot **4.7.2** and press F5. Install matching export templates for release builds.
+Install matching export templates for release builds. See [developer setup](DEVELOPMENT.md) for installation and Android tooling.
 
 ```sh
 GODOT_BIN=/path/to/godot tools/test.sh
@@ -52,79 +124,3 @@ GODOT_BIN=/path/to/godot tools/release.sh
 For a signed Android export, set `ANDROID_HOME`, `JAVA_HOME`, `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. Keep the same signing key and increase Android's `version/code` for each published update. The script writes packages and checksums to `dist/`.
 
 The streets, businesses, characters, artwork, and arcade moves are original fictional content. The game and original assets are [MIT licensed](LICENSE). Godot and the bundled [DejaVu font](assets/DejaVu-LICENSE.txt) have their own notices.
-
-## Development update — 25 November 2026
-
-Implemented **From One Bar to the Whole Soi**, turning the Blue Hour campaign into a playable idle bar business:
-
-- Added beer bars, Soi 6-style bars and gogos, each with three upgrade stages, distinct interiors, better earning potential and new story beats.
-- Added click-to-serve income, automated staff service, paid stock deliveries, managers and up to eight hours of offline net earnings.
-- Added eight separately owned street properties, reputation-based venue unlocks, adult host preferences and shift-based availability after accepted bar-fine requests.
-- Added five milestone chapters featuring Anong, Dao, Pim, Mali, Bo and Anton, culminating in a repeatable After Hours Street Festival.
-- Added advance warnings and preparation for blackouts, Navy visits, inspections, floods, Songkran, viral crowds, low season, rival promotions and Godzilla. Setbacks are recoverable, and offline time never advances disasters.
-- Added version-two saves with migration of existing campaigns; removed the mandatory one-year ending while retaining optional managed shifts, district exploration, tours and Toybox fights.
-- Added economy, progression, event, offline-income, migration and UI regression tests, plus a graphical preview harness covering all nine venue stages and festival states.
-
-Validation includes the automated Godot suite and rendered desktop previews. Android device playtesting and longer-term economy balancing remain follow-up work. The separate artwork refresh is not included in this gameplay update.
-
-## Development update — Customer demand and sustainable expansion
-
-Replaced guaranteed click/staff income with a shared customer economy. Visitors
-occupy space, place orders, have patience and budgets, and can become regulars.
-Stock, service and demand must all be available for a sale. Different venue types
-compete for local, tourist and nightlife audiences; events primarily change access
-and traffic. Dancers attract crowds during scheduled sets while bartenders serve.
-
-Pool tables are stage-one purchases: ฿50 per table per 45-second game, charged
-once. Added Free Pool Night, Happy Hour, Pool Tournament and Sports Night, with
-cooldowns, repetition fatigue and reports separating actual receipts from estimated
-uplift. Pool players remain customers and keep ordering drinks.
-
-Added equipment, staff rotas, temporary closure, owner-run recovery, per-venue
-loyalty/healthy-shift renovation gates and working-cash reserves. Wages continue
-through quiet trading. The Service panel explains demand, service, occupancy,
-stock and break-even demand; shift reports distinguish full, slow, quiet and
-out-of-stock trading. Renovations no longer increase every drink's price.
-
-Unified guided shifts with the live clock and ledger, added repeat-safe offline
-projections, and migrated older saves without resetting owned progress. The
-current graphics refresh is consumed by the new customer and pool-state display;
-its source checkout remains independent. The completed artwork is now integrated,
-including all Toybox opponents and the nine venue frontages.
-
-Validation: customer/finance/save regression tests, pointer interaction checks,
-thirty paired free-pool scenarios and nine fresh campaigns across three seeds and
-three play styles. Active runs reach pool in **16.7–19.7 minutes**, stage 2 in
-**39.8–43.4 minutes**, a second venue in **131.5–139.3 minutes**, and stage 3 in
-**216.8–225.6 minutes**. These policy simulations exclude offline income; human
-playtesting and Android device verification remain separate work.
-
-See [the economy guide](docs/ECONOMY.md) for rules, model boundaries, migration,
-calibration and test commands. Use a fresh campaign to experience the new curve;
-existing owned stages are intentionally preserved.
-
-## Development update — Completed artwork integration
-
-Integrated the finished graphics into the customer-economy branch: all **61 runtime
-textures**, **20 animation atlases / 136 frames**, nine venue interiors, nine
-exterior illustrations, staff portraits and all Toybox fighters. Removed the
-temporary procedural fighter fallback. Empire now shows matching exterior cards.
-
-Kept live customer occupancy, waiting-order markers, pool charges/timers, staff
-rotas, host availability and scheduled dancers connected to the economy. Fixed
-mixed-team host portraits, preserved pool table identity across game completion
-and reload, and marked illustrated but unpurchased pool facilities as not open.
-Imported the graphics fixes for mirrored sprites, pole alignment, district paths,
-combat contact/KO positioning, offline-notice Back handling and audio shutdown.
-
-The full art-integrity suite now runs with gameplay and pacing tests. Preview
-fixtures use actual customers and staff roles and exercise the shared guided
-shift clock. Updated developer documentation and removed obsolete app icons.
-The integration is checked with isolated saves; source artwork work remains in
-its original checkout. Target-device testing is still required for Android.
-
-Integration validation: the combined suite passes with no missing catalog assets;
-all nine fresh-campaign pacing runs still pass. Reviewed 51 general graphics
-captures and 23 economy captures, plus wider-window layouts. The integrated Linux
-build exports and starts successfully; the Android debug APK exports and verifies.
-No release has been published.

@@ -1,5 +1,9 @@
 # Developer setup and handover
 
+For the premise and cast, see [story.md](story.md). For gameplay help, see the
+[player guide](docs/PLAYER_GUIDE.md). [Testing and release checks](docs/TESTING.md)
+records coverage and remaining platform verification.
+
 Pattaya After Hours is an offline Godot/GDScript game. The entry point is
 `project.godot` → `main.tscn` → `scripts/main.gd`. There is no web server,
 database, npm install, Python virtual environment, or .NET dependency.
@@ -226,7 +230,9 @@ matching templates and run tests plus exports before handing over.
 
 Prepared on **25 November 2026**, Ubuntu 26.04.1 x86-64:
 
-- Checkout: `/home/zak/projects/pattaya-after-hours`.
+- Original graphics workspace: `/home/zak/projects/pattaya-after-hours`.
+- Combined gameplay/art checkout: `/home/zak/projects/pattaya-after-hours-economy`.
+  Check `git branch --show-current` before editing or building.
 - Godot: `/home/zak/.local/bin/godot-4.7.2` (also available as `godot`).
 - Matching templates installed in the standard user template directory.
 - JDK 17: `/home/zak/.local/opt/java/temurin-17`.
@@ -244,13 +250,13 @@ debug APK builds and passes `apksigner verify`. Windows/macOS execution and
 Android device playtesting remain target-device checks.
 
 Generated builds are available in local `dist/` and are intentionally not
-tracked. The repo changes are ready for review/commit; no release is published
-by the setup commands.
+tracked. The combined changes are committed on a development branch; setup/build commands
+do not publish a release.
 
 Open the application shortcut or run:
 
 ```sh
-godot-4.7.2 --editor --path /home/zak/projects/pattaya-after-hours
+godot-4.7.2 --editor --path /home/zak/projects/pattaya-after-hours-economy
 ```
 
 ## Artwork and visual checks
