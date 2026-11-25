@@ -1,0 +1,12 @@
+{
+  "id": "fight-orchid-1",
+  "group": "fight-orchid",
+  "ref": "fight-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Orchid, adult Thai woman with dark high bun and pink orchid hair flower, gold cropped halter top, fitted burgundy short shorts with belt, gold hand wraps, black ankle-strap high heels. Match RIGHT fighter from reference but turn her to face RIGHT. Isolated individual fighter only. Side-on camera facing RIGHT, consistent body proportions and character design across combat poses, generous space for extended limbs. Pose: Advancing fighting footwork, lead foot forward, rear heel lifted, fists up. Square canvas.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-bb6b082d-1690-41d7-8f11-4fa53ac1d5a9.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/fight-reference.png",
+    "/home/zak/projects/pattaya-after-hours/art/sources/fight-orchid-0.png"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "fight-vega-6",
+  "group": "fight-vega",
+  "ref": "fight-reference",
+  "prompt": "Production game sprite of VEGA, a distinct adult Thai woman age 30. Bright bubblegum PINK athletic crop top, CHARCOAL black fitted short shorts, white hand wraps, BLACK ankle strap high heels, long unbraided REDDISH BROWN HIGH PONYTAIL. NO BRAID, no burgundy shirt, no navy shorts. Confident face, gold hoop earrings. Keep this exact character identity across every pose. Detailed illustrated pixel art with plum outlines and amber highlights matching the style of the reference, but use the VEGA character described here. One isolated full-body sprite on genuine transparent alpha, no text or floor or shadow. Side-on facing RIGHT. Entire body and shoes within generous padding. Pose: Jab CONTACT pose: left wrapped fist extended horizontally to the RIGHT at chest height, right fist guards face, feet planted. Square canvas.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-dd27f41a-fe49-448f-a8ee-214ac957207f.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/fight-vega-0.png"
+  ],
+  "original_references": [
+    "/home/zak/projects/pattaya-after-hours/art/revisions/fight-vega-0.png"
+  ]
+}

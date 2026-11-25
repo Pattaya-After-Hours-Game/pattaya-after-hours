@@ -16,7 +16,7 @@ record their original locations. No ComfyUI server or external generation
 service was used.
 
 `service-jobs.json`, `remaining-jobs.json`, `extra-jobs.json`, and
-`locomotion-jobs.json` define the source inventory. Each production pose is an
+`locomotion-jobs.json`, and `frontage-jobs.json` define the source inventory. Each production pose is an
 individual generated image, except Anong's previously generated four-direction
 walking reference, whose 16 frames are extracted with fixed cell boundaries.
 `*-refinement.json` records replacements of a first iteration. Superseded local
@@ -39,14 +39,17 @@ python3 tools/prepare_art.py
 The packer refuses missing source poses. `--partial` is only for intermediate
 art work. It preserves aspect ratio for character silhouettes, removes alpha
 below 160, uses nearest-neighbor resizing, and anchors each sprite at the centre
-of its supporting feet, four pixels above the bottom of its atlas cell. Extended
-limbs retain padding. Raised arms, jumps, and floor poses use explicit heights in
+of its supporting feet, four pixels above the bottom of its atlas cell. Floor-level
+KO poses use the full silhouette centre instead. Extended limbs retain padding. Raised arms, jumps, and floor poses use explicit heights in
 the recipe rather than resizing every silhouette to the same height.
 
 Environment plates are 960 × 540. The foreground bar and inspection character
 are independent transparent layers. Exact signs, text, values, and controls are
 rendered by Godot. Ambient light, fan blades, weather, water, confetti, attack
 trails, and impact particles remain engine effects.
+
+Nine transparent 320 × 256 frontage illustrations appear in Empire property
+cards. The compact selector uses matching interior thumbnails for quick recognition.
 
 `packing.json` records the final source-frame order and cell dimensions.
 `assets/art/manifest.json` records resource paths, dimensions and SHA-256 hashes.
@@ -79,3 +82,43 @@ compare each character's silhouette across poses, and inspect in-engine playback
 for foot sliding, clipping, stage alignment and contact timing. Review all venue
 stages and event states at 960 × 540 before checking a larger landscape window.
 Target-device playtesting is separate from successful desktop/Android exports.
+
+## Integration verification — 25 November 2026
+
+The shipped catalog contains 61 textures, including 20 atlases with 136 frames,
+nine interiors, nine frontage illustrations and 16 portraits. Two complete
+packing runs produced identical manifests. Integrity checks validate hashes,
+resource paths, atlas bounds, frame coverage, transparent padding and icon sizes.
+
+The complete automated suite passes: gameplay, migration, economy, events, UI,
+arcade, tutorial, Godzilla, art integrity and transformed input. The isolated-save
+preview run rendered 196 captures covering 193 distinct views; combat playback
+was recaptured after the final contact-effect adjustment. Alpha edges were
+reviewed on light and dark backgrounds. Gameplay was inspected at 960 × 540 and
+in a 1560 × 720 landscape window, including the management drawer.
+
+Linux, Windows and macOS archives and the Android debug APK export successfully.
+The Linux executable passes the isolated-save headless smoke test and an X11
+graphical startup/shutdown check with hardware OpenGL. Active audio playback is
+released on shutdown to avoid leaked stream resources. Android APK signature
+verification passes. Windows/macOS execution and Android device
+playtesting remain unverified; no Android device was connected. These are local
+build artifacts; no release was published.
+
+Current gameplay screenshots: [Blue Hour](../docs/blue-hour.png),
+[showroom](../docs/showroom.png), [district](../docs/district.png), and
+[Toybox](../docs/toybox.png).
+
+## Customer-economy branch integration
+
+The complete catalog is now integrated with the customer-demand model. Staff
+identity comes from their assigned role/host ID; customers and order markers
+come from live occupancy, and gogo pole performances follow the shift schedule.
+Pool games keep stable table IDs through completion and save migration. All
+replacement fighter atlases are present, so the temporary fallback is removed.
+
+The combined gameplay, art integrity, transformed-input and nine-campaign pacing
+suite passes. The integration review captured 51 general graphics views and 23
+economy views, plus wider-window pool/layout checks. Linux export and its isolated
+headless smoke test pass; the integrated Android debug APK exports and verifies.
+Android device, Windows and macOS execution were not tested in this integration.

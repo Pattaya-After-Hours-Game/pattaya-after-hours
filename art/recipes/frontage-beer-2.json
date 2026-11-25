@@ -1,0 +1,10 @@
+{
+  "id": "frontage-beer-2",
+  "prompt": "Production game property frontage illustration. ONE individual Thai shophouse facade, near frontal three-quarter architectural view, entire building including base visible. refurbished cyan sign border, visible green pool table and sports screen, fresh burgundy paint. Detailed illustrated pixel art matching the reference's burgundy timber, plum shadows, amber lamps and cyan neon. Genuine transparent background, isolated building with no street scenery surrounding it. No people, no text, no lettering, no logo, no UI, no border, no labels. Blank dark sign panel. Readable strong silhouette for a small property thumbnail. Square canvas with generous transparent margin.",
+  "ref": "art/sources/beer-1.png",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-0a8a8b91-1240-4b67-b1cc-66d09b739d2f.png",
+  "references": [
+    "art/sources/beer-1.png"
+  ]
+}

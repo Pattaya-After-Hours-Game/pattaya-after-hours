@@ -15,7 +15,7 @@ missing_plates=[name for name in required if not (SRC/(name+'.png')).exists()]
 if missing_plates and '--partial' not in sys.argv:
     raise SystemExit('Missing source artwork: '+', '.join(missing_plates))
 
-def normalize(im, cell=(128,192), height=180):
+def normalize(im, cell=(128,192), height=180, foot_pivot=True):
     im=im.convert('RGBA')
     # Remove near-transparent fringes before measuring the silhouette.
     im.putalpha(im.getchannel('A').point(lambda a: 0 if a < 160 else 255))
@@ -27,7 +27,7 @@ def normalize(im, cell=(128,192), height=180):
     tile=Image.new('RGBA',cell)
     # Anchor the feet rather than the full silhouette (a tray/punch extends it).
     foot_region=im.getchannel('A').crop((0,max(0,im.height-12),im.width,im.height)).getbbox()
-    foot_x=(foot_region[0]+foot_region[2])/2 if foot_region else im.width/2
+    foot_x=(foot_region[0]+foot_region[2])/2 if foot_region and foot_pivot else im.width/2
     paste_x=round(cell[0]/2-foot_x)
     # Never crop extended limbs: packer selects sufficiently wide cells.
     paste_x=max(2,min(cell[0]-im.width-2,paste_x))
@@ -63,13 +63,18 @@ recipe=ROOT/'art/packing.json'
 # allowed only during the art pass; final preparation fails closed.
 groups={}
 missing=[]
-for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json']:
+for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json','frontage-jobs.json']:
     for job in json.loads((ROOT/'art/recipes'/filename).read_text()):
         if not (SRC/(job['id']+'.png')).exists(): missing.append(job['id'])
         if 'group' in job: groups.setdefault(job['group'],[]).append(job['id']+'.png')
 if missing and '--partial' not in sys.argv:
     raise SystemExit('Missing source poses: '+', '.join(missing))
 packing={}
+for kind in ['beer','soi','gogo']:
+    for stage in range(1,4):
+        name=f'frontage-{kind}-{stage}'
+        if (SRC/(name+'.png')).exists():
+            normalize(Image.open(SRC/(name+'.png')),(320,256),248).save(OUT/(name+'.png'))
 for name,frames in groups.items():
     if not all((SRC/f).exists() for f in frames): continue
     spec={'frames':frames,'cell':[160,192],'height':180}
@@ -106,7 +111,7 @@ if recipe.exists():
             frames=[]
             for index,path in enumerate(spec['frames']):
                 height=spec.get('frame_heights',[spec.get('height',180)]*len(spec['frames']))[index]
-                frames.append(normalize(Image.open(SRC/path),cell,height))
+                frames.append(normalize(Image.open(SRC/path),cell,height,not (name.startswith('fight-') and index==10)))
             atlas=Image.new('RGBA',(cell[0]*len(frames),cell[1]))
             for i,frame in enumerate(frames): atlas.alpha_composite(frame,(i*cell[0],0))
             atlas.save(OUT/(name+'.png'))

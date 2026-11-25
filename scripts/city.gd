@@ -57,7 +57,7 @@ func _draw() -> void:
 		for i in int(bar.crew):
 			if i in bar.away or (bar.has("team") and i < bar.team.size() and not bar.team[i].on): continue
 			var role: int = int(bar.team[i].role) if bar.has("team") and i < bar.team.size() else (2 if kind==2 else 0)
-			var who: String = Art.HOSTS[i%6] if role != 0 else Art.STAFF[i%6]
+			var who: String = Art.worker_id(bar,i)
 			if bars.is_empty() and i < legacy_staff.size():
 				if not legacy_staff[i].work or legacy_staff[i].hurt: continue
 				who = Art.STAFF[int(legacy_staff[i].id)]
@@ -66,8 +66,8 @@ func _draw() -> void:
 			var state := "idle"
 			var flip := false
 			if role == 2 and dancer_index < stage and (street_state.is_empty() or int(street_state.seconds) in range(40,80)):
-				var poles: Array = [[470],[400,540],[400,470,540]][stage-1]
-				base = Vector2(poles[dancer_index]-13,303)
+				var poles: Array = [[478],[402,545],[400,476,549]][stage-1]
+				base = Vector2(poles[dancer_index]-19,303)
 				dancer_index += 1
 				state = "dance"
 			elif cycle<4:
@@ -80,17 +80,24 @@ func _draw() -> void:
 		var crowd: int = bar.customers.size() if bar.has("customers") else mini(8,guests)
 		for i in crowd:
 			var place := Vector2(185+(i%8)*53,365+(i/8)*23)
-			if bar.has("customers") and bar.customers[i].playing: place = Vector2(290+(i%2)*145,335)
+			if bar.has("customers") and bar.customers[i].playing:
+				for game in bar.games:
+					var player: int = game.players.find(bar.customers[i].id)
+					if player>=0: place = Vector2(315-int(game.get("table",0))*150+player*110,335)
 			Art.frame(self,"patrons",i%4,place,.55, i%2 == 1,Vector2.ZERO,Color.WHITE,Vector2(1,1+.008*sin(clock*2+i)))
 			if bar.has("customers") and bar.customers[i].order: draw_circle(place+Vector2(0,-53),3,GOLD)
 	if bar.has("games") and bar.equipment.pool>0:
 		# Status is model-owned; the artwork never creates a pool fee.
 		for i in int(bar.equipment.pool):
-			var p := Vector2(180+i*155,306)
+			var p := Vector2(300-i*150,306)
 			draw_style_box(_sign_box(),Rect2(p,Vector2(145,31)))
 			var label := "POOL / ฿50"
-			if i<bar.games.size(): label = "%ds / %s" % [bar.games[i].remaining,"FREE" if bar.games[i].fee==0 else "PAID"]
+			for game in bar.games:
+				if int(game.get("table",0))==i: label = "%ds / %s" % [game.remaining,"FREE" if game.fee==0 else "PAID"]
 			draw_string(font,p+Vector2(7,21),label,HORIZONTAL_ALIGNMENT_LEFT,135,16,GOLD)
+	if kind==0 and stage>1 and bar.has("equipment") and bar.equipment.pool==0:
+		draw_style_box(_sign_box(),Rect2(300,306,155,31))
+		draw_string(font,Vector2(307,327),"POOL / NOT OPEN",HORIZONTAL_ALIGNMENT_LEFT,145,14,GOLD)
 	# Anong remains available at the service position even before the first hire.
 	var idle := 0 if service_flash <= 0 else 3
 	Art.frame(self,"anong-service",idle,Vector2(760,470),1.35,false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
@@ -99,12 +106,15 @@ func _draw() -> void:
 	# Exact signage is live text, not lettering baked into generated artwork.
 	var sign_name: String = "BLUE HO" if selected_bar == 0 and stage == 1 else str(bar.name).to_upper()
 	draw_style_box(_sign_box(),Rect2(665,73,230,40))
-	draw_string(font,Vector2(676,101),sign_name,HORIZONTAL_ALIGNMENT_CENTER,208,24,[TEAL,PINK,GOLD][kind])
+	var neon: Color = [TEAL,PINK,GOLD][kind]
+	neon = neon.darkened(.025+.025*sin(clock*2.3))
+	draw_string(font,Vector2(676,101),sign_name,HORIZONTAL_ALIGNMENT_CENTER,208,24,neon)
 	# The fan blades rotate over the centre of the illustrated fan cage.
-	var fan: Vector2 = [Vector2(502,122),Vector2(547,136),Vector2(266,92)][kind]
-	for i in 3:
-		var ray := Vector2.from_angle(clock*9+i*TAU/3)*23
-		draw_line(fan+ray*.22,fan+ray,Color("#8e5e5670"),5)
+	if kind != 1:
+		var fan := Vector2(502,122) if kind==0 else Vector2(266,92)
+		for i in 3:
+			var ray := Vector2.from_angle(clock*9+i*TAU/3)*23
+			draw_line(fan+ray*.22,fan+ray,Color("#8e5e5670"),5)
 	if closed:
 		draw_rect(Rect2(0,0,960,540),Color(0.08,0.03,0.09,.55))
 		draw_string(font,Vector2(260,275),"TEMPORARILY CLOSED",HORIZONTAL_ALIGNMENT_CENTER,440,30,GOLD)
@@ -114,7 +124,7 @@ func _draw() -> void:
 			var p := Vector2(fposmod(i*53-clock*40,180),fposmod(i*71+clock*250,540))
 			draw_line(p,p+Vector2(-3,13),Color("#92c7dc70"),1)
 	if godzilla in ["attack","asleep"]:
-		var state := 3 if godzilla == "asleep" else 2 if shot_flash > .1 else 1 if arrival_time > 1.0 else 0
+		var state := 3 if godzilla == "asleep" else 2 if shot_flash > .1 else 1 if arrival_time > 1.0 else int(arrival_time*4)%2
 		Art.frame(self,"monster",state,Vector2(400-maxf(0,1-arrival_time)*500,460),1.2,false,Vector2(320,320),Color.WHITE,Vector2(1,1+.012*sin(clock*(1.5 if state==3 else 3))))
 		if shot_flash > .1: draw_circle(Vector2(445,255),9*shot_flash,Color(1,.8,.3,shot_flash*.6))
 
@@ -132,7 +142,7 @@ func _draw_event() -> void:
 		0:
 			if not street_event.get("prepared",false): draw_rect(Rect2(0,0,960,540),Color(0.02,.01,.06,.65))
 		1:
-			for i in 2: Art.frame(self,"patrons",i,Vector2(35+i*35,395),.38)
+			for i in 4: Art.frame(self,"patrons",i,Vector2(90+i*44,395),.52)
 			for i in 7:
 				var p := Vector2(14+i*25,85+sin(clock*2+i)*2)
 				draw_colored_polygon(PackedVector2Array([p,p+Vector2(18,3),p+Vector2(9,24)]),Color("#bcdbe3") if i%2 else Color("#27467a"))

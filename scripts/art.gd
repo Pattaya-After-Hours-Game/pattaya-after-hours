@@ -16,6 +16,9 @@ static func texture(id: String) -> Texture2D:
 static func venue(kind: int, stage: int) -> Texture2D:
 	return texture("%s-%d" % [TYPES[clampi(kind,0,2)],clampi(stage,1,3)])
 
+static func frontage(kind: int, stage: int) -> Texture2D:
+	return texture("frontage-%s-%d" % [TYPES[clampi(kind,0,2)],clampi(stage,1,3)])
+
 static func image(canvas: CanvasItem, id: String, rect: Rect2, tint: Color = Color.WHITE) -> void:
 	var tex := texture(id)
 	if tex: canvas.draw_texture_rect(tex,rect,false,tint)
@@ -30,7 +33,6 @@ static func frame(canvas: CanvasItem, id: String, index: int, foot: Vector2, sca
 	var region := Rect2(Vector2(index%cols,index/cols)*cell,cell)
 	var dest := Rect2(foot-Vector2(cell.x*.5,cell.y-4)*scale_value*stretch,cell*scale_value*stretch)
 	if flip:
-		dest.position.x += dest.size.x
 		dest.size.x = -dest.size.x
 	canvas.draw_texture_rect_region(tex,dest,region,tint)
 
@@ -55,3 +57,12 @@ static func animation_frame(id: String, state: String, time: float, fps: float =
 
 static func event_treatment(id: int) -> String:
 	return ["blackout","shore-leave","inspection","flood","songkran","bar-crawl","low-season","rival-promotion","monster-arrival","festival"][clampi(id,0,9)]
+
+# Stable identity follows the host assignment, not their position in a mixed team.
+static func worker_id(bar: Dictionary, index: int) -> String:
+	if bar.has("team") and index<bar.team.size():
+		var person: Dictionary = bar.team[index]
+		if person.role==1: return HOSTS[clampi(int(person.host),0,HOSTS.size()-1)]
+		if person.role==2: return HOSTS[index%HOSTS.size()]
+		return STAFF[index%STAFF.size()]
+	return HOSTS[index%HOSTS.size()] if bar.type>0 else STAFF[index%STAFF.size()]

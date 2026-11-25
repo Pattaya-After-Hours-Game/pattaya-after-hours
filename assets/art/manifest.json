@@ -117,7 +117,7 @@
       3840,
       256
     ],
-    "sha256": "d0792a74a3863cc3a08c0631e93433b5df5e1f5cd7a58f32593c0bc5a83274c7"
+    "sha256": "80de7f64756667d3b4827595f19b18a4e1a6143f8320a4ed507e61b22d56dc1b"
   },
   "fight-mali": {
     "file": "res://assets/art/fight-mali.png",
@@ -126,6 +126,94 @@
       256
     ],
     "sha256": "aa59b9099a4752323cf627a30bb3b47dcfd6d40ea7aba2cba2dd9fb7f1cca5fa"
+  },
+  "fight-orchid": {
+    "file": "res://assets/art/fight-orchid.png",
+    "size": [
+      3840,
+      256
+    ],
+    "sha256": "5a0c7f7fdba8aebfd8d62d828be2f15cbe842695a1720c5a0ddecd929f5461d8"
+  },
+  "fight-vega": {
+    "file": "res://assets/art/fight-vega.png",
+    "size": [
+      3840,
+      256
+    ],
+    "sha256": "df1549049d0be3122ea3af3cfda30e65c5bce185935edb64ddd2dbff56d28ba4"
+  },
+  "frontage-beer-1": {
+    "file": "res://assets/art/frontage-beer-1.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "ab17a3826be7f4b9d8d528102544d77ac7f7f169241eefa32038dc71d2e870ab"
+  },
+  "frontage-beer-2": {
+    "file": "res://assets/art/frontage-beer-2.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "3dfafad9764be525dad2ad6a2e35f9ca1dae7cb4ebc001cb9b57f26f36dde810"
+  },
+  "frontage-beer-3": {
+    "file": "res://assets/art/frontage-beer-3.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "65e04d64ed87c1366d7820699df1180a39cf4c39a89a2be0ddb1d650cdff258d"
+  },
+  "frontage-gogo-1": {
+    "file": "res://assets/art/frontage-gogo-1.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "e3429fb88ecd2b5b46968f67d0efb746017ebd744c0dd674d3454b215a3757f1"
+  },
+  "frontage-gogo-2": {
+    "file": "res://assets/art/frontage-gogo-2.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "b224aa3147b2d7f45e42a2098d4135b66f65ffe829637849730586223f9416f8"
+  },
+  "frontage-gogo-3": {
+    "file": "res://assets/art/frontage-gogo-3.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "2f0e8bbfb522a2e4d8a831d48c98fbda54a610ce6b9e7a32d0bf6438187fd61c"
+  },
+  "frontage-soi-1": {
+    "file": "res://assets/art/frontage-soi-1.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "0c0d1c1267702ad50d2510f8a5adb5c72ded0ff2ac630bb3ecf443420c83e810"
+  },
+  "frontage-soi-2": {
+    "file": "res://assets/art/frontage-soi-2.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "2c3af443a520f4dafea64d12403c99f945e7ff0ff80d48f8f2830c8dc18b0059"
+  },
+  "frontage-soi-3": {
+    "file": "res://assets/art/frontage-soi-3.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "e9808331a5c94f48f65de13c99fb2a10c1e52b3c162880b4412e927f65a5754c"
   },
   "gogo-1": {
     "file": "res://assets/art/gogo-1.png",
@@ -343,6 +431,14 @@
     ],
     "sha256": "4d65a2d8726b565e29738c05fb89a4559a4e8d156a32a2d73ed2c604038c35db"
   },
+  "portrait-orchid": {
+    "file": "res://assets/art/portrait-orchid.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "50d412d989e6d0983b69a7df51168055e297226176b69aba47459288f06a8a94"
+  },
   "portrait-pim": {
     "file": "res://assets/art/portrait-pim.png",
     "size": [
@@ -350,6 +446,14 @@
       96
     ],
     "sha256": "a679420cb9877d8d22bfdbc9cd303ed1f432ec727250a2ed6ee71f4d5368d3f8"
+  },
+  "portrait-vega": {
+    "file": "res://assets/art/portrait-vega.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "0b2b6e070636fef9f0df1ded16dc71368a6398eba649ee8f775686b04638bc09"
   },
   "soi-1": {
     "file": "res://assets/art/soi-1.png",

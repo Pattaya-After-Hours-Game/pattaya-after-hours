@@ -15,6 +15,8 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		var defaults := new_fields()
 		for key in defaults:
 			if not bar.has(key): bar[key] = defaults[key]
+		for table in bar.games.size():
+			if not bar.games[table].has("table"): bar.games[table].table = table
 		if migrated:
 			# Old crew served drinks: keep them as bartenders, never remove a hire.
 			for _i in int(bar.crew): bar.team.append({"role":0,"on":true,"host":-1})
@@ -274,7 +276,11 @@ func pool_tick(bar: Dictionary) -> void:
 			customer.played = true
 			customer.life = maxi(int(customer.life)+C.POOL_EXTRA_STAY,C.POOL_SECONDS+1)
 			ids.append(customer.id)
-		bar.games.append({"players":ids,"remaining":C.POOL_SECONDS,"fee":fee})
+		var occupied := []
+		for game in bar.games: occupied.append(int(game.get("table",0)))
+		var table := 0
+		while table in occupied: table += 1
+		bar.games.append({"table":table,"players":ids,"remaining":C.POOL_SECONDS,"fee":fee})
 		bar.pool_games += 1
 		bar.pool_income += fee
 		bar.shift.pool_income += fee

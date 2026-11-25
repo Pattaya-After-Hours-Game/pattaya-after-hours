@@ -65,9 +65,9 @@ func _process(delta: float) -> void:
 func on_path(p: Vector2) -> bool:
 	if not Rect2(5,48,310,127).has_point(p): return false
 	for y in LANES:
-		if absf(p.y-y)<5: return true
+		if absf(p.y-y)<5 and (y!=LANES[0] or p.x<=104): return true
 	for x in ALLEYS:
-		if absf(p.x-x)<5: return true
+		if absf(p.x-x)<5 and (x<=103 or p.y>=110): return true
 	return false
 
 func nearest_lane(p: Vector2) -> float:
@@ -79,28 +79,31 @@ func nearest_lane(p: Vector2) -> float:
 func route(p: Vector2) -> void:
 	p = p.clamp(Vector2(10,48),Vector2(310,170))
 	var y := nearest_lane(p)
+	if y==LANES[0]: p.x = minf(p.x,103)
 	var from_y := nearest_lane(point)
 	var x: float = ALLEYS[0]
 	var best := INF
 	for alley in ALLEYS:
+		if (y==LANES[0] or from_y==LANES[0]) and alley>103: continue
 		var cost: float = absf(point.x-alley)+absf(p.x-alley)
 		if cost < best:
 			best = cost
 			x = alley
 	waypoints.clear()
-	# While already in an alley, finish the vertical segment before changing lanes.
+	# Finish an interrupted alley segment before crossing to a different alley.
 	if absf(point.y-from_y)>5:
 		for alley in ALLEYS:
-			if absf(point.x-alley)<5: x = alley
-		waypoints.append(Vector2(x,y))
-	elif absf(y-from_y)>1:
+			if absf(point.x-alley)<5:
+				waypoints.append(Vector2(alley,from_y))
+				break
+	if absf(y-from_y)>1:
 		waypoints.append(Vector2(x,from_y))
 		waypoints.append(Vector2(x,y))
 	waypoints.append(Vector2(p.x,y))
 	target = waypoints.pop_front()
 
 func site_rect(index: int) -> Rect2:
-	return Rect2(SITES[index][1]-Vector2(25,15),Vector2(50,22))
+	return Rect2(SITES[index][1]-Vector2(25,25),Vector2(50,16))
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -134,11 +137,12 @@ func _draw() -> void:
 		rect.size *= 3
 		draw_rect(rect,Color("#211621ee"))
 		draw_rect(rect,item[3] if nearby==i else GOLD.darkened(.4),false,1)
-		draw_string(font,rect.position+Vector2(5,40),item[0],HORIZONTAL_ALIGNMENT_CENTER,rect.size.x-10,16,item[3])
+		draw_string(font,rect.position+Vector2(5,30),item[0],HORIZONTAL_ALIGNMENT_CENTER,rect.size.x-10,16,item[3])
 	for i in 6:
 		var x := fposmod(i*147+clock*(9+i),960)
 		Art.frame(self,"patrons",2+i%2,Vector2(x,348-absf(sin(clock*7+i))),.22,i%2==1)
-	Art.frame(self,"anong-walk",facing*4+(int(clock*24)%4 if walking else 0),point*3,.3,false,Vector2(128,192))
+	var breath := 1.0 if walking else 1.0+.008*sin(clock*2)
+	Art.frame(self,"anong-walk",facing*4+(int(clock*24)%4 if walking else 0),point*3,.3,false,Vector2(128,192),Color.WHITE,Vector2(1,breath))
 	if weather>=5:
 		for i in 90:
 			var p := Vector2(fposmod(i*67-clock*65,960),fposmod(i*i*19+clock*270,540))

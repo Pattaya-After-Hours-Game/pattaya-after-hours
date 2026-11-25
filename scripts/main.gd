@@ -374,7 +374,7 @@ func render(keep_scroll: bool = false) -> void:
 			return "%d/%d customers · %d orders waiting\n%s" % [bar.customers.size(),model.street.economy.seats(bar),model.street.economy.pending(bar),model.street.economy.forecast(bar).reason]])
 		demand_note.text = live_labels.back()[1].call()
 	primary.disabled = practicing and model.s.phase == "plan" and model.s.stock == PRACTICE_STOCK
-	if offline_notice > 0 and not practicing:
+	if offline_notice > 0 and not practicing and model.s.phase == "plan":
 		var shade := ColorRect.new()
 		shade.size = Vector2(960,540)
 		shade.color = Color(0.04,0.02,0.05,.65)
@@ -384,9 +384,7 @@ func render(keep_scroll: bool = false) -> void:
 		abs_text(welcome,Rect2(24,15,500,35),"WELCOME BACK",23,GOLD)
 		abs_text(welcome,Rect2(24,59,500,30),"Estimated managed profit: "+cash(offline_notice)+" net.",21,TEAL)
 		abs_text(welcome,Rect2(24,96,500,26),"Demand and costs included · estimates in Journal",14,MUTED)
-		at_button(welcome,Rect2(24,142,512,40),"Back to the street",func():
-			offline_notice = 0
-			render(),true)
+		at_button(welcome,Rect2(24,142,512,40),"Back to the street",dismiss_offline,true)
 	if previous > 0: scroll.set_deferred("scroll_vertical",previous)
 
 func toggle_drawer(index: int) -> void:
@@ -567,7 +565,7 @@ func empire_panel() -> void:
 	chapter_panel()
 	for i in model.s.street.bars.size():
 		var bar: Dictionary = model.s.street.bars[i]
-		row_button("%s · %s %d/3" % [bar.name,StreetContent.TYPES[int(bar.type)].name,bar.stage],select_bar.bind(i),i == model.s.street.selected)
+		property_card(bar,i)
 	body("AVAILABLE LEASES",GOLD,12)
 	for kind in StreetContent.TYPES.size():
 		var info: Dictionary = StreetContent.TYPES[kind]
@@ -635,7 +633,7 @@ func street_panel() -> void:
 		body("POOL · ฿50 PER GAME",GOLD,14)
 		live_body(func() -> String:
 			var timers := []
-			for game in bar.games: timers.append("%ds (%s)" % [game.remaining,"free" if game.fee==0 else "paid"])
+			for game in bar.games: timers.append("Table %d: %ds (%s)" % [int(game.get("table",0))+1,game.remaining,"free" if game.fee==0 else "paid"])
 			return "%d/%d tables busy · %d waiting\n%s\n%d games · %s pool income · %d free games" % [bar.games.size(),bar.equipment.pool,eco.pool_queue(bar).size(),", ".join(timers),bar.pool_games,cash(bar.pool_income),bar.free_games],WHITE,13)
 	body("EQUIPMENT",GOLD,14)
 	for i in StreetContent.EQUIPMENT.size():
@@ -655,6 +653,7 @@ func street_panel() -> void:
 		var person: Dictionary = bar.team[i]
 		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
 		if person.role==1: name_text = StreetContent.HOSTS[int(person.host)][0]
+		character_card(Art.worker_id(bar,i),name_text,"Serves waiting orders" if person.role==0 else "Attracts visitors")
 		row_button("%s · %s" % [name_text,"On duty" if person.on else "Off duty"],street_action.bind("rota",i))
 		if bar.type>0: row_button("Reassign role · "+name_text,street_action.bind("role",i))
 		if person.role==1:
@@ -976,6 +975,7 @@ func _notification(what: int) -> void:
 		if is_instance_valid(district): close_district()
 		elif is_instance_valid(fight): leave_fight(fight.result if fight.over else false)
 		elif campaign_before_tutorial != null: finish_tutorial()
+		elif offline_notice > 0 and model.s.phase == "plan": dismiss_offline()
 		elif drawer_open and model.s.phase == "plan": close_drawer()
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -986,6 +986,34 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		finish_tutorial()
 
+	elif event.is_action_pressed("ui_cancel") and offline_notice > 0 and model.s.phase == "plan":
+		get_viewport().set_input_as_handled()
+		dismiss_offline()
 	elif event.is_action_pressed("ui_cancel") and drawer_open and model.s.phase == "plan":
 		get_viewport().set_input_as_handled()
 		close_drawer()
+
+func _exit_tree() -> void:
+	# Release active playback before the audio server shuts down.
+	for player in [music, sfx]:
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+
+func dismiss_offline() -> void:
+	offline_notice = 0
+	render()
+
+func property_card(bar: Dictionary, index: int) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation",8)
+	column.add_child(row)
+	var exterior := TextureRect.new()
+	exterior.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	exterior.texture = Art.frontage(int(bar.type),int(bar.stage))
+	exterior.custom_minimum_size = Vector2(100,80)
+	exterior.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	row.add_child(exterior)
+	var select := button("%s\n%s · %d/3" % [bar.name,StreetContent.TYPES[int(bar.type)].name,bar.stage],select_bar.bind(index),index == model.s.street.selected)
+	select.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(select)

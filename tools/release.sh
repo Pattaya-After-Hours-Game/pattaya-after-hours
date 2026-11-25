@@ -34,7 +34,9 @@ for os in linux windows; do
     zip -q -FS "../PattayaAfterHours-$os-x86_64.zip" ./*
   )
 done
-"$out/linux/PattayaAfterHours.x86_64" --headless --quit-after 3
+smoke_data="$(mktemp -d)"
+XDG_DATA_HOME="$smoke_data" XDG_CONFIG_HOME="$smoke_data/config" "$out/linux/PattayaAfterHours.x86_64" --headless --quit-after 3
+rm -rf "$smoke_data"
 (
   cd "$out"
   releases=(PattayaAfterHours-*-x86_64.zip PattayaAfterHours-macOS.zip)

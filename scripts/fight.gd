@@ -240,7 +240,7 @@ func _resolve(f: Dictionary,other: Dictionary,delta: float) -> void:
 			flash = 0.11
 			sound.emit("block" if blocked else "impact")
 			for i in 10:
-				sparks.append({"p":Vector2(other.x,other.y-24),"v":Vector2(rng.randf_range(-77,77),rng.randf_range(-72,39)),
+				sparks.append({"p":Vector2(other.x,other.y-24),"v":Vector2(rng.randf_range(-77,77),rng.randf_range(-72,39)),"attack":f.move,
 					"life":rng.randf_range(0.13,0.39),"color":Color("#75ffed") if blocked else Color("#ffcb79")})
 	if f.timer >= timing[0]+timing[1]+timing[2]: f.move = ""
 
@@ -280,29 +280,26 @@ func _draw() -> void:
 	centered(452,149,"AFTER HOURS CIRCUIT",11,gold)
 	# Spectators and foreground effects remain independently animated.
 	for i in 6:
-		Art.frame(self,"patrons",i%4,Vector2(140+i*134,375),.42,i%2==1)
+		Art.frame(self,"patrons",i%4,Vector2(140+i*134,375),.42,i%2==1,Vector2.ZERO,Color.WHITE,Vector2(1,1+.018*sin(elapsed*3+i)))
 	for i in fighters.size():
 		var f: Dictionary = fighters[i]
-		var foot := Vector2(f.x*3,414+(f.y-FLOOR)*3)
+		var pose := frame_index(f)
+		var foot := Vector2(f.x*3,414 if pose in [10,11] else 414+(f.y-FLOOR)*3)
+		# A fallen body stays visible inside the arena without moving simulation positions.
+		if pose==10: foot.x = clampf(foot.x,160,800)
 		draw_set_transform(Vector2(f.x*3,416)*size/Vector2(960,540),0,Vector2(1,.16)*size/Vector2(960,540))
 		draw_circle(Vector2.ZERO,33,Color(0.05,.02,.07,.5))
 		draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
 		var id := "fight-mali" if i == 0 else "fight-"+str(RIVALS[rival_index][0]).to_lower()
-		var pose := frame_index(f)
 		var breath := 1.0+.006*sin(elapsed*3+i) if pose in [0,4,11] else 1.0
-		if Art.texture(id):
-			Art.frame(self,id,pose,foot,1.0,int(f.facing)<0,Vector2(320,256),Color.WHITE,Vector2(1,breath))
-		else:
-			# Keep opponents visible while the separate graphics refresh is unfinished.
-			draw_set_transform(Vector2(0,414-FLOOR*3)*size/Vector2(960,540),0,3*size/Vector2(960,540))
-			fallback_sprite(f,neon if i==0 else pink,Color("#d99c73") if i==0 else RIVALS[rival_index][2],0 if i==0 else rival_index+1)
-			draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
+		Art.frame(self,id,pose,foot,1.0,int(f.facing)<0,Vector2(320,256),Color.WHITE,Vector2(1,breath))
 		if f.move == "super" and f.timer >= ATTACKS.super[0] and f.timer < ATTACKS.super[0]+ATTACKS.super[1]:
 			for ray in 5:
 				var origin := foot+Vector2(f.facing*35,-125+ray*7)
 				draw_line(origin,origin+Vector2(f.facing*(60+ray*7),0),Color(neon,.6),2)
 	for spark in sparks:
 		var pos: Vector2 = Vector2(spark.p.x*3,369+(spark.p.y-FLOOR)*3)
+		if spark.get("attack","kick") != "kick": pos.y -= 40
 		draw_line(pos,pos+spark.v.normalized()*9,spark.color,2)
 	if flash>0: draw_rect(Rect2(0,68,960,388),Color(1,.6,.7,flash*.3))
 	panel(Rect2(0,0,960,72),Color("#21161ff8"))
@@ -337,60 +334,3 @@ func _draw() -> void:
 	elif elapsed<5 and not OS.has_feature("mobile"):
 		panel(Rect2(255,426,450,23),Color("#21161fe8"))
 		centered(480,443,"A/D MOVE   W JUMP   S GUARD   J/K/L ATTACK",13,gold)
-
-# Original procedural fighter is retained only as a missing-art fallback.
-func fallback_sprite(f: Dictionary,coat: Color,skin: Color,style: int) -> void:
-	var cx := int(f.x)
-	var cy := int(f.y)
-	draw_rect(Rect2(cx-12,FLOOR,24,3),Color("#20162d"))
-	var flip: int = f.facing
-	var bob := int(elapsed*9)%2 if not f.motion else int(elapsed*15)%3
-	var cy0 := cy - bob + (2 if f.guard else 0)
-	var dark := coat.darkened(.54)
-	var light := coat.lightened(.36)
-	var ink := Color("#161224")
-	var arm := 0
-	if f.move == "jab" or f.move == "super": arm = 7 if f.timer > 0.09 else -2
-	var kick := 13 if f.move == "kick" and f.timer > 0.17 else 0
-	var stance := int(sin(elapsed*19)*3) if f.motion else 0
-	_piece(cx,cy0,flip,-8,-43,15,12,ink)
-	_piece(cx,cy0,flip,-7,-42,13,10,skin.darkened(.24))
-	_piece(cx,cy0,flip,-3,-40,10,8,skin)
-	_piece(cx,cy0,flip,4,-39,2,1,ink)
-	_piece(cx,cy0,flip,-8,-45,13,4,ink if style != 2 else Color("#b97d51"))
-	_piece(cx,cy0,flip,-10,-41,5,11 + style,ink)
-	_piece(cx,cy0,flip,-5,-33,11,3,skin)
-	_piece(cx,cy0,flip,-8,-30,16,15,dark)
-	_piece(cx,cy0,flip,-5,-30,11,12,coat)
-	_piece(cx,cy0,flip,-4,-28,8,2,light)
-	_piece(cx,cy0,flip,-8,-17,16,4,ink)
-	_piece(cx,cy,flip,-7+stance,-14,6,13,dark)
-	_piece(cx,cy,flip,-9+stance,-3,8,3,ink)
-	if kick > 0:
-		_piece(cx,cy,flip,1,-15,6+kick,5,coat)
-		_piece(cx,cy,flip,15,-16,5,7,light)
-	else:
-		_piece(cx,cy,flip,3-stance,-14,5,12,coat)
-		_piece(cx,cy,flip,3-stance,-3,8,3,ink)
-	_piece(cx,cy0,flip,7,-29,6+maxi(0,arm),5,skin.darkened(.18))
-	_piece(cx,cy0,flip,10+arm,-31 if f.guard else -29,6,6,light)
-	_piece(cx,cy0,flip,-9,-27,5,9,skin.darkened(.18))
-	_piece(cx,cy0,flip,-7,-22,7,5,coat)
-	_piece(cx,cy0,flip,-10,-24,4,4,light)
-	_piece(cx,cy0,flip,-6,-41,4,1,skin.lightened(.15))
-	_piece(cx,cy0,flip,-1,-35,5,1,skin.darkened(.33))
-	_piece(cx,cy0,flip,-4,-15,11,1,light)
-	if style == 0:
-		_piece(cx,cy0,flip,-9,-40,4,4,coat)
-		_piece(cx,cy0,flip,-11,-36,3,6,ink)
-	else:
-		_piece(cx,cy0,flip,-6,-44,10,2,light)
-		_piece(cx,cy0,flip,-11,-40,4,2,dark)
-	if f.move == "super" and arm > 0:
-		_piece(cx,cy0,flip,18,-33,17,2,light)
-		_piece(cx,cy0,flip,21,-26,19,2,coat)
-	if f.guard:
-		_piece(cx,cy0,flip,14,-40,2,19,light)
-
-func _piece(x: int,y: int,flip: int,dx: int,dy: int,w: int,h: int,color: Color) -> void:
-	draw_rect(Rect2(x+dx if flip == 1 else x-dx-w,y+dy,w,h),color)

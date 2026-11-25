@@ -200,6 +200,22 @@ func run(test: SceneTree) -> void:
 	cash_start = loaded.s.cash
 	loaded.street.action("promotion",1)
 	test.check(loaded.s.cash==cash_start and loaded.street.selected().promo.remaining==100,"Repeated promotion clicks cannot restart or duplicate rewards")
+	# A second game's table identity survives the first table finishing and reload.
+	m = Campaign.new(2)
+	bar = m.street.selected()
+	bar.equipment.pool = 2
+	bar.equipment.seating = 2
+	bar.customers.clear()
+	for i in 4:
+		m.street.economy.admit(bar)
+		bar.customers.back().pool = true
+	m.street.economy.pool_tick(bar)
+	bar.games[0].remaining = 1
+	m.street.economy.pool_tick(bar)
+	test.check(bar.games.size()==1 and bar.games[0].table==1,"A game stays at table two when table one finishes")
+	m.save_game()
+	loaded = Campaign.new(1)
+	test.check(loaded.load_game() and loaded.street.selected().games[0].table==1,"Pool table identity survives reload")
 	test_promotions(test)
 	test_migration(test)
 	DirAccess.remove_absolute(Campaign.SAVE)

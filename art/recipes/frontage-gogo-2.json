@@ -1,0 +1,10 @@
+{
+  "id": "frontage-gogo-2",
+  "prompt": "Production game property frontage illustration. ONE individual Thai shophouse facade, near frontal three-quarter architectural view, entire building including base visible. wide twin magenta light arches, premium burgundy doors, gold trim, bottle display. Detailed illustrated pixel art matching the reference's burgundy timber, plum shadows, amber lamps and cyan neon. Genuine transparent background, isolated building with no street scenery surrounding it. No people, no text, no lettering, no logo, no UI, no border, no labels. Blank dark sign panel. Readable strong silhouette for a small property thumbnail. Square canvas with generous transparent margin.",
+  "ref": "art/sources/beer-1.png",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-08ae3319-9aed-463c-a77a-07615ddd7bb8.png",
+  "references": [
+    "art/sources/beer-1.png"
+  ]
+}

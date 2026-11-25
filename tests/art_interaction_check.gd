@@ -77,6 +77,10 @@ func run(test: SceneTree) -> void:
 	test.check(app.model.s.street.served==before,"Offline notice blocks controls behind it")
 	await click(test,test.find_button(app,"Back to the street"))
 	test.check(app.offline_notice==0,"Offline earnings notice dismisses")
+	app.offline_notice = 123
+	app.render()
+	app._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	test.check(app.offline_notice==0,"Android Back dismisses offline earnings")
 	app.queue_free()
 	await test.process_frame
 	# Pointer coordinates use each view's displayed transform, not simulation units.
@@ -120,6 +124,17 @@ func run(test: SceneTree) -> void:
 		for waypoint: Vector2 in path:
 			for step in 21:
 				test.check(district.on_path(previous.lerp(waypoint,step/20.0)),"District route stays on streets: %d" % i)
+			previous = waypoint
+	# Retargeting while between lanes must not cross the upper shop roofs.
+	for start in [Vector2(216,140),Vector2(310,145),Vector2(103,80)]:
+		district.point = start
+		district.route(Vector2(56,52))
+		var previous: Vector2 = start
+		var path: Array = [district.target]
+		path.append_array(district.waypoints)
+		for waypoint: Vector2 in path:
+			for step in 21:
+				test.check(district.on_path(previous.lerp(waypoint,step/20.0)),"Retargeted route stays on streets")
 			previous = waypoint
 	district.queue_free()
 	await test.process_frame

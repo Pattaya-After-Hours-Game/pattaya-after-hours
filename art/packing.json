@@ -298,6 +298,76 @@
       235
     ]
   },
+  "fight-vega": {
+    "frames": [
+      "fight-vega-0.png",
+      "fight-vega-1.png",
+      "fight-vega-2.png",
+      "fight-vega-3.png",
+      "fight-vega-4.png",
+      "fight-vega-5.png",
+      "fight-vega-6.png",
+      "fight-vega-7.png",
+      "fight-vega-8.png",
+      "fight-vega-9.png",
+      "fight-vega-10.png",
+      "fight-vega-11.png"
+    ],
+    "cell": [
+      320,
+      256
+    ],
+    "height": 200,
+    "frame_heights": [
+      200,
+      200,
+      200,
+      160,
+      185,
+      185,
+      200,
+      190,
+      185,
+      195,
+      52,
+      235
+    ]
+  },
+  "fight-orchid": {
+    "frames": [
+      "fight-orchid-0.png",
+      "fight-orchid-1.png",
+      "fight-orchid-2.png",
+      "fight-orchid-3.png",
+      "fight-orchid-4.png",
+      "fight-orchid-5.png",
+      "fight-orchid-6.png",
+      "fight-orchid-7.png",
+      "fight-orchid-8.png",
+      "fight-orchid-9.png",
+      "fight-orchid-10.png",
+      "fight-orchid-11.png"
+    ],
+    "cell": [
+      320,
+      256
+    ],
+    "height": 200,
+    "frame_heights": [
+      200,
+      200,
+      200,
+      160,
+      185,
+      185,
+      200,
+      190,
+      185,
+      195,
+      52,
+      235
+    ]
+  },
   "monster": {
     "frames": [
       "monster-0.png",

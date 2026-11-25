@@ -3,3 +3,11 @@ dist/
 *.jks
 *.keystore
 *.p12
+
+# Local visual research and downloaded source images
+/references/
+
+# Local art reviews and superseded source iterations
+/art/rejected/
+/art/review/
+__pycache__/

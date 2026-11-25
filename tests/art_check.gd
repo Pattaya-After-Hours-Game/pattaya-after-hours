@@ -2,11 +2,15 @@ extends RefCounted
 const Art = preload("res://scripts/art.gd")
 
 func run(test: SceneTree) -> void:
+	test.check(Art.worker_id({"type":1,"team":[{"role":0,"host":-1},{"role":1,"host":0}]},1)=="bee","Mixed-team host artwork uses the assigned identity")
+	test.check(Art.worker_id({"type":2,"team":[{"role":0,"host":-1}]},0)=="dao","Gogo bartenders use service artwork, not dancer artwork")
 	for kind in 3:
 		for stage in range(1,4):
 			var tex := Art.venue(kind,stage)
 			test.check(tex != null,"Venue artwork exists: %d/%d" % [kind,stage])
 			if tex: test.check(tex.get_size()==Vector2(960,540),"Venue uses presentation resolution")
+			var front := Art.frontage(kind,stage)
+			test.check(front != null and front.get_size()==Vector2(320,256),"Matching property frontage: %d/%d" % [kind,stage])
 	for id in ["district","toybox","counter","event-inspection"]:
 		test.check(Art.texture(id) != null,"Scene/prop artwork exists: "+id)
 	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid"]:

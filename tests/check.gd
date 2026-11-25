@@ -88,6 +88,7 @@ func run() -> void:
 	load("res://tests/street_check.gd").new().run(self)
 	test_risk()
 	await test_ui()
+	load("res://tests/art_check.gd").new().run(self)
 	await load("res://tests/art_interaction_check.gd").new().run(self)
 	if failures == 0:
 		print("PASS · incident deck, endless year, street economy, chapters, migration, offline earnings, events, UI, arcade, tutorial, Godzilla and decision odds")

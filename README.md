@@ -89,9 +89,8 @@ out-of-stock trading. Renovations no longer increase every drink's price.
 Unified guided shifts with the live clock and ledger, added repeat-safe offline
 projections, and migrated older saves without resetting owned progress. The
 current graphics refresh is consumed by the new customer and pool-state display;
-its source checkout remains independent. This branch contains an artwork snapshot;
-Toybox uses its original procedural opponent if that opponent's replacement atlas
-is not yet available. The separate graphics task is still in progress.
+its source checkout remains independent. The completed artwork is now integrated,
+including all Toybox opponents and the nine venue frontages.
 
 Validation: customer/finance/save regression tests, pointer interaction checks,
 thirty paired free-pool scenarios and nine fresh campaigns across three seeds and
@@ -103,3 +102,29 @@ playtesting and Android device verification remain separate work.
 See [the economy guide](docs/ECONOMY.md) for rules, model boundaries, migration,
 calibration and test commands. Use a fresh campaign to experience the new curve;
 existing owned stages are intentionally preserved.
+
+## Development update — Completed artwork integration
+
+Integrated the finished graphics into the customer-economy branch: all **61 runtime
+textures**, **20 animation atlases / 136 frames**, nine venue interiors, nine
+exterior illustrations, staff portraits and all Toybox fighters. Removed the
+temporary procedural fighter fallback. Empire now shows matching exterior cards.
+
+Kept live customer occupancy, waiting-order markers, pool charges/timers, staff
+rotas, host availability and scheduled dancers connected to the economy. Fixed
+mixed-team host portraits, preserved pool table identity across game completion
+and reload, and marked illustrated but unpurchased pool facilities as not open.
+Imported the graphics fixes for mirrored sprites, pole alignment, district paths,
+combat contact/KO positioning, offline-notice Back handling and audio shutdown.
+
+The full art-integrity suite now runs with gameplay and pacing tests. Preview
+fixtures use actual customers and staff roles and exercise the shared guided
+shift clock. Updated developer documentation and removed obsolete app icons.
+The integration is checked with isolated saves; source artwork work remains in
+its original checkout. Target-device testing is still required for Android.
+
+Integration validation: the combined suite passes with no missing catalog assets;
+all nine fresh-campaign pacing runs still pass. Reviewed 51 general graphics
+captures and 23 economy captures, plus wider-window layouts. The integrated Linux
+build exports and starts successfully; the Android debug APK exports and verifies.
+No release has been published.
