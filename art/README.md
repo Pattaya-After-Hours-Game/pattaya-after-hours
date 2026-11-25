@@ -65,7 +65,11 @@ remaining hosts work the floor. Interior adults share a floor-depth scale, inclu
 The foreground counter occludes Anong's legs; crops of the original venue plate
 occlude bartenders behind the illustrated counters. Customers and pool tables
 are drawn in floor-depth order, with waiting-order dots above customer heads.
-Both pool tables stay indoors. Street traffic follows the visible outside lane;
+Both pool tables stay indoors. Street traffic follows the visible outside lane,
+cycling through the three distinct existing patron appearances on successive
+crossings, alternating direction and leaving a short gap. Each appearance stays
+fixed throughout its crossing; the patron cells are not a walking-animation cycle.
+The visual clock does not consume gameplay RNG or count as customer arrivals;
 the furnished beer-bar terrace does not receive a passerby sprite. Event effects
 do not add an indoor decorative crowd. The message strip sits above the room,
 leaving customers' feet clear of the property selector.
@@ -172,3 +176,22 @@ suite passes. The integration review captured 51 general graphics views and 23
 economy views, plus wider-window pool/layout checks. Linux export and its isolated
 headless smoke test pass; the integrated Android debug APK exports and verifies.
 Android device, Windows and macOS execution were not tested in this integration.
+
+## Equipment ownership: wall fans
+
+The wall fan and its animation now follow each venue's `equipment.comfort`.
+Room views and interior thumbnails share the same cached ownership variant.
+Unowned beer/gogo fans are covered by small matching wall patches; purchased
+Soi fans use a transparent prop. Original room PNGs are unchanged, and pixels
+outside each fan region are identical between the two ownership states.
+
+Seven added textures bring the current catalog to 68. The built-in image tool
+created the edits and transparent prop. Prompts and crop rectangles are in
+[fan-ownership.json](recipes/fan-ownership.json), with source receipts in
+[fan-ownership-receipts.json](recipes/fan-ownership-receipts.json). Selected
+sources live in `art/sources/fan-hidden-*.png` and `art/sources/wall-fan.png`;
+`tools/prepare_art.py` downsizes/crops these into `assets/art/fan-hidden-*.png`
+and `assets/art/wall-fan.png`. The original room sources and packed pixels remain unchanged.
+
+Use the `fan-*` general-preview filter to inspect owned/unowned pairs across
+all nine stages; the economy preview includes a real comfort purchase.

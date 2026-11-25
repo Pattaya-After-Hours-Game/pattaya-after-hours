@@ -103,6 +103,54 @@
     ],
     "sha256": "d11d35dc8755b646cce26599d1280715dac68e7560a56585f8eff43e6ab79ebc"
   },
+  "fan-hidden-beer-1": {
+    "file": "res://assets/art/fan-hidden-beer-1.png",
+    "size": [
+      84,
+      122
+    ],
+    "sha256": "850c6c1d8808ad77ac3c09671032f4267dbc2041fd08c0476b157c0ee241427b"
+  },
+  "fan-hidden-beer-2": {
+    "file": "res://assets/art/fan-hidden-beer-2.png",
+    "size": [
+      84,
+      122
+    ],
+    "sha256": "56137c5f4bc357f528dece1362bc04cfb3cb4040d6b453653815b53a05bf06e0"
+  },
+  "fan-hidden-beer-3": {
+    "file": "res://assets/art/fan-hidden-beer-3.png",
+    "size": [
+      84,
+      122
+    ],
+    "sha256": "fe491b264fae206b82c080eee42da09ebfe59a559b180f2a8942b8ae012c6256"
+  },
+  "fan-hidden-gogo-1": {
+    "file": "res://assets/art/fan-hidden-gogo-1.png",
+    "size": [
+      62,
+      96
+    ],
+    "sha256": "780c2aa2aecfb8252c39f8090faff9224a7bfd89ddbd5acb32d002748cb8bc20"
+  },
+  "fan-hidden-gogo-2": {
+    "file": "res://assets/art/fan-hidden-gogo-2.png",
+    "size": [
+      62,
+      96
+    ],
+    "sha256": "28265696850a77e3219f1a47f2cf6a78b3e3abf7e6c3b302ab4274b1fb530859"
+  },
+  "fan-hidden-gogo-3": {
+    "file": "res://assets/art/fan-hidden-gogo-3.png",
+    "size": [
+      62,
+      96
+    ],
+    "sha256": "a3d9d36e8eaa0a09a697794e184c7a22d4df478e70a285b53a6ecdb6f844d3f3"
+  },
   "fern": {
     "file": "res://assets/art/fern.png",
     "size": [
@@ -494,5 +542,13 @@
       540
     ],
     "sha256": "e45aa4441aa13c7af3f31efa28ba76176eb8a1dec32ce50fca1ff6506b1378c6"
+  },
+  "wall-fan": {
+    "file": "res://assets/art/wall-fan.png",
+    "size": [
+      56,
+      84
+    ],
+    "sha256": "b883a702177cad3bd4bc8cbc624bd53cb305e850d17b1ed014a07689acc4cbd9"
   }
 }

@@ -112,12 +112,28 @@ func run() -> void:
 	app.windows_updates.queue_free()
 	app.windows_updates = null
 	fresh(app)
+	for crossing in 6:
+		app.scene_clock = crossing*24+10
+		await capture(app,"passerby-%d" % crossing)
+	app.scene_clock = 22
+	await capture(app,"passerby-gap")
+	app.scene_clock = 3.4
 	for kind in 3:
 		if kind > 0: app.model.street.action("buy",kind)
 		for stage in range(1,4):
 			var bar: Dictionary = app.model.street.selected()
 			populate(app,bar,stage)
 			await capture(app,"type-%d-stage-%d" % [kind,stage])
+	# Purchased equipment must be visible only after ownership, at every stage.
+	for kind in 3:
+		app.model.s.street.selected = kind
+		var bar: Dictionary = app.model.street.selected()
+		for stage in range(1,4):
+			bar.stage = stage
+			for owned in [false,true]:
+				bar.equipment.comfort = 1 if owned else 0
+				await capture(app,"fan-%d-%d-%s" % [kind,stage,"owned" if owned else "unowned"])
+		bar.equipment.comfort = 0
 	# Occupancy extremes reveal clipping and layering hidden by light fixtures.
 	for kind in 3:
 		app.model.s.street.selected = kind

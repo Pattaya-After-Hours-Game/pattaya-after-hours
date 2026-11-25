@@ -29,6 +29,22 @@ player-facing overview is in [README.md](README.md).
   cursor. Added schema-four migration preserving existing campaigns.
 - Kept original pacing windows with a small traffic adjustment and prep-aware
   fresh-campaign policies. Updated gameplay, story, save and testing documentation.
+## 25 November 2026 — Fans follow equipment ownership
+
+- Hide the wall fan until Fans & comfortable seats is purchased, in both the
+  room and property thumbnail. Installed fans stop spinning when closed.
+- Preserve the original room artwork, using small generated wall patches for
+  unowned fans and a transparent purchased fan for Soi venues.
+- Add purchase/save/renovation ownership checks, pixel-preservation checks and
+  before/after previews for every venue stage.
+
+## 25 November 2026 — Street passerby variety
+
+- Replaced the repeating single-man street loop with three distinct existing
+  patron appearances, alternating directions and a short gap between crossings.
+- Kept each appearance stable throughout a crossing, independent of customer
+  counts, saves and gameplay randomness. Added crossing previews and regression
+  coverage for variety, continuity and outside-lane bounds.
 
 ## 25 November 2026 — Bar-scene perspective and layout
 

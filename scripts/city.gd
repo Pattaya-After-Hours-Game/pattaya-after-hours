@@ -41,7 +41,7 @@ func _draw() -> void:
 	var bar: Dictionary = bars[selected_bar] if not bars.is_empty() else {"type":0,"stage":clampi(level,1,3),"crew":legacy_staff.size(),"away":[],"closed":0,"name":"Blue Hour"}
 	var kind := int(bar.type)
 	var stage := int(bar.stage)
-	var backdrop := Art.venue(kind,stage)
+	var backdrop := Art.venue(kind,stage,fan_owned(bar))
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
 	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
 	# Only the street opening contains ambient traffic. Interior sprites come
@@ -102,8 +102,8 @@ func _draw() -> void:
 	var neon: Color = [TEAL,PINK,GOLD][kind]
 	neon = neon.darkened(.025+.025*sin(clock*2.3))
 	draw_string(font,Vector2(676,101),sign_name,HORIZONTAL_ALIGNMENT_CENTER,208,24,neon)
-	# The fan blades rotate over the centre of the illustrated fan cage.
-	if kind != 1:
+	# Owned fans stay installed when closed, but only spin during trading.
+	if fan_owned(bar) and not closed:
 		var fan := Vector2(502,122) if kind==0 else Vector2(266,92)
 		for i in 3:
 			var ray := Vector2.from_angle(clock*9+i*TAU/3)*23
@@ -124,6 +124,9 @@ func _draw() -> void:
 		var state := 3 if godzilla == "asleep" else 2 if shot_flash > .1 else 1 if arrival_time > 1.0 else int(arrival_time*4)%2
 		Art.frame(self,"monster",state,Vector2(400-maxf(0,1-arrival_time)*500,460),1.2,false,Vector2(320,320),Color.WHITE,Vector2(1,1+.012*sin(clock*(1.5 if state==3 else 3))))
 		if shot_flash > .1: draw_circle(Vector2(445,255),9*shot_flash,Color(1,.8,.3,shot_flash*.6))
+
+static func fan_owned(bar: Dictionary) -> bool:
+	return int(bar.get("equipment",{}).get("comfort",0))>0
 
 static func pool_rect(table: int) -> Rect2:
 	return Rect2(270+table*200,274+table*12,165,78)
@@ -154,12 +157,25 @@ static func counter_regions(kind: int, stage: int) -> Array[Rect2]:
 func _draw_passerby(kind: int, stage: int) -> void:
 	# The stage-three beer bar has a furnished terrace in this opening.
 	if kind==0 and stage==3: return
-	# The illuminated street is x=40..200. The standing patron atlas has no
-	# walking cycle, so let the distant passerby cross slowly without fake steps.
-	var progress := fposmod(clock*.045,1.0)
-	var foot := Vector2(183,278).lerp(Vector2(122,355),progress)
-	var tint := Color(.72,.80,.92,smoothstep(0,.12,progress)*(1-smoothstep(.88,1,progress)))
-	Art.frame(self,"patrons",2,foot,lerpf(.36,.56,progress),false,Vector2.ZERO,tint)
+	var passerby := passerby_at(clock)
+	var tint := Color(.72,.80,.92,passerby.alpha)
+	Art.frame(self,"patrons",passerby.pose,passerby.foot,passerby.scale,passerby.flip,Vector2.ZERO,tint)
+
+static func passerby_at(time: float) -> Dictionary:
+	# Cells 0 and 2 depict the same man. Choose distinct appearances per
+	# crossing, never per animation frame, and leave a gap between people.
+	# This visual clock does not consume campaign RNG or create customers.
+	var cycle := int(maxf(0,time)/24.0)
+	var progress := clampf(fposmod(maxf(0,time),24.0)/20.0,0,1)
+	var approaching := cycle%2==0
+	var depth := progress if approaching else 1-progress
+	return {
+		"pose":[2,3,1][cycle%3],
+		"foot":Vector2(183,278).lerp(Vector2(122,355),depth),
+		"scale":lerpf(.36,.56,depth),
+		"flip":approaching,
+		"alpha":smoothstep(0,.12,progress)*(1-smoothstep(.88,1,progress))
+	}
 
 func scene_people(bar: Dictionary) -> Array:
 	var people: Array = []

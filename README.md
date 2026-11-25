@@ -34,6 +34,8 @@ extra customer. Messages sit above the room so the floor remains visible.
 The customer cast includes older regulars and Indian, Korean, Black and Thai
 visitors, with outfits ranging from scruffy holiday wear to tailored clubwear.
 Looks stay consistent during each visit and do not determine spending behaviour.
+Wall fans appear only after buying **Fans & comfortable seats**, including in
+the property thumbnail; renovation alone does not install them.
 
 Save for signage, seating, a bartender and a pool table. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
@@ -140,7 +142,7 @@ practice campaign and never overwrites your campaign.
 
 ## Project status
 
-The current source includes 62 runtime textures, twenty-one sprite atlases with
+The current source includes 69 runtime textures, twenty-one sprite atlases with
 145 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, art integrity, input and nine fresh-campaign pacing simulations
 passed during the completed-art integration. Linux startup and Android debug
