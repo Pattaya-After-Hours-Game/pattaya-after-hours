@@ -3,8 +3,55 @@
 The live street is authoritative. `scripts/economy.gd` owns visitors, orders,
 stock settlement, payroll, pool games, promotions and forecasts. `street.gd`
 advances this model once per foreground second and settles reports every 120
-seconds. UI and artwork consume this state; they never award sales themselves.
+seconds of street trading, plus one partial report at overnight closure. UI and artwork consume this state; they never award sales themselves.
 Balance and purchase definitions live in `scripts/street_content.gd`.
+
+## Clock, closing and preparation
+
+The authoritative street clock starts at minute 720 (12pm); each foreground
+second advances one game minute. Midnight advances the existing calendar and
+weekly accounts. All venue types trade from noon to 1am, with a per-venue nightly
+extension until 3am that must be selected before 1am. Noon resets late permission
+and raid closure, never owner intent or cash-shortage closure.
+
+`Economy.trading` is the shared eligibility rule for simulation and presentation.
+Scheduled closure, raid closure, temporary event closure and the owner's `open`
+flag remain separate. Scheduled/raid/owner closure removes customers, requests
+and pool games without new fees, refunds or invented service failures. It finishes
+promotion reporting once. Existing temporary disaster closures preserve their
+queues. Closed venues do not sell, attract customers or accrue operating costs.
+A final partial ledger is settled when all venues stop overnight, including any
+guided session. Short business reports are not calendar days.
+
+Peak windows are beer 17:00–21:00, Soi 19:00–23:00 and gogo 22:00–02:00,
+including midnight wraparound. A peak multiplies that venue's attraction by 1.5;
+the shared traffic pool remains bounded. Forecasts and real customer allocation
+use the same peak multiplier, after accounting for the venue's opening state.
+
+Each actual drink sale adds one dirt point, or two during its venue's peak,
+capped at 100. Attraction is multiplied
+by `1 - 0.25 * dirt / 100`, including offline forecasts. A fifteen-foreground-second
+clean, available while closed, clears dirt and costs no cash. Managers start the
+job automatically on closure. Restocking uses the existing paid purchase action.
+
+Between 1am and noon, an entirely closed street may skip to noon. It cancels
+unfinished cleaning without clearing dirt or buying stock. Natural noon opening
+also cancels unfinished jobs. Skipping never runs simulation ticks, cools heat,
+resolves events or grants healthy reports. Normal closed-hour ticks advance prep
+and temporary closure timers, while street-event countdowns pause.
+
+## Late-trading enforcement
+
+Each venue accumulates actual trading minutes after 1am. Every ten adds one
+shared heat point (maximum 100); every fifteen checks for a raid using the saved
+economy RNG. Chance is `2 + 0.2 * heat` percent. Safe foreground time removes one
+heat point per 120 seconds; late operation resets that cooling counter.
+
+A raid charges `min(available cash, 300 * venue stage)`, records a separate fine
+in the venue and weekly ledgers, and closes only that venue until noon. It never
+creates debt or removes owned progress. Fine costs also count in actual net and
+healthy-shift assessment. The completed raid tick requests an immediate campaign
+save. Existing scheduled inspections retain their separate preparation mechanics.
 
 ## Playing the first bar
 
@@ -15,7 +62,7 @@ budget, and leave unhappy when an order waits too long. A quiet click neither
 uses stock nor earns money. Manual service is capped at one order per second.
 
 Welcoming has a ten-second cooldown, a short expiry and a capped attraction
-bonus. The street supplies seven potential visitors per minute before events;
+bonus. The street supplies 7.3 potential visitors per real minute before events;
 opening a different venue type adds an audience, while similar venues compete.
 Local, tourist and nightlife groups choose among the venues and outside options.
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
@@ -62,7 +109,7 @@ not additional revenue. Late purchases from attributed guests update the report.
 Stage 2 requires 70 satisfied visits, 10 local regulars and eight healthy shifts.
 Stage 3 requires 600 satisfied visits, 70 local regulars and forty healthy shifts.
 A healthy shift serves at least four orders, fulfils at least 80% of orders and
-has positive operating margin after stock consumed, payroll and promotion costs.
+has positive operating margin after stock consumed, payroll, promotion costs and fines.
 The cash report separately records inventory purchases when paid.
 
 Milestones belong to the venue. Renovation also requires its fee and the next
@@ -81,17 +128,27 @@ create customers or settle another report. The original tutorial is a separate
 practice campaign. Old saves interrupted inside a legacy shift finish that shift
 once, then enter the live economy.
 
-Version-three saves retain all new queues, game fees, promotion timers and RNG
-state. Version-one/two migration retains money, properties, stages and hires;
+Version-four saves retain queues, game fees, promotion timers, clock, cleaning,
+nightly permissions, raid counters and RNG state. Version-three migration starts
+at noon on the existing day with clean venues, preserving its live queues and
+paid/free pool identity. Version-one/two migration retains money, properties,
+stages and hires;
 older beer bars at stage 2+ receive their depicted pool table. New queues start
 empty. Existing progress is not rolled back to enforce the new pacing curve.
 
 Offline trading is an explicitly **estimated** projection, capped at eight hours.
-Only open managed venues qualify. Expected sales are bounded by shared demand,
-space, service and stock; stock and operating costs are deducted. Unviable trading
+Only enabled managed venues outside temporary event closure/recovery qualify.
+Project from a saved private minute cursor, counting only noon–1am windows at
+one game minute per real second. Advance that cursor across the full wall-clock
+gap (even beyond the earning cap), but leave the live clock unchanged. Foreground
+clock movement reanchors it; consecutive offline claims cannot reuse a legal
+window. Split the projection at opening, closing and all venue peak boundaries;
+calculate competition and service/stock limits separately for each segment.
+Expected sales are bounded by shared demand, space, service and stock; stock and operating costs are deducted. Unviable trading
 or insufficient working cash pauses the projection, without spending the opening
 cash reserve. Temporary promotions, customer queues, local milestones, events and
-calendar time do not advance. Reports in Journal list estimated customers served,
+calendar time, dirt, cleaning, heat and raids do not advance. Reports in Journal
+separate time away from eligible trading seconds and list estimated customers served,
 income, costs, net profit and limiting factors. Monotonic saved claim timestamps
 prevent repeat rewards, including clock rollback.
 
@@ -105,18 +162,20 @@ income or injected money. Click-heavy players serve every second, balanced playe
 every four seconds, and mostly-idle players every fifteen seconds. The purchase
 policy invests in signage, staff, deliveries and seating before pool, then a
 fridge, stage 2, management, a second property and stage 3. All purchases pass the
-real action gates. Active styles must meet every target; mostly-idle must still
+real action gates. Policies clean each venue and skip to noon using real actions;
+prep seconds count toward milestone times. Base traffic was adjusted from 7 to
+7.3 per real minute to retain the acceptance windows with dirt and nightly prep. Active styles must meet every target; mostly-idle must still
 finish without becoming stuck.
 
 | Milestone | Active target | Measured active range |
 | --- | --- | --- |
-| First useful purchase | 2–5 min | 2.2–3.1 min |
-| Pool table | 10–20 min | 16.7–19.7 min |
-| First stage 2 | 30–45 min | 39.8–43.4 min |
-| Second property | 90–150 min | 131.5–139.3 min |
-| First stage 3 | 180–300 min | 216.8–225.6 min |
+| First useful purchase | 2–5 min | 2.1–2.5 min |
+| Pool table | 10–20 min | 15.8–17.6 min |
+| First stage 2 | 30–45 min | 39.1–43.5 min |
+| Second property | 90–150 min | 129.4–142.9 min |
+| First stage 3 | 180–300 min | 217.1–236.0 min |
 
-Mostly-idle runs reach stage 3 in approximately 228–238 minutes, with a slower
+Mostly-idle runs reach stage 3 in approximately 235–244 minutes, with a slower
 opening. These are deterministic policy tests, not a claim about every human
 strategy. Across thirty paired scenario seeds, free pool improved aggregate quiet
 night contribution and reduced full-house contribution. Regression coverage also

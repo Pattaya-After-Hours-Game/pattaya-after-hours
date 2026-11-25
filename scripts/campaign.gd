@@ -40,6 +40,7 @@ func _init(seed_value: int = 0, practice: bool = false) -> void:
 	_reset_week()
 	_forecast()
 	street = Street.new(s,not practice)
+	street.checkpoint_requested.connect(save_checkpoint)
 	s.street.economy_seed = maxi(1,seed_value) if seed_value != 0 else rng.randi_range(1,2147483646)
 
 func _add_staff(id: int) -> void:
@@ -219,6 +220,7 @@ func legacy_mode() -> bool:
 func start() -> String:
 	if not legacy_mode():
 		if s.phase != "plan": return "Finish the current decision first."
+		if not street.any_trading(): return "Open a venue during trading hours before starting guidance."
 		s.street.guided = {"wave":int(s.street.seconds)/40}
 		s.phase = "guided_choice"
 		return "The guided shift uses the same customers, stock and clock."
@@ -631,6 +633,11 @@ func next_day() -> void:
 	s.legacy_shift = false
 	_forecast()
 
+func save_checkpoint() -> void:
+	var error := save_game()
+	if error!=OK:
+		street.record("Save failed (%d). Keep the game open and retry saving." % error)
+
 func save_game() -> int:
 	s.street.last_seen = maxi(int(s.street.last_seen),int(Time.get_unix_time_from_system()))
 	s.rng = str(rng.state)
@@ -652,7 +659,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -674,11 +681,13 @@ func _read(path: String) -> Variant:
 				for key in ["id","phase","remaining","prepared"]:
 					if not data.event.has(key): return null
 				if int(data.event.id) < 0 or int(data.event.id) >= Street.C.EVENTS.size(): return null
-		if int(parsed.version) == 3:
+		if int(parsed.version) >= 3:
 			for key in ["elapsed","economy_seed","next_customer","pass_credit","offered","arrivals","orders","guided","offline_report"]:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)==3:
+					for key in Street.Economy.clock_fields(): defaults.erase(key)
 				for key in defaults:
 					if not bar.has(key): return null
 					if defaults[key] is Array and not bar[key] is Array: return null
@@ -694,6 +703,19 @@ func _read(path: String) -> Variant:
 						if not customer.has(key): return null
 				for game in bar.games:
 					if not game is Dictionary or not game.get("players") is Array or not game.has("remaining") or not game.has("fee"): return null
+		if int(parsed.version)==4:
+			for key in ["minute","offline_cursor","cool_seconds"]:
+				if not parsed.street.get(key) is float and not parsed.street.get(key) is int: return null
+			if parsed.street.minute<0 or parsed.street.minute>=1440 or parsed.street.offline_cursor<0 or parsed.street.offline_cursor>=1440: return null
+			if parsed.street.cool_seconds<0 or parsed.street.cool_seconds>=Street.C.COOL_SECONDS: return null
+			for bar in parsed.street.bars:
+				for key in ["late_open","raided","clean_auto_started"]:
+					if not bar[key] is bool: return null
+				for key in ["late_minutes","dirt","clean_remaining"]:
+					if not bar[key] is float and not bar[key] is int: return null
+					if bar[key]<0: return null
+				if bar.dirt>Street.C.DIRT_LIMIT or bar.clean_remaining>Street.C.CLEAN_SECONDS or bar.late_minutes>120: return null
+				if not bar.shift is Dictionary or not bar.shift.has("fines"): return null
 		return parsed
 	return null
 
@@ -705,6 +727,7 @@ func load_game() -> bool:
 	if int(s.version)<3 and s.phase in ["incident","fight","report","godzilla"] and not s.night.get("street_boss",false): s.legacy_shift = true
 	rng.state = int(str(s.rng))
 	street = Street.new(s)
+	street.checkpoint_requested.connect(save_checkpoint)
 	if s.phase == "end":
 		s.phase = "plan"
 		s.end = ""

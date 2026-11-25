@@ -4,6 +4,21 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Unreleased — Game clock and overnight preparation
+
+- Added a one-game-minute-per-second clock, noon opening, 1am closing and nightly
+  per-venue extensions to 3am; calendar days now change at midnight.
+- Added distinct beer/Soi/gogo peak hours with extra attraction and twice the
+  dirt per drink, including peak-aware legal-hours offline estimates.
+- Added timed cleaning, manager cleaning, dirt affecting attraction and optional
+  skipping to noon with unfinished preparation.
+- Added late-operation heat, saved raid checks, per-stage fines and closure until
+  noon, preserving owner closures and recovery routes.
+- Restricted offline estimates to projected legal opening windows with a saved
+  cursor. Added schema-four migration preserving existing campaigns.
+- Kept original pacing windows with a small traffic adjustment and prep-aware
+  fresh-campaign policies. Updated gameplay, story, save and testing documentation.
+
 ## Unreleased — Branch consolidation
 
 - Combined the progression and customer-economy histories with current upstream

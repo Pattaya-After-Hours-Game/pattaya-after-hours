@@ -36,6 +36,29 @@ costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
 cash for the next shift—not just a large bank balance.
 
+## Opening time, prep and late nights
+
+The clock runs at **one game minute per real second**. Venues open at **12pm**
+and normally close at **1am**: thirteen real minutes of trading. The date changes
+at midnight; business reports still cover two real minutes of trading.
+
+Each venue has its own peak: **beer bars 5–9pm**, **Soi venues 7–11pm**, and
+**gogos 10pm–2am**. Peak trade adds 50% attraction and doubles dirt per drink sold;
+venues still compete for the same bounded street traffic. A gogo needs late
+permission to serve the part of its peak after 1am.
+
+In **Service**, choose **Stay open until 3am tonight** separately for each venue
+before 1am. Late trading adds heat and risks a raid, a fine of **฿300 per venue
+stage** (up to the cash available), and closure until noon. All venues shut by
+3am; late permission resets each day. The screen shows current raid odds.
+
+Use closed hours to clean, restock and adjust staffing. Cleaning takes fifteen
+real seconds; managers start it automatically. Dirt from drink sales reduces
+attraction by up to 25%. Once every venue stops trading after 1am, **Skip to
+12pm** is available even with unfinished prep. Skipping cancels incomplete
+cleaning and buys no stock. Noon never reverses your own closure or a shutdown
+from insufficient cash.
+
 ## Build the street
 
 | Venue | Identity | Three stages |
@@ -69,12 +92,14 @@ Toybox sparring. Tours and legacy mining investments are not progression gates.
 | Godzilla | **Serve a shot** or Space; ten shots before the timer ends |
 
 The game autosaves after decisions and every fifteen seconds. Older campaigns
-retain money, staff, venues and owned stages when migrated. A fresh campaign is
+retain money, staff, venues and owned stages when migrated to save schema 4.
+Their clock starts at noon on the existing day, with initially clean venues. A fresh campaign is
 needed to experience the revised progression from the beginning.
 
-Foreground shifts last two minutes. Viable managed venues receive up to eight
-hours of estimated offline net profit, limited by demand, stock, service and
-costs. Offline time does not advance disasters or calendar time. See **Journal**
+Business reports use two real minutes of trading. Viable managed venues receive
+an estimate for up to eight real hours away, counting only projected noon–1am
+windows and limited by demand, stock, service, cleanliness, venue peak hours and costs. Offline time
+does not advance the live clock, cleaning, heat, raids or disasters. See **Journal**
 for the estimate. Optional **Open managed shift** guidance uses the same live
 customers and clock. **Tutorial** runs the older decision lessons in an isolated
 practice campaign and never overwrites your campaign.

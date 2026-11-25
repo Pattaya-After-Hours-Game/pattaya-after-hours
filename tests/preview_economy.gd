@@ -113,6 +113,40 @@ func run() -> void:
 	app.model.finish_godzilla(true)
 	app.tab = 0
 	await capture(app,"festival-complete")
+	# Clock and prep scenes use the same live actions/state as the game.
+	app.model = Campaign.new(72)
+	app.model.s.cash = 10000
+	app.tab = 0
+	app.drawer_open = true
+	app.message = ""
+	var clock_bar: Dictionary = app.model.street.selected()
+	clock_bar.manager = true
+	clock_bar.team = [{"role":0,"on":true,"host":-1}]
+	clock_bar.crew = 1
+	clock_bar.dirt = 65
+	for kind in 3:
+		clock_bar.type = kind
+		app.model.s.street.minute = int(app.model.street.C.PEAK_HOURS[kind].start)
+		await capture(app,"clock-peak-%d" % kind)
+	clock_bar.type = 0
+	app.model.s.day = 2
+	app.model.s.street.minute = 30
+	await capture(app,"clock-warning")
+	app.model.street.action("late")
+	app.model.s.street.minute = 90
+	await capture(app,"clock-late")
+	clock_bar.shift.open_seconds = 60
+	app.model.s.street.seconds = 60
+	app.model.street.raid(clock_bar)
+	await capture(app,"clock-raid")
+	app.drawer_open = false
+	await capture(app,"clock-raid-scene")
+	app.drawer_open = true
+	await capture(app,"clock-prep","PREP FOR OPENING")
+	for i in 15: app.model.street.tick(1)
+	await capture(app,"clock-clean","PREP FOR OPENING")
+	app.model.street.action("skip")
+	await capture(app,"clock-noon")
 	for rival in 3:
 		var duel = load("res://scripts/fight.gd").new()
 		duel.rival_index = rival

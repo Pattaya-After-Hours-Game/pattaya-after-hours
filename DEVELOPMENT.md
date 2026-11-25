@@ -90,9 +90,9 @@ the affected screens when changing visuals, controls, audio, or mobile layout.
 | --- | --- |
 | `scripts/main.gd` | Programmatically built management UI, tabs, tutorial, audio, minigame transitions, Godzilla timer |
 | `scripts/campaign.gd` | Campaign dictionary, actions, service simulation, accounting, endings, RNG, saves |
-| `scripts/street.gd` | Shared simulation clock, properties, chapters and events |
-| `scripts/economy.gd` | Customers, orders, pool, promotions, costs, forecasts and offline projections |
-| `scripts/street_content.gd` | Nine venue stages, chapter goals, event stories and adult host preferences |
+| `scripts/street.gd` | Shared clock/calendar, nightly hours, raids, properties, chapters and events |
+| `scripts/economy.gd` | Trading availability, cleaning, customers, pool, promotions, ledgers and offline projections |
+| `scripts/street_content.gd` | Venue stages/peaks, clock/raid tuning, chapter goals, event stories and host preferences |
 | `scripts/content.gd` | Six staff profiles, events, tours, weather, 51 incident cards, 15 story beats |
 | `scripts/city.gd` | Layered venue interiors, available workers, event treatments and Godzilla |
 | `scripts/district.gd` | Walkable neighborhood and links back to management tabs |
@@ -101,8 +101,9 @@ the affected screens when changing visuals, controls, audio, or mobile layout.
 | `tests/check.gd` | Campaign and UI regression checks |
 | `tools/audio.py` | Rebuilds the committed music and sound effects |
 
-The default `plan` phase is the live customer economy, with two-minute foreground
-shifts. `scripts/economy.gd` owns shared arrivals, occupancy, orders, pool games,
+The default `plan` phase is the live customer economy, with two-real-minute
+trading reports and a clock advancing one game minute per real second. Midnight,
+not the report boundary, advances the calendar. `scripts/economy.gd` owns shared arrivals, occupancy, orders, pool games,
 stock, timed payroll, promotions and forecasts. Manual clicks and bartenders can
 only serve real orders. Hosts and dancers attract customers. The UI reports
 actual net separately from forecast automatic income. See [the economy guide](docs/ECONOMY.md).
@@ -136,11 +137,16 @@ Godot's `user://` path varies by OS and `XDG_DATA_HOME`. Back up both campaign
 files before experimenting with save changes. Writes use a temporary file,
 preserve a backup, and store RNG state so decisions resume deterministically.
 Campaign fights reload at the beginning of the bout. Changes to the save
-dictionary need compatibility handling; the current schema version is 3. `Street.new(state)` migrates version-one/two
+dictionary need compatibility handling; the current schema version is 4. `Street.new(state)` migrates version-one/two
 properties, stages, hires and finances. Older stage-2+ beer bars receive their
 pool table; queues start empty. Existing version-three pool games gain stable
 table IDs without changing fees or timers. Load validates
-the street shape before accepting a save. Offline credit is claimed in the UI
+the street shape and v4 clock/prep fields before accepting a save. Version-three
+queues, stock, promotions, paid/free pool identity, money and owned progress are
+preserved; migration starts at noon on the existing day with clean venues. New
+saves retain nightly permissions, raid counters, cleaning progress, heat cooling
+and the separate offline projection cursor. Raids request an immediate save
+after the completed live tick. Offline credit is claimed in the UI
 on launch/resume and saved immediately; foreground saves move the timestamp
 watermark forward. Tutorials remain isolated.
 

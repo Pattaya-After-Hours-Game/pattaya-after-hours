@@ -87,6 +87,7 @@ func run() -> void:
 	check(clean_days == 365 and model.s.phase == "plan" and model.s.day == 366,"Street continues beyond the first year")
 	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
 	load("res://tests/street_check.gd").new().run(self)
+	load("res://tests/clock_check.gd").new().run(self)
 	test_risk()
 	test_windows_updates()
 	await test_ui()
@@ -186,8 +187,35 @@ func test_ui() -> void:
 	app._unhandled_key_input(escape)
 	check(app.model == live_campaign,"Esc exits a replay")
 	test_godzilla(app)
+	test_clock_ui(app)
 	app.queue_free()
 	await process_frame
+
+
+func test_clock_ui(app: Control) -> void:
+	app.model = Campaign.new(72)
+	app.offline_notice = 0
+	app.model.s.cash = 10000
+	app.change_tab(0)
+	var bar: Dictionary = app.model.street.selected()
+	use_button(app,"Stay open until 3am tonight")
+	check(bar.late_open,"Nightly extension works through Service")
+	use_button(app,"Cancel late opening tonight")
+	check(not bar.late_open,"Nightly extension can be cancelled through Service")
+	bar.dirt = 80
+	app.model.s.street.minute = 59
+	app.model.street.tick(1)
+	app.render()
+	check(find_button(app,"Serve a drink").disabled and find_button(app,"Welcome customers").disabled,"Closed-hours UI disables customer actions")
+	check(panel_has_text(app,"PREP FOR OPENING") and find_button(app,"Skip to 12pm")!=null,"Closed-hours Service exposes prep and skipping")
+	use_button(app,"Clean venue · 15 seconds")
+	check(bar.clean_remaining==15,"Cleaning starts through the prep control")
+	app.model.street.tick(5)
+	use_button(app,"Restock fridge · ฿14 per drink")
+	check(bar.stock==app.model.street.capacity(bar),"Prep restocking uses the live stock action")
+	use_button(app,"Skip to 12pm")
+	check(bar.dirt==80 and bar.clean_remaining==0 and app.model.s.street.minute==720,"Skip control cancels unfinished cleaning")
+	check(not find_button(app,"Serve a drink").disabled,"Noon UI restores service")
 
 
 func panel_has_text(app: Control, label: String) -> bool:

@@ -6,6 +6,8 @@ const OFFLINE_CAP = 8 * 60 * 60
 const SHIFT_SECONDS = 120
 var s: Dictionary
 var economy: RefCounted
+signal checkpoint_requested
+var raid_checkpoint := false
 
 func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
@@ -29,8 +31,14 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	# settle their own stock, wages and overhead through their live sales.
 	s.level = s.street.bars[0].stage
 	s.venue = 1
+	if int(s.get("version",1))<4:
+		s.street.minute = C.OPEN_MINUTE
+		s.street.offline_cursor = C.OPEN_MINUTE
+		s.street.cool_seconds = 0
+		for bar in s.street.bars:
+			bar.merge(Economy.clock_fields(),true)
 	economy = Economy.new(s,fresh)
-	s.version = 3
+	s.version = 4
 
 func make_bar(kind: int, slot: int) -> Dictionary:
 	return {"type":kind, "stage":1, "name":C.NAMES[slot], "crew":0,
@@ -82,7 +90,7 @@ func available(bar: Dictionary) -> int:
 
 func net_rate(bar: Dictionary, offline: bool = false) -> int:
 	if offline and not bar.manager: return 0
-	if not bar.open or bar.closed > 0: return 0
+	if not economy.is_trading(bar,offline): return 0
 	return floori(economy.forecast(bar,offline).net)
 
 func total_rate(offline: bool = false) -> int:
@@ -98,8 +106,23 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine":
+		"serve","stock","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine","clean":
 			result = economy.action(bar,id,index)
+		"late":
+			if bar.late_open:
+				bar.late_open = false
+				result = "Late opening cancelled. Normal closing is 1am."
+			else:
+				if not Economy.scheduled({},int(s.street.minute)) or bar.raided:
+					return "Choose late opening before 1am."
+				bar.late_open = true
+				result = "%s can trade until 3am tonight. Heat and raid risk rise after 1am." % bar.name
+		"skip":
+			if not can_skip(): return "Skip is available after 1am when every venue has stopped trading."
+			s.street.minute = C.OPEN_MINUTE
+			reopen_noon()
+			s.street.offline_cursor = C.OPEN_MINUTE
+			result = "12pm. Unfinished cleaning was skipped; check the prep list."
 		"restock":
 			if bar.restock: return "Bo already handles deliveries."
 			if not pay(900): return "The supplier agreement needs ฿900."
@@ -150,6 +173,8 @@ func action(id: String, index: int = 0) -> String:
 			result = "After Hours Street Festival announced. Prepare the street!"
 		_:
 			return "Unknown street action."
+	reconcile_closures()
+	settle_overnight()
 	if not id in ["serve","welcome","stock"]: record(result)
 	check_chapters()
 	return result
@@ -227,40 +252,115 @@ func end_shift() -> void:
 	s.bookings.clear()
 	s.night.erase("godzilla")
 
-# Called for foreground time only. No events or calendar changes during absence.
+func clock_text() -> String:
+	var hour := int(s.street.minute)/60
+	return "%d:%02d%s" % [12 if hour%12==0 else hour%12,int(s.street.minute)%60,"am" if hour<12 else "pm"]
+
+func any_trading() -> bool:
+	for bar in s.street.bars:
+		if economy.is_trading(bar): return true
+	return false
+
+func can_skip() -> bool:
+	return s.phase=="plan" and s.street.minute>=C.CLOSE_MINUTE and s.street.minute<C.OPEN_MINUTE and not any_trading()
+
+func raid_chance() -> float:
+	return C.RAID_BASE_CHANCE+C.RAID_HEAT_CHANCE*clampi(int(s.heat),0,100)
+
+func reopen_noon() -> void:
+	for bar in s.street.bars:
+		bar.late_open = false
+		bar.raided = false
+		bar.late_minutes = 0
+		bar.clean_remaining = 0
+
+func next_calendar_day() -> void:
+	s.weekly.nights += 1
+	if int(s.day)%7==0:
+		s.last_week = s.weekly.duplicate()
+		s.weekly = {"revenue":0,"costs":0,"guests":0,"tours":0,"nights":0,"weeks":int(s.day/7.0)+1}
+	s.day += 1
+
+func reconcile_closures() -> void:
+	for bar in s.street.bars:
+		# Temporary disaster closures preserve their existing queues and timers.
+		if not bar.open or bar.raided or not Economy.scheduled(bar,int(s.street.minute)):
+			economy.close_customers(bar)
+
+func settle_overnight() -> void:
+	if s.street.minute<C.CLOSE_MINUTE or s.street.minute>=C.OPEN_MINUTE or any_trading(): return
+	if s.street.seconds>0:
+		end_shift()
+	if not s.street.guided.is_empty() and s.phase in ["guided","guided_choice"]:
+		s.phase = "guided_report"
+
+func raid(bar: Dictionary) -> void:
+	if bar.raided or not economy.is_trading(bar) or s.street.minute<C.CLOSE_MINUTE or s.street.minute>=C.LATE_CLOSE_MINUTE: return
+	var fine := mini(maxi(0,int(s.cash)),C.RAID_FINE_PER_STAGE*int(bar.stage))
+	economy.cost(bar,fine,"fines")
+	bar.raided = true
+	economy.close_customers(bar)
+	record("LATE RAID · %s fined ฿%d and closed until 12pm. Anong: That extra round came with paperwork." % [bar.name,fine])
+	raid_checkpoint = true
+
+func tick_heat() -> void:
+	var late := false
+	if s.street.minute>=C.CLOSE_MINUTE and s.street.minute<C.LATE_CLOSE_MINUTE:
+		for bar in s.street.bars:
+			if not economy.is_trading(bar): continue
+			late = true
+			bar.late_minutes += 1
+			if int(bar.late_minutes)%C.HEAT_INTERVAL==0: s.heat = mini(100,int(s.heat)+1)
+			if int(bar.late_minutes)%C.RAID_INTERVAL==0 and economy.roll(1000)<roundi(raid_chance()*10): raid(bar)
+	if late:
+		s.street.cool_seconds = 0
+	else:
+		s.street.cool_seconds += 1
+		if s.street.cool_seconds>=C.COOL_SECONDS:
+			s.heat = maxi(0,int(s.heat)-1)
+			s.street.cool_seconds = 0
+
+# Foreground only: the clock shares the live economy's decision/pause rules.
 func tick(seconds: int) -> void:
 	if not s.phase in ["plan","guided"]: return
 	for _second in clampi(seconds,0,60):
 		if not s.phase in ["plan","guided"]: break
-		s.street.seconds += 1
+		reconcile_closures()
+		var trading_now := any_trading()
+		if trading_now: s.street.seconds += 1
+		for bar in s.street.bars: economy.prep_tick(bar)
+		tick_heat()
 		economy.tick()
-		s.street.cycle = (int(s.street.cycle)+1) % 4
-		for bar in s.street.bars:
-			bar.closed = maxi(0,int(bar.closed)-1)
+		s.street.cycle = (int(s.street.cycle)+1)%4
+		for bar in s.street.bars: bar.closed = maxi(0,int(bar.closed)-1)
 		var event: Dictionary = s.street.event
-		if not event.is_empty():
-			event.remaining -= 1
-			if event.remaining <= 0:
-				if event.phase == "warning": start_event()
-				else: finish_event(not int(event.id) in [8,9])
-		elif s.street.chapter >= 1:
-			s.street.event_wait -= 1
-			if s.street.event_wait <= 0:
-				announce(1 + int(s.street.event_index) % 8)
-				s.street.event_index += 1
-		if s.street.seconds >= SHIFT_SECONDS:
+		if trading_now:
+			if not event.is_empty():
+				event.remaining -= 1
+				if event.remaining<=0:
+					if event.phase=="warning": start_event()
+					else: finish_event(not int(event.id) in [8,9])
+			elif s.street.chapter>=1:
+				s.street.event_wait -= 1
+				if s.street.event_wait<=0:
+					announce(1+int(s.street.event_index)%8)
+					s.street.event_index += 1
+		s.street.minute = (int(s.street.minute)+1)%C.DAY_MINUTES
+		if s.street.minute==0: next_calendar_day()
+		if s.street.minute==C.OPEN_MINUTE: reopen_noon()
+		s.street.offline_cursor = s.street.minute
+		reconcile_closures()
+		if s.street.seconds>=SHIFT_SECONDS:
 			end_shift()
-			s.weekly.nights += 1
-			if int(s.day) % 7 == 0:
-				s.last_week = s.weekly.duplicate()
-				s.weekly = {"revenue":0,"costs":0,"guests":0,"tours":0,"nights":0,"weeks":int(s.day/7.0)+1}
-			s.day += 1
-			if not s.street.guided.is_empty():
-				s.phase = "guided_report"
-		elif not s.street.guided.is_empty() and int(s.street.seconds)%40 == 0:
+			if not s.street.guided.is_empty(): s.phase = "guided_report"
+		elif trading_now and not s.street.guided.is_empty() and int(s.street.seconds)%40==0:
 			s.street.guided.wave = int(s.street.seconds)/40
 			s.phase = "guided_choice"
+		settle_overnight()
 		check_chapters()
+		if raid_checkpoint:
+			raid_checkpoint = false
+			checkpoint_requested.emit()
 
 func claim_offline(now: int) -> int:
 	var earnings: int = economy.offline(now,OFFLINE_CAP)

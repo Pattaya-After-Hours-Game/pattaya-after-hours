@@ -44,6 +44,35 @@ than removing their agency.
 “Rent is due on Tuesday” expresses the opening pressure. It is not a mandatory
 real-time deadline or a separate Tuesday rent mechanic in the live economy.
 
+## Noon, last orders and tomorrow's mop
+
+The playable day now has a clock: noon opening, 1am closing, and an optional
+extension to 3am chosen separately for each venue each night. One real second
+is one game minute. Anong's short business reports are not whole calendar days.
+
+The street gets busy in waves: beer-bar peaks run from 5–9pm, Soi venues from
+7–11pm, and gogos from 10pm–2am. The extra attraction still competes for real
+passersby. More trade also leaves more work: each drink sold during peak time
+makes twice the mess. A gogo's final peak hour tempts the owner into late opening.
+
+Late takings come with attention. Operating after 1am raises heat; a raid fines
+the offending venue and shuts it until noon. This is separate from the warned
+street inspection event. Losing the gamble leaves a recoverable business,
+not confiscated staff or an ending screen.
+
+> **Anong:** “That extra round came with paperwork.”
+
+Closed hours bring ordinary work back into the story: cleaning, buying stock,
+and checking the rota. Fifteen seconds of cleaning clears the dirt left by
+actual drink sales; managers take responsibility for starting it. The owner can
+skip to noon without finishing, but an unclean bar attracts fewer customers and
+an empty fridge stays empty. Bo's delivery still costs money.
+
+> **Anong:** “You can skip to opening. The floor can't.”
+
+These are current source mechanics. Personal staff quests and other future
+hooks below remain separate ideas.
+
 ## The people on the street
 
 | Character | Place in the story | Voice and continuing ambition |

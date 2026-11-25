@@ -11,6 +11,16 @@ func simulate(seed_value: int, style: String, minutes: int = 300) -> Dictionary:
 	var eco = st.economy
 	var times := {"seed":seed_value,"style":style,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1}
 	for second in minutes*60:
+		# Real player prep actions; seconds spent cleaning count toward pacing.
+		if st.can_skip():
+			var ready := true
+			for i in model.s.street.bars.size():
+				model.s.street.selected = i
+				var venue: Dictionary = st.selected()
+				if venue.dirt>0:
+					st.action("clean")
+					ready = false
+			if ready: st.action("skip")
 		model.s.street.selected = 0
 		var bar: Dictionary = st.selected()
 		var click_interval := 1 if style=="click-heavy" else 4 if style=="balanced" else 15

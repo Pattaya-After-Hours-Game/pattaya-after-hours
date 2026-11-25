@@ -1,5 +1,6 @@
 extends Control
 const Art = preload("res://scripts/art.gd")
+const Economy = preload("res://scripts/economy.gd")
 const Content = preload("res://scripts/street_content.gd")
 const INK = Color("#21131e")
 const TEAL = Color("#73f5dc")
@@ -42,7 +43,7 @@ func _draw() -> void:
 	var stage := int(bar.stage)
 	var backdrop := Art.venue(kind,stage)
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
-	var closed: bool = bar.closed > 0 or not bar.get("open",true)
+	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
 	# Reuse the existing illustrated table as an equipment layer at stage one.
 	# A second purchased table is another instance; artwork never awards income.
 	if kind==0 and bar.has("equipment"):
@@ -91,7 +92,7 @@ func _draw() -> void:
 		for i in int(bar.equipment.pool):
 			var p := Vector2(300-i*150,306)
 			draw_style_box(_sign_box(),Rect2(p,Vector2(145,31)))
-			var label := "POOL / ฿50"
+			var label := "POOL / CLOSED" if closed else "POOL / ฿50"
 			for game in bar.games:
 				if int(game.get("table",0))==i: label = "%ds / %s" % [game.remaining,"FREE" if game.fee==0 else "PAID"]
 			draw_string(font,p+Vector2(7,21),label,HORIZONTAL_ALIGNMENT_LEFT,135,16,GOLD)
@@ -99,7 +100,7 @@ func _draw() -> void:
 		draw_style_box(_sign_box(),Rect2(300,306,155,31))
 		draw_string(font,Vector2(307,327),"POOL / NOT OPEN",HORIZONTAL_ALIGNMENT_LEFT,145,14,GOLD)
 	# Anong remains available at the service position even before the first hire.
-	var idle := 0 if service_flash <= 0 else 3
+	var idle := 0 if service_flash <= 0 or closed else 3
 	Art.frame(self,"anong-service",idle,Vector2(760,470),1.35,false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
 	# Foreground bar layer occludes the bartender's legs, never the interface.
 	Art.image(self,"counter",Rect2(560,365,400,118))
@@ -117,8 +118,12 @@ func _draw() -> void:
 			draw_line(fan+ray*.22,fan+ray,Color("#8e5e5670"),5)
 	if closed:
 		draw_rect(Rect2(0,0,960,540),Color(0.08,0.03,0.09,.55))
-		draw_string(font,Vector2(260,275),"TEMPORARILY CLOSED",HORIZONTAL_ALIGNMENT_CENTER,440,30,GOLD)
-	_draw_event()
+		var reason := "RAID / UNTIL 12PM" if bar.get("raided",false) else "CLOSED / PREP TIME" if not Economy.scheduled(bar,int(street_state.get("minute",720))) else "TEMPORARILY CLOSED"
+		draw_string(font,Vector2(160,250),reason,HORIZONTAL_ALIGNMENT_CENTER,390,23,GOLD)
+		if bar.get("clean_remaining",0)>0:
+			draw_string(font,Vector2(160,280),"CLEANING / %ds" % bar.clean_remaining,HORIZONTAL_ALIGNMENT_CENTER,390,18,TEAL)
+	if bar.get("raided",false): Art.image(self,"event-inspection",Rect2(140,290,90,110))
+	_draw_event(closed)
 	if weather >= 5:
 		for i in 65:
 			var p := Vector2(fposmod(i*53-clock*40,180),fposmod(i*71+clock*250,540))
@@ -135,14 +140,15 @@ func _sign_box() -> StyleBoxFlat:
 	s.set_border_width_all(1)
 	return s
 
-func _draw_event() -> void:
+func _draw_event(closed: bool) -> void:
 	if street_event.get("phase","") != "active": return
 	var id := int(street_event.get("id",-1))
 	match id:
 		0:
 			if not street_event.get("prepared",false): draw_rect(Rect2(0,0,960,540),Color(0.02,.01,.06,.65))
 		1:
-			for i in 4: Art.frame(self,"patrons",i,Vector2(90+i*44,395),.52)
+			if not closed:
+				for i in 4: Art.frame(self,"patrons",i,Vector2(90+i*44,395),.52)
 			for i in 7:
 				var p := Vector2(14+i*25,85+sin(clock*2+i)*2)
 				draw_colored_polygon(PackedVector2Array([p,p+Vector2(18,3),p+Vector2(9,24)]),Color("#bcdbe3") if i%2 else Color("#27467a"))
@@ -163,6 +169,7 @@ func _draw_event() -> void:
 				var t := fposmod(clock+i*.23,1.0)
 				draw_arc(Vector2(80+i*79,380+i%3*12),5+t*18,0,TAU,18,Color(.4,.85,1,(1-t)*.6),1)
 		5:
+			if closed: return
 			for i in 4:
 				var p := Vector2(90+i*44,395)
 				Art.frame(self,"patrons",i,p,.52)

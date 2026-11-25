@@ -45,7 +45,27 @@ const HOSTS = [
 	["Nan", "Wants predictable hours; accepts bar-fine requests", true]
 ]
 
-# Economy values use real seconds and baht; day/shift presentation stays compressed.
+# Game minutes advance once per foreground second. Economy timers use real seconds.
+const OPEN_MINUTE = 12 * 60
+const CLOSE_MINUTE = 60
+const LATE_CLOSE_MINUTE = 3 * 60
+const DAY_MINUTES = 24 * 60
+const CLEAN_SECONDS = 15
+const PEAK_HOURS = [
+	{"start":17*60,"end":21*60,"label":"5–9pm"},
+	{"start":19*60,"end":23*60,"label":"7–11pm"},
+	{"start":22*60,"end":2*60,"label":"10pm–2am"}
+]
+const PEAK_ATTRACTION = 1.5
+const PEAK_DIRT_PER_DRINK = 2
+const DIRT_LIMIT = 100
+const DIRT_ATTRACTION_PENALTY = 0.25
+const HEAT_INTERVAL = 10
+const COOL_SECONDS = 120
+const RAID_INTERVAL = 15
+const RAID_BASE_CHANCE = 2.0
+const RAID_HEAT_CHANCE = 0.2
+const RAID_FINE_PER_STAGE = 300
 const STARTING_CASH = 200
 const STOCK_COST = 14
 const POOL_FEE = 50
@@ -76,7 +96,7 @@ const STAGE_GOALS = [
 	{"happy":600,"regulars":70,"healthy":40}
 ]
 
-const TRAFFIC_PER_MINUTE = 7.0
+const TRAFFIC_PER_MINUTE = 7.3 # Maintains fresh-campaign pacing with nightly prep and dirt.
 const AUDIENCE_TRAFFIC_BONUS = 2.0
 const BASE_SEATS = [6,12,20]
 const VISIT_SECONDS = 90

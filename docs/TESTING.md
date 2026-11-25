@@ -20,9 +20,12 @@ campaigns; use the wrapper rather than running them against your personal saves.
 | Area | What the suite covers |
 | --- | --- |
 | Customer economy | Real orders, stockouts, service delays, full rooms and bounded shared traffic |
-| Finance | Quiet-period payroll, closure/recovery and local renovation gates |
+| Finance | Quiet-period payroll, closure/recovery, raid fine ledgers and local renovation gates |
+| Clock and prep | Noon/midnight/1am/3am boundaries, nightly permissions, manager/manual cleaning, skipped work and closure precedence |
+| Peak hours | Separate beer/Soi/gogo windows, midnight wrap, bounded shared demand, double dirt and legal-hours offline segments |
+| Late raids | Per-venue heat counters, cooling, deterministic RNG, immediate saves, capped fines and next-noon recovery |
 | Pool and promotions | One fee per game, free-game expiry, table identity, cooldowns, quote preservation and reload safety |
-| Offline operation | Demand/cost limits, eight-hour cap, unchanged events and repeat-safe claims |
+| Offline operation | Legal-window cursor, peak segmentation, demand/stock/cost limits, eight-hour cap, unchanged live state and repeat-safe claims |
 | Saves and guided shifts | Older-schema migration, backup recovery, shared timing and no click-through income |
 | Story and legacy modes | Incident responses, ongoing campaign, tutorial isolation and Godzilla outcomes |
 | Presentation | Catalog resources/hashes, atlas frames/padding, host identity, property hit regions, scrolling, district paths and combat input |
@@ -51,6 +54,8 @@ packing instructions are in [art/README.md](../art/README.md).
 
 Review these behaviours, not just whether a PNG exists:
 
+- Clock, peak hours, 12:30am warning and raid notices remain legible; financial
+  rates clearly use real minutes. Prep exposes cleaning, stock and optional skip.
 - Empty venues look empty, waiting-order markers match customers, and closed or
   off-duty staff do not appear to be working.
 - Beer-bar pool states distinguish paid, free, idle and not-open facilities.
@@ -113,3 +118,28 @@ and header-layout checks. Linux, Windows and macOS packages exported successfull
 and the Linux startup smoke test passed. The exact inputs and maintainer notes
 are recorded in [MERGE_HANDOFF.md](MERGE_HANDOFF.md). Windows update execution and
 rollback still require Windows testing.
+
+## Clock, prep and peak-hours verification — 25 November 2026
+
+Working branch: `codex/game-clock`, based on `c056dfc`. These are source checks,
+not a published release or a new target-device certification.
+
+- `tools/test.sh`: passed, including the new clock/cleaning/raid/peak regressions,
+  v1–v4 migration and backup checks, UI controls, thirty paired promotion scenarios
+  and all nine fresh-campaign pacing runs with preparation counted.
+- `git diff --check` and local Markdown link checks: passed.
+- `tools/preview-art.sh`: full general runner completed (197 captures), followed
+  by focused review of affected drawers, closures, guidance and tutorial screens.
+- `PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd tools/preview-art.sh`: completed;
+  inspected clock, all three peak windows, prep, late trading, raid and noon states.
+- Repeated the clock/peak captures with `PATTAYA_PREVIEW_RESOLUTION=1560x720` and
+  inspected the wide layout. Existing production artwork is retained.
+
+The active policy reaches pool in 15.8–17.6 real minutes, stage 2 in 39.1–43.5,
+a second property in 129.4–142.9 and stage 3 in 217.1–236.0. The original target
+windows remain unchanged. These simulations include normal 1am closing and prep;
+late-trading risk is covered separately by deterministic gameplay tests.
+
+Android touch/device play, Windows/macOS execution and a human multi-session
+balance study remain unverified for this change. No merge, release publication
+or export was performed as part of this work.

@@ -143,7 +143,10 @@ func run(test: SceneTree) -> void:
 	m.street.announce(3)
 	var event: Dictionary = m.s.street.event.duplicate(true)
 	var day := int(m.s.day)
-	var expected := floori(m.street.economy.forecast(bar,true).net*480)
+	var capped = Campaign.new(3)
+	capped.s = m.s.duplicate(true)
+	capped.street = Campaign.Street.new(capped.s)
+	var expected: int = capped.street.claim_offline(1000+28800)
 	test.check(m.street.claim_offline(1000+86400)==expected,"Offline profit is demand-limited and capped at eight hours")
 	test.check(m.s.day==day and m.s.street.event==event,"Offline time cannot advance disasters or calendar")
 	test.check(m.street.claim_offline(87400)==0 and m.street.claim_offline(900)==0,"Repeated claims and backward clocks cannot create money")
@@ -178,11 +181,11 @@ func run(test: SceneTree) -> void:
 	for _i in 3:
 		m.street.tick(40)
 		if m.s.phase=="guided_choice": m.pick(2)
-	test.check(m.s.phase=="guided_report" and m.s.day==current_day+1,"Guided report settles on the ordinary two-minute clock")
+	test.check(m.s.phase=="guided_report" and m.s.day==current_day,"Guided report settles on the ordinary two-minute clock")
 	cash_start = m.s.cash
 	m.next_day()
 	m.next_day()
-	test.check(m.s.cash==cash_start and m.s.day==current_day+1,"Report dismissal cannot pay or advance twice")
+	test.check(m.s.cash==cash_start and m.s.day==current_day,"Report dismissal cannot pay or advance twice")
 	# Happy Hour quotes once, and reloading an active promotion cannot restart it.
 	m = Campaign.new(72)
 	m.s.cash = 1000
@@ -248,7 +251,7 @@ func test_migration(test: SceneTree) -> void:
 	var model = Campaign.new(9)
 	test.check(model.load_game(),"Version-two save loads")
 	var bar: Dictionary = model.street.selected()
-	test.check(model.s.version==3 and model.s.cash==9876 and bar.stage==2 and bar.team.size()==2,"Migration preserves money, stage and staff")
+	test.check(model.s.version==4 and model.s.cash==9876 and bar.stage==2 and bar.team.size()==2,"Migration preserves money, stage and staff")
 	test.check(bar.equipment.pool==1 and bar.customers.is_empty(),"Existing illustrated pool table is granted; migration creates no buyers")
 	model.save_game()
 	model.save_game()

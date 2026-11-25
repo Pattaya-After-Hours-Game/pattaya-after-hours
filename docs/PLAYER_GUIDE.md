@@ -22,6 +22,54 @@ The first useful purchase depends on the bar: frontage helps quiet trade,
 seating helps a full room, and a bartender helps unattended orders. More service
 capacity cannot sell drinks to customers who are not there.
 
+## The clock and tomorrow's opening
+
+**TIME** advances one game minute per real second. Every venue type opens at
+12pm and normally shuts at 1am. Dates change at midnight; two-minute business
+reports and the 45-second pool timer still use real seconds. Financial rates
+are shown per real minute.
+
+Check the peak indicator in Service when planning staffing and stock:
+
+| Venue | Peak hours |
+| --- | --- |
+| Beer bar | 5–9pm |
+| Soi venue | 7–11pm |
+| Gogo | 10pm–2am |
+
+Peaks add 50% attraction, increasing your share of the existing street traffic.
+They do not guarantee sales or extra service capacity. Each drink sold during a
+peak adds two dirt points instead of one, so a busy night needs more cleanup.
+Gogos still need permission to operate during their peak hour after 1am.
+
+Before 1am, use **Stay open until 3am tonight** in Service for any venue you want
+to keep trading. A warning appears at 12:30am. You can cancel the extension or
+close early. No venue trades after 3am, and the choice resets at noon.
+
+Each late venue adds one heat point per ten minutes of actual late operation.
+Every fifteen late minutes it risks a raid: 2% plus 0.2 percentage points per
+heat point, up to 22%. The fine is ฿300 per venue stage, capped at the cash you
+have, and that venue shuts until noon. Fines appear in its report and the weekly
+books. Heat cools by one point per two safe real minutes; skipping does not cool
+it. Reopening buttons cannot override a raid.
+
+When closed, Service shows **Prep for opening**. Start a fifteen-second clean,
+buy stock, and check the rota. Managers start cleaning automatically. Each drink
+sold adds dirt; a completely dirty bar loses 25% of its attraction. Cleaning
+costs no cash. Stock still costs ฿14 per drink, subject to fridge capacity.
+
+After 1am, when all venues have stopped trading, **Skip to 12pm** is available.
+The list shows unfinished prep across the street. You can skip anyway: incomplete
+cleaning is cancelled, dirt stays, and no stock is purchased. Waiting naturally
+until noon also cancels incomplete cleaning. Skipping does not run events,
+complete jobs, award sales or grant healthy-shift progress.
+
+Scheduled closure pauses sales and operating costs. Noon makes venues available
+again, but preserves owner closures and cash-shortage shutdowns. Use **Enable
+opening** when ready, or the existing owner-run recovery option after a raid
+has ended. Street-event countdowns pause while all venues are shut; temporary
+closure and cleaning timers still run during foreground prep time.
+
 ## Read the bottleneck
 
 | What you see | What to try |
@@ -54,7 +102,7 @@ Open **Events** for venue promotions:
 | Pool Tournament | Pool stays paid; the promotion includes a prize-budget cost |
 | Sports Night | Requires a screen and attracts visitors for the fixture |
 
-Only one promotion can run at a venue at once. It lasts two minutes, followed by
+Only one promotion can run at a venue at once. It lasts two real minutes, followed by
 a two-minute cooldown. Repeating the same offer immediately after cooldown has
 less pull; vary it or allow another ordinary shift. Paid games stay paid, and
 free games stay free even when a promotion ends mid-game.
@@ -82,8 +130,8 @@ The wealth of another property cannot satisfy those milestones. **Empire** shows
 leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
-The tested active-play curve reaches a first pool table around 17–20 minutes,
-stage 2 around 40–44 minutes and a second property around two hours. These are
+The tested active-play curve reaches a first pool table around 16–18 minutes,
+stage 2 around 39–44 minutes and a second property around 129–143 minutes. These are
 simulation results for a particular investment strategy, not timers or promises
 for every play style. [Economy details](ECONOMY.md) include the full measurements.
 
@@ -101,11 +149,13 @@ rota. Event closures must finish before recovery can begin.
 
 ## Away from the street
 
-Open, viable managed venues can earn an estimated net amount for up to eight
-hours away. The calculation includes limited demand and costs; an unviable
-projection pauses instead of consuming your starting cash. It does not advance
-promotions, disasters, local renovation milestones or calendar time. **Journal**
-shows the estimate and limiting factors.
+Enabled, viable managed venues can earn an estimated net amount for up to eight
+real hours away. Only projected noon–1am windows count, at the game's clock
+speed; late permissions do not extend offline hours. The calculation includes
+limited demand, stock, saved dirt, each venue's peak windows and costs. An unviable projection pauses instead
+of consuming your starting cash. It does not advance the visible clock, cleaning,
+heat, raids, promotions, disasters or local milestones. **Journal** distinguishes
+time away from eligible trading time and reports the estimate and limiting factors.
 
 **Open managed shift** offers decisions across the same live two-minute shift.
 The decision screens pause the model; continuing does not skip the clock or
@@ -115,7 +165,8 @@ optional. The street continues after the festival.
 ## Saves and versions
 
 Saves happen after decisions and every fifteen seconds, with a backup retained.
-Old campaigns preserve owned progress when migrated, so an existing stage-3 bar
+Save schema 4 introduces the clock at noon on an old campaign's existing day,
+with initially clean venues. Old campaigns preserve owned progress when migrated, so an existing stage-3 bar
 will not revert to stage 1 for the new balance. Use a fresh campaign if you want
 to play the revised opening. **Restart campaign** erases that run; back up saves
 first if you want to keep it. [Developer setup](../DEVELOPMENT.md) lists save paths.
