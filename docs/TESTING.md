@@ -26,13 +26,16 @@ campaigns; use the wrapper rather than running them against your personal saves.
 | Late raids | Per-venue heat counters, cooling, deterministic RNG, immediate saves, capped fines and next-noon recovery |
 | Pool and promotions | One fee per game, free-game expiry, table identity, cooldowns, quote preservation and reload safety |
 | Offline operation | Legal-window cursor, peak segmentation, demand/stock/cost limits, eight-hour cap, unchanged live state and repeat-safe claims |
+| Active actions | Exact fractional refill boundaries, shared social cooldown, once-per-visit reassurance, upgrades/reserves, per-venue independence and UI state |
 | Saves and guided shifts | Older-schema migration, backup recovery, shared timing and no click-through income |
+| Startup menu | No simulation or writes before selection, disabled Resume without a valid save, backup recovery, cancellation, immediate new-game save and removal of erased progress from backups |
 | Story and legacy modes | Incident responses, ongoing campaign, tutorial isolation and Godzilla outcomes |
 | Presentation | Catalog resources/hashes, atlas frames/padding, host identity, property hit regions, scrolling, district paths and combat input |
-| Pacing | Three seeds × click-heavy, balanced and mostly-idle strategies, with no injected money or offline income |
+| Pacing | Nine target campaigns plus six no-chat/manual-versus-staff comparisons, with no injected money or offline income |
 
 The six active-strategy runs must meet the configured milestone windows. The
-three mostly-idle runs must complete without getting stuck. Thirty paired
+three mostly-idle runs must complete without getting stuck. Six additional
+manual-first/staff-first comparisons must finish without Chat. Thirty paired
 promotion scenarios compare quiet and full-house free-pool contribution. These
 are useful repeatable checks; they do not replace human balance testing.
 
@@ -54,6 +57,8 @@ packing instructions are in [art/README.md](../art/README.md).
 
 Review these behaviours, not just whether a PNG exists:
 
+- Use `boot-*` to review first launch, a resumable campaign and the destructive
+  New Game confirmation. Check legibility, focus, Cancel and touch target sizes.
 - Clock, peak hours, 12:30am warning and raid notices remain legible; financial
   rates clearly use real minutes. Prep exposes cleaning, stock and optional skip.
 
@@ -174,3 +179,92 @@ opening, peak trade, prep and raid closure were inspected. Raid artwork uses the
 new perspective scale and sits clear of the closure notice. Diff formatting and
 local documentation links passed. This integration is merged to local `main`;
 no push, release publication or export is part of this merge.
+
+## Diverse male customer sprites — 25 November 2026
+
+Branch `codex/diverse-male-customers`, based on `1273636`. Added eight adult male
+appearances in a new atlas, mixed with the existing patrons. Saved customer IDs
+select appearance and facing; queue position, budget and audience do not.
+
+- `GODOT_BIN=/home/zak/.local/bin/godot-4.7.2 tools/test.sh`: passed, including
+  atlas/hash checks, all eight variants being reachable, stable appearances after
+  departures/reordering/JSON round-trip, read-only rendering and nine pacing runs.
+- `tools/preview-art.sh` with `opening,customers-men-*,type-*,full-*,empty-*,closed-*`:
+  22 captures. Inspected opening, the new cast in all venue types, full occupancy,
+  empty rooms and closure visibility at 960 × 540.
+- Economy preview runner with `*pool*`: four pool views plus its three standard
+  fight captures. Inspected the paid-pool drawer and surviving second-table game.
+- Wide preview at 1560 × 720 with `customers-men-*,full-2`: four captures;
+  inspected the gogo cast and control layout.
+- `tools/review_art.py`: inspected each new silhouette on light and dark
+  backgrounds and the labelled [cast sheet](customer-cast.png).
+- `git diff --check` and changed-document local links: passed.
+
+No economy rules or save fields changed. This asset update has not been exported,
+published or played on Android/Windows/macOS devices.
+
+## Startup menu — 25 November 2026
+
+Branch `codex/boot-menu`: launches now offer New Game and Resume. Existing
+campaigns require confirmation before replacement, including removal of the old
+backup. Menu time does not simulate the street or write campaign saves.
+
+- Godot 4.7.2 `tools/test.sh`: passed, including all nine pacing runs, menu
+  inactivity, resume/backup recovery, replacement, cancellation, pointer controls,
+  tutorial isolation and deferred, repeat-safe offline credit.
+- `tools/preview-art.sh`: inspected first-launch, Resume and confirmation screens
+  at 960 × 540 and 1560 × 720, plus the fresh opening and economy Service drawer.
+- `git diff --check`: passed. Existing artwork and unrelated working changes
+  were preserved; save schema and economic balance are unchanged.
+
+No exports or release publication. Android device and Windows/macOS playtesting
+remain outstanding; the automated back-button check is not a device playtest.
+
+
+## Supplied-reference customer — 25 November 2026
+
+Added the curly-haired, bearded guest with black glasses and a white graphic
+T-shirt as cell 8 of `patrons-men`. The existing customer catalog assigns him
+through real customer IDs; this addition does not add save fields or economy rules.
+
+- Godot 4.7.2 `tools/test.sh`: passed, including all nine male appearances,
+  identity stability, atlas bounds/checksums and the current pacing suite.
+- Nine focused general previews: the new guest, the complete male cast and full
+  occupancy in each venue type. Inspected the guest in all three interiors at
+  960 × 540 and alpha edges against light and dark backgrounds.
+- Economy pool previews completed; existing order markers and table occlusion
+  remain intact. See [the in-game guest](customer-beard-glasses.png).
+- Updated the packing recipe, generation provenance and cast sheet. Existing
+  uncommitted gameplay and boot-menu work was retained.
+
+No exports, publication or target-device playtesting for this addition.
+
+
+## Active service and customer chat — 25 November 2026
+
+Branch `codex/active-service-cooldowns`, based on `1273636` with the existing
+startup-menu and artwork working changes preserved. This is source verification,
+not a published release or device certification.
+
+- Godot 4.7.2 `tools/test.sh`: passed. Includes exact fractional cooldown boundaries,
+  rapid/failed actions, live refill controls, chat targeting and shared recovery,
+  all upgrade tiers/reserves, per-venue independence, guided choices, recovery,
+  v1–v5 migration, fractional save round-trips, backups and unchanged offline rules.
+- Nine target campaigns passed, plus six manual-first/staff-first comparisons
+  without Chat. Active targets measured: first purchase 2.7–4.4 minutes, pool
+  15.9–18.6, stage 2 38.7–41.9, second property 137.9–147.0, stage 3 221.8–236.9.
+  Mostly-idle campaigns finished in 235.2–243.8 minutes. Both no-chat routes
+  finished without manual upgrades being a mandatory gate.
+- `tools/preview-art.sh`: 17 focused general captures and the full economy runner.
+  Inspected ready/refilling buttons, urgent chat and its customer marker, purchase
+  shortfalls/max levels, stockouts, closures, navigation and the practice tutorial.
+- Repeated the action previews in a 1560 × 720 window (the aspect-preserving game
+  content is 1280 × 720), checking the action bar and upgrade drawer.
+- `git diff --check` and local documentation-link checks passed.
+
+The first action-upgrade price was calibrated from ฿650 to ฿900 to preserve the
+opening purchase window. Other economic prices, traffic and wages are unchanged;
+manual-first tests defer deliveries/fridge until stage 2 and restock by hand.
+These are deterministic strategy checks, not proof of every human play style.
+Android device play, Windows/macOS execution and human balance testing remain
+unverified. No exports, merge or publication were performed.

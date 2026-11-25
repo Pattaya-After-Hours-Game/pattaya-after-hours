@@ -71,6 +71,10 @@ func _draw() -> void:
 			_draw_person(item)
 	# Markers are drawn after the people so a nearer guest cannot hide an order.
 	for person in people:
+		if person.get("chat_until",0.0)>float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0)):
+			var feedback := order_position(person)+Vector2(-31,-14)
+			draw_style_box(_sign_box(),Rect2(feedback-Vector2(4,15),Vector2(78,21)))
+			draw_string(font,feedback,"+10s · chat",HORIZONTAL_ALIGNMENT_LEFT,-1,12,TEAL)
 		if person.order:
 			var marker := order_position(person)
 			draw_circle(marker,6,INK)
@@ -212,7 +216,9 @@ func scene_people(bar: Dictionary) -> Array:
 			for game in bar.games:
 				var player: int = game.players.find(bar.customers[i].id)
 				if player>=0: foot = Vector2(250+int(game.get("table",0))*200+player*205,355+int(game.get("table",0))*12)
-		people.append({"who":"patrons","pose":i%4,"foot":foot,"flip":i%2==1,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"behind_bar":false})
+		var customer_id: int = int(bar.customers[i].id) if bar.has("customers") else i+1
+		var appearance := Art.customer_sprite(customer_id)
+		people.append({"who":appearance[0],"pose":appearance[1],"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})
 	people.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.foot.y<b.foot.y)
 	return people
 

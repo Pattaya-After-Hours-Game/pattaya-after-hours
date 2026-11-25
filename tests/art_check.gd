@@ -4,6 +4,11 @@ const Art = preload("res://scripts/art.gd")
 func run(test: SceneTree) -> void:
 	test.check(Art.worker_id({"type":1,"team":[{"role":0,"host":-1},{"role":1,"host":0}]},1)=="bee","Mixed-team host artwork uses the assigned identity")
 	test.check(Art.worker_id({"type":2,"team":[{"role":0,"host":-1}]},0)=="dao","Gogo bartenders use service artwork, not dancer artwork")
+	var male_variants := {}
+	for variant in Art.CUSTOMER_VARIANTS:
+		test.check(Art.atlas_specs().has(variant[0]) and variant[1]>=0 and variant[1]<Art.atlas_specs()[variant[0]][1],"Customer appearance resolves to a valid atlas cell")
+		if variant[0]=="patrons-men": male_variants[variant[1]] = true
+	test.check(male_variants.size()==9,"All nine male customer sprites, including the supplied-reference guest, are reachable")
 	for kind in 3:
 		for stage in range(1,4):
 			var tex := Art.venue(kind,stage)

@@ -88,8 +88,11 @@ func run() -> void:
 	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
 	load("res://tests/street_check.gd").new().run(self)
 	load("res://tests/clock_check.gd").new().run(self)
+	load("res://tests/action_check.gd").new().run(self)
 	test_risk()
 	test_windows_updates()
+	load("res://tests/boot_menu_check.gd").new().run(self)
+	await load("res://tests/action_check.gd").new().run_ui(self)
 	await test_ui()
 	load("res://tests/art_check.gd").new().run(self)
 	load("res://tests/scene_check.gd").new().run(self)
@@ -102,9 +105,11 @@ func test_ui() -> void:
 	var app = load("res://main.tscn").instantiate()
 	root.add_child(app)
 	await process_frame
+	use_button(app,"New Game")
 	check(app.show_tutorial_hint,"New players see the tutorial hint")
+	var initial_save := FileAccess.get_file_as_string(Campaign.SAVE)
 	use_button(app,"Tutorial")
-	check(not FileAccess.file_exists(Campaign.SAVE),"Opening a tutorial creates no campaign save")
+	check(FileAccess.get_file_as_string(Campaign.SAVE)==initial_save,"Opening a tutorial leaves the new campaign save untouched")
 	use_button(app,"Exit")
 	var opening_cash := int(app.model.s.cash)
 	use_button(app,"Serve a drink")
@@ -216,7 +221,7 @@ func test_clock_ui(app: Control) -> void:
 	check(bar.stock==app.model.street.capacity(bar),"Prep restocking uses the live stock action")
 	use_button(app,"Skip to 12pm")
 	check(bar.dirt==80 and bar.clean_remaining==0 and app.model.s.street.minute==720,"Skip control cancels unfinished cleaning")
-	check(not find_button(app,"Serve a drink").disabled,"Noon UI restores service")
+	check(find_button(app,"Serve a drink").disabled and not find_button(app,"Welcome customers").disabled,"Noon allows welcoming; service waits for a real order")
 
 
 func panel_has_text(app: Control, label: String) -> bool:

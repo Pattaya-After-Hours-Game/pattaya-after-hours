@@ -70,6 +70,15 @@ const STARTING_CASH = 200
 const STOCK_COST = 14
 const POOL_FEE = 50
 const POOL_SECONDS = 45
+const ACTION_COOLDOWNS = [10,8,6,4]
+const ACTION_UPGRADE_COSTS = [900,1400,2800]
+const ACTION_UPGRADES = [
+	{"id":"pouring","name":"Faster pouring","action":"serve"},
+	{"id":"welcoming","name":"Better welcoming","action":"welcome"}
+]
+const CHAT_SECONDS = 20
+const CHAT_PATIENCE = 10
+const CHAT_THRESHOLD = 10
 const EQUIPMENT = [
 	{"id":"sign", "name":"Better frontage", "cost":900, "max":1, "help":"More passersby consider entering; no extra service speed."},
 	{"id":"comfort", "name":"Fans & comfortable seats", "cost":900, "max":1, "help":"Guests stay longer and wait more patiently; uses one seat and adds ฿4/min overhead."},

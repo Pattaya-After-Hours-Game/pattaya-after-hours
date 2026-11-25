@@ -23,6 +23,12 @@ func run(test: SceneTree) -> void:
 	app.set_process(false)
 	app.muted = true
 	app.music.stop()
+	await click(test,test.find_button(app,"New Game"))
+	test.check(app.new_game_confirmation,"Pointer opens the new-game warning")
+	await click(test,test.find_button(app,"Cancel"))
+	test.check(app.boot_menu and not app.new_game_confirmation,"Pointer cancels without leaving the menu")
+	await click(test,test.find_button(app,"Resume"))
+	test.check(not app.boot_menu,"Pointer resumes the saved campaign")
 	app.model = Campaign.new(555)
 	app.offline_notice = 0
 	app.show_tutorial_hint = false

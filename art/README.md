@@ -90,6 +90,49 @@ for foot sliding, clipping, stage alignment and contact timing. Review all venue
 stages and event states at 960 × 540 before checking a larger landscape window.
 Target-device playtesting is separate from successful desktop/Android exports.
 
+## Additional male customers — 25 November 2026
+
+Eight new adult men use the original patron sprite as a rendering-style reference.
+The built-in image-generation tool produced each character separately. Exact
+prompts and generation receipts are in `recipes/customer-jobs.json` and the
+matching `recipes/customer-*.json` files; originals are in `sources/customer-*.png`.
+No ComfyUI or external generation service was used for this addition.
+
+| Atlas cell | Appearance |
+| --- | --- |
+| 0 | Stocky older regular, sun-faded teal vest, cargo shorts and flip-flops |
+| 1 | Silver-haired old boy, salmon polo, shorts, socks and sandals |
+| 2 | Indian visitor, rumpled maroon T-shirt, olive shorts and crossbody bag |
+| 3 | Indian clubgoer, plum shirt, tailored trousers and oxblood loafers |
+| 4 | Korean visitor, sage T-shirt, shorts, waist bag and worn trainers |
+| 5 | Korean clubgoer, ivory blazer, black shirt and polished loafers |
+| 6 | Black clubgoer, cobalt shirt, cream trousers and leather loafers |
+| 7 | Thai regular, amber patterned shirt, navy trousers and slip-on shoes |
+| 8 | User-reference guest, curly dark hair, black glasses, full beard, white graphic tee and navy shorts |
+
+The ninth guest was added from a supplied likeness reference, retained at
+`references/customer-beard-glasses-reference.png`. The built-in generator used
+that image for identity/clothing and the sun-faded regular for rendering style.
+The blue shirt graphic is simplified for sprite readability. Its exact prompt,
+reference roles and output provenance are in `recipes/customer-beard-glasses.json`.
+
+`assets/art/patrons-men.png` has nine 160 × 192 cells. The existing packer
+normalizes alpha, height, padding and foot pivots. These are standing appearances
+with the scene's existing idle breathing, not a walking-animation sequence.
+`tools/review_art.py` produces a labelled lineup and light/dark edge sheets.
+
+The catalog mixes these men with the existing patrons. Appearance and facing
+come from the saved customer ID, so departures, queue reordering and reloads
+do not change a remaining guest's look. Ethnicity, age and wardrobe do not alter
+customer budgets, audience groups, orders or the simulation RNG. No save fields
+were added. Only actual admitted customers are drawn; closures still empty rooms.
+Use the `customers-men-*` preview filter to see the cast in each venue type,
+or `customer-beard-glasses-*` for a small group led by the reference guest.
+
+The current catalog has 62 runtime textures, 21 sprite atlases and 145 frames.
+See [the cast lineup](../docs/customer-cast.png) and
+[testing notes](../docs/TESTING.md) for review coverage.
+
 ## Integration verification — 25 November 2026
 
 The shipped catalog contains 61 textures, including 20 atlases with 136 frames,

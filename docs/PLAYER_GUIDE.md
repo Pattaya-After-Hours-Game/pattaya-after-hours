@@ -1,13 +1,19 @@
 # Running your first bar
 
 Start the game from the repository with `godot --path .`, or run a packaged
-build. The main street is the live business. **Tutorial** is an optional practice
+build. On the startup menu, choose **New Game** to open your first bar or
+**Resume** to continue your saved campaign. Starting another new game asks you
+to confirm erasing the previous campaign, including its backup; **Cancel** keeps
+it. Resume is disabled when no readable save is available.
+
+The main street is the live business. **Tutorial** is an optional practice
 campaign using the original decision lessons; it does not spend your real till.
 
 ## Your first shift
 
 1. Serve the three opening customers. A gold dot above a customer marks an order. Each successful
-   click sells one drink and consumes one unit of stock.
+   click sells one drink and consumes one unit of stock, then refills for ten seconds.
+   No order or unavailable stock means no spent cooldown.
 2. When no orders are waiting, welcome passersby. Welcoming has a cooldown and a
    capped effect; it cannot create an unlimited crowd.
 3. Open **Service**. Read demand, staff service, occupied seats and stock together.
@@ -21,6 +27,35 @@ campaign using the original decision lessons; it does not spend your real till.
 The first useful purchase depends on the bar: frontage helps quiet trade,
 seating helps a full room, and a bartender helps unattended orders. More service
 capacity cannot sell drinks to customers who are not there.
+
+## Give yourself a faster shift
+
+The Serve and Welcome buttons fill back up as foreground time passes. The label
+shows seconds remaining, Ready, or why the action is unavailable. Each venue has
+its own timers. Bartenders keep serving while your own Serve button refills.
+
+Near the top of **Service**, **Faster pouring** and **Better welcoming** each have
+three purchases: **10 → 8 → 6 → 4 seconds**, costing **฿900 / ฿1,400 / ฿2,800**.
+The menu shows cash still needed, including the next shift’s operating reserve.
+Buying a level changes the next use; it does not clear an active refill. Existing
+Service training improves bartenders separately.
+
+**Have a chat** helps the eligible guest nearest walking out, when they have ten
+seconds or less left to wait. It adds ten seconds of patience and visit time,
+once per visit. You still need to fulfil their orders to earn satisfaction.
+Chat and Welcome share a timer: welcoming uses its current cooldown; chatting
+locks both for twenty seconds, even with upgraded welcoming. Serve stays separate.
+This creates a choice between attracting newcomers and looking after a queue.
+
+An active opening can buy pouring speed, frontage, seating and pool before hiring,
+while restocking by hand. Delaying automatic deliveries and a larger fridge until
+stage 2 leaves money for the renovation. A signage-and-staff opening also works;
+neither manual upgrades nor Chat is required to finish. Avoid buying every speed
+level when stock, seats or customers are your actual limit.
+
+Closing a venue does not reset timers. Normal prep time refills them; skipping to
+noon, paused decisions, startup menus and offline time do not. Reloading preserves
+the remaining refill and which visitors have already had a chat.
 
 ## The clock and tomorrow's opening
 
@@ -135,8 +170,8 @@ The wealth of another property cannot satisfy those milestones. **Empire** shows
 leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
-The tested active-play curve reaches a first pool table around 16–18 minutes,
-stage 2 around 39–44 minutes and a second property around 129–143 minutes. These are
+The tested active-play curve reaches a first pool table around 16–19 minutes,
+stage 2 around 39–42 minutes and a second property around 138–147 minutes. These are
 simulation results for a particular investment strategy, not timers or promises
 for every play style. [Economy details](ECONOMY.md) include the full measurements.
 
@@ -169,11 +204,17 @@ optional. The street continues after the festival.
 
 ## Saves and versions
 
-Saves happen after decisions and every fifteen seconds, with a backup retained.
-Save schema 4 introduces the clock at noon on an old campaign's existing day,
+There is one local campaign slot. New Game saves immediately; later saves happen
+after decisions, every fifteen seconds, and on normal close or application pause,
+with a backup retained. Waiting on the startup menu does not run the business,
+write saves or claim offline estimates. Resume claims eligible time away once.
+Save schema 5 preserves action upgrades, fractional cooldowns and customer chat
+allowances. Existing venues begin with unpurchased action upgrades. Migration from
+pre-clock saves introduces noon on the campaign’s existing day,
 with initially clean venues. Old campaigns preserve owned progress when migrated, so an existing stage-3 bar
 will not revert to stage 1 for the new balance. Use a fresh campaign if you want
-to play the revised opening. **Restart campaign** erases that run; back up saves
+to play the revised opening. **New Game** and **Restart campaign** replace that
+run and remove its old backup after confirmation; back up saves
 first if you want to keep it. [Developer setup](../DEVELOPMENT.md) lists save paths.
 
 The source branch and a published release may be different builds. Use the

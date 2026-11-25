@@ -399,5 +399,23 @@
       192
     ],
     "height": 180
+  },
+  "patrons-men": {
+    "frames": [
+      "customer-sunfaded-regular.png",
+      "customer-silver-polo.png",
+      "customer-maroon-casual.png",
+      "customer-plum-club.png",
+      "customer-sage-holiday.png",
+      "customer-ivory-club.png",
+      "customer-cobalt-evening.png",
+      "customer-amber-local.png",
+      "customer-beard-glasses.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
   }
 }

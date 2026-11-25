@@ -15,6 +15,8 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		var defaults := new_fields()
 		for key in defaults:
 			if not bar.has(key): bar[key] = defaults[key]
+		for key in ["serve_ready","welcome_ready","welcome_until"]: bar[key] = float(bar[key])
+		for customer in bar.customers: customer.merge(customer_action_fields())
 		bar.shift.merge({"fines":0})
 		if not bar.last_shift.is_empty(): bar.last_shift.merge({"fines":0})
 		for report in bar.recent: report.merge({"fines":0})
@@ -92,13 +94,20 @@ func prep_tick(bar: Dictionary) -> void:
 		bar.clean_remaining -= 1
 		if bar.clean_remaining==0: bar.dirt = 0
 
+static func action_fields() -> Dictionary:
+	return {"action_levels":{"pouring":0,"welcoming":0},"serve_duration":10.0,"welcome_duration":10.0}
+
+static func customer_action_fields() -> Dictionary:
+	return {"chatted":false,"chat_until":0.0}
+
 static func new_fields() -> Dictionary:
 	var fields := {"customers":[],"team":[],"equipment":{"sign":0,"comfort":0,"fridge":0,"pool":0,"seating":0,"screen":0,"training":0,"menu":0},
 		"open":true,"close_reason":"","recovery":0,"consignment":0,"games":[],"promo":{},"promo_report":{},"promo_id":0,"promo_cooldown":0,"last_promo":-1,"promo_repeats":0,"ordinary_seconds":0,
-		"welcome":0,"welcome_until":0,"welcome_ready":0,"serve_ready":0,"service_clock":0,"cost_credit":0,
+		"welcome":0,"welcome_until":0.0,"welcome_ready":0.0,"serve_ready":0.0,"service_clock":0,"cost_credit":0,
 		"regulars":0,"happy":0,"healthy":0,"shift":ledger(),"last_shift":{},"recent":[],"recent_sales":[],"recent_orders":[],
 		"pool_games":0,"pool_income":0,"free_games":0,"arrivals":0,"orders":0,"sold":0,"lost_full":0,"lost_service":0,"lost_stock":0,"host_requests":[]}
 	fields.merge(clock_fields())
+	fields.merge(action_fields())
 	return fields
 
 static func ledger() -> Dictionary:
@@ -257,6 +266,7 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 	var customer := {"id":int(s.street.next_customer),"life":C.VISIT_SECONDS+(20 if bar.equipment.comfort else 0),"order":false,"wait":0,"quoted":0,"drinks":0,"next":0,
 		"audience":audience,"fine_budget":600*int(bar.stage) if audience==2 else 0,"budget":int(C.TYPES[int(bar.type)].drink)*2+100,"premium":roll(100)<[15,50,35][audience],"pool":roll(100)<(85 if bar.promo.get("kind",-1) in [0,2] else 40),
 		"pool_wait":0,"played":false,"playing":false,"missed":false,"opening":opening,"promo":int(bar.promo.get("id",0)) if promoted else 0}
+	customer.merge(customer_action_fields())
 	s.street.next_customer += 1
 	bar.customers.append(customer)
 	bar.arrivals += 1
@@ -270,7 +280,8 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 
 func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 	if not is_trading(bar): return 0
-	if manual and s.street.elapsed < bar.serve_ready: return 0
+	if manual and not action_status(bar,"serve").enabled: return 0
+	if manual: count = 1
 	var sold := 0
 	for customer in bar.customers:
 		if sold >= count: break
@@ -298,8 +309,66 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		if bar.type == 1 and customer.drinks == 2 and on_duty(bar,1)>0 and customer.fine_budget>=300*int(bar.stage) and roll(100)<40:
 			bar.host_requests.append(int(customer.id))
 		sold += 1
-	if manual and sold > 0: bar.serve_ready = int(s.street.elapsed)+1
+	if manual and sold > 0: start_cooldown(bar,"serve",action_cooldown(bar,"serve"))
 	return sold
+
+# Deadlines use the saved foreground clock, never wall-clock or rendered frames.
+func action_time() -> float:
+	return float(s.street.elapsed)+float(s.street.get("tick_fraction",0.0))
+
+func action_cooldown(bar: Dictionary, id: String) -> float:
+	if id=="chat": return C.CHAT_SECONDS
+	var key := "pouring" if id=="serve" else "welcoming"
+	return float(C.ACTION_COOLDOWNS[int(bar.action_levels[key])])
+
+func start_cooldown(bar: Dictionary, id: String, duration: float) -> void:
+	bar[id+"_duration"] = duration
+	bar[id+"_ready"] = action_time()+duration
+
+func patience(bar: Dictionary, customer: Dictionary) -> int:
+	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)
+
+func chat_target(bar: Dictionary) -> Dictionary:
+	var target := {}
+	var shortest := C.CHAT_THRESHOLD+1
+	for customer in bar.customers:
+		if not customer.order or customer.missed or customer.get("chatted",false): continue
+		var remaining := mini(patience(bar,customer)-int(customer.wait),int(customer.life))
+		if remaining>=0 and remaining<shortest:
+			shortest = remaining
+			target = customer
+	return target
+
+func action_status(bar: Dictionary, id: String) -> Dictionary:
+	var timer := "serve" if id=="serve" else "welcome"
+	var remaining := maxf(0.0,float(bar[timer+"_ready"])-action_time())
+	var duration := maxf(0.001,float(bar[timer+"_duration"]))
+	var reason := ""
+	if not is_trading(bar): reason = status(bar)
+	elif remaining>0.000001: reason = "%s ready in %.1fs." % ["Serve" if id=="serve" else "Welcome / Chat",remaining]
+	elif id=="serve" and pending(bar)==0: reason = "No orders waiting. Welcome customers or plan a promotion."
+	elif id=="serve" and bar.stock==0 and not (bar.restock and s.cash>=C.STOCK_COST+ceili(operating_rate(bar)/60.0)): reason = "Restock the fridge."
+	elif id=="chat" and chat_target(bar).is_empty(): reason = "Chat helps an unchatted guest with 10s or less left to wait."
+	return {"enabled":reason.is_empty(),"reason":reason,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
+
+func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
+	var item: Dictionary = C.ACTION_UPGRADES[index]
+	var level := int(bar.action_levels[item.id])
+	var price := 0 if level==3 else int(C.ACTION_UPGRADE_COSTS[level])
+	var shortfall := maxi(0,price+operating_rate(bar)*2-int(s.cash))
+	return {"level":level,"price":price,"shortfall":shortfall,"enabled":level<3 and shortfall==0,
+		"current":C.ACTION_COOLDOWNS[level],"next":C.ACTION_COOLDOWNS[mini(3,level+1)]}
+
+func buy_action_upgrade(bar: Dictionary, index: int) -> String:
+	if index<0 or index>=C.ACTION_UPGRADES.size(): return "Unknown action upgrade."
+	var state := action_upgrade_status(bar,index)
+	if state.level==3: return "Already at the fastest cooldown."
+	if not state.enabled: return "Need ฿%d more, including next shift's operating reserve." % state.shortfall
+	var item: Dictionary = C.ACTION_UPGRADES[index]
+	s.cash -= state.price
+	s.weekly.costs += state.price
+	bar.action_levels[item.id] += 1
+	return "%s: %ds → %ds on the next use." % [item.name,state.current,state.next]
 
 func promotion_record(bar: Dictionary, id: int) -> Dictionary:
 	if id == 0: return {}
@@ -405,16 +474,26 @@ func upgrade_reason(bar: Dictionary) -> String:
 func action(bar: Dictionary, id: String, index: int) -> String:
 	match id:
 		"serve":
-			if not is_trading(bar): return status(bar)
-			if pending(bar)==0: return "No orders waiting. Welcome customers or plan a promotion."
-			return "Order served. Stock and income recorded." if serve(bar,1,true)>0 else "Wait a moment, or restock the fridge."
+			var state := action_status(bar,id)
+			if not state.enabled: return state.reason
+			return "Order served. Stock and income recorded." if serve(bar,1,true)>0 else "Restock the fridge."
 		"welcome":
-			if not is_trading(bar): return status(bar)
-			if s.street.elapsed<bar.welcome_ready: return "Give the next passersby a moment."
+			var state := action_status(bar,id)
+			if not state.enabled: return state.reason
 			bar.welcome = mini(3,int(bar.welcome)+1)
-			bar.welcome_until = int(s.street.elapsed)+20
-			bar.welcome_ready = int(s.street.elapsed)+10
+			bar.welcome_until = action_time()+20
+			start_cooldown(bar,"welcome",action_cooldown(bar,"welcome"))
 			return "Welcoming passersby. The street still has a limited crowd."
+		"chat":
+			var state := action_status(bar,id)
+			if not state.enabled: return state.reason
+			var customer := chat_target(bar)
+			customer.chatted = true
+			customer.life += C.CHAT_PATIENCE
+			customer.chat_until = action_time()+3.0
+			start_cooldown(bar,"welcome",C.CHAT_SECONDS)
+			return "A little reassurance: 10 extra seconds to fulfil that order."
+		"action_upgrade": return buy_action_upgrade(bar,index)
 		"stock":
 			return "Stock delivered at ฿14 per drink." if (restock(bar,true) or restock(bar)) else "Fridge full, or insufficient cash for the delivery."
 		"equipment": return buy_equipment(bar,index)
@@ -559,7 +638,7 @@ func tick() -> void:
 			customer.life -= 1
 			if customer.order:
 				customer.wait += 1
-				if customer.wait > (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0):
+				if customer.wait > patience(bar,customer):
 					customer.order = false
 					customer.missed = true
 					var reason := "lost_stock" if bar.stock==0 else "lost_service"

@@ -107,7 +107,11 @@ Mali's opponents **Juno, Vega and Orchid** as optional arcade characters.
 
 ### Chapter 1 — Rent Is Due on Tuesday
 
-Rescue the Blue Hour. The first successes are tangible: a served order, cold
+Rescue the Blue Hour. The owner’s Serve and Welcome actions recover over ten seconds, with local
+upgrades making them faster. A quick chat can buy an impatient guest time, at the
+cost of delaying the next welcome. Reassurance still needs a fulfilled order.
+
+The first successes are tangible: a served order, cold
 stock, a returning customer and a quiet shift that still pays its way. Pool and
 small equipment purchases give the bar a personality before a major renovation.
 

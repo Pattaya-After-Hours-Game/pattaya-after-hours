@@ -2,6 +2,7 @@ extends SceneTree
 # Run only with an isolated XDG_DATA_HOME (tools/preview-art.sh enforces this).
 const Campaign = preload("res://scripts/campaign.gd")
 const Fight = preload("res://scripts/fight.gd")
+const Art = preload("res://scripts/art.gd")
 var output := OS.get_environment("PATTAYA_PREVIEW_DIR")
 var captures: Array[String] = []
 var filter := OS.get_environment("PATTAYA_PREVIEW_FILTER")
@@ -16,10 +17,11 @@ func capture(app: Control, name_text: String, rebuild: bool = true) -> void:
 		if not matches: return
 	if rebuild:
 		app.render()
-		app.city.set_process(false)
-		app.city.clock = app.scene_clock
-		app.city.arrival_time = 2
-		app.city.queue_redraw()
+		if not app.boot_menu:
+			app.city.set_process(false)
+			app.city.clock = app.scene_clock
+			app.city.arrival_time = 2
+			app.city.queue_redraw()
 	await process_frame
 	await process_frame
 	await RenderingServer.frame_post_draw
@@ -89,6 +91,16 @@ func run() -> void:
 	app.set_process(false)
 	app.muted = true
 	app.music.stop()
+	await capture(app,"boot-new")
+	app.start_new_game()
+	app.boot_menu = true
+	app.resume_available = true
+	await capture(app,"boot-resume")
+	app.request_new_game()
+	await capture(app,"boot-confirm")
+	app.cancel_new_game()
+	app.resume_game()
+	app.show_tutorial_hint = true
 	app.model = Campaign.new(72)
 	app.offline_notice = 0
 	await capture(app,"opening")
@@ -122,6 +134,26 @@ func run() -> void:
 		bar.open = false
 		await capture(app,"closed-%d" % kind)
 		bar.open = true
+	# Each new appearance in actual room scale; these are admitted fixture guests.
+	for kind in 3:
+		app.model.s.street.selected = kind
+		var bar: Dictionary = app.model.street.selected()
+		populate(app,bar,3)
+		bar.customers.clear()
+		bar.games.clear()
+		bar.equipment.pool = 0
+		var customer_base := int(app.model.s.street.next_customer)
+		customer_base += Art.CUSTOMER_VARIANTS.size()-customer_base%Art.CUSTOMER_VARIANTS.size()
+		for i in Art.CUSTOMER_VARIANTS.size():
+			if Art.CUSTOMER_VARIANTS[i][0]!="patrons-men": continue
+			app.model.s.street.next_customer = customer_base+i+1
+			app.model.street.economy.admit(bar)
+		await capture(app,"customers-men-%d" % kind)
+		bar.customers.clear()
+		# The supplied-reference guest leads a small group for likeness review.
+		app.model.s.street.next_customer = customer_base+Art.CUSTOMER_VARIANTS.size()
+		for i in 3: app.model.street.economy.admit(bar)
+		await capture(app,"customer-beard-glasses-%d" % kind)
 	while app.model.s.street.bars.size()<8: app.model.street.action("buy",app.model.s.street.bars.size()%3)
 	for i in 8:
 		app.model.s.street.selected = i

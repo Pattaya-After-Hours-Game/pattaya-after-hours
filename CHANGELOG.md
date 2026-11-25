@@ -4,6 +4,17 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Unreleased — Active service and customer chat
+
+- Serve and Welcome now show ten-second base refills. Each venue can buy separate
+  8/6/4-second action upgrades for ฿900, ฿1,400 and ฿2,800 per track.
+- Added once-per-visit customer reassurance with ten extra seconds of patience
+  and visit time; Chat shares Welcome’s timer and always recovers for twenty seconds.
+- Added authoritative fractional cooldowns, eligibility feedback and schema-five
+  migration preserving existing campaigns, deadlines and paid/free pool games.
+- Retained progression targets with tested investment strategies; manual upgrades
+  and Chat remain optional. Added action, UI, save and no-chat balance regressions.
+
 ## Unreleased — Game clock and overnight preparation
 
 - Added a one-game-minute-per-second clock, noon opening, 1am closing and nightly

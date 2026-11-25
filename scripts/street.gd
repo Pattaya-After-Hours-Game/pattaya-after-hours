@@ -37,8 +37,9 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		s.street.cool_seconds = 0
 		for bar in s.street.bars:
 			bar.merge(Economy.clock_fields(),true)
+	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	economy = Economy.new(s,fresh)
-	s.version = 4
+	s.version = 5
 
 func make_bar(kind: int, slot: int) -> Dictionary:
 	return {"type":kind, "stage":1, "name":C.NAMES[slot], "crew":0,
@@ -106,7 +107,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine","clean":
+		"serve","stock","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:
@@ -321,6 +322,17 @@ func tick_heat() -> void:
 			s.street.cool_seconds = 0
 
 # Foreground only: the clock shares the live economy's decision/pause rules.
+# Accumulate fractional foreground time without changing the fixed economy step.
+func advance(delta: float) -> void:
+	var remaining := clampf(delta,0.0,60.0)
+	while remaining>0.0000001 and s.phase in ["plan","guided"]:
+		var step := minf(remaining,1.0-float(s.street.tick_fraction))
+		s.street.tick_fraction += step
+		remaining -= step
+		if s.street.tick_fraction>=0.9999999:
+			s.street.tick_fraction = 0.0
+			tick(1)
+
 func tick(seconds: int) -> void:
 	if not s.phase in ["plan","guided"]: return
 	for _second in clampi(seconds,0,60):

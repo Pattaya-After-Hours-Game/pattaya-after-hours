@@ -638,7 +638,7 @@ func save_checkpoint() -> void:
 	if error!=OK:
 		street.record("Save failed (%d). Keep the game open and retry saving." % error)
 
-func save_game() -> int:
+func save_game(replace_campaign: bool = false) -> int:
 	s.street.last_seen = maxi(int(s.street.last_seen),int(Time.get_unix_time_from_system()))
 	s.rng = str(rng.state)
 	var temporary := SAVE + ".tmp"
@@ -649,17 +649,24 @@ func save_game() -> int:
 	var error := file.get_error()
 	file.close()
 	if error != OK: return error
-	if FileAccess.file_exists(SAVE) and _read(SAVE) is Dictionary:
+	# A new run must not leave the erased campaign available for backup recovery.
+	if replace_campaign and FileAccess.file_exists(BACKUP):
+		error = DirAccess.remove_absolute(BACKUP)
+		if error != OK: return error
+	elif not replace_campaign and FileAccess.file_exists(SAVE) and _read(SAVE) is Dictionary:
 		error = DirAccess.copy_absolute(SAVE, BACKUP)
 		if error != OK: return error
 	return DirAccess.rename_absolute(temporary,SAVE)
+
+func _finite_number(value: Variant, minimum: float, maximum: float) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and float(value)>=minimum and float(value)<=maximum
 
 func _read(path: String) -> Variant:
 	if not FileAccess.file_exists(path): return null
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -686,6 +693,8 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)<5:
+					for key in Street.Economy.action_fields(): defaults.erase(key)
 				if int(parsed.version)==3:
 					for key in Street.Economy.clock_fields(): defaults.erase(key)
 				for key in defaults:
@@ -703,7 +712,7 @@ func _read(path: String) -> Variant:
 						if not customer.has(key): return null
 				for game in bar.games:
 					if not game is Dictionary or not game.get("players") is Array or not game.has("remaining") or not game.has("fee"): return null
-		if int(parsed.version)==4:
+		if int(parsed.version)>=4:
 			for key in ["minute","offline_cursor","cool_seconds"]:
 				if not parsed.street.get(key) is float and not parsed.street.get(key) is int: return null
 			if parsed.street.minute<0 or parsed.street.minute>=1440 or parsed.street.offline_cursor<0 or parsed.street.offline_cursor>=1440: return null
@@ -716,6 +725,19 @@ func _read(path: String) -> Variant:
 					if bar[key]<0: return null
 				if bar.dirt>Street.C.DIRT_LIMIT or bar.clean_remaining>Street.C.CLEAN_SECONDS or bar.late_minutes>120: return null
 				if not bar.shift is Dictionary or not bar.shift.has("fines"): return null
+		if int(parsed.version)>=5:
+			if not _finite_number(parsed.street.get("tick_fraction"),0.0,0.999999999): return null
+			for bar in parsed.street.bars:
+				for key in ["pouring","welcoming"]:
+					var level: Variant = bar.action_levels.get(key)
+					if not _finite_number(level,0,3) or float(level)!=floorf(float(level)): return null
+				for key in ["serve_ready","welcome_ready","welcome_until"]:
+					if not _finite_number(bar.get(key),0,1.0e15): return null
+				for key in ["serve_duration","welcome_duration"]:
+					if not _finite_number(bar.get(key),1,Street.C.CHAT_SECONDS): return null
+				for customer in bar.customers:
+					if not customer.get("chatted") is bool: return null
+					if not _finite_number(customer.get("chat_until"),0,1.0e15): return null
 		return parsed
 	return null
 
@@ -735,13 +757,14 @@ func load_game() -> bool:
 	return true
 
 
-func _restore_numbers(value: Variant) -> Variant:
-	# The save schema contains whole numbers, while JSON restores numbers as floats.
+func _restore_numbers(value: Variant, field: String = "") -> Variant:
+	# Preserve explicit fractional action clocks; legacy numeric fields stay integers.
 	match typeof(value):
 		TYPE_FLOAT:
+			if field in ["tick_fraction","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until"]: return value
 			return int(value)
 		TYPE_ARRAY:
 			for i in value.size(): value[i] = _restore_numbers(value[i])
 		TYPE_DICTIONARY:
-			for key in value: value[key] = _restore_numbers(value[key])
+			for key in value: value[key] = _restore_numbers(value[key],str(key))
 	return value

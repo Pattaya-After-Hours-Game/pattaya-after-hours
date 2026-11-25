@@ -21,13 +21,19 @@ godot --path .
 **Attract customers → give them a reason to stay → fulfil orders → earn a profit
 → reinvest.** You start with ฿200, eighteen drinks and three opening customers.
 Tap **Serve a drink** for a waiting order; use **Welcome customers** when quiet.
-No order means no sale. Open **Service** to see demand, service speed, occupancy,
+Both actions refill over ten seconds. In **Service**, buy **Faster pouring** and
+**Better welcoming** to reduce each venue’s cooldowns to eight, six, then four
+seconds. **Have a chat** buys an urgent waiting guest ten more seconds; it shares
+Welcome’s timer and takes twenty seconds to recover. No order means no sale. Open **Service** to see demand, service speed, occupancy,
 stock, payroll and recent actual profit.
 
 Inside the scene, customers stand on the public side of the bar, bartenders
 work behind the counters, and gold dots above customers mark waiting orders.
 The smaller passerby in the left street opening is background traffic, not an
 extra customer. Messages sit above the room so the floor remains visible.
+The customer cast includes older regulars and Indian, Korean, Black and Thai
+visitors, with outfits ranging from scruffy holiday wear to tailored clubwear.
+Looks stay consistent during each visit and do not determine spending behaviour.
 
 Save for signage, seating, a bartender and a pool table. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
@@ -90,15 +96,24 @@ Toybox sparring. Tours and legacy mining investments are not progression gates.
 
 | Where | Controls |
 | --- | --- |
-| Street | **Serve a drink**, **Welcome customers**, property cards and the scrollable management tabs |
+| Street | **Serve a drink**, **Welcome customers**, **Have a chat**, property cards and the scrollable management tabs |
 | Events | Pink warning banner or **Events**; prepare before the countdown, then **Face Godzilla** for a monster challenge |
 | District | WASD/arrows to walk, E to enter, Esc to return; touch a destination on mobile |
 | Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J/K/L to jab/kick/Burst; mobile touch controls |
 | Godzilla | **Serve a shot** or Space; ten shots before the timer ends |
 
-The game autosaves after decisions and every fifteen seconds. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 4.
-Their clock starts at noon on the existing day, with initially clean venues. A fresh campaign is
+Each launch opens a **New Game / Resume** menu. **Resume** continues your saved
+campaign and is disabled when no readable save or backup exists. **New Game**
+starts over; if a save exists, confirm to permanently replace its progress and
+remove its backup. There is one campaign slot per device. The street stays
+paused on the menu, and offline estimates are claimed only when you resume.
+
+The game autosaves after decisions and every fifteen seconds, and on normal
+close or application pause. New games are saved immediately. Older campaigns
+retain money, staff, venues and owned stages when migrated to save schema 5.
+Pre-clock saves start at noon on the existing day, with initially clean venues.
+Schema 5 preserves fractional action timers and chat allowances; old venues
+start with unpurchased action upgrades. A fresh campaign is
 needed to experience the revised progression from the beginning.
 
 Business reports use two real minutes of trading. Viable managed venues receive
@@ -125,8 +140,8 @@ practice campaign and never overwrites your campaign.
 
 ## Project status
 
-The integrated build includes 61 runtime textures, twenty animation atlases with
-136 frames, nine interiors and nine matching exterior illustrations. Gameplay,
+The current source includes 62 runtime textures, twenty-one sprite atlases with
+145 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, art integrity, input and nine fresh-campaign pacing simulations
 passed during the completed-art integration. Linux startup and Android debug
 export/signature checks passed. Android device and Windows/macOS execution still

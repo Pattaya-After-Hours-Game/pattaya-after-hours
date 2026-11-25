@@ -1,0 +1,16 @@
+{
+  "id": "customer-ivory-club",
+  "group": "patrons-men",
+  "index": 5,
+  "prompt": "Use case: stylized-concept. Production sprite for Pattaya After Hours. ONE original adult male customer, full body, relaxed standing idle, frontal three-quarter view facing RIGHT. Reference image is STYLE ONLY, create a distinctly different individual. Match its detailed illustrated pixel-art look, crisp dark plum outlines, clustered cel shading, amber highlights and subtle cyan rim light, readable at 180 pixels tall, approximately six heads tall. Both complete shoes and head visible, ample clear padding, feet grounded on the same baseline. Genuine transparent background, no floor, no cast shadow, no scenery, no sheet, no labels, no letters, no logos. Hands empty: one loosely at side, one resting naturally at hip or pocket. A 38-year-old Korean man, light beige skin, slim build, sleek side-parted black hair, clean-shaven angular face. Stylish tailored ivory blazer over a black open-neck shirt, charcoal tapered trousers, polished black loafers, slim silver wristwatch. Upscale nightclub outfit, relaxed elegant stance. Natural human anatomy and individual facial features, no caricature.",
+  "ref": "patrons-0",
+  "label": "ivory-club",
+  "generator": "built-in image generation",
+  "date": "2026-11-25",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-30f20297-f73f-4de3-928f-bbf78f44dd5a.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/patrons-0.png"
+  ],
+  "destination": "art/sources/customer-ivory-club.png",
+  "transparent_background": true
+}

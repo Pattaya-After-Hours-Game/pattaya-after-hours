@@ -1,0 +1,16 @@
+{
+  "id": "customer-plum-club",
+  "group": "patrons-men",
+  "index": 3,
+  "prompt": "Use case: stylized-concept. Production sprite for Pattaya After Hours. ONE original adult male customer, full body, relaxed standing idle, frontal three-quarter view facing RIGHT. Reference image is STYLE ONLY, create a distinctly different individual. Match its detailed illustrated pixel-art look, crisp dark plum outlines, clustered cel shading, amber highlights and subtle cyan rim light, readable at 180 pixels tall, approximately six heads tall. Both complete shoes and head visible, ample clear padding, feet grounded on the same baseline. Genuine transparent background, no floor, no cast shadow, no scenery, no sheet, no labels, no letters, no logos. Hands empty: one loosely at side, one resting naturally at hip or pocket. A 32-year-old Indian man with medium brown skin, tall lean build, neatly trimmed beard and short swept-back black hair. Elegant dark plum open-collar shirt with rolled forearms, slim tailored black trousers, polished oxblood loafers, understated gold wristwatch. Confident relaxed high-end clubwear, no jacket. Natural human anatomy and individual facial features, no caricature.",
+  "ref": "patrons-0",
+  "label": "plum-club",
+  "generator": "built-in image generation",
+  "date": "2026-11-25",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-cbfeaa1c-4466-416b-a37c-1f7d9afe5429.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/patrons-0.png"
+  ],
+  "destination": "art/sources/customer-plum-club.png",
+  "transparent_background": true
+}

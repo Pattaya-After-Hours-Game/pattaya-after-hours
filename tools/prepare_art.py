@@ -63,7 +63,7 @@ recipe=ROOT/'art/packing.json'
 # allowed only during the art pass; final preparation fails closed.
 groups={}
 missing=[]
-for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json','frontage-jobs.json']:
+for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json','frontage-jobs.json','customer-jobs.json']:
     for job in json.loads((ROOT/'art/recipes'/filename).read_text()):
         if not (SRC/(job['id']+'.png')).exists(): missing.append(job['id'])
         if 'group' in job: groups.setdefault(job['group'],[]).append(job['id']+'.png')

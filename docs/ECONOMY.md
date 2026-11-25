@@ -59,7 +59,27 @@ Start with ฿200, 18 drinks and three forgiving opening customers. Serve their
 actual orders; welcome passersby when there are no orders. A gold dot marks a
 waiting order. Customers can buy two drinks during a visit, have a spending
 budget, and leave unhappy when an order waits too long. A quiet click neither
-uses stock nor earns money. Manual service is capped at one order per second.
+uses stock nor earns money. Manual service immediately sells one ordered drink,
+then refills for ten foreground seconds. Failed attempts consume no cooldown.
+Bartenders continue serving independently during manual recovery.
+
+Each venue buys separate Faster pouring and Better welcoming levels in Service:
+10 → 8 → 6 → 4 seconds, at incremental prices of ฿900, ฿1,400 and ฿2,800.
+Purchases preserve the next shift’s operating reserve and affect subsequent uses,
+never shorten an active refill. They do not change staff training or demand caps.
+
+Have a chat targets the eligible guest nearest departure, with at most ten seconds
+of patience or visit time remaining. Once per visit, it adds ten seconds to order
+patience and remaining visit time. It cannot undo a missed order or directly grant
+income, satisfaction or regulars. Welcome and Chat share a social timer: Welcome
+starts its upgraded cooldown; Chat always starts twenty seconds on both buttons.
+Serve has an independent timer. A brief +10s marker identifies the reassured guest.
+
+Action deadlines use elapsed foreground time plus a saved fractional second.
+The economic model still steps once per second. Closed-hour preparation advances
+timers; paused decisions, startup menus, offline claims and skipping to noon do
+not. Buttons display readiness and remaining time from the same model gates used
+by actions and guided choices.
 
 Welcoming has a ten-second cooldown, a short expiry and a capped attraction
 bonus. The street supplies 7.3 potential visitors per real minute before events;
@@ -121,6 +141,11 @@ and operating options; it does not increase ordinary beer prices.
 
 ## Guided shifts, saves and offline time
 
+The startup menu pauses simulation and saving until the player chooses New Game
+or Resume. Resume claims eligible offline time once, including time spent on the
+menu. Confirmed New Game replaces the single campaign slot and removes the old
+backup; it starts with the ordinary opening cash, stock and customers.
+
 Managed-shift guidance has three decisions at the ordinary shift boundaries
 (start, 40s and 80s). Decision screens pause the model. Continuing resumes the
 same visitors, games, inventory and ledger. Repeated choices cannot skip time,
@@ -128,7 +153,10 @@ create customers or settle another report. The original tutorial is a separate
 practice campaign. Old saves interrupted inside a legacy shift finish that shift
 once, then enter the live economy.
 
-Version-four saves retain queues, game fees, promotion timers, clock, cleaning,
+Version-five saves additionally retain fractional foreground time, action upgrade
+levels, cooldown durations/deadlines and per-visit chat allowance. Versions 1–4
+migrate with unpurchased upgrades and their existing deadlines preserved.
+Version-four saves already retain queues, game fees, promotion timers, clock, cleaning,
 nightly permissions, raid counters and RNG state. Version-three migration starts
 at noon on the existing day with clean venues, preserving its live queues and
 paid/free pool identity. Version-one/two migration retains money, properties,
@@ -158,22 +186,30 @@ Run `tools/test.sh` with Godot 4.7.2. It uses temporary save directories and run
 both the regression suite and `tests/economy_balance.gd`.
 
 The balance runner uses fresh campaigns with seeds 11, 72 and 291 and no offline
-income or injected money. Click-heavy players serve every second, balanced players
-every four seconds, and mostly-idle players every fifteen seconds. The purchase
-policy invests in signage, staff, deliveries and seating before pool, then a
-fridge, stage 2, management, a second property and stage 3. All purchases pass the
-real action gates. Policies clean each venue and skip to noon using real actions;
-prep seconds count toward milestone times. Base traffic was adjusted from 7 to
-7.3 per real minute to retain the acceptance windows with dirt and nightly prep. Active styles must meet every target; mostly-idle must still
-finish without becoming stuck.
+income or injected money. Attentive players check ready actions each second,
+balanced players every two seconds, and mostly-idle players every fifteen seconds.
+These are decision checks, not successful sales: all actions obey their cooldowns.
+
+Active players buy the first pouring upgrade, frontage, seating and pool, then
+hire a bartender. They manually restock and defer the supplier agreement and
+larger fridge until stage 2; after management they buy the first welcoming upgrade.
+Mostly-idle players follow the signage/staff/deliveries route without action
+upgrades or Chat. Policies clean and skip through real actions, with prep seconds
+counted. Prices, traffic, wages and progression gates are otherwise unchanged.
+The first upgrade was tuned from ฿650 to ฿900 to retain the 2–5 minute opening target.
+
+All six active target runs must meet every window; the three mostly-idle runs
+must finish without becoming stuck. Six additional balanced runs compare manual
+upgrades and staff-first automation without Chat; both routes must finish within
+300 minutes. This makes Chat and manual upgrades optional, not progression gates.
 
 | Milestone | Active target | Measured active range |
 | --- | --- | --- |
-| First useful purchase | 2–5 min | 2.1–2.5 min |
-| Pool table | 10–20 min | 15.8–17.6 min |
-| First stage 2 | 30–45 min | 39.1–43.5 min |
-| Second property | 90–150 min | 129.4–142.9 min |
-| First stage 3 | 180–300 min | 217.1–236.0 min |
+| First useful purchase | 2–5 min | 2.7–4.4 min |
+| Pool table | 10–20 min | 15.9–18.6 min |
+| First stage 2 | 30–45 min | 38.7–41.9 min |
+| Second property | 90–150 min | 137.9–147.0 min |
+| First stage 3 | 180–300 min | 221.8–236.9 min |
 
 Mostly-idle runs reach stage 3 in approximately 235–244 minutes, with a slower
 opening. These are deterministic policy tests, not a claim about every human

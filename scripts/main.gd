@@ -36,6 +36,9 @@ const SHOT_INTERVAL = 0.60
 const GODZILLA_SECONDS = 10.0
 
 var model = Campaign.new()
+var boot_menu := true
+var resume_available := false
+var new_game_confirmation := false
 var campaign_before_tutorial: Campaign
 var show_tutorial_hint := false
 var offline_notice := 0
@@ -61,9 +64,10 @@ var training := false
 var arcade_circuit := false
 
 var live_labels: Array = []
+var action_controls: Array = []
+var upgrade_controls: Array = []
 var live_seconds := 0.0
 var save_seconds := 0.0
-var serve_delay := 0.0
 var refresh_street := false
 var show_details := false
 var confirmation := false
@@ -93,10 +97,7 @@ func _ready() -> void:
 	interface_font.fallbacks = [preload("res://assets/DejaVuSans.ttf")]
 	theme = Theme.new()
 	theme.default_font = interface_font
-	show_tutorial_hint = not model.load_game()
-	if not show_tutorial_hint:
-		offline_notice = model.street.claim_offline(int(Time.get_unix_time_from_system()))
-		save_state()
+	resume_available = model.load_game()
 	var config := ConfigFile.new()
 	if config.load("user://settings.cfg") == OK: muted = config.get_value("audio","muted",false)
 	music = AudioStreamPlayer.new()
@@ -111,10 +112,94 @@ func _ready() -> void:
 		sfx_streams[kind] = load("res://assets/%s.wav" % kind)
 	if not muted and DisplayServer.get_name() != "headless": music.play()
 	render()
-	if model.s.phase == "fight": enter_fight(false)
 	if windows_updates != null:
 		windows_updates.confirm_restart()
 		if DisplayServer.get_name() != "headless": windows_updates.check()
+
+func render_boot_menu() -> void:
+	var background := TextureRect.new()
+	background.texture = Art.venue(0,1)
+	background.size = Vector2(960,540)
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root_ui.add_child(background)
+	pane(root_ui,Rect2(0,0,960,540),Color("#170f18b8"),Color.TRANSPARENT)
+	var menu := pane(root_ui,Rect2(220,64,520,412),DARK,GOLD)
+	abs_text(menu,Rect2(28,20,464,24),"THE BLUE HOUR IS WAITING",14,TEAL)
+	abs_text(menu,Rect2(28,51,464,42),"PATTAYA AFTER HOURS",29,GOLD)
+	if new_game_confirmation:
+		abs_text(menu,Rect2(28,110,464,30),"Replace your saved campaign?",22,PINK)
+		abs_text(menu,Rect2(28,151,464,65),"All progress in your current game will be erased.\nYou will start again at the Blue Hour.\nThis cannot be undone.",16,WHITE)
+		at_button(menu,Rect2(28,242,464,48),"Erase progress & start new game",start_new_game)
+		at_button(menu,Rect2(28,304,464,48),"Cancel",cancel_new_game,true).grab_focus()
+	else:
+		var summary := "No saved campaign yet. Start your first bar."
+		if resume_available:
+			summary = "Day %d · %s in the till · %d venue%s" % [model.s.day,cash(model.s.cash),model.s.street.bars.size(),"" if model.s.street.bars.size()==1 else "s"]
+		abs_text(menu,Rect2(28,111,464,28),summary,16,WHITE)
+		abs_text(menu,Rect2(28,148,464,48),"One street. One saved campaign.\nNew Game replaces your existing progress.",15,MUTED)
+		var resume := at_button(menu,Rect2(28,224,464,48),"Resume",resume_game,true)
+		resume.disabled = not resume_available
+		var fresh := at_button(menu,Rect2(28,286,464,48),"New Game",request_new_game)
+		if resume_available: resume.grab_focus()
+		else: fresh.grab_focus()
+	var notice := abs_text(menu,Rect2(28,359,464,36),message,14,PINK)
+	notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	at_button(root_ui,Rect2(848,14,98,40),"Muted" if muted else "Sound",set_sound)
+	if windows_updates != null:
+		update_button = at_button(root_ui,Rect2(14,14,98,40),"Update",windows_updates.ask)
+		update_button.visible = not windows_updates.tag.is_empty()
+
+func resume_game() -> void:
+	if not boot_menu or not resume_available: return
+	# Re-read on selection; time on the menu still counts as time away.
+	if not model.load_game():
+		resume_available = false
+		message = "No readable save found. Start a new game."
+		render()
+		return
+	boot_menu = false
+	new_game_confirmation = false
+	message = ""
+	offline_notice = model.street.claim_offline(int(Time.get_unix_time_from_system()))
+	save_state()
+	render()
+	if model.s.phase == "fight": enter_fight(false)
+
+func request_new_game() -> void:
+	if not boot_menu: return
+	if FileAccess.file_exists(Campaign.SAVE) or FileAccess.file_exists(Campaign.BACKUP):
+		new_game_confirmation = true
+		message = ""
+		render()
+	else:
+		start_new_game()
+
+func cancel_new_game() -> void:
+	new_game_confirmation = false
+	message = ""
+	render()
+
+func start_new_game() -> void:
+	if updater_worker or campaign_before_tutorial != null: return
+	var fresh := Campaign.new()
+	var error := fresh.save_game(true)
+	if error != OK:
+		message = "Could not start a new game: save failed (%d)." % error
+		render(true)
+		return
+	model = fresh
+	boot_menu = false
+	new_game_confirmation = false
+	confirmation = false
+	offline_notice = 0
+	live_seconds = 0.0
+	save_seconds = 0.0
+	guide = 2
+	tab = 0
+	drawer_open = false
+	show_tutorial_hint = true
+	message = ""
+	render()
 
 func _update_available() -> void:
 	if is_instance_valid(update_button): update_button.show()
@@ -193,7 +278,7 @@ func set_sound() -> void:
 	render(true)
 
 func save_state() -> void:
-	if campaign_before_tutorial != null: return
+	if boot_menu or campaign_before_tutorial != null: return
 	show_tutorial_hint = false
 	var error: int = model.save_game()
 	if error != OK: message = "Save failed (%d)." % error
@@ -208,6 +293,8 @@ func change_tab(index: int) -> void:
 
 func render(keep_scroll: bool = false) -> void:
 	live_labels.clear()
+	action_controls.clear()
+	upgrade_controls.clear()
 	refresh_street = false
 	var previous := scroll.scroll_vertical if keep_scroll and is_instance_valid(scroll) else 0
 	if is_instance_valid(root_ui):
@@ -216,6 +303,9 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui = Control.new()
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
+	if boot_menu:
+		render_boot_menu()
+		return
 	var practicing := campaign_before_tutorial != null
 	pane(root_ui,Rect2(0,0,960,540),Color("#170f18"))
 	city = City.new()
@@ -294,10 +384,11 @@ func render(keep_scroll: bool = false) -> void:
 	note.clip_text = true
 	pane(root_ui,Rect2(0,482,960,58),Color("#21161ff8"))
 	for index in TAB_NAMES.size():
-		var b := at_button(root_ui,Rect2(14+index*88,490,82,40),TAB_NAMES[index],toggle_drawer.bind(index),drawer_open and tab == index)
-		b.add_theme_font_size_override("font_size",13)
+		var b := at_button(root_ui,Rect2(14+index*62,490,56,40),TAB_NAMES[index],toggle_drawer.bind(index),drawer_open and tab == index)
+		b.add_theme_font_size_override("font_size",12)
 		b.disabled = model.s.phase != "plan" or practicing
-	var walk := at_button(root_ui,Rect2(459,490,116,40),"Walk district",walk_district)
+	var walk := at_button(root_ui,Rect2(328,490,76,40),"Walk\ndistrict",walk_district)
+	walk.add_theme_font_size_override("font_size",12)
 	walk.disabled = practicing or model.s.phase != "plan"
 	drawer = Control.new()
 	drawer.position = Vector2(570,54)
@@ -349,8 +440,11 @@ func render(keep_scroll: bool = false) -> void:
 		"guided_choice":
 			title(["Open the doors","The rush","Last call"][int(model.s.street.guided.wave)])
 			body("Anong: Read the room. Customers and stock are real; choosing a response does not skip the clock.")
-			row_button("Serve a waiting order",choose.bind(0))
-			row_button("Welcome passersby",choose.bind(1))
+			for choice in 2:
+				var state: Dictionary = model.street.economy.action_status(model.street.selected(),"serve" if choice==0 else "welcome")
+				var control := row_button("Serve a waiting order" if choice==0 else "Welcome passersby",choose.bind(choice))
+				control.disabled = not state.enabled
+				if not state.enabled: body(state.reason,MUTED,12)
 			action_label = "Continue normal service"
 			action = choose.bind(2)
 		"guided_report":
@@ -393,10 +487,14 @@ func render(keep_scroll: bool = false) -> void:
 			action_label = "Resume the fight"
 			action = enter_fight.bind(false)
 	var live_service: bool = not practicing and model.s.phase in ["plan","guided"]
-	var primary := at_button(root_ui,Rect2(594,490,170 if live_service else 352,40),action_label,action,true)
+	if not live_service:
+		var primary := at_button(root_ui,Rect2(594,490,352,40),action_label,action,true)
+		primary.disabled = practicing and model.s.phase == "plan" and model.s.stock == PRACTICE_STOCK
 	if live_service:
-		var welcome_button := at_button(root_ui,Rect2(774,490,172,40),"Welcome customers",street_action.bind("welcome"))
-		welcome_button.disabled = not model.street.economy.is_trading(model.street.selected())
+		cooldown_button(Rect2(414,490,170,40),"Serve a drink","serve")
+		cooldown_button(Rect2(594,490,172,40),"Welcome customers","welcome")
+		cooldown_button(Rect2(776,490,170,40),"Have a chat","chat")
+		update_action_controls()
 		var demand_note := abs_text(root_ui,Rect2(14,100,540,42),"",14,GOLD)
 		live_labels.append([demand_note,func() -> String:
 			var bar: Dictionary = model.street.selected()
@@ -405,7 +503,6 @@ func render(keep_scroll: bool = false) -> void:
 			elif model.s.street.minute>=60 and model.s.street.minute<180 and model.street.economy.is_trading(bar): warning = "LATE TRADE · Heat %d · " % model.s.heat
 			return "%d/%d customers · %d orders waiting\n%s%s" % [bar.customers.size(),model.street.economy.seats(bar),model.street.economy.pending(bar),warning,model.street.economy.forecast(bar).reason]])
 		demand_note.text = live_labels.back()[1].call()
-	primary.disabled = (practicing and model.s.phase == "plan" and model.s.stock == PRACTICE_STOCK) or (live_service and not model.street.economy.is_trading(model.street.selected()))
 	if offline_notice > 0 and not practicing and model.s.phase == "plan":
 		var shade := ColorRect.new()
 		shade.size = Vector2(960,540)
@@ -481,8 +578,10 @@ func character_card(id: String, heading: String, detail: String) -> void:
 	description.add_theme_font_size_override("font_size",13)
 	row.add_child(description)
 
-func row_button(value: String, call: Callable, primary: bool = false) -> void:
-	column.add_child(button(value,call,primary))
+func row_button(value: String, call: Callable, primary: bool = false) -> Button:
+	var control := button(value,call,primary)
+	column.add_child(control)
+	return control
 
 func row_pair(first: String, left: Callable, second: String, right: Callable) -> void:
 	var row := HBoxContainer.new()
@@ -631,12 +730,57 @@ func select_bar(index: int) -> void:
 	commit()
 
 func street_action(id: String,index: int = 0) -> void:
-	if id == "serve":
-		if serve_delay > 0: return
-		serve_delay = 0.2
-		if model.street.economy.pending(model.street.selected())>0: service_animation = 0.7
+	var sold_before := int(model.s.street.served)
 	message = model.street.action(id,index)
+	if id=="serve" and model.s.street.served>sold_before: service_animation = 0.7
 	commit(true)
+
+func cooldown_button(rect: Rect2, label: String, id: String) -> void:
+	var button := at_button(root_ui,rect,"",street_action.bind(id),id=="serve")
+	button.add_theme_font_size_override("font_size",13)
+	var fill := ColorRect.new()
+	fill.color = Color(0.44,0.98,0.82,0.24)
+	fill.position = Vector2(2,2)
+	fill.size = Vector2(rect.size.x-4,rect.size.y-4)
+	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(fill)
+	var caption := Label.new()
+	caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	caption.add_theme_font_size_override("font_size",13)
+	caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(caption)
+	action_controls.append([button,fill,caption,label,id])
+
+func update_action_controls() -> void:
+	var bar: Dictionary = model.street.selected()
+	var eco = model.street.economy
+	for entry in action_controls:
+		if not is_instance_valid(entry[0]): continue
+		var state: Dictionary = eco.action_status(bar,entry[4])
+		entry[0].disabled = not state.enabled
+		entry[0].tooltip_text = "Ready" if state.enabled else state.reason
+		# Keep native button text for keyboard/accessibility; a child draws the caption over the fill.
+		entry[0].text = entry[3]
+		for color_name in ["font_color","font_disabled_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
+			entry[0].add_theme_color_override(color_name,Color.TRANSPARENT)
+		entry[1].size.x = (entry[0].size.x-4)*state.fill
+		entry[1].color.a = 0.24 if state.remaining>0 or state.enabled else 0.07
+		var detail := "Ready" if state.enabled else "Unavailable"
+		if not eco.is_trading(bar): detail = "Venue closed"
+		elif state.remaining>0.000001: detail = "Refilling · %ds" % ceili(state.remaining)
+		elif not state.enabled and entry[4]=="serve": detail = "No orders" if eco.pending(bar)==0 else "Restock fridge"
+		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
+		entry[2].text = entry[3]+"\n"+detail
+		entry[2].modulate = DARK if state.enabled and entry[4]=="serve" else WHITE if state.enabled or state.remaining>0 else MUTED
+	for entry in upgrade_controls:
+		if not is_instance_valid(entry[0]): continue
+		var item: Dictionary = StreetContent.ACTION_UPGRADES[entry[1]]
+		var state: Dictionary = eco.action_upgrade_status(bar,entry[1])
+		entry[0].disabled = not state.enabled
+		entry[0].add_theme_color_override("font_disabled_color",MUTED)
+		entry[0].text = "%s · %ds · MAX" % [item.name,state.current] if state.level==3 else "%s · %ds → %ds · %s%s" % [item.name,state.current,state.next,cash(state.price),"\nNeed %s more incl. reserve" % cash(state.shortfall) if state.shortfall>0 else ""]
 
 func live_body(value: Callable,tint: Color = MUTED,px: int = 15) -> void:
 	var label := body(value.call(),tint,px)
@@ -655,6 +799,12 @@ func street_panel() -> void:
 	body("%s · Stage %d/3\n%s" % [info.name,bar.stage,info.stages[int(bar.stage)-1][0]],TEAL,16)
 	live_body(func() -> String: return "%s · %s" % [model.street.clock_text(),eco.status(bar)],TEAL,14)
 	live_body(func() -> String: return eco.peak_status(bar),TEAL,12)
+	body("YOUR ACTION UPGRADES",GOLD,14)
+	body("Per venue · prices preserve next shift’s reserve.",MUTED,12)
+	for i in StreetContent.ACTION_UPGRADES.size():
+		var button := row_button("",street_action.bind("action_upgrade",i))
+		upgrade_controls.append([button,i])
+	update_action_controls()
 	if not eco.is_trading(bar):
 		body("PREP FOR OPENING",GOLD,14)
 		live_body(func() -> String: return "Cleanliness %d%% · %.1f%% less attraction\n%s\nStock %d/%d · %d bartenders ready" % [100-int(bar.dirt),float(bar.dirt)/StreetContent.DIRT_LIMIT*StreetContent.DIRT_ATTRACTION_PENALTY*100.0,"Cleaning: %ds remaining" % bar.clean_remaining if bar.clean_remaining>0 else "Clean" if bar.dirt==0 else "Cleaning unfinished",bar.stock,eco.stock_capacity(bar),eco.on_duty(bar,0)],WHITE,13)
@@ -889,19 +1039,18 @@ func street_ui_state() -> Array:
 	return state
 
 func _process(delta: float) -> void:
-	if updater_worker: return
+	if updater_worker or boot_menu: return
 	scene_clock += delta
 	service_animation = maxf(0,service_animation-delta)
-	serve_delay = maxf(0.0,serve_delay-delta)
 	if campaign_before_tutorial == null:
+		var before := street_ui_state()
+		model.street.advance(minf(delta,1.0))
+		refresh_street = refresh_street or before != street_ui_state()
+		update_action_controls()
 		live_seconds += minf(delta,1.0)
 		save_seconds += minf(delta,1.0)
 		if live_seconds >= 1.0:
 			live_seconds -= 1.0
-			var before := street_ui_state()
-			model.street.tick(1)
-			var after := street_ui_state()
-			refresh_street = refresh_street or before != after
 			if refresh_street and model.s.phase in ["plan","guided","guided_choice","guided_report"] and not is_instance_valid(fight) and not is_instance_valid(district): render(true)
 			for entry in live_labels:
 				if is_instance_valid(entry[0]): entry[0].text = entry[1].call()
@@ -963,12 +1112,7 @@ func restart() -> void:
 		message = "Press again to replace this campaign."
 		render(true)
 		return
-	model = Campaign.new()
-	confirmation = false
-	guide = 2
-	tab = 0
-	message = ""
-	commit()
+	start_new_game()
 
 func enter_fight(practice: bool, circuit: bool = false) -> void:
 	if is_instance_valid(fight): return
@@ -1020,6 +1164,9 @@ func close_district() -> void:
 
 func _notification(what: int) -> void:
 	if updater_worker: return
+	if boot_menu:
+		if what == NOTIFICATION_WM_GO_BACK_REQUEST and new_game_confirmation: cancel_new_game()
+		return
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if campaign_before_tutorial == null: save_state()
 	if what == NOTIFICATION_APPLICATION_RESUMED and campaign_before_tutorial == null:
@@ -1034,6 +1181,11 @@ func _notification(what: int) -> void:
 		elif drawer_open and model.s.phase == "plan": close_drawer()
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if boot_menu:
+		if event.is_action_pressed("ui_cancel") and new_game_confirmation:
+			get_viewport().set_input_as_handled()
+			cancel_new_game()
+		return
 	if model.s.phase == "godzilla" and event is InputEventKey and event.physical_keycode == KEY_SPACE and event.pressed and not event.echo:
 		get_viewport().set_input_as_handled()
 		serve_godzilla()

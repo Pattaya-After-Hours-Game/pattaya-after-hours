@@ -39,11 +39,36 @@ func run() -> void:
 	app.set_process(false)
 	app.muted = true
 	app.music.stop()
+	app.start_new_game()
 	app.model = Campaign.new(72)
 	await capture(app,"opening")
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	await capture(app,"economy-opening")
+	await capture(app,"actions-ready")
+	app.model.street.action("serve")
+	app.model.street.action("welcome")
+	app.model.street.advance(5.25)
+	await capture(app,"actions-refilling")
+	app.model.street.advance(5)
+	app.model.street.selected().customers[1].wait = 40
+	await capture(app,"actions-chat-ready")
+	app.model.street.action("chat")
+	app.drawer_open = false
+	await capture(app,"actions-chat-feedback")
+	app.drawer_open = true
+	await capture(app,"actions-upgrades","YOUR ACTION UPGRADES")
+	app.model.s.cash = 250000
+	for i in 3:
+		app.model.street.action("action_upgrade",0)
+		app.model.street.action("action_upgrade",1)
+	await capture(app,"actions-max","YOUR ACTION UPGRADES")
+	app.model.street.advance(20)
+	app.model.street.selected().stock = 0
+	await capture(app,"actions-stockout")
+	app.model.street.action("open")
+	await capture(app,"actions-closed")
+	app.model = Campaign.new(72)
 	app.model.s.cash = 250000
 	var first: Dictionary = app.model.street.selected()
 	first.equipment.pool = 1

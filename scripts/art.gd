@@ -4,6 +4,13 @@ const ROOT = "res://assets/art/"
 const TYPES = ["beer", "soi", "gogo"]
 const STAFF = ["dao", "mali", "fern", "nok", "jin", "pim"]
 const HOSTS = ["bee", "may", "june", "lek", "fah", "nan"]
+# Appearance is independent of audience, spending budget and gameplay RNG.
+const CUSTOMER_VARIANTS = [
+	["patrons-men",0], ["patrons",1], ["patrons-men",2],
+	["patrons-men",5], ["patrons-men",1], ["patrons-men",3],
+	["patrons",0], ["patrons-men",4], ["patrons-men",6],
+	["patrons",3], ["patrons-men",7], ["patrons-men",8]
+]
 static var textures: Dictionary = {}
 
 static func texture(id: String) -> Texture2D:
@@ -37,14 +44,20 @@ static func frame(canvas: CanvasItem, id: String, index: int, foot: Vector2, sca
 	canvas.draw_texture_rect_region(tex,dest,region,tint)
 
 static func atlas_specs() -> Dictionary:
-	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
+	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),9],"monster":[Vector2(320,320),4]}
 	for id in STAFF: specs[id] = [Vector2(160,192),4]
 	for id in HOSTS: specs[id] = [Vector2(160,256),6]
 	for id in ["mali","juno","vega","orchid"]: specs["fight-"+id] = [Vector2(320,256),12]
 	return specs
 
+static func customer_sprite(customer_id: int) -> Array:
+	# Existing saved IDs keep a guest's look stable as other guests leave.
+	return CUSTOMER_VARIANTS[(maxi(1,customer_id)-1)%CUSTOMER_VARIANTS.size()]
+
 # Semantic animation catalog. Contact frames are selected by the combat simulator.
 static func animation_frames(id: String, state: String) -> Array:
+	# Patron cells are separate appearances, not an animation sequence.
+	if id.begins_with("patrons"): return [0]
 	if id.begins_with("fight-"):
 		return {"idle":[0],"walk":[1,2],"jump":[3],"guard":[4],"anticipation":[5],"jab":[6],"kick":[7],"burst":[8],"hit":[9],"ko":[10],"victory":[11]}.get(state,[0])
 	if id == "monster": return {"arrival":[0,1],"idle":[1],"drinking":[2,1],"sleep":[3]}.get(state,[1])
