@@ -1,0 +1,80 @@
+name: Publish game release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: game-releases
+  queue: max
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: game-release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Godot and Android build tools
+        run: |
+          tools/setup-linux.sh --templates
+          echo "GODOT_BIN=$HOME/.local/bin/godot-$(cat .godot-version)" >> "$GITHUB_ENV"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.1.0"
+      - name: Set the release version and run tests
+        run: |
+          # v1.0.7 (Android code 8) was the last manually numbered release.
+          # Re-running the same workflow uses the same version.
+          version="1.0.$((7 + GITHUB_RUN_NUMBER))"
+          version_code=$((8 + GITHUB_RUN_NUMBER))
+          echo "RELEASE_TAG=v$version" >> "$GITHUB_ENV"
+          sed -i "s/^config\/version=.*/config\/version=\"$version\"/" project.godot
+          sed -i -E "s|^(application/(short_version\|version)\|version/name)=.*|\1=\"$version\"|; s|^version/code=.*|version/code=$version_code|" export_presets.cfg
+          tools/test.sh
+      - name: Export and verify the game
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: pattaya-after-hours
+        run: |
+          : "${KEYSTORE_BASE64:?Set the signing key in the game-release environment}"
+          umask 077
+          export GODOT_ANDROID_KEYSTORE_RELEASE_PATH="$RUNNER_TEMP/pattaya-release.p12"
+          trap 'rm -f "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH"' EXIT
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH"
+          unset KEYSTORE_BASE64
+          tools/release.sh
+          apksigner="$ANDROID_HOME/build-tools/36.1.0/apksigner"
+          signer="$("$apksigner" verify --print-certs dist/PattayaAfterHours.apk | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')"
+          test "$signer" = 4a72524dbe76197f4c5122f0f99c6967f7c969ac978fcae37d48dbd6432827c0
+          (cd dist && sha256sum --check SHA256SUMS.txt)
+      - name: Publish the completed release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if draft=$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft); then
+            if [[ "$draft" == false ]]; then
+              echo "$RELEASE_TAG is already published."
+              exit 0
+            fi
+          else
+            gh release create "$RELEASE_TAG" --draft --target "$GITHUB_SHA" \
+              --title "Pattaya After Hours $RELEASE_TAG" --generate-notes
+          fi
+          gh release upload "$RELEASE_TAG" --clobber \
+            dist/PattayaAfterHours-linux-x86_64.zip dist/PattayaAfterHours-windows-x86_64.zip \
+            dist/PattayaAfterHours-macOS.zip dist/PattayaAfterHours.apk dist/SHA256SUMS.txt
+          latest_tag=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)
+          latest=false
+          if [[ $(printf '%s\n' "$latest_tag" "$RELEASE_TAG" | sort -V | tail -1) == "$RELEASE_TAG" ]]; then
+            latest=true
+          fi
+          gh release edit "$RELEASE_TAG" --draft=false --latest="$latest"

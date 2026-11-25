@@ -204,6 +204,20 @@ References: [Godot Android export guide](https://docs.godotengine.org/en/stable/
 and [4.7.2 Android exporter source](https://github.com/godotengine/godot/blob/4.7.2-stable/platform/android/export/export_plugin.cpp).
 The pinned source is authoritative for version-specific SDK defaults.
 
+## Automatic releases
+
+Every push to `main` runs the campaign checks and exports the Windows, Linux,
+macOS and signed Android builds. GitHub publishes a release after the files and
+checksums are ready. The workflow run number sets the patch version and Android
+version code without committing version changes. Retry a failed run from the
+Actions tab to reuse its version.
+
+The `game-release` GitHub environment is limited to `main`. Its
+`ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD` secrets provide the
+existing Android signing identity. The workflow checks the APK against the
+published signing certificate before release. Manual exports still work as
+shown above. Avoid hand-numbering public releases in parallel with the workflow.
+
 ## What to include in the repository
 
 - `project.godot`, `main.tscn`, all `scripts/*.gd`, and their `.gd.uid` files.
