@@ -289,3 +289,5 @@ first if you want to keep it. [Developer setup](../DEVELOPMENT.md) lists save pa
 The source branch and a published release may be different builds. Use the
 checkout containing the changes you want to play, and avoid running two versions
 against the same campaign at once.
+The build version is in the lower-right corner. Include that corner when sharing
+a screenshot for a bug report.
