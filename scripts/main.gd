@@ -835,6 +835,31 @@ func chapter_panel() -> void:
 	body("CHAPTER %d · %s" % [mini(5,chapter+1),StreetContent.CHAPTERS[chapter][0]],GOLD,14)
 	body(StreetContent.CHAPTERS[chapter][1],MUTED,13)
 
+func next_goal_panel() -> void:
+	body("ANONG'S NEXT STEP",GOLD,14)
+	live_body(func() -> String:
+		var goal: Dictionary = model.street.next_goal()
+		return goal.title+"\n"+goal.detail,TEAL,12)
+	var button := row_button("Show next step",show_next_goal)
+	button.name = "NextGoalButton"
+
+func show_next_goal() -> void:
+	var goal: Dictionary = model.street.next_goal()
+	model.s.street.selected = goal.venue
+	change_tab(goal.tab)
+	if goal.focus=="serve":
+		close_drawer()
+		for entry in action_controls:
+			if entry[4]=="serve": entry[0].grab_focus()
+		return
+	if str(goal.focus).is_empty(): return
+	await get_tree().process_frame
+	if not is_instance_valid(scroll): return
+	for node in column.get_children():
+		if (node is Label or node is Button) and node.text.begins_with(goal.focus):
+			scroll.ensure_control_visible(node)
+			break
+
 func street_panel() -> void:
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
@@ -846,7 +871,7 @@ func street_panel() -> void:
 	live_body(func() -> String:
 		var party: Dictionary = model.street.celebration_info()
 		return "%s · %s at the Blue Hour · details in Events" % ["Party tonight" if party.active else "Next: day %d" % party.day,party.name],PINK,12)
-	body("Reputation helps attract visitors from shared street traffic. Music speeds up repeat orders; reputation does not change order timing or budgets.",MUTED,12)
+	next_goal_panel()
 	body("YOUR ACTION UPGRADES",GOLD,14)
 	body("Per venue · prices preserve next shift’s reserve.",MUTED,12)
 	row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off") if bar.auto_serve else "Buy auto-serve · "+cash(StreetContent.AUTO_SERVE_COST),street_action.bind("auto_serve"))

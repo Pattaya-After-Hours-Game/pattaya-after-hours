@@ -42,13 +42,15 @@ claiming behaviour exists; update the relevant documentation when it changes.
 - Keep all three venue types useful, with three stages each. Renovation earns
   space and options; it does not automatically raise every drink's price.
   Local satisfaction, regulars and healthy operation matter alongside cash.
+  Stage three requires 450 happy visits, 70 regulars and 40 healthy shifts;
+  final renovations cost ฿40,000/65,000/120,000 by venue type.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.
   Bartender contracts cost ฿1,200; host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped/offline
   time. Switching a bartender to a specialist role charges the positive contract
   price difference prorated to the remaining term, with a shift reserve; no refund
   for switching back. Training belongs to the person and survives expiry/rehire. Base bartender
   service starts ready: sell one real order, then recover for 25 seconds, improving
-  to 20/15 through training. Keep the saved deadline through queue changes, owner
+  to 20/15 through training costing ฿400/800. Keep the saved deadline through queue changes, owner
   clicks, rota/role changes and reloads. Staff precede purchased owner auto-serve. Owner automation is relief: serve
   when pending orders exceed available bartenders, or a guest has at most ten
   seconds left and no bartender can recover before their deadline. No eligible
@@ -75,7 +77,7 @@ claiming behaviour exists; update the relevant documentation when it changes.
   The schema-7 migration preserves paid manager/supplier appointments as level 1 and grants no
   free music/auto-serve or higher levels. Manager income is an explicit exception
   to customer-based receipts: ฿10/20/40 per trading second at levels 1/2/3, with
-  purchase prices ฿18,000/36,000/72,000. Keep it separate from drink/pool sales,
+  purchase prices ฿12,000/36,000/72,000. Keep it separate from drink/pool sales,
   commission, customer counters and healthy-service milestones. No closed income.
 - Music costs ฿1,200 and shortens repeat-order timing 35→25 seconds; budgets and
   visit limits still apply. Auto-serve costs ฿3,000 per venue and uses the SAME
@@ -157,3 +159,11 @@ Keep README, story, economy rules and tests aligned with the resulting behaviour
 Report what changed, what was verified and what remains unverified. Do not expand
 a small task into every future story hook, reset saves to make tests pass, or
 claim unpublished work is already in release downloads.
+
+Anong's next-step guidance is a pure read of chapter requirements and business
+state. Navigation may select a venue/tab and scroll, never purchase, pay rewards,
+advance chapters/time, or run RNG. Retain the shared chapter predicates and
+existing gates. Current active pacing bounds keep stage two at 30–45 minutes,
+second property at 90–125 and stage three at 135–240. Measure the saving gaps as
+well: first-manager wait at most 30 minutes and longest between-investment gap
+at most 38 in baseline active policies. These are balance checks, not wait timers.

@@ -9,7 +9,9 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 	var model = Campaign.new(seed_value)
 	var st = model.street
 	var eco = st.economy
-	var times := {"seed":seed_value,"style":style,"opening":opening,"chat":use_chat,"feature":feature,"promoter":-1,"compact":-1,"hire":-1,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1}
+	var times := {"seed":seed_value,"style":style,"opening":opening,"chat":use_chat,"feature":feature,"promoter":-1,"compact":-1,"hire":-1,"manager":-1,"chapter1":-1,"longest_investment_gap":0,"manager_saving_gap":0,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1}
+	var last_investment := 0
+	var last_investments := investment_count(model.s.street.bars)
 	for second in minutes*60:
 		# Real player prep actions; seconds spent cleaning count toward pacing.
 		if st.can_skip():
@@ -100,6 +102,15 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 			if other.stock<8 and model.s.cash>150: eco.restock(other)
 			model.s.street.selected = 0
 			if bar.stage==2 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
+		if bar.manager and times.manager<0:
+			times.manager = second
+			times.manager_saving_gap = second-last_investment
+		if model.s.street.chapter>=1 and times.chapter1<0: times.chapter1 = second
+		var investments := investment_count(model.s.street.bars)
+		if investments>last_investments:
+			times.longest_investment_gap = maxi(times.longest_investment_gap,second-last_investment)
+			last_investment = second
+			last_investments = investments
 		if bar.stage==3:
 			times.stage3 = second
 			break
@@ -121,6 +132,16 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 	times.arrivals = model.s.street.arrivals
 	return times
 
+# Purchases that improve the business; deliveries/renewals are ordinary upkeep.
+func investment_count(bars: Array) -> int:
+	var result := 0
+	for bar in bars:
+		result += int(bar.stage)+int(bar.auto_serve)+int(bar.manager_level)+int(bar.supplier_level)+bar.team.size()
+		for value in bar.equipment.values(): result += int(value)
+		for value in bar.action_levels.values(): result += int(value)
+		for person in bar.team: result += int(person.get("training",0))+int(person.get("audience_training",0))
+	return result
+
 func run() -> void:
 	var failures := 0
 	for style in ["click-heavy","balanced","mostly-idle"]:
@@ -130,9 +151,11 @@ func run() -> void:
 			if result.cash<0 or result.sales>result.orders or result.arrivals>result.offered+3:
 				printerr("ECONOMY FAIL: strategy bypassed cash or customer limits")
 				failures += 1
-			# Free weekly celebrations intentionally accelerate mid-game investment.
-			# Allow up to fifteen minutes below the original three-hour target.
-			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,9000],"stage3":[9900,18000]}
+			# Opening-arc pass: preserve the first renovation, shorten the mid-game saving wall.
+			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,7500],"stage3":[8100,14400]}
+			if style!="mostly-idle" and (result.manager_saving_gap>1800 or result.longest_investment_gap>2280):
+				printerr("PACING FAIL: excessive saving gap / "+style)
+				failures += 1
 			for milestone in bounds:
 				var seconds := int(result[milestone])
 				# Mostly-idle is intentionally slower; still must remain solvent and finish.

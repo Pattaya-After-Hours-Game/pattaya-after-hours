@@ -92,6 +92,7 @@ func run() -> void:
 
 	load("res://tests/staff_check.gd").new().run(self)
 	load("res://tests/staff_ready_check.gd").new().run(self)
+	load("res://tests/balance_guidance_check.gd").new().run(self)
 	load("res://tests/promoter_check.gd").new().run(self)
 	load("res://tests/automation_check.gd").new().run(self)
 	load("res://tests/bulk_stock_check.gd").new().run(self)
@@ -100,6 +101,7 @@ func run() -> void:
 	test_windows_updates()
 	load("res://tests/boot_menu_check.gd").new().run(self)
 	await load("res://tests/action_check.gd").new().run_ui(self)
+	await load("res://tests/balance_guidance_check.gd").new().run_ui(self)
 	await test_ui()
 	load("res://tests/art_check.gd").new().run(self)
 	load("res://tests/scene_check.gd").new().run(self)
@@ -138,7 +140,7 @@ func test_ui() -> void:
 	check(app.model.s.street.event.prepared,"Event preparation works through the UI")
 	app.model.s.street.event = {}
 	app.change_tab(0)
-	use_button(app,"Train Bartender 1 · ฿800")
+	use_button(app,"Train Bartender 1 · ฿400")
 	check(app.model.street.selected().team[0].training==1,"Individual training control works")
 	app.model.street.economy.advance_contracts(14400)
 	app.render()

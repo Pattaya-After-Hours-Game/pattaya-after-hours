@@ -3,7 +3,36 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current bartender-priority / renewal verification — 26 November 2026
+## Current opening-arc balance verification — 26 November 2026
+
+Godot 4.7.2 `tools/test.sh` passes all regressions, 42 fresh campaigns and sixty
+paired celebration scenarios. Before/after baseline runs compare against v1.0.19
+(`e644c55`) with the same seeds/policies. First renovation stays at 33.6–36.8
+minutes; the second property moves from 117.7–122.2 to 102.2–104.7, and stage three
+from 166.9–172.4 to 142.5–144.1. Mostly-idle stage three is 178.9–184.5 minutes.
+
+The revised active criteria are explicit: stage two 30–45 minutes, second property
+90–125, stage three 135–240, first-manager saving gap at most 30 minutes and the
+longest gap between improvements at most 38. The measured gaps are 24.8–26.8 and
+34.2–36.2 minutes. These intentionally replace the former final-stage lower bound
+in response to the request for less grind; no artificial waiting timer is added.
+Alternative investment routes remain solvent and respect demand/stock/customer
+limits. Current route measurements are in [ECONOMY](ECONOMY.md).
+
+`balance_guidance_check.gd` covers revised price/reserve boundaries, unchanged
+service deadlines, retained paid ownership after reload, all three final
+renovation prices and each local gate. It verifies pure guidance reads, shared
+chapter requirements and UI navigation without spending or simulating. An isolated
+regression rerun passes after refining the opening button to reveal Serve rather
+than suggest buying stock that is already available.
+
+Four `guidance-*` economy previews at 960 × 540 and 1280 × 720 cover opening,
+renovation progress, management saving and festival objectives. Existing art and
+bottom service controls remain visible. Source docs and relative links are checked.
+No human retention study, full-festival pacing simulation or Android device play
+is claimed; those remain follow-up evidence rather than inferred from export success.
+
+## Previous bartender-priority / renewal verification — 26 November 2026
 
 `tools/test.sh` passes on Godot 4.7.2: regressions, 42 fresh campaigns and 60
 paired celebration scenarios, with no changed pacing thresholds. Auto-serve

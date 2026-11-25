@@ -100,11 +100,11 @@ const PROMOTIONS = [
 const ROLE_NAMES = ["Bartender", "Adult host", "Adult dancer", "Adult promoter"]
 const ROLE_WAGES = [24,20,36,0] # per minute, including quiet periods
 const OVERHEAD = [18,45,90]
-const RENOVATIONS = [[4800,50000],[18000,80000],[45000,150000]]
+const RENOVATIONS = [[4800,40000],[18000,65000],[45000,120000]]
 const LEASES = [21000,16000,85000] # The retired owner's Soi lease leaves room for staff and action investments.
 const STAGE_GOALS = [
 	{"happy":70,"regulars":10,"healthy":8},
-	{"happy":600,"regulars":70,"healthy":40}
+	{"happy":450,"regulars":70,"healthy":40}
 ]
 
 const TRAFFIC_PER_MINUTE = 7.3 # Maintains fresh-campaign pacing with nightly prep and dirt.
@@ -119,7 +119,7 @@ const BARTENDER_CONTRACT_COST = 1200
 const STAFF_CONTRACT_DAYS = 10
 const STAFF_CONTRACT_MINUTES = STAFF_CONTRACT_DAYS * DAY_MINUTES
 const STAFF_SERVICE_SECONDS = [25,20,15] # One drink, per bartender; training stays with the person.
-const STAFF_TRAINING_COST = 800
+const STAFF_TRAINING_COST = 400
 const ORDER_ALERT_SECONDS = 10.0
 const PROMOTION_SECONDS = 120
 const PROMOTION_COOLDOWN = 120
@@ -139,7 +139,7 @@ const MUSIC_ORDER_SECONDS = 25
 const SUPPLIER_PRICES = [900,1200,2400,4800,9600]
 const SUPPLIER_UNIT_COSTS = [14,14,12,10,8,6]
 const SUPPLIER_STAGES = [1,1,2,2,3]
-const MANAGER_PRICES = [18000,36000,72000]
+const MANAGER_PRICES = [12000,36000,72000]
 const MANAGER_INCOME = [0,10,20,40]
 const MANAGER_STAGES = [2,3,3]
 

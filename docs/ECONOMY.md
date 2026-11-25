@@ -145,7 +145,7 @@ An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.
 A bartender contract costs ฿1,200, matching Nida’s upfront fee without her commission. Base service is one drink
-per 25 real seconds (2.4/min); individual training costs ฿800 then ฿1,600 and
+per 25 real seconds (2.4/min); individual training costs ฿400 then ฿800 and
 reduces this to 20s (3/min) then 15s (4/min). Each bartender has a saved cooldown deadline. She starts ready, serves one
 actual order on the next live tick, and only then begins recovery. Empty queues
 and stockouts do not restart that deadline or bank multiple future sales. Manual
@@ -310,7 +310,7 @@ Consignment drinks retain Bo's original ฿14 repayment regardless of supplier t
 
 | Manager level | Incremental purchase | Separate income per real second | Minimum venue stage |
 | --- | ---: | ---: | ---: |
-| 1 | ฿18,000 | ฿10 | 2 |
+| 1 | ฿12,000 | ฿10 | 2 |
 | 2 | ฿36,000 | ฿20 | 3 |
 | 3 | ฿72,000 | ฿40 | 3 |
 
@@ -363,13 +363,13 @@ not additional revenue. Late purchases from attributed guests update the report.
 ## Renovation and expansion
 
 Stage 2 requires 70 satisfied visits, 10 local regulars and eight healthy shifts.
-Stage 3 requires 600 satisfied visits, 70 local regulars and forty healthy shifts.
+Stage 3 requires 450 satisfied visits, 70 local regulars and forty healthy shifts.
 A healthy shift serves at least four orders, fulfils at least 80% of orders and
 has positive operating margin after stock consumed, payroll, promotion costs, fines and drink commission.
 The cash report separately records inventory purchases when paid.
 
 Milestones belong to the venue. Renovation also requires its fee and the next
-shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿50,000. New
+shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿40,000. New
 leases additionally require a float for a ฿1,200 bartender contract, stock and existing street payroll.
 The first Soi lease is ฿16,000: a cheaper entry from the retiring owner, balanced
 against its higher overhead. This leaves room for contracts, individual training
@@ -441,103 +441,95 @@ separate time away from eligible trading seconds and list estimated customers se
 income, costs, net profit and limiting factors. Monotonic saved claim timestamps
 prevent repeat rewards, including clock rollback.
 
+## Opening-arc balance pass — 26 November 2026
+
+The first manager now costs ฿12,000; later levels remain ฿36,000/72,000.
+Bartender training is ฿400 then ฿800, with unchanged 25/20/15-second service.
+Audience training is still ฿800/1,600. Final renovations cost ฿40,000/65,000/120,000
+for beer/Soi/gogo venues; first renovations stay ฿4,800/18,000/45,000. The final
+local gate is 450 happy visits, 70 regulars and forty healthy shifts. No new stage
+price multiplier, free hires, reward currency or retroactive refund is introduced.
+
+Before this pass, six active baseline runs had 44.4–47.9-minute gaps while saving
+for management. The revised first-manager saving gap is 24.8–26.8 minutes.
+Reducing only the manager cost moved the long wait to final renovation, so that
+price and its happy-visit requirement were tuned together. Regulars, healthy
+shifts, operating reserves and bounded customer demand remain required.
+
+| Baseline milestone | Before | Revised measured range | Current active acceptance |
+| --- | --- | --- | --- |
+| First useful purchase | 2.5–4.4 min | unchanged | 2–5 min |
+| Pool | 15.9–18.4 min | unchanged | 10–20 min |
+| Stage two | 33.6–36.8 min | unchanged | 30–45 min |
+| First manager | 98.7–102.2 min | 85.8–87.8 min | saving gap ≤30 min |
+| Second property | 117.7–122.2 min | 102.2–104.7 min | 90–125 min |
+| Stage three | 166.9–172.4 min | 142.5–144.1 min | 135–240 min |
+| Longest gap between improvements | 44.4–47.9 min | 34.2–36.2 min | ≤38 min |
+
+Mostly-idle baseline stage three improves from 227.1–233.2 to 178.9–184.5 minutes.
+These policies do not optimize later properties or simulate a full festival run.
+The bounds intentionally supersede the old three-to-five-hour target in response
+to the player's request for less grind. They are not imposed waiting periods.
+Buying discretionary equipment can delay a milestone; all alternative routes
+still need to remain solvent and respect demand, orders and supply.
+
+At full incremental demand, the first training tier's ฿400 buys 0.6 extra drinks
+per minute: roughly 16 minutes to repay at a ฿41 margin, before commission.
+The second tier buys one extra drink per minute, roughly 20 minutes to repay.
+An empty bar has no training payback. First management's separate ฿600/min income
+less its extra ฿12/min overhead repays ฿12,000 in about 20.4 open minutes, before
+changes in other trade. Stage two and viable-operation prerequisites prevent an
+opening cash generator. Forecasts remain estimates, not promised profit.
+
+Anong's next-step panel reads the shared chapter predicates and real progress.
+It points to supplies, local renovation, reopening events, staff, deliveries,
+management and expansion. It cannot change money, RNG, time or progression.
+Story reminders grant no reward and add no new mandatory steps or save fields.
+
 ## Balance verification
 
-Run `tools/test.sh` with Godot 4.7.2. It uses temporary save directories and runs
-the regression suite, `tests/economy_balance.gd`, `tests/promoter_balance.gd` and
-`tests/automation_balance.gd`: 42 fresh campaigns in total.
-`tests/celebration_balance.gd` additionally compares 60 paired trading-day
-scenarios (120 days): 30 seeds for basic and prepared businesses. Prepared bars
-sold 51% more drinks and earned 57% more trading contribution in aggregate;
-basic bars gained 28% and 27%, with more queue losses. These are controlled
-comparisons, not a guarantee that every party or every human strategy profits.
+Run `tools/test.sh` with Godot 4.7.2. Temporary save/config directories isolate
+regressions and 42 fresh campaigns: fifteen baseline/no-Chat runs, twelve promoter
+comparisons and fifteen automation/early-bartender routes. Seeds are 11, 72 and
+291. Attentive players check actions each second, balanced players every two
+seconds, mostly-idle players every fifteen seconds. All actions use real stock,
+orders, paid purchases, contracts and the normal clock; no offline income or
+injected cash is used in these campaign runs.
 
-The combined balance runner uses fresh campaigns with seeds 11, 72 and 291,
-without injected cash or offline income. Attentive players check ready actions
-each second, balanced players every two seconds, and mostly-idle players every
-fifteen seconds. Every serve still obeys its cooldown, actual orders and stock.
+The baseline buys pouring level one, signage, seating and pool, then renovates.
+It buys further pouring, hires/trains, arranges deliveries/management and expands.
+Alternative routes change this investment order. Routine stock and renewals do
+not count as new improvements when measuring saving gaps. Cleaning and skipping
+use actual actions. The player may choose other investments during these gaps;
+this policy is a reproducible comparison, not a claim that every human waits.
 
-Active players buy pouring level 1, signage, seating and pool, then renovate.
-They buy remaining pouring levels after stage 2, hire and train a bartender,
-arrange deliveries/management, and buy welcoming level 1 before expanding.
-Expired staff are rehired through the same paid action when affordable. Idle and
-staff-first comparisons use no action upgrades; six additional campaigns disable
-Chat. Closed-hour cleaning and skipping use actual player actions. An existing
-staff order is allowed to finish while the owner's Serve button refills.
-
-The current tuning uses ฿1,200 bartender contracts, 25/20/15-second staff service, ten-second
-base owner actions and ฿900/1,400/2,800 action upgrade prices. Combining those
-investments required lowering the first Soi lease from ฿26,000 to ฿16,000.
-Existing money, properties and upgrades are never reset; no refunds are minted.
-
-| Milestone | Original active target | Measured combined active range |
-| --- | --- | --- |
-| First useful purchase | 2–5 min | 2.5–4.4 min |
-| Pool table | 10–20 min | 15.9–18.5 min |
-| First stage 2 | 30–45 min | 33.6–36.8 min |
-| Second property | 90–150 min | 117.7–122.2 min |
-| First stage 3 | 180–300 min | 166.9–172.4 min |
-
-Mostly-idle campaigns reach stage 3 in 227–234 minutes. No-chat manual-upgrade
-campaigns take 171–173 minutes; no-chat staff-first campaigns take 180–188 minutes.
-The six active target runs use the original windows with a fifteen-minute allowance
-below the original three-hour stage-3 lower bound for earned weekly-party income; the other nine
-must remain viable and complete within the ten-hour simulation limit. All target
-runs also check sales against orders and arrivals against shared street supply.
-This is a reproducible purchase policy, not a promise for every human
-strategy. Across thirty paired scenario seeds, free pool improved aggregate quiet
-night contribution and reduced full-house contribution. Regression coverage also
-includes empty-order clicks, stockouts, service queues, shared demand, timed wages,
-closure/recovery, pool/save idempotency, role separation, local renovation gates,
-consensual customer-originated bar fines, offline claims and guided shift timing.
-
-Twelve additional campaigns compare promoter-before-renovation, service-first,
-compact-first and no-promoter/no-Chat paths using the same seeds and paid actions.
-All finish solvent within ten hours and respect order/shared-traffic limits.
-These optional investments are not forced into the baseline milestone windows:
-
-| Purchase route | Stage 2 | Second property | Stage 3 |
+| Optional purchase route | Stage 2 | Second property | Stage 3 |
 | --- | ---: | ---: | ---: |
-| Promoter before renovation | 47.3–47.5 min | 128.7–131.4 min | 178.7–179.6 min |
-| Service first, promoter after renovation | 43.4–44.0 min | 128.7–130.0 min | 177.4–178.4 min |
-| Compact layout, no promoter | 38.7–42.2 min | 119.0–122.1 min | 167.3–170.5 min |
+| Promoter before renovation | 47.3–47.5 min | 110.5–112.0 min | 148.2–150.5 min |
+| Service first, promoter later | 43.4–44.0 min | 109.7–111.2 min | 148.4–149.6 min |
+| Compact layout | 38.7–42.2 min | 102.5–105.0 min | 141.5–143.8 min |
+| Music first | 41.2–42.5 min | 106.7–110.4 min | 146.0–148.7 min |
+| Auto-serve and two-second pouring | 35.5–36.3 min | 126.5–127.3 min | 165.4–165.9 min |
+| Supplier first | 35.5–36.3 min | 105.4–109.2 min | 143.4–146.8 min |
+| Automation bundle | 41.2–42.5 min | 130.4–131.4 min | 168.0–168.6 min |
+| Bartender before other upgrades | 47.6–50.3 min | 106.4–107.5 min | 147.2–148.0 min |
 
-The early promoter route buys pouring level two and compact seating before Nida,
-yet still delays renovation: automatic welcoming is a convenience with a real
-cost, not a compulsory profit upgrade. The six active target runs retain the early milestone windows, with the
-fifteen-minute stage-3 allowance described above. Promoter contract/commission terms and shared traffic remain unchanged.
-The new manager income is priced separately as described above. Dancer stage gates/retained skills and service separation
-have regression coverage, not a new full-gogo campaign balancing claim.
+The early hire still occurs at 4.2–4.7 minutes. Convenience spending buys fewer
+taps rather than the fastest possible milestone. Auto-serve routes stop tapping
+Serve once purchased. Nida retains her price/commission; no training or upgrade
+can bypass shared traffic. All runs finish solvent, with sales bounded by orders
+and arrivals bounded by street supply. Staff/idle and no-Chat paths remain viable.
 
-The additional twelve automation campaigns compare music-first, auto-serve plus
-two-second pouring, supplier-first and the combined bundle. Automatic strategies
-stop pressing Serve once it is purchased; they still pay for every upgrade.
+Sixty paired celebration scenarios additionally compare 120 trading days. The
+unchanged birthday rules produce 51% more drinks and 57% more contribution for
+prepared bars in aggregate; basic bars gain 28% and 27%, with more queue losses.
+Pool checks across thirty paired seeds still show a quiet-night benefit and a
+full-house trade-off. These are scenario results, not a universal profit promise.
 
-| Route | Stage 2 | Second property | Stage 3 |
-| --- | ---: | ---: | ---: |
-| Music first | 41.2–42.5 min | 123.9–127.5 min | 173.3–176.4 min |
-| Auto-serve and two-second pouring | 35.5–36.3 min | 142.5–144.6 min | 190.5–191.8 min |
-| Supplier first | 35.5–36.3 min | 122.9–126.5 min | 169.8–174.3 min |
-| Automation bundle | 41.2–42.5 min | 144.9–147.8 min | 188.4–190.7 min |
-
-Optional convenience spending delays expansion; it is not required for the
-baseline targets. All strategies remain solvent and respect orders/shared demand.
-The initial ฿24,000 manager price delayed baseline expansion beyond 150 minutes;
-฿18,000 keeps active expansion inside the target range without raising drink prices or
-inventing customer sales. Larger manager tiers have settlement/gate coverage,
-not a claim of fully balanced post-stage-three play.
-
-Three further campaigns save for a bartender before other investments. The first
-hire is affordable at **4.2–4.7 minutes**; pool follows at 22.6–23.2 minutes,
-stage 2 at 53.6–57.0, the second property at 127.6–130.2 and stage 3 at
-177.8–179.0. Early wages and delayed owner upgrades make this a convenience
-choice, not a guaranteed acceleration of every milestone. All three remain
-solvent and respect demand; the first-hire acceptance ceiling is ten minutes.
-
-The graphical preview harness renders the opening, pool, free-pool report,
-recovery, all nine venue stages and festival states. It consumes the current
-artwork refresh; it does not replace that artwork. Device playtesting remains
-separate from automated desktop checks.
+Larger management tiers, gogo rules and final venue prices have settlement/gate
+coverage. This pass does not establish full-festival pacing or human retention.
+Relevant scene previews preserve the existing artwork. Device playtesting remains
+separate from the automated regressions and desktop renders.
 
 ## Renewal availability
 

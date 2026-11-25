@@ -22,14 +22,14 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Bartender-first relief auto-serve and visible Nida renewal |
-| Status | REVIEW; local verification passed; previous feature shipped in v1.0.18 (`0799a00`) |
+| Active feature | Opening-arc pacing, training value and Anong’s next step |
+| Status | REVIEW; local checks passed; prior feature shipped in v1.0.19 (`e644c55`) |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Codex verified tests and layout; independent device play pending |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/staff-priority-nida-renewal`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Relief dispatch, renewal affordability/controls, regression tests and docs |
-| Next handoff / blocker | Full suite and four previews passed; ready for authorized main merge/release; device play remains |
+| Working branch / chat / PR | `codex/opening-arc-balance`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Price balance, read-only story guidance, fresh-campaign measurements, tests and docs |
+| Next handoff / blocker | 42 campaigns, regressions and previews passed; ready for authorized main release; human play pending |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-26 |
 

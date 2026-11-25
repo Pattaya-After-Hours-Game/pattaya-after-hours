@@ -23,7 +23,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -110,6 +110,23 @@ func run() -> void:
 	app.model.street.selected().customers.clear()
 	app.model.street.economy.admit(app.model.street.selected())
 	await capture(app,"staff-ready-relief","YOUR ACTION UPGRADES")
+	app.model = Campaign.new(72)
+	app.drawer_open = true
+	await capture(app,"guidance-opening","ANONG'S NEXT STEP")
+	app.model.s.street.served = 10
+	app.model.street.selected().regulars = 5
+	app.model.street.selected().happy = 28
+	app.model.street.selected().healthy = 4
+	await capture(app,"guidance-renovation","ANONG'S NEXT STEP")
+	app.model.s.cash = 7000
+	app.model.street.action("hire",0)
+	app.model.street.action("restock")
+	app.model.street.selected().stage = 2
+	app.model.street.selected().healthy = 8
+	app.model.s.street.events_survived = 1
+	await capture(app,"guidance-manager","ANONG'S NEXT STEP")
+	app.model.s.street.chapter = 4
+	await capture(app,"guidance-festival","ANONG'S NEXT STEP")
 	app.model = Campaign.new(72)
 	app.model.s.day = 6
 	app.drawer_open = false

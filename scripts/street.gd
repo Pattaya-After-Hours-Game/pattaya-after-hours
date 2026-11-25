@@ -196,7 +196,7 @@ func festival_ready() -> bool:
 		if bar.stage == 3: kinds[int(bar.type)] = true
 	return kinds.size() == 3
 
-func check_chapters() -> void:
+func chapter_requirements() -> Array:
 	var bars: Array = s.street.bars
 	var managers := 0
 	var has_soi := false
@@ -205,12 +205,86 @@ func check_chapters() -> void:
 		managers += int(bar.manager)
 		has_soi = has_soi or bar.type == 1
 		showroom = showroom or (bar.type == 2 and bar.stage >= 2)
-	var goals := [bars[0].stage >= 2 and bars[0].manager and s.street.served >= 10 and s.street.events_survived > 0,
+	return [bars[0].stage >= 2 and bars[0].manager and s.street.served >= 10 and s.street.events_survived > 0,
 		bars.size() >= 2, has_soi and managers >= 2, showroom, s.street.festival]
+
+func check_chapters() -> void:
+	var goals := chapter_requirements()
 	while s.street.chapter < goals.size() and goals[int(s.street.chapter)]:
 		s.street.chapter += 1
 		var heading := "STORY COMPLETE" if s.street.chapter == 5 else "CHAPTER %d" % (int(s.street.chapter)+1)
 		record("%s · %s" % [heading,C.CHAPTERS[int(s.street.chapter)][0]])
+
+# Read-only guidance: no reward, purchase, chapter advance, RNG or save mutation.
+func goal_cash(price: int, reserve: int) -> String:
+	return "฿%d purchase + ฿%d kept in reserve; ฿%d still to save." % [price,reserve,maxi(0,price+reserve-int(s.cash))]
+
+func next_goal() -> Dictionary:
+	var chapter := int(s.street.chapter)
+	var first: Dictionary = s.street.bars[0]
+	var title := "The soi never sleeps"
+	var detail := "Keep your mixed street healthy, try a different promotion or host the festival again. No reset required."
+	var focus := ""
+	var tab := 1
+	if chapter<5 and chapter_requirements()[chapter]:
+		return {"title":"Milestone ready","detail":"The business has earned its next chapter. Continue trading to record it.","focus":"","tab":0,"venue":0}
+	if chapter==0:
+		tab = 0
+		if s.street.served<10:
+			title = "Ice duty: the first ten drinks"
+			detail = "%d/10 real orders served. Anong: Cold drinks first. Empire later. Serve waiting guests; welcome passersby when quiet." % mini(10,int(s.street.served))
+			focus = "Buy %d drinks" % economy.pack_quantity(first) if first.stock==0 else "serve"
+		elif first.regulars==0:
+			title = "Give someone a reason to return"
+			detail = "Keep orders moving and stock ready. Happy departures can earn your first regular. Anong: A second visit beats a five-star promise."
+			focus = "TEAM & PAYROLL"
+		elif first.stage<2:
+			var target: Dictionary = C.STAGE_GOALS[0]
+			title = "Make the Blue Hour a local favourite"
+			detail = "%d/%d happy visits · %d/%d regulars · %d/%d healthy shifts. %s" % [mini(first.happy,target.happy),target.happy,mini(first.regulars,target.regulars),target.regulars,mini(first.healthy,target.healthy),target.healthy,goal_cash(upgrade_cost(first),economy.operating_rate(first)*2)]
+			focus = "Upgrade ·"
+		elif s.street.events_survived==0:
+			title = "The reopening: keep the lights on"
+			detail = "The new sign is ready. Check Events for Bo's generator offer and see the reopening through. A setback will not end the business."
+			tab = 1
+		elif not first.manager:
+			if economy.on_duty(first,0)==0:
+				title = "A colleague behind the counter"
+				detail = "Hire or rehire a bartender for ฿%d and put them on duty. Training stays with them. Dao needs a serving team before taking the keys." % C.BARTENDER_CONTRACT_COST
+				focus = "TEAM & PAYROLL"
+			elif not first.restock:
+				title = "Give Bo a standing order"
+				detail = "Supplier level 1 automates paid deliveries when orders need stock. %s" % goal_cash(C.SUPPLIER_PRICES[0],economy.operating_rate(first)*2)
+				focus = "SUPPLIER AGREEMENT"
+			else:
+				title = "Hand Dao the keys"
+				var offer: Dictionary = economy.manager_offer(first)
+				detail = "%s Dao enables managed offline trading and ฿10 per open second. %s" % [goal_cash(offer.price,(economy.operating_rate(first)+12)*2),"Ready to appoint." if offer.enabled else offer.reason]
+				focus = "MANAGEMENT"
+	elif chapter==1:
+		title = "A second address on the soi"
+		detail = "Anong: He's retiring again. This time, get the keys. Soi lease: %s Reputation %d/20. Other venue types remain your choice." % [goal_cash(purchase_cost(1),opening_reserve(1)),mini(20,int(s.rep))]
+		tab = 3
+	elif chapter==2:
+		var managers := 0
+		var soi := false
+		for bar in s.street.bars:
+			managers += int(bar.manager)
+			soi = soi or bar.type==1
+		title = "Trust the team with two venues"
+		detail = "Soi venue: %s · managers %d/2. Each new bar must earn its own customers and healthy shifts. Dao: Two sets of keys. One owner who finally sits down." % ["owned" if soi else "still needed",mini(2,managers)]
+		tab = 3
+	elif chapter==3:
+		title = "Give Anton something to worry about"
+		detail = "Open a gogo and earn its second stage. Dancers attract; bartenders serve. Anton has ordered another screen. Pim suggests a better show."
+		tab = 3
+	elif chapter==4:
+		var developed := [false,false,false]
+		for bar in s.street.bars:
+			if bar.stage==3: developed[int(bar.type)] = true
+		title = "Bring the whole street together"
+		detail = "Stage-three venues: beer %d/1 · Soi %d/1 · gogo %d/1. Then arrange the After Hours Street Festival in Events. The guest list includes something from the bay." % [int(developed[0]),int(developed[1]),int(developed[2])]
+	return {"title":title,"detail":detail,"focus":focus,"tab":tab,"venue":0}
 
 func announce(id: int) -> void:
 	s.street.event = {"id":id,"phase":"warning","remaining":60,"prepared":false}

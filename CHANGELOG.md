@@ -4,6 +4,16 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Source update — A clearer opening arc and shorter saving gaps
+
+- Bartender training costs ฿400 then ฿800; first management costs ฿12,000.
+- Final beer / Soi / gogo renovations cost ฿40,000 / ฿65,000 / ฿120,000 and
+  require 450 happy visits, retaining 70 regulars and forty healthy shifts.
+- Added Anong's Next Step in Service: live story progress and navigation to the
+  relevant controls, without new rewards, timers or compulsory purchases.
+- Measured pre/post-change fresh campaigns and added saving-gap acceptance checks.
+  Existing progress, training, cooldowns and prices paid for old stock are retained.
+
 ## Source update — Bartender priority and Nida renewal
 
 - Owner auto-serve now backs up staffed venues during queue overflow or imminent

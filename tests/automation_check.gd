@@ -92,7 +92,7 @@ func run(test: SceneTree) -> void:
 	m.street.action("restock")
 	cash_before = m.s.cash
 	m.street.action("manager")
-	test.check(b.manager_level==1 and m.s.cash==cash_before-18000,"Manager level one costs 18000 and retains its operating gates")
+	test.check(b.manager_level==1 and m.s.cash==cash_before-12000,"Manager level one costs 12000 and retains its operating gates")
 	b.customers.clear()
 	stock = b.stock
 	m.street.tick(5)

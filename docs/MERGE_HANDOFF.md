@@ -1,29 +1,30 @@
 # Current implementation and release handoff
 
-Updated **26 November 2026**. The previous ready-bartender feature is merged in
-main at `0799a00` and published as v1.0.18. The follow-up
-**`codex/staff-priority-nida-renewal`** adds bartender-first owner relief and
-clear Nida renewal controls. Other worktrees and user attachments are preserved.
+Updated **26 November 2026**. Main `e644c55` shipped as **v1.0.19** with staff-first
+auto-serve and visible Nida renewal. The follow-up **`codex/opening-arc-balance`**
+addresses the player's request to review story, rules, prices and grind together.
+Other worktrees and user attachments are preserved.
 
-Staff always settle first. Owner auto-serve leaves quiet orders to the team,
-helping with overflow or a guest whose deadline staff cannot meet. Without
-eligible bartenders it covers ordinary service. Price remains ฿3,000; manual
-clicks and saved cooldowns are unchanged. No save schema change is needed.
+Bartender training is ฿400/800, first management ฿12,000, and final beer/Soi/gogo
+renovations ฿40,000/65,000/120,000. Stage three needs 450 happy visits while retaining
+seventy local regulars and forty healthy shifts. Initial progression, contracts,
+customer demand, owner/staff cooldowns, auto-serve price, birthday rules and later
+manager tiers remain unchanged. Existing ownership is retained without refunds.
 
-Nida's renewal lives in Frontage promoter, showing the exact fee, payroll and
-stock reserve, and cash shortfall. Expiry refreshes the roster independently of
-history messages. Tests cover live expiry, earning the missing reserve, renewing
-with a full floor roster and retaining training without duplicate charges.
+Anong's Next Step reads shared chapter requirements and current business progress.
+Its button navigates to existing controls; it cannot purchase, award money or
+advance time. No save schema change or extra compulsory quest is introduced.
 
-Full regressions, 42 fresh campaigns, 60 paired celebration scenarios and four
-960 × 540 previews pass; renewal is also inspected at 1280 × 720. See
-[testing](TESTING.md) for results and device limitations. Documentation and story
-reflect the resulting rules. The feature is ready for the authorized main merge
-and signed release workflow. Verify the workflow and
-[latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for the actual published tag/source; this source handoff does not predict it.
+Full regressions, 42 fresh campaigns and sixty paired party scenarios pass.
+Compared with v1.0.19, the first-manager saving gap falls from 44–48 to 25–27
+minutes; active stage three moves from 167–173 to 143–144. Four guidance previews
+are inspected at 960 × 540 and 1280 × 720. See [testing](TESTING.md) and
+[economy](ECONOMY.md) for measurements, revised bounds and limitations.
 
-The consolidation audit below is historical, not a new audit of every chat.
+Ready for the authorized main merge and signed release workflow. Verify its run
+and the [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+for the published tag/source. Human retention, full-festival pacing and device
+play remain unverified. This handoff is not a new audit of every conversation.
 
 ## Historical consolidation audit
 

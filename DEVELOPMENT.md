@@ -367,3 +367,10 @@ staff service. UI status reads this predicate without settling sales. Renewal
 quotes use `rehire_offer` for both validation and frontage UI; contract state is
 part of `street_ui_state` so expiry does not depend on a changed history notice.
 No save schema change is needed for these rules.
+
+`street.gd::chapter_requirements` supplies chapter advancement and next-step
+readiness. `next_goal` is read-only guidance; `main.gd::show_next_goal` navigates
+and scrolls only. The balance runner records manager timing and gaps between
+purchases that improve the business (excluding routine stock and renewals).
+`tests/balance_guidance_check.gd` covers price/reserve boundaries, saved ownership,
+local milestones, guidance purity and UI navigation. No schema change is needed.

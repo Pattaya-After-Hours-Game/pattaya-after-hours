@@ -9,6 +9,20 @@ it. Resume is disabled when no readable save is available.
 The main street is the live business. **Tutorial** is an optional practice
 campaign using the original decision lessons; it does not spend your real till.
 
+## Find the next useful step
+
+At the top of **Service**, **Anong's Next Step** shows the current story objective,
+its real progress and relevant cash reserve. **Show next step** takes you to the
+matching control or tab. It does not buy anything. Early steps cover real drink
+sales and regulars; later ones explain renovation, reopening preparations,
+deliveries and the first manager. The guide follows the Blue Hour and then the
+street-wide story even when you have another property selected.
+
+Final renovations now cost ฿40,000 for a beer bar, ฿65,000 for a Soi venue and
+฿120,000 for a gogo. Each still needs its own 450 happy visits, 70 regulars and
+40 healthy shifts, plus operating cash. You can work on another bar while that
+customer base grows. The first renovation and ordinary drink prices are unchanged.
+
 ## Look ahead to day seven
 
 Open **Events** to see the next free neighbourhood celebration. **Anong's
@@ -229,7 +243,7 @@ Hosts and dancers remain ฿4,500. All floor staff retain wages while on duty;
 bartenders do not take Nida’s drink commission.
 A base bartender serves one real drink order every **25 seconds** (2.4/min), so
 keep serving alongside them during rushes. **Train** on their individual card
-costs ฿800 for level 1 (20 seconds) and ฿1,600 for level 2 (15 seconds). Training
+costs ฿400 for level 1 (20 seconds) and ฿800 for level 2 (15 seconds). Training
 does not create customers and is retained across contracts and role changes.
 
 **Service → Team & Payroll** shows the remaining contract time. When it expires,
@@ -351,7 +365,7 @@ cost ฿84 for six, then ฿144/120/96/72 for twelve. Levels three/four need ven
 stage three. Discounts affect new stock, including manual purchases. Previously
 bought drinks keep their paid cost in profit reports.
 
-Managers cost ฿18,000, then ฿36,000 and ฿72,000 to upgrade. They generate a
+Managers cost ฿12,000, then ฿36,000 and ฿72,000 to upgrade. They generate a
 separate ฿10/฿20/฿40 per game minute (real second) while the venue trades,
 before operating costs. Level one needs stage two, a bartender, deliveries and
 eight healthy shifts; later levels need stage three. They also keep their
