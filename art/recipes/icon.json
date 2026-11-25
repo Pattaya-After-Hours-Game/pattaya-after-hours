@@ -1,0 +1,10 @@
+{
+  "id": "icon",
+  "prompt": "Original mobile game APP ICON foreground mark, genuine transparent background. Centered neon cyan beer glass with gold liquid and foam, a small magenta crescent and palm frond behind it, subtle burgundy shophouse roof silhouette at base. Bold instantly readable detailed pixel-art emblem for a Thai nightlife management game. No letters, no words, no border, no watermark, no rounded-square background. Keep complete emblem inside middle 65 percent of square canvas for Android adaptive icon safe area. Match supplied game's cyan, amber, burgundy and plum palette.",
+  "ref": "beer-1",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-0f7bc19c-6ad2-4c68-8287-aea61e1ea978.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/beer-1.png"
+  ]
+}

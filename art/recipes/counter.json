@@ -1,0 +1,10 @@
+{
+  "id": "counter",
+  "prompt": "Production foreground prop for the supplied illustrated pixel-art bar. One wide burgundy timber bar counter viewed slightly from above, decorated with a small lime board, metal ice bucket, beer glass and receipt pad with NO writing. Entire isolated counter including wooden front face and polished top. Straight-on horizontal composition, width about four times height. Transparent background, no people, no room, no lettering, no watermark. Amber highlights, plum shadows, cyan edge reflection, crisp detailed pixel illustration. It will be composited in front of a bartender at bottom right of a game screen.",
+  "ref": "beer-1",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-6a779652-6cd5-439b-91cd-1ce4030957a3.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/beer-1.png"
+  ]
+}

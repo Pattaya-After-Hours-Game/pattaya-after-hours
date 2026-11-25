@@ -6,7 +6,7 @@ config/description="A neon nightlife management sim"
 run/main_scene="res://main.tscn"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://assets/icon.png"
+config/icon="res://assets/art/icon.png"
 boot_splash/bg_color=Color(0.063, 0.055, 0.133, 1)
 boot_splash/show_image=false
 

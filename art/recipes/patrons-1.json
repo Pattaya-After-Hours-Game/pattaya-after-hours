@@ -1,0 +1,12 @@
+{
+  "id": "patrons-1",
+  "group": "patrons",
+  "ref": "core-cast-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Adult Thai woman with shoulder-length black hair, teal summer dress and sandals, relaxed standing chatting. New original character, reference used only for rendering style. Square canvas.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-3a154d74-7c42-499d-b966-a10db2406fe8.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/core-cast-reference.png",
+    "/home/zak/projects/pattaya-after-hours/art/sources/patrons-0.png"
+  ]
+}

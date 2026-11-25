@@ -1,0 +1,11 @@
+{
+  "id": "monster-0",
+  "group": "monster",
+  "ref": "beer-1",
+  "prompt": "One friendly giant reptilian kaiju character, original teal-green scales, chunky body, long tail, violet crystalline dorsal plates catching cyan neon, golden eyes, expressive rounded snout. Same character in all poses. Detailed illustrated pixel art matching supplied game's amber/plum/cyan palette. Transparent background, entire creature visible, no text, no scenery, no floor or painted shadow. Three-quarter view facing RIGHT. Walking into view with one massive foot raised, head curious.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-ee5e726e-6e66-4430-8a1a-3c2964345d2b.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/beer-1.png"
+  ]
+}

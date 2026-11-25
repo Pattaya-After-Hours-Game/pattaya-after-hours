@@ -1,0 +1,11 @@
+{
+  "id": "fight-vega-0",
+  "group": "fight-vega",
+  "ref": "fight-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Vega, original adult Thai woman with reddish brown ponytail, pink cropped athletic top, fitted charcoal short shorts, white hand wraps, black ankle-strap high heels. Distinct magenta-themed rival. Isolated individual fighter only. Side-on camera facing RIGHT, consistent body proportions and character design across combat poses, generous space for extended limbs. Pose: Neutral Muay Thai ready stance, feet planted, fists relaxed at chest. Square canvas.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-7d0a1304-4041-4a9a-ad15-bebb1074db97.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/fight-reference.png"
+  ]
+}

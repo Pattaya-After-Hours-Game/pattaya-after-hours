@@ -1,5 +1,7 @@
 extends Control
 
+const Art = preload("res://scripts/art.gd")
+
 signal finished(won: bool)
 signal sound(kind: String)
 const FLOOR = 126.0
@@ -90,15 +92,22 @@ func _input(event: InputEvent) -> void:
 			activate(event.position,-1)
 
 func activate(point: Vector2, index: int) -> void:
+	point = to_canvas(point)
 	if Rect2(880,465,72,61).has_point(point):
 		finished.emit(result if over else false)
 	elif over:
 		if Rect2(345,281,270,82).has_point(point): finished.emit(result)
 	elif index != -1:
-		touches[index] = action_at(point)
+		touches[index] = _action_at_canvas(point)
 		buffer(touches[index])
 
+func to_canvas(point: Vector2) -> Vector2:
+	return (point-global_position)/(size/Vector2(960,540))
+
 func action_at(point: Vector2) -> String:
+	return _action_at_canvas(to_canvas(point))
+
+func _action_at_canvas(point: Vector2) -> String:
 	for item in BUTTONS:
 		if Rect2(item[2],464,68,60).has_point(point): return item[0]
 	return ""
@@ -235,87 +244,105 @@ func _resolve(f: Dictionary,other: Dictionary,delta: float) -> void:
 					"life":rng.randf_range(0.13,0.39),"color":Color("#75ffed") if blocked else Color("#ffcb79")})
 	if f.timer >= timing[0]+timing[1]+timing[2]: f.move = ""
 
-func p(x: float,y: float,w: float,h: float,tint: Color) -> void:
-	draw_rect(Rect2(floorf(x),floorf(y),w,h),tint)
+func frame_index(f: Dictionary) -> int:
+	if f.hp <= 0: return 10
+	if over or next_round > 0:
+		if f.hp > fighters[1 if f == fighters[0] else 0].hp: return 11
+	if f.stun > 0: return 4 if f.guard else 9
+	if not f.move.is_empty():
+		var timing: Array = ATTACKS[f.move]
+		if f.timer < timing[0]: return 5
+		if f.timer < timing[0]+timing[1]: return {"jab":6,"kick":7,"super":8}[f.move]
+		return 5 if f.timer < timing[0]+timing[1]+timing[2]*.5 else 0
+	if f.y < FLOOR: return 3
+	if f.guard: return 4
+	if f.motion: return 1+int(elapsed*8)%2
+	return 0
+
+func panel(rect: Rect2, fill: Color, border: Color = Color("#986748")) -> void:
+	draw_rect(rect,fill)
+	draw_rect(rect,border,false,1)
 
 func label_at(x: float,y: float,value: String,px: int,tint: Color) -> void:
 	draw_string(font,Vector2(x,y),value,HORIZONTAL_ALIGNMENT_LEFT,-1,px,tint)
 
 func centered(x: float,y: float,value: String,px: int,tint: Color) -> void:
-	var w := font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,px).x
-	label_at(x-w/2,y,value,px,tint)
+	var width := font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,px).x
+	label_at(x-width/2,y,value,px,tint)
 
 func _draw() -> void:
-	draw_set_transform(Vector2.ZERO,0,Vector2(3,3))
-	var neon := Color("#65ffd5")
-	var gold := Color("#ffce77")
+	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
+	var neon := Color("#73f5dc")
+	var gold := Color("#e8ba7b")
 	var pink: Color = RIVALS[rival_index][1]
-	p(0,0,320,180,Color("#100e23"))
-	for row in 26: p(0,24+row*4,320,4,Color("#2b1647").lerp(Color("#753151"),row/28.0))
-	for i in 19:
-		var x := i*19
-		var h := 16 + (i*51)%37
-		p(x,100-h,14,h,Color("#342044"))
-		for y in range(102-h,98,6):
-			if (i+y)%4: p(x+3,y,2,2,Color("#9c5377"))
-	p(0,98,320,38,Color("#372641"))
-	p(0,101,320,2,Color("#ff6299"))
-	p(0,112,320,2,Color("#db8294"))
-	for x in range(5,319,19):
-		p(x,96,2,34,Color("#918099"))
-		p(x-1,95,4,2,gold)
-	for i in 27:
-		var x := i*13-4
-		var y := 99+(i*11)%9 + int(sin(elapsed*2.0+i)*2)
-		p(x,y-6,4,5,Color("#c08083").darkened((i%3)*0.15))
-		p(x-2,y-1,8,9,[Color("#2c243f"),Color("#463058"),Color("#752d62")][i%3])
-	p(0,127,320,25,Color("#302742"))
-	for y in [132,141,149]: p(0,y,320,1,Color("#5c3b60"))
-	for x in range(-40,390,31):
-		draw_line(Vector2((x+160)/2,127),Vector2(x,152),Color("#594164"))
-	centered(160,69,"T O Y B O X",15,pink.darkened(.17))
-	centered(160,82,"CIRCUIT · MATCH %d / %d" % [rival_index+1,RIVALS.size()] if circuit else "AFTER HOURS CIRCUIT",6,gold)
-	if fighters.size() == 2:
-		_sprite(fighters[0],neon,Color("#d99c73"),0)
-		_sprite(fighters[1],pink,RIVALS[rival_index][2],1+rival_index)
-		for spark in sparks:
-			p(spark.p.x,spark.p.y,2,2,spark.color)
-		if flash > 0: p(0,25,320,123,Color(1,.56,.68,flash*.24))
-		p(9,16,129,7,Color("#503050"))
-		p(182,16,129,7,Color("#503050"))
-		p(9,16,int(fighters[0].hp*1.29),7,neon)
-		var right := int(fighters[1].hp*1.29)
-		p(311-right,16,right,7,pink)
-		p(9,26,int(fighters[0].meter*1.29),2,gold)
-		p(311-int(fighters[1].meter*1.29),26,int(fighters[1].meter*1.29),2,gold)
-	label_at(9,12,"MALI  •  %d" % wins[0],8,neon)
-	var rival_label := "%d  •  %s" % [wins[1],RIVALS[rival_index][0]]
-	centered(286,12,rival_label,8,pink)
-	centered(160,24,"%02d" % ceili(time_left),15,gold)
-	p(0,152,320,28,Color("#151126"))
+	Art.image(self,"toybox",Rect2(0,0,960,540))
+	centered(452,129,"TOYBOX",30,Color("#ff80b2"))
+	centered(452,149,"AFTER HOURS CIRCUIT",11,gold)
+	# Spectators and foreground effects remain independently animated.
+	for i in 6:
+		Art.frame(self,"patrons",i%4,Vector2(140+i*134,375),.42,i%2==1)
+	for i in fighters.size():
+		var f: Dictionary = fighters[i]
+		var foot := Vector2(f.x*3,414+(f.y-FLOOR)*3)
+		draw_set_transform(Vector2(f.x*3,416)*size/Vector2(960,540),0,Vector2(1,.16)*size/Vector2(960,540))
+		draw_circle(Vector2.ZERO,33,Color(0.05,.02,.07,.5))
+		draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
+		var id := "fight-mali" if i == 0 else "fight-"+str(RIVALS[rival_index][0]).to_lower()
+		var pose := frame_index(f)
+		var breath := 1.0+.006*sin(elapsed*3+i) if pose in [0,4,11] else 1.0
+		if Art.texture(id):
+			Art.frame(self,id,pose,foot,1.0,int(f.facing)<0,Vector2(320,256),Color.WHITE,Vector2(1,breath))
+		else:
+			# Keep opponents visible while the separate graphics refresh is unfinished.
+			draw_set_transform(Vector2(0,414-FLOOR*3)*size/Vector2(960,540),0,3*size/Vector2(960,540))
+			fallback_sprite(f,neon if i==0 else pink,Color("#d99c73") if i==0 else RIVALS[rival_index][2],0 if i==0 else rival_index+1)
+			draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
+		if f.move == "super" and f.timer >= ATTACKS.super[0] and f.timer < ATTACKS.super[0]+ATTACKS.super[1]:
+			for ray in 5:
+				var origin := foot+Vector2(f.facing*35,-125+ray*7)
+				draw_line(origin,origin+Vector2(f.facing*(60+ray*7),0),Color(neon,.6),2)
+	for spark in sparks:
+		var pos: Vector2 = Vector2(spark.p.x*3,369+(spark.p.y-FLOOR)*3)
+		draw_line(pos,pos+spark.v.normalized()*9,spark.color,2)
+	if flash>0: draw_rect(Rect2(0,68,960,388),Color(1,.6,.7,flash*.3))
+	panel(Rect2(0,0,960,72),Color("#21161ff8"))
+	Art.image(self,"portrait-mali",Rect2(10,8,54,54))
+	Art.image(self,"portrait-"+str(RIVALS[rival_index][0]).to_lower(),Rect2(896,8,54,54))
+	label_at(76,25,"MALI  ·  %d" % wins[0],18,neon)
+	label_at(575,25,"%d  ·  %s" % [wins[1],RIVALS[rival_index][0]],18,pink)
+	centered(480,35,"%02d" % ceili(time_left),30,gold)
+	centered(480,57,"ROUND %d" % (wins[0]+wins[1]+1),11,gold)
+	for i in fighters.size():
+		var x := 76 if i==0 else 575
+		panel(Rect2(x,34,310,16),Color("#4b3040"))
+		var width: float = fighters[i].hp*3.08
+		draw_rect(Rect2(x+1 if i==0 else x+309-width,35,width,14),neon if i==0 else pink)
+		draw_rect(Rect2(x,57,fighters[i].meter*3.1,5),gold)
+	panel(Rect2(0,456,960,84),Color("#21161ff8"))
 	for item in BUTTONS:
-		var x: float = item[2]/3.0
-		p(x,154,22,20,neon if pressed(item[0]) else Color("#38294b"))
-		p(x+1,155,20,18,Color("#211835"))
-		centered(x+11,167,item[1],6,gold if item[0] == "super" else neon)
-	p(294,154,23,20,Color("#3c2545"))
-	centered(305,167,"EXIT",6,pink)
-	if countdown > 0:
-		centered(160,109,"READY" if countdown > 0.4 else "FIGHT!",18,gold)
-	elif next_round > 0:
-		centered(160,100,announced,25,gold)
+		var rect := Rect2(item[2],464,68,60)
+		panel(rect,Color("#4d3941") if pressed(item[0]) else Color("#30212c"),neon if pressed(item[0]) else gold.darkened(.45))
+		centered(rect.get_center().x,500,item[1],14,gold if item[0]=="super" else neon)
+	panel(Rect2(880,465,72,61),Color("#392630"))
+	centered(916,501,"EXIT",15,gold)
+	if countdown>0:
+		centered(480,270,"READY" if countdown>.4 else "FIGHT!",44,gold)
+	elif next_round>0:
+		centered(480,270,announced,44,gold)
 	elif over:
-		p(80,68,160,59,Color("#120e24f4"))
-		centered(160,87,("TOYBOX CHAMPION" if circuit else "MALI WINS") if result else "CORNER CALLED IT",14,neon if result else pink)
-		p(115,94,90,24,Color("#39274e"))
-		centered(160,109,"CONTINUE",9,gold)
-	elif elapsed < 5 and not OS.has_feature("mobile"):
-		centered(160,146,"A/D MOVE  W JUMP  S GUARD  J/K/L ATTACK",6,Color("#dbc5df"))
+		panel(Rect2(240,208,480,160),Color("#21161ff5"))
+		centered(480,251,("TOYBOX CHAMPION" if circuit else "MALI WINS") if result else "CORNER CALLED IT",26,neon if result else pink)
+		panel(Rect2(345,281,270,82),Color("#49303a"))
+		centered(480,329,"CONTINUE",22,gold)
+	elif elapsed<5 and not OS.has_feature("mobile"):
+		panel(Rect2(255,426,450,23),Color("#21161fe8"))
+		centered(480,443,"A/D MOVE   W JUMP   S GUARD   J/K/L ATTACK",13,gold)
 
-func _sprite(f: Dictionary,coat: Color,skin: Color,style: int) -> void:
+# Original procedural fighter is retained only as a missing-art fallback.
+func fallback_sprite(f: Dictionary,coat: Color,skin: Color,style: int) -> void:
 	var cx := int(f.x)
 	var cy := int(f.y)
-	p(cx-12,FLOOR,24,3,Color("#20162d"))
+	draw_rect(Rect2(cx-12,FLOOR,24,3),Color("#20162d"))
 	var flip: int = f.facing
 	var bob := int(elapsed*9)%2 if not f.motion else int(elapsed*15)%3
 	var cy0 := cy - bob + (2 if f.guard else 0)
@@ -366,4 +393,4 @@ func _sprite(f: Dictionary,coat: Color,skin: Color,style: int) -> void:
 		_piece(cx,cy0,flip,14,-40,2,19,light)
 
 func _piece(x: int,y: int,flip: int,dx: int,dy: int,w: int,h: int,color: Color) -> void:
-	p(x+dx if flip == 1 else x-dx-w,y+dy,w,h,color)
+	draw_rect(Rect2(x+dx if flip == 1 else x-dx-w,y+dy,w,h),color)

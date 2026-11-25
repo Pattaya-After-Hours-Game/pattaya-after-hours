@@ -19,13 +19,13 @@ var s: Dictionary
 var street: RefCounted
 var rng := RandomNumberGenerator.new()
 
-func _init(seed_value: int = 0) -> void:
+func _init(seed_value: int = 0, practice: bool = false) -> void:
 	if seed_value == 0:
 		rng.randomize()
 	else:
 		rng.seed = seed_value
 	s = {
-		"version": 1, "day": 1, "phase": "plan", "cash": 6400, "reserve": 0, "debt": 0,
+		"practice": practice, "version": 1, "day": 1, "phase": "plan", "cash": 6400, "reserve": 0, "debt": 0,
 		"stock": 62, "rep": 15, "regulars": 4, "trust": 38, "heat": 5, "safety": 65,
 		"partner": 63, "visa": 75, "license": 80, "supplier": 58, "rival": 14, "condition": 72,
 		"staff": [], "level": 1, "venue": 1, "rig": 0, "market": 100, "contract": 0,
@@ -39,7 +39,8 @@ func _init(seed_value: int = 0) -> void:
 		_add_staff(i)
 	_reset_week()
 	_forecast()
-	street = Street.new(s)
+	street = Street.new(s,not practice)
+	s.street.economy_seed = maxi(1,seed_value) if seed_value != 0 else rng.randi_range(1,2147483646)
 
 func _add_staff(id: int) -> void:
 	s.staff.append({"id":id,"skill":C.STAFF[id][2],"guide":C.STAFF[id][3],"morale":72,"fatigue":12,"work":true,"hurt":0})
@@ -113,10 +114,13 @@ func booking(index: int, route_id: int) -> String:
 		return "%s %s" % [C.STAFF[s.staff[index].id][0], declined]
 	if s.pay == 0 and C.ROUTES[route_id][2] == 2:
 		return "The guide asks for standard split or better on long routes."
+	if not legacy_mode() and not spend(guide_pay(route_id)): return "The guide needs their agreed pay upfront."
 	s.bookings[key] = route_id
 	return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
 
 func action(id: String, index: int = 0) -> String:
+	if not legacy_mode() and id in ["buy","hire","rota","train","reno"]:
+		return street.action({"buy":"stock","hire":"hire","rota":"rota","train":"equipment","reno":"upgrade"}[id],6 if id=="train" else index)
 	if s.phase != "plan":
 		return "Finish the current night first."
 	match id:
@@ -209,7 +213,15 @@ func action(id: String, index: int = 0) -> String:
 			return "Anton agrees to share festival dates."
 	return ""
 
+func legacy_mode() -> bool:
+	return s.get("practice",false) or s.get("legacy_shift",false)
+
 func start() -> String:
+	if not legacy_mode():
+		if s.phase != "plan": return "Finish the current decision first."
+		s.street.guided = {"wave":int(s.street.seconds)/40}
+		s.phase = "guided_choice"
+		return "The guided shift uses the same customers, stock and clock."
 	if s.phase != "plan":
 		return ""
 	var workers := 0
@@ -259,6 +271,9 @@ func finish_godzilla(won: bool) -> void:
 		_close()
 
 func rest() -> void:
+	if not legacy_mode():
+		if street.selected().open: street.action("open")
+		return
 	if s.phase != "plan": return
 	s.bookings.clear()
 	s.event = 0
@@ -293,6 +308,12 @@ func current_card() -> Array:
 	return C.GOOD[id] if id < C.GOOD.size() else C.BAD[id - C.GOOD.size()]
 
 func pick(index: int) -> String:
+	if s.phase == "guided_choice":
+		if not index in [0,1,2]: return "Unknown response."
+		if index == 0: street.economy.serve(street.selected(),1,true)
+		elif index == 1: street.economy.action(street.selected(),"welcome",0)
+		s.phase = "guided"
+		return "Service continues on the live clock."
 	if s.phase != "incident": return ""
 	var card := current_card()
 	var offset := 2 + index * 2
@@ -402,6 +423,9 @@ func _apply(effects: Dictionary, target: Dictionary) -> Dictionary:
 	return changes
 
 func fallback() -> void:
+	if s.phase == "guided_choice":
+		pick(2)
+		return
 	if s.phase != "incident": return
 	s.night.notes.append("%s · reduced service" % current_card()[0])
 	if s.card < 100:
@@ -588,6 +612,10 @@ func _close() -> void:
 	log_message("Day %d · %+d net · %d guests" % [s.day,n.cash,n.guests])
 
 func next_day() -> void:
+	if s.phase == "guided_report":
+		s.street.guided = {}
+		s.phase = "plan"
+		return
 	if s.phase != "report": return
 	if not s.end.is_empty():
 		s.phase = "end"
@@ -600,6 +628,7 @@ func next_day() -> void:
 	s.bookings.clear()
 	s.event = 0
 	s.card = -1
+	s.legacy_shift = false
 	_forecast()
 
 func save_game() -> int:
@@ -623,10 +652,10 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
-		if parsed.version == 2:
+		if parsed.version >= 2:
 			if not parsed.get("street") is Dictionary: return null
 			var data: Dictionary = parsed.street
 			for key in ["bars","selected","chapter","served","earned","seconds","cycle","event","event_wait","event_index","events_survived","reopening","festival","festivals","last_seen","offline","history"]:
@@ -645,6 +674,26 @@ func _read(path: String) -> Variant:
 				for key in ["id","phase","remaining","prepared"]:
 					if not data.event.has(key): return null
 				if int(data.event.id) < 0 or int(data.event.id) >= Street.C.EVENTS.size(): return null
+		if int(parsed.version) == 3:
+			for key in ["elapsed","economy_seed","next_customer","pass_credit","offered","arrivals","orders","guided","offline_report"]:
+				if not parsed.street.has(key): return null
+			for bar in parsed.street.bars:
+				var defaults := Street.Economy.new_fields()
+				for key in defaults:
+					if not bar.has(key): return null
+					if defaults[key] is Array and not bar[key] is Array: return null
+					if defaults[key] is Dictionary and not bar[key] is Dictionary: return null
+				for key in defaults.equipment:
+					if not bar.equipment.get(key) is float and not bar.equipment.get(key) is int: return null
+				for person in bar.team:
+					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
+					if not int(person.role) in [0,1,2] or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
+				for customer in bar.customers:
+					if not customer is Dictionary: return null
+					for key in ["id","life","order","wait","quoted","drinks","next","budget","premium","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
+						if not customer.has(key): return null
+				for game in bar.games:
+					if not game is Dictionary or not game.get("players") is Array or not game.has("remaining") or not game.has("fee"): return null
 		return parsed
 	return null
 
@@ -653,6 +702,7 @@ func load_game() -> bool:
 	if parsed == null: parsed = _read(BACKUP)
 	if parsed == null: return false
 	s = _restore_numbers(parsed)
+	if int(s.version)<3 and s.phase in ["incident","fight","report","godzilla"] and not s.night.get("street_boss",false): s.legacy_shift = true
 	rng.state = int(str(s.rng))
 	street = Street.new(s)
 	if s.phase == "end":

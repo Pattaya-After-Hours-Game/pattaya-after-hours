@@ -1,0 +1,12 @@
+{
+  "id": "fight-mali-7",
+  "group": "fight-mali",
+  "ref": "fight-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Mali, adult Thai woman with long dark braid, burgundy cropped athletic top, fitted navy short shorts with belt, white hand wraps, burgundy ankle-strap high heels. Match LEFT fighter from reference. Isolated individual fighter only. Side-on camera facing RIGHT, consistent body proportions and character design across combat poses, generous space for extended limbs. Pose: Kick CONTACT pose: right leg extended horizontally to the RIGHT at waist height, left supporting foot on ground, arms guard. Square canvas.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-a816846a-fd59-4fd6-843c-4cc0207c8488.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/fight-reference.png",
+    "/home/zak/projects/pattaya-after-hours/art/sources/fight-mali-0.png"
+  ]
+}

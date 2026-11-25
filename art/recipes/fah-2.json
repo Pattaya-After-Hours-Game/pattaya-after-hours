@@ -1,0 +1,12 @@
+{
+  "id": "fah-2",
+  "group": "fah",
+  "ref": "core-cast-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Fah, adult Thai woman age 29, short dark pixie haircut, navy two-piece bikini with full-coverage bottoms, teal earrings and black ankle-strap heels. The reference is for rendering STYLE only, this is a distinct original character. Pose: Upright dance pose, one hand raised above head to grasp an invisible vertical dance pole just to the right of her shoulder, weight on left leg, right knee slightly bent, other hand extended gracefully. Pole itself is NOT drawn. Non-explicit adult nightlife game art. Square canvas.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-cd30c537-6cf6-45b3-a610-09480461d532.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/core-cast-reference.png",
+    "/home/zak/projects/pattaya-after-hours/art/sources/fah-0.png"
+  ]
+}

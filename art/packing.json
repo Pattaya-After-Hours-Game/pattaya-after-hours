@@ -1,0 +1,333 @@
+{
+  "anong-service": {
+    "frames": [
+      "anong-service-0.png",
+      "anong-service-1.png",
+      "anong-service-2.png",
+      "anong-service-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  },
+  "dao": {
+    "frames": [
+      "dao-0.png",
+      "dao-1.png",
+      "dao-2.png",
+      "dao-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  },
+  "mali": {
+    "frames": [
+      "mali-0.png",
+      "mali-1.png",
+      "mali-2.png",
+      "mali-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  },
+  "fern": {
+    "frames": [
+      "fern-0.png",
+      "fern-1.png",
+      "fern-2.png",
+      "fern-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  },
+  "nok": {
+    "frames": [
+      "nok-0.png",
+      "nok-1.png",
+      "nok-2.png",
+      "nok-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  },
+  "jin": {
+    "frames": [
+      "jin-0.png",
+      "jin-1.png",
+      "jin-2.png",
+      "jin-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  },
+  "pim": {
+    "frames": [
+      "pim-0.png",
+      "pim-1.png",
+      "pim-2.png",
+      "pim-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  },
+  "bee": {
+    "frames": [
+      "bee-0.png",
+      "bee-1.png",
+      "bee-2.png",
+      "bee-3.png",
+      "bee-4.png",
+      "bee-5.png"
+    ],
+    "cell": [
+      160,
+      256
+    ],
+    "height": 180,
+    "frame_heights": [
+      180,
+      180,
+      196,
+      196,
+      180,
+      180
+    ]
+  },
+  "may": {
+    "frames": [
+      "may-0.png",
+      "may-1.png",
+      "may-2.png",
+      "may-3.png",
+      "may-4.png",
+      "may-5.png"
+    ],
+    "cell": [
+      160,
+      256
+    ],
+    "height": 180,
+    "frame_heights": [
+      180,
+      180,
+      196,
+      196,
+      180,
+      180
+    ]
+  },
+  "june": {
+    "frames": [
+      "june-0.png",
+      "june-1.png",
+      "june-2.png",
+      "june-3.png",
+      "june-4.png",
+      "june-5.png"
+    ],
+    "cell": [
+      160,
+      256
+    ],
+    "height": 180,
+    "frame_heights": [
+      180,
+      180,
+      196,
+      196,
+      180,
+      180
+    ]
+  },
+  "lek": {
+    "frames": [
+      "lek-0.png",
+      "lek-1.png",
+      "lek-2.png",
+      "lek-3.png",
+      "lek-4.png",
+      "lek-5.png"
+    ],
+    "cell": [
+      160,
+      256
+    ],
+    "height": 180,
+    "frame_heights": [
+      180,
+      180,
+      196,
+      196,
+      180,
+      180
+    ]
+  },
+  "fah": {
+    "frames": [
+      "fah-0.png",
+      "fah-1.png",
+      "fah-2.png",
+      "fah-3.png",
+      "fah-4.png",
+      "fah-5.png"
+    ],
+    "cell": [
+      160,
+      256
+    ],
+    "height": 180,
+    "frame_heights": [
+      180,
+      180,
+      196,
+      196,
+      180,
+      180
+    ]
+  },
+  "nan": {
+    "frames": [
+      "nan-0.png",
+      "nan-1.png",
+      "nan-2.png",
+      "nan-3.png",
+      "nan-4.png",
+      "nan-5.png"
+    ],
+    "cell": [
+      160,
+      256
+    ],
+    "height": 180,
+    "frame_heights": [
+      180,
+      180,
+      196,
+      196,
+      180,
+      180
+    ]
+  },
+  "fight-mali": {
+    "frames": [
+      "fight-mali-0.png",
+      "fight-mali-1.png",
+      "fight-mali-2.png",
+      "fight-mali-3.png",
+      "fight-mali-4.png",
+      "fight-mali-5.png",
+      "fight-mali-6.png",
+      "fight-mali-7.png",
+      "fight-mali-8.png",
+      "fight-mali-9.png",
+      "fight-mali-10.png",
+      "fight-mali-11.png"
+    ],
+    "cell": [
+      320,
+      256
+    ],
+    "height": 200,
+    "frame_heights": [
+      200,
+      200,
+      200,
+      160,
+      185,
+      185,
+      200,
+      190,
+      185,
+      195,
+      52,
+      235
+    ]
+  },
+  "fight-juno": {
+    "frames": [
+      "fight-juno-0.png",
+      "fight-juno-1.png",
+      "fight-juno-2.png",
+      "fight-juno-3.png",
+      "fight-juno-4.png",
+      "fight-juno-5.png",
+      "fight-juno-6.png",
+      "fight-juno-7.png",
+      "fight-juno-8.png",
+      "fight-juno-9.png",
+      "fight-juno-10.png",
+      "fight-juno-11.png"
+    ],
+    "cell": [
+      320,
+      256
+    ],
+    "height": 200,
+    "frame_heights": [
+      200,
+      200,
+      200,
+      160,
+      185,
+      185,
+      200,
+      190,
+      185,
+      195,
+      52,
+      235
+    ]
+  },
+  "monster": {
+    "frames": [
+      "monster-0.png",
+      "monster-1.png",
+      "monster-2.png",
+      "monster-3.png"
+    ],
+    "cell": [
+      320,
+      320
+    ],
+    "height": 290,
+    "frame_heights": [
+      290,
+      290,
+      290,
+      210
+    ]
+  },
+  "patrons": {
+    "frames": [
+      "patrons-0.png",
+      "patrons-1.png",
+      "patrons-2.png",
+      "patrons-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "blue-hour-interior-v1.png": {
+    "original_path": "references/mockups/blue-hour-interior-v1.png",
+    "sha256": "708e4e1615670ca62f83a069df56b1d6c39f612a49f9ebb26783e7e99d90df2b",
+    "origin": "Project generated concept"
+  },
+  "district-map-v1.png": {
+    "original_path": "references/mockups/district-map-v1.png",
+    "sha256": "5b25bdbce3944a01480d24ab4b1d0c89bcb09242a4a9569caebdb6542c34b56b",
+    "origin": "Project generated concept"
+  }
+}

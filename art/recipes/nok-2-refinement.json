@@ -1,0 +1,10 @@
+{
+  "id": "nok-2",
+  "ref": "nok-0",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Nok, adult Thai woman, dark hair in bun with white flower, mustard t-shirt, burgundy apron, black cropped trousers and black shoes. Pose: WALK CYCLE PASSING POSITION. Walking right, feet CLOSE TOGETHER beneath hips, straight supporting right leg, left knee bent with heel lifted passing under the body. NOT a wide stride. Empty hands counter-swinging, no props. Exact same adult character identity and clothes. True transparent alpha, no background or shadow.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-3cc89faf-0cf4-45b7-8c1f-42833e13cb33.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/nok-0.png"
+  ]
+}

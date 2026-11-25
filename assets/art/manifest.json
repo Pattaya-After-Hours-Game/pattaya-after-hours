@@ -1,0 +1,386 @@
+{
+  "adaptive-background": {
+    "file": "res://assets/art/adaptive-background.png",
+    "size": [
+      432,
+      432
+    ],
+    "sha256": "7550296daa4d62c4358c1ab71ee985bc8b9b54d14f41b4a3c35ae1986c0d071c"
+  },
+  "adaptive-foreground": {
+    "file": "res://assets/art/adaptive-foreground.png",
+    "size": [
+      432,
+      432
+    ],
+    "sha256": "0fe67c76980e6ab80f4c9da6dd02b393d356bcbf8517798449f8cb3e6f8afcf8"
+  },
+  "anong-service": {
+    "file": "res://assets/art/anong-service.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "7a48f657a2ee477b9963f8287cfbc603d9366f0cc078005647fd85c53c16bb6c"
+  },
+  "anong-walk": {
+    "file": "res://assets/art/anong-walk.png",
+    "size": [
+      512,
+      768
+    ],
+    "sha256": "b380fe728b29f64d5e62b0dd94c46486d47a489dbdc42b75a5c112b2698aa3ed"
+  },
+  "bee": {
+    "file": "res://assets/art/bee.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "2422778b0170a692374d8a0e76dbae4683ab9319f32ab08e70588d0ae614c2ce"
+  },
+  "beer-1": {
+    "file": "res://assets/art/beer-1.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "afd50fd069dd4624f6c00501968d3c67afe3a4658c2297bac1f74446646cea27"
+  },
+  "beer-2": {
+    "file": "res://assets/art/beer-2.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "79a23c6b2245dd31928df6e8fa41994f9e7cadb62d28a08f1d42437c911c4aa1"
+  },
+  "beer-3": {
+    "file": "res://assets/art/beer-3.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "7586e298f452d5bcc06d080ccc563b9dc928cc4c820515118c749f56f6cc1196"
+  },
+  "counter": {
+    "file": "res://assets/art/counter.png",
+    "size": [
+      800,
+      236
+    ],
+    "sha256": "9b29fba9d5b58345d61bf3d28d715c16583e359555b8342bad42461bcf2463be"
+  },
+  "dao": {
+    "file": "res://assets/art/dao.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "64ad2e17efc97a21acec20773a9e37a710d384b14313b96a9bc0368df421f3f0"
+  },
+  "district": {
+    "file": "res://assets/art/district.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "d124d72d066638f97fa4fccd1db8fb48cbeed6becfa07d9cecc6528ab45ed5ab"
+  },
+  "event-inspection": {
+    "file": "res://assets/art/event-inspection.png",
+    "size": [
+      160,
+      192
+    ],
+    "sha256": "c42366b71c3ed9c97c6a6a66fa66e22d419b372ecf0d66f4e5dc4da1eb0f48b5"
+  },
+  "fah": {
+    "file": "res://assets/art/fah.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "d11d35dc8755b646cce26599d1280715dac68e7560a56585f8eff43e6ab79ebc"
+  },
+  "fern": {
+    "file": "res://assets/art/fern.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "4e4e9eeaa299850ecb0f97daf688e2b087bdb7f8b40450e03391c0793d85649c"
+  },
+  "fight-juno": {
+    "file": "res://assets/art/fight-juno.png",
+    "size": [
+      3840,
+      256
+    ],
+    "sha256": "d0792a74a3863cc3a08c0631e93433b5df5e1f5cd7a58f32593c0bc5a83274c7"
+  },
+  "fight-mali": {
+    "file": "res://assets/art/fight-mali.png",
+    "size": [
+      3840,
+      256
+    ],
+    "sha256": "aa59b9099a4752323cf627a30bb3b47dcfd6d40ea7aba2cba2dd9fb7f1cca5fa"
+  },
+  "gogo-1": {
+    "file": "res://assets/art/gogo-1.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "60de2d28a054f1ff885c903cd896e72a0c0a873bbfe24a0654e9124f47ad6b19"
+  },
+  "gogo-2": {
+    "file": "res://assets/art/gogo-2.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "4bc6a16e0c49dd3a273415c6bf9225512d81158f85cea4a71619b84ecf259baf"
+  },
+  "gogo-3": {
+    "file": "res://assets/art/gogo-3.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "5305364c54ef7912f954b4dc27212ea75879a179433c7065a4bc131d7803561f"
+  },
+  "icon": {
+    "file": "res://assets/art/icon.png",
+    "size": [
+      192,
+      192
+    ],
+    "sha256": "113566b3cf1618fb81b1c813b7424ec79a3cc50dbffa3124956e5992e2e90132"
+  },
+  "jin": {
+    "file": "res://assets/art/jin.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "dd01e9ff9959b100c90a5f97689055ffc71f5547cf1517b286616a28ae17f331"
+  },
+  "june": {
+    "file": "res://assets/art/june.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "8214549f033d48805e6e3835fa6898282b7fc2f21b79e0759c80fc288be3d6a4"
+  },
+  "lek": {
+    "file": "res://assets/art/lek.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "bda666c7e623cb3d0538517df96d3475e0fb5dd7f834652ef3a3bb323eba6434"
+  },
+  "mali": {
+    "file": "res://assets/art/mali.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "815d64a95eb945b67aff020ab33fd86f9c20514e4af9868fe6cd0522273ef915"
+  },
+  "may": {
+    "file": "res://assets/art/may.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "9523238b8f7685e5e25df79b81eb096066a9a62cdf66e639259bb522393d73dc"
+  },
+  "monster": {
+    "file": "res://assets/art/monster.png",
+    "size": [
+      1280,
+      320
+    ],
+    "sha256": "3760fe2951fbc0b8584aa1d13db5e0427595dfa96644c64877f3c664cd9387d7"
+  },
+  "nan": {
+    "file": "res://assets/art/nan.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "9a62460c1b3ce901af761053fc2000a09391215a6472e86d5be463602dc509b2"
+  },
+  "nok": {
+    "file": "res://assets/art/nok.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "01186e811dde64fccd45bb561f791697ca5fccbd265506554ce4822dd33ff80c"
+  },
+  "patrons": {
+    "file": "res://assets/art/patrons.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "2c1d84b99acfc38c30402bb6c6a49e00e4f1c4f0ab809aa18a88eb63b0cd5c03"
+  },
+  "pim": {
+    "file": "res://assets/art/pim.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "669ec36df629041121d829a3a013dbd473cb9dc6236d65ef8adc82f30712f1dd"
+  },
+  "portrait-anong": {
+    "file": "res://assets/art/portrait-anong.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "54edcfe991b787be64cd0fd116ef1d91da6020e1bdfd7a0547481300391d2d25"
+  },
+  "portrait-bee": {
+    "file": "res://assets/art/portrait-bee.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "fb73d6c2a017c799ceefffa77cd8b7f0bb78ff9c0fa0d80c6409069d84f3e8c1"
+  },
+  "portrait-dao": {
+    "file": "res://assets/art/portrait-dao.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "41190b3d2b374e7db8a928de8a9c773550161571815327ef1800c3ce23a410ec"
+  },
+  "portrait-fah": {
+    "file": "res://assets/art/portrait-fah.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "6854f49b10e5364204970a9d18bb971771a9c793c60772f9978012602a5816c8"
+  },
+  "portrait-fern": {
+    "file": "res://assets/art/portrait-fern.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "1afb387d4d63754ac5af83170bf2dea78510a1a0dcc047064bc275e5138bb0e7"
+  },
+  "portrait-jin": {
+    "file": "res://assets/art/portrait-jin.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "f82d4346e000de6932f7ebe1fafe67d8ebeb102919744d3cf2f38ac110092ae5"
+  },
+  "portrait-june": {
+    "file": "res://assets/art/portrait-june.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "20252fb35f8de891b4380b28b656f32eb8f1558faa600134f761eebc3d3e9309"
+  },
+  "portrait-juno": {
+    "file": "res://assets/art/portrait-juno.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "e3140a2bc2ffa7a4d8cb81003b7e63996e795f051b10f5f7dc73a35b96d03575"
+  },
+  "portrait-lek": {
+    "file": "res://assets/art/portrait-lek.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "eb920e7b0a91302bb6e86b4c1f9c9edee4e8e8e5b9a1eb526134eb4f92fe7e8e"
+  },
+  "portrait-mali": {
+    "file": "res://assets/art/portrait-mali.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "a9dbd0a27573c8a32dfcc5a2214c6d73a5d1d709ddf4622e4c63b5a867eccf86"
+  },
+  "portrait-may": {
+    "file": "res://assets/art/portrait-may.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "a81a240e202574d11e2e28df8d63c3273e321ac429164603078254a73bffb208"
+  },
+  "portrait-nan": {
+    "file": "res://assets/art/portrait-nan.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "b33cfd457435a250b92ea67e9d573695fbd719312156c26a116cd4e1c2c808d0"
+  },
+  "portrait-nok": {
+    "file": "res://assets/art/portrait-nok.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "4d65a2d8726b565e29738c05fb89a4559a4e8d156a32a2d73ed2c604038c35db"
+  },
+  "portrait-pim": {
+    "file": "res://assets/art/portrait-pim.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "a679420cb9877d8d22bfdbc9cd303ed1f432ec727250a2ed6ee71f4d5368d3f8"
+  },
+  "soi-1": {
+    "file": "res://assets/art/soi-1.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "209c5ed4f11766194be2f7ef5df9b19a91ba98ef0f364b258480617e3bedb680"
+  },
+  "soi-2": {
+    "file": "res://assets/art/soi-2.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "63417e947b73424cff0e91fa94ceee5be41c47729fc51ff0bcf4148575d0b1c1"
+  },
+  "soi-3": {
+    "file": "res://assets/art/soi-3.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "4b1ed8d3dfc4617f31a076d4ca9de2b8d13bf66811827394de66a39d93fc9716"
+  },
+  "toybox": {
+    "file": "res://assets/art/toybox.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "e45aa4441aa13c7af3f31efa28ba76176eb8a1dec32ce50fca1ff6506b1378c6"
+  }
+}

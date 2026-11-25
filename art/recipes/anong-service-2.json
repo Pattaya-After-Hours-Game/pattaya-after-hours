@@ -1,0 +1,8 @@
+{
+  "id": "anong-service-2",
+  "group": "anong-service",
+  "ref": "core-cast-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Anong, adult Thai woman with dark high ponytail, gold hoop earrings, navy sleeveless buttoned blouse, burgundy waist apron over dark skirt, black low heels. Pose: Walking opposite contact pose, right foot forward and left foot back, gentle opposite arm swing. Same scale and angle.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-18a05793-158c-4a2b-8376-5b9567e895e4.png"
+}

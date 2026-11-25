@@ -5,24 +5,15 @@ const Content = preload("res://scripts/content.gd")
 const StreetContent = preload("res://scripts/street_content.gd")
 const City = preload("res://scripts/city.gd")
 const District = preload("res://scripts/district.gd")
+const Art = preload("res://scripts/art.gd")
 const Fight = preload("res://scripts/fight.gd")
 const TEAL = Color("#71f9d2")
 const PINK = Color("#ff80b2")
 const GOLD = Color("#ffd083")
 const WHITE = Color("#f6e4f3")
 const MUTED = Color("#b8a9cb")
-const EDGE = Color("#3b2c54")
-const DARK = Color("#151027")
-const TAB_NAMES = ["Service","Events","Tours","Empire","Journal"]
-const PRACTICE_STOCK = 24
-const SHOT_GOAL = 10
-const SHOT_INTERVAL = 0.60
-const GODZILLA_SECONDS = 10.0
-const COMPACT_EFFECTS = {
-	"trust":"neighbors","supplier":"supplier","morale":"morale","fatigue":"fatigue",
-	"skill":"skill","condition":"condition","rival":"rivals","mine":"rig output",
-	"tour":"tours","route":"tour route","demand":"demand","capacity":"capacity","partner":"Anong trust",
-}
+const EDGE = Color("#79553e")
+const DARK = Color("#241820")
 const EFFECT_LABELS = {
 	"cash":"Till","reserve":"Reserve","debt":"Debt","stock":"Stock","rep":"Reputation",
 	"trust":"Neighborhood trust","partner":"Anong trust","safety":"Safety","heat":"Heat",
@@ -32,10 +23,26 @@ const EFFECT_LABELS = {
 	"mine":"Rig output factor","tour":"Tour adjustment","route":"Tour route level",
 	"demand":"Demand this wave","capacity":"Capacity this wave",
 }
+const COMPACT_EFFECTS = {
+	"trust":"neighbors","supplier":"supplier","morale":"morale","fatigue":"fatigue",
+	"skill":"skill","condition":"condition","rival":"rivals","mine":"rig output",
+	"tour":"tours","route":"tour route","demand":"demand","capacity":"capacity","partner":"Anong trust",
+}
+const TAB_NAMES = ["Service","Events","Tours","Empire","Journal"]
+const PRACTICE_STOCK = 24
+const SHOT_GOAL = 10
+const SHOT_INTERVAL = 0.60
+const GODZILLA_SECONDS = 10.0
 
 var model = Campaign.new()
 var campaign_before_tutorial: Campaign
 var show_tutorial_hint := false
+var offline_notice := 0
+var drawer_open := false
+var drawer: Control
+var event_banner: Button
+var scene_clock := 0.0
+var service_animation := 0.0
 var tab := 0
 var guide := 2
 var message := ""
@@ -57,8 +64,8 @@ var live_seconds := 0.0
 var save_seconds := 0.0
 var serve_delay := 0.0
 var refresh_street := false
-var confirmation := false
 var show_details := false
+var confirmation := false
 var godzilla_shots := 0
 var godzilla_time := 0.0
 var shot_delay := 0.0
@@ -67,6 +74,7 @@ var godzilla_meter_label: Label
 var godzilla_clock: Label
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var interface_font := FontVariation.new()
 	interface_font.base_font = ThemeDB.fallback_font
 	interface_font.fallbacks = [preload("res://assets/DejaVuSans.ttf")]
@@ -74,7 +82,7 @@ func _ready() -> void:
 	theme.default_font = interface_font
 	show_tutorial_hint = not model.load_game()
 	if not show_tutorial_hint:
-		model.street.claim_offline(int(Time.get_unix_time_from_system()))
+		offline_notice = model.street.claim_offline(int(Time.get_unix_time_from_system()))
 		save_state()
 	var config := ConfigFile.new()
 	if config.load("user://settings.cfg") == OK: muted = config.get_value("audio","muted",false)
@@ -111,6 +119,7 @@ func abs_text(parent: Control, rect: Rect2, value: String, px: int, tint: Color 
 	var element := Label.new()
 	element.position = rect.position
 	element.size = rect.size
+	element.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	element.text = value
 	element.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	element.add_theme_color_override("font_color",tint)
@@ -121,14 +130,15 @@ func abs_text(parent: Control, rect: Rect2, value: String, px: int, tint: Color 
 func button(value: String, call: Callable, primary: bool = false) -> Button:
 	var b := Button.new()
 	b.text = value
-	b.custom_minimum_size.y = 37
+	b.custom_minimum_size.y = 40
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.add_theme_font_size_override("font_size",15)
 	b.add_theme_color_override("font_color",Color("#111d22") if primary else WHITE)
 	b.add_theme_color_override("font_hover_color",Color("#111d22") if primary else WHITE)
 	b.add_theme_color_override("font_pressed_color",Color("#111d22") if primary else TEAL)
 	b.add_theme_color_override("font_focus_color",Color("#111d22") if primary else WHITE)
-	b.add_theme_stylebox_override("normal",box(TEAL if primary else Color("#231936"),TEAL.darkened(.15) if primary else EDGE))
-	b.add_theme_stylebox_override("hover",box(Color("#b2ffe8") if primary else Color("#352046"),PINK))
+	b.add_theme_stylebox_override("normal",box(TEAL if primary else Color("#2e2028"),TEAL.darkened(.15) if primary else EDGE))
+	b.add_theme_stylebox_override("hover",box(Color("#b2ffe8") if primary else Color("#49303a"),PINK))
 	b.add_theme_stylebox_override("pressed",box(Color("#a0ead8") if primary else Color("#3f2954"),TEAL))
 	var focus := box(Color.TRANSPARENT,GOLD)
 	focus.draw_center = false
@@ -171,6 +181,7 @@ func save_state() -> void:
 func change_tab(index: int) -> void:
 	confirmation = false
 	tab = index
+	drawer_open = true
 	message = ""
 	render()
 
@@ -185,93 +196,101 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
 	var practicing := campaign_before_tutorial != null
-	pane(root_ui,Rect2(0,0,960,540),Color("#100c1d"),Color("#100c1d"))
-	pane(root_ui,Rect2(0,0,960,3),PINK,PINK)
-	abs_text(root_ui,Rect2(17,7,360,26),"PATTAYA AFTER HOURS",24,WHITE)
-	var status: String = "%s · %s" % [model.weekday(),Content.WEATHER[int(model.s.weather)]]
-	abs_text(root_ui,Rect2(18,36,320,20),("PRACTICE SHIFT" if practicing else str(model.street.selected().name).to_upper())+"   /   "+status,13,GOLD if practicing else TEAL)
-	metric(355,"TILL",cash(model.s.cash) if model.s.cash < 100000 else "฿%.1fk" % (model.s.cash / 1000.0),TEAL)
-	metric(465,"STOCK",str(int(model.s.stock) if practicing else int(model.street.selected().stock)),GOLD)
-	metric(558,"REPUTATION",str(int(model.s.rep)),TEAL)
-	metric(676,"HEAT",str(int(model.s.heat)),PINK)
-	metric(762,"SHIFT","D%03d" % int(model.s.day),WHITE)
-	var tutorial_button := at_button(root_ui,Rect2(816,14,63,40),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
-	tutorial_button.disabled = model.s.phase == "godzilla"
-	at_button(root_ui,Rect2(883,14,62,40),"Muted" if muted else "Sound",set_sound)
-	pane(root_ui,Rect2(14,66,550,386),DARK)
+	pane(root_ui,Rect2(0,0,960,540),Color("#170f18"))
 	city = City.new()
-	city.position = Vector2(16,68)
-	city.size = Vector2(546,370)
+	city.position = Vector2(0,48)
+	city.size = Vector2(960,540)
 	city.clip_contents = true
+	city.clock = scene_clock
+	city.service_flash = service_animation
 	city.night = model.s.phase in ["incident","fight","report","godzilla"]
-	city.godzilla = model.s.night.get("godzilla","") if city.night else ""
-	city.guests = model.s.night.get("guests",0) if city.night else 0
+	city.godzilla = model.s.night.get("godzilla","")
+	city.guests = model.s.night.get("guests",0)
 	city.weather = int(model.s.weather)
 	city.level = int(model.s.level)
-	city.venue = int(model.s.venue)
-	city.rig = int(model.s.rig)
+	city.legacy_staff = model.s.staff
 	if not practicing:
 		city.bars = model.s.street.bars
+		city.street_state = model.s.street
 		city.selected_bar = int(model.s.street.selected)
 		city.street_event = model.s.street.event
-		city.godzilla = model.s.night.get("godzilla","")
-		city.select_bar.connect(select_bar)
-	city.site.connect(func(index: int):
-		if not practicing and model.s.phase == "plan": change_tab(index))
 	root_ui.add_child(city)
-	pane(root_ui,Rect2(16,438,546,14),Color("#251a36"),EDGE)
-	var district_status := "SERVICE LIVE" if city.night else "THE SOI IS OPEN"
-	match city.godzilla:
-		"attack": district_status = "GODZILLA AT THE DOOR"
-		"asleep": district_status = "GODZILLA ASLEEP OUT FRONT"
-		"scared": district_status = "BAR EMPTY"
-	abs_text(root_ui,Rect2(24,435,527,19),"AFTER HOURS SOI   /   "+district_status,10,WHITE)
-	pane(root_ui,Rect2(14,461,550,65),DARK)
+	# Full-width scene, with all live text rendered at the UI resolution.
+	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
+	abs_text(root_ui,Rect2(14,4,235,24),"PATTAYA / AFTER HOURS",19,GOLD)
+	abs_text(root_ui,Rect2(14,27,245,16),"PRACTICE SHIFT" if practicing else str(model.street.selected().name)+" · "+model.weekday(),12,TEAL)
+	metric(268,"TILL",cash(model.s.cash),TEAL)
+	metric(377,"STOCK",str(int(model.s.stock) if practicing else int(model.street.selected().stock)),GOLD)
+	metric(462,"REPUTATION",str(int(model.s.rep)),TEAL)
+	metric(570,"HEAT",str(int(model.s.heat)),PINK)
+	metric(644,"SHIFT","D%03d" % int(model.s.day),WHITE)
+	var tutorial_button := at_button(root_ui,Rect2(748,5,92,37),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
+	tutorial_button.disabled = model.s.phase == "godzilla"
+	at_button(root_ui,Rect2(848,5,98,37),"Muted" if muted else "Sound",set_sound)
+	event_banner = null
+	if not practicing and not model.s.street.event.is_empty():
+		event_banner = at_button(root_ui,Rect2(14,56,540,36),"",change_tab.bind(1))
+		event_banner.add_theme_color_override("font_color",PINK)
+		var banner_text := func() -> String:
+			var e: Dictionary = model.s.street.event
+			if e.is_empty(): return ""
+			return "%s · %s · %ds  ›" % ["SOON" if e.phase == "warning" else "LIVE",StreetContent.EVENTS[int(e.id)][0],e.remaining]
+		event_banner.text = banner_text.call()
+		live_labels.append([event_banner,banner_text])
+	# Property cards remain selectable without opening management.
+	if not practicing:
+		for i in 8:
+			var occupied: bool = i < model.s.street.bars.size()
+			var card := at_button(root_ui,Rect2(14+i*67,421,62,55),"",select_bar.bind(i) if occupied else change_tab.bind(3),occupied and i == model.s.street.selected)
+			card.name = "Property%d" % i
+			card.clip_contents = true
+			card.disabled = model.s.phase != "plan"
+			card.tooltip_text = str(model.s.street.bars[i].name) if occupied else "Available lease · open Empire"
+			if occupied:
+				var b: Dictionary = model.s.street.bars[i]
+				var thumb := TextureRect.new()
+				thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				thumb.texture = Art.venue(int(b.type),int(b.stage))
+				thumb.position = Vector2(3,3)
+				thumb.size = Vector2(56,32)
+				thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				card.add_child(thumb)
+				abs_text(card,Rect2(2,34,58,18),"%d · %s %d" % [i+1,["BEER","SOI","GOGO"][int(b.type)],b.stage],10,Color("#241820") if i == model.s.street.selected else GOLD)
+			else:
+				card.text = "+\nLEASE"
+				card.add_theme_font_size_override("font_size",11)
 	var first_shift := show_tutorial_hint and not practicing
-	var results: Array = model.s.night.get("results",[]) if city.night else []
-	if results.is_empty():
-		abs_text(root_ui,Rect2(26,467,265,20),"YOUR FIRST SHIFT" if first_shift else "THE SHIFT LOG",13,GOLD)
-		var log_text := "Serve drinks, upgrade the bar, then hire your team." if first_shift else str(model.s.log.front()).left(61)
-		abs_text(root_ui,Rect2(26,490,410,24),log_text,14,MUTED)
-	else:
-		var last: Dictionary = results.back()
-		var heading := abs_text(root_ui,Rect2(26,465,524,17),result_heading(last),13,TEAL if last.worked else PINK)
-		heading.clip_text = true
-		var detail := abs_text(root_ui,Rect2(26,482,524,27),effect_text(last.changes,true),12,WHITE)
-		detail.clip_text = true
-		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		detail.max_lines_visible = 2
-		var wave: Dictionary = model.s.night.get("last_wave",{})
-		if not wave.is_empty():
-			var limit := " · "+str(wave.limit) if not str(wave.limit).is_empty() else ""
-			abs_text(root_ui,Rect2(26,509,524,15),"Last wave: %d served · %s sales · %d missed%s" % [
-				wave.served,cash(wave.sales),wave.missed,limit],12,MUTED)
+	var log_text := "Serve → upgrade → hire → grow" if first_shift else str(model.s.log.front())
+	pane(root_ui,Rect2(14,390,540,27),Color("#21161fdd"))
+	var note := abs_text(root_ui,Rect2(20,393,530,22),message if not message.is_empty() else log_text,13,GOLD)
+	note.clip_text = true
+	pane(root_ui,Rect2(0,482,960,58),Color("#21161ff8"))
+	for index in TAB_NAMES.size():
+		var b := at_button(root_ui,Rect2(14+index*88,490,82,40),TAB_NAMES[index],toggle_drawer.bind(index),drawer_open and tab == index)
+		b.add_theme_font_size_override("font_size",13)
+		b.disabled = model.s.phase != "plan" or practicing
+	var walk := at_button(root_ui,Rect2(459,490,116,40),"Walk district",walk_district)
+	walk.disabled = practicing or model.s.phase != "plan"
+	drawer = Control.new()
+	drawer.position = Vector2(570,54)
+	drawer.size = Vector2(380,422)
+	root_ui.add_child(drawer)
+	pane(drawer,Rect2(0,0,380,422),Color("#241820f7"))
+	abs_text(drawer,Rect2(16,5,290,30),"SHIFT DESK" if practicing or model.s.phase != "plan" else TAB_NAMES[tab].to_upper(),16,GOLD)
 	if not practicing and model.s.phase == "plan":
-		at_button(root_ui,Rect2(435,473,117,41),"Walk district",walk_district)
-	pane(root_ui,Rect2(576,66,370,460),DARK)
-	if model.s.phase == "plan" and not practicing:
-		for index in TAB_NAMES.size():
-			var b := at_button(root_ui,Rect2(582 + 71*index,72,69,37),TAB_NAMES[index],change_tab.bind(index),tab == index)
-			b.add_theme_font_size_override("font_size",13)
-	elif model.s.phase in ["incident","report"]:
-		var section := "SHIFT SUMMARY"
-		var details := "Shift log"
-		if model.s.phase == "incident":
-			section = "WAVE %d / %d" % [int(model.s.night.wave)+1,2 if model.s.hours == 0 else 3]
-			details = "Story"
-		abs_text(root_ui,Rect2(586,72,220,37),section,13,GOLD)
-		at_button(root_ui,Rect2(842,72,94,37),"Hide" if show_details else details,toggle_details)
+		at_button(drawer,Rect2(324,4,48,36),"×",close_drawer)
 	scroll = ScrollContainer.new()
-	scroll.position = Vector2(586,119)
-	scroll.size = Vector2(350,330)
+	scroll.position = Vector2(14,44)
+	scroll.size = Vector2(352,366)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	scroll.scroll_deadzone = 8
-	root_ui.add_child(scroll)
+	drawer.add_child(scroll)
 	column = VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.add_theme_constant_override("separation",7)
+	column.add_theme_constant_override("separation",9)
 	scroll.add_child(column)
+	drawer.visible = drawer_open or practicing or model.s.phase != "plan"
 	var action_label := ""
 	var action: Callable
 	match model.s.phase:
@@ -279,10 +298,11 @@ func render(keep_scroll: bool = false) -> void:
 			if practicing:
 				title("1 / 3    Stock the bar")
 				if model.s.stock == PRACTICE_STOCK:
-					body("Buy stock to open the bar.")
+					body("Check STOCK at the top. Every two guests use one unit. Buy a delivery before opening.")
 					row_button(stock_label(),do_action.bind("buy"),true)
 				else:
-					body("Stock is ready. Open the doors.",TEAL)
+					body("Delivery in. Open the doors to serve two waves of guests.",TEAL)
+				body("Dao, Mali, and Fern are on tonight. In the campaign, give tired staff a night off.")
 			else:
 				match tab:
 					0: service_panel()
@@ -292,10 +312,29 @@ func render(keep_scroll: bool = false) -> void:
 					4: journal_panel()
 			action_label = "Open the doors" if practicing else "Serve a drink"
 			action = begin if practicing else street_action.bind("serve")
+		"guided":
+			title("Guided shift · live service")
+			live_body(func() -> String: return "Wave %d/3 · %ds into this shift" % [int(model.s.street.guided.wave)+1,model.s.street.seconds],GOLD)
+			street_panel()
+			action_label = "Serve a drink"
+			action = street_action.bind("serve")
+		"guided_choice":
+			title(["Open the doors","The rush","Last call"][int(model.s.street.guided.wave)])
+			body("Anong: Read the room. Customers and stock are real; choosing a response does not skip the clock.")
+			row_button("Serve a waiting order",choose.bind(0))
+			row_button("Welcome passersby",choose.bind(1))
+			action_label = "Continue normal service"
+			action = choose.bind(2)
+		"guided_report":
+			title("Guided shift complete")
+			shift_report(model.street.selected())
+			body("The same live ledger has already recorded these results. Returning to the street adds no extra money or time.")
+			action_label = "Back to the street"
+			action = advance
 		"incident":
 			if practicing:
 				title("2 / 3    Run the shift")
-				body("Pick a response. The result appears below the map.")
+				body("Choose a response to serve the next wave. Spending can help service or relationships.")
 			incident_panel()
 			action_label = "Scale back service"
 			action = func():
@@ -304,7 +343,7 @@ func render(keep_scroll: bool = false) -> void:
 		"report":
 			if practicing:
 				title("3 / 3    Check the books")
-				body("Check the net and how many guests you served.")
+				body("Compare sales with payroll and fees. Check guests turned away and stock used before planning tomorrow.")
 			report_panel()
 			if practicing:
 				action_label = "Finish tutorial"
@@ -325,20 +364,44 @@ func render(keep_scroll: bool = false) -> void:
 			body("Mali is ready to return to the floor.")
 			action_label = "Resume the fight"
 			action = enter_fight.bind(false)
-	if not message.is_empty():
-		var note := abs_text(root_ui,Rect2(588,454,344,27),message,12,PINK)
-		note.clip_text = true
-	elif model.s.phase == "incident":
-		var chance: int = model.response_risk(Campaign.SCALE_BACK).chance
-		abs_text(root_ui,Rect2(588,454,344,27),"Scale back · %d%% contained / %d%% worse" % [chance,100-chance],12,MUTED)
-	var primary := at_button(root_ui,Rect2(585,480,352,37),action_label,action,true)
+	var live_service: bool = not practicing and model.s.phase in ["plan","guided"]
+	var primary := at_button(root_ui,Rect2(594,490,170 if live_service else 352,40),action_label,action,true)
+	if live_service:
+		at_button(root_ui,Rect2(774,490,172,40),"Welcome customers",street_action.bind("welcome"))
+		var demand_note := abs_text(root_ui,Rect2(14,100,540,42),"",14,GOLD)
+		live_labels.append([demand_note,func() -> String:
+			var bar: Dictionary = model.street.selected()
+			return "%d/%d customers · %d orders waiting\n%s" % [bar.customers.size(),model.street.economy.seats(bar),model.street.economy.pending(bar),model.street.economy.forecast(bar).reason]])
+		demand_note.text = live_labels.back()[1].call()
 	primary.disabled = practicing and model.s.phase == "plan" and model.s.stock == PRACTICE_STOCK
-	if previous > 0:
-		scroll.set_deferred("scroll_vertical",previous)
+	if offline_notice > 0 and not practicing:
+		var shade := ColorRect.new()
+		shade.size = Vector2(960,540)
+		shade.color = Color(0.04,0.02,0.05,.65)
+		shade.mouse_filter = Control.MOUSE_FILTER_STOP
+		root_ui.add_child(shade)
+		var welcome := pane(root_ui,Rect2(200,155,560,200),Color("#241820"),GOLD)
+		abs_text(welcome,Rect2(24,15,500,35),"WELCOME BACK",23,GOLD)
+		abs_text(welcome,Rect2(24,59,500,30),"Estimated managed profit: "+cash(offline_notice)+" net.",21,TEAL)
+		abs_text(welcome,Rect2(24,96,500,26),"Demand and costs included · estimates in Journal",14,MUTED)
+		at_button(welcome,Rect2(24,142,512,40),"Back to the street",func():
+			offline_notice = 0
+			render(),true)
+	if previous > 0: scroll.set_deferred("scroll_vertical",previous)
+
+func toggle_drawer(index: int) -> void:
+	if drawer_open and tab == index:
+		close_drawer()
+	else:
+		change_tab(index)
+
+func close_drawer() -> void:
+	drawer_open = false
+	render()
 
 func metric(x: int,name_text: String,value: String,tint: Color) -> void:
-	abs_text(root_ui,Rect2(x,7,124,17),name_text,11,MUTED)
-	var label := abs_text(root_ui,Rect2(x,25,124,25),value,20,tint)
+	abs_text(root_ui,Rect2(x,3,105,15),name_text,11,MUTED)
+	var label := abs_text(root_ui,Rect2(x,20,105,24),value,18,tint)
 	if campaign_before_tutorial == null:
 		live_labels.append([label,func() -> String:
 			match name_text:
@@ -368,6 +431,24 @@ func body(value: String,tint: Color = MUTED, px: int = 15) -> Label:
 	element.add_theme_font_size_override("font_size",px)
 	column.add_child(element)
 	return element
+
+func character_card(id: String, heading: String, detail: String) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation",10)
+	column.add_child(row)
+	var portrait := TextureRect.new()
+	portrait.texture = Art.texture("portrait-"+id)
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.custom_minimum_size = Vector2(56,56)
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	row.add_child(portrait)
+	var description := Label.new()
+	description.text = heading+"\n"+detail
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	description.add_theme_color_override("font_color",WHITE)
+	description.add_theme_font_size_override("font_size",13)
+	row.add_child(description)
 
 func row_button(value: String, call: Callable, primary: bool = false) -> void:
 	column.add_child(button(value,call,primary))
@@ -411,19 +492,17 @@ func advance() -> void:
 
 func start_tutorial() -> void:
 	if campaign_before_tutorial != null: return
-	show_details = false
 	campaign_before_tutorial = model
 	show_tutorial_hint = false
 	confirmation = false
 	message = ""
-	model = Campaign.new(72)
+	model = Campaign.new(72,true)
 	model.s.stock = PRACTICE_STOCK
 	model.s.hours = 0
 	render()
 
 func finish_tutorial() -> void:
 	if campaign_before_tutorial == null: return
-	show_details = false
 	model = campaign_before_tutorial
 	campaign_before_tutorial = null
 	message = ""
@@ -435,53 +514,39 @@ func stock_label() -> String:
 
 func service_panel() -> void:
 	street_panel()
-	title("Run a managed shift")
-	body("Optional: take the Blue Hour through three service waves. Street time pauses during decisions; this shift uses the original bar stock and rota.")
+	title("Guided service")
+	body("Optional three-wave guidance uses the same customers, stock and two-minute clock. Choices cannot skip time or generate extra sales.")
 	row_button("Open managed shift",begin)
-	body("Managed-shift stock: %d" % model.s.stock,GOLD,13)
-	body("%s traffic expected. Standard shifts have three waves." % ("Heavy" if model.s.forecast >= 9 else "Light" if model.s.forecast < 0 else "Steady"))
-	row_pair("Hours: "+Campaign.HOURS[int(model.s.hours)],cycle.bind("hours",Campaign.HOURS),
-		Campaign.PROMOS[int(model.s.promo)],cycle.bind("promo",Campaign.PROMOS))
-	row_pair(stock_label(),do_action.bind("buy"),"Hire · ฿980",do_action.bind("hire"))
-	body("TEAM ROTA    /    FATIGUE · MORALE",GOLD,12)
-	for i in model.s.staff.size():
-		var staff: Dictionary = model.s.staff[i]
-		var profile: Array = Content.STAFF[int(staff.id)]
-		body("%s  ·  %s\nSkill %d    Fatigue %d    Morale %d" % [profile[0], profile[1],staff.skill,staff.fatigue,staff.morale],WHITE,13)
-		row_pair("Paid leave" if staff.hurt else "On rota" if staff.work else "Off duty",do_action.bind("rota",i),
-			"Train · ฿410",do_action.bind("train",i))
-	body("Supplier reliability %d · Regulars %d" % [model.s.supplier,model.s.regulars],MUTED,13)
-	row_button("Close tonight for team recovery",func():
-		model.rest()
-		commit())
 
 func events_panel() -> void:
 	street_event_panel()
-	title("What's on tonight?")
-	var disrupted: int = model.event_disruption_percent()
-	var canceled := disrupted * Campaign.CANCEL_IF_DISRUPTED
-	body("%d%% on time · %.1f%% delayed · %.1f%% canceled
-Booking fee applies if canceled." % [100-disrupted,disrupted-canceled,canceled])
-	for i in Content.EVENTS.size():
-		var item: Array = Content.EVENTS[i]
-		var value: String = item[0]+(" · "+cash(item[1]) if item[1] else "")
-		row_button(value,func():
-			model.s.event = i
-			message = "%s selected." % item[0]
-			commit(true), i == model.s.event)
-	body("SECURITY & NEIGHBORS",GOLD,12)
-	for i in Campaign.SECURITY.size():
-		var crew: String = Campaign.SECURITY[i]
-		row_button(crew+[" · no fee"," · ฿480"," · ฿255 / draws heat"][i],func():
-			model.s.security = i
-			commit(true),i == model.s.security)
+	title("Venue promotions")
+	var bar: Dictionary = model.street.selected()
+	body("One promotion for two minutes, then a two-minute cooldown. Repeated promotions have less pull. Check your seats and service first.")
+	live_body(func() -> String: return "Operating costs: ฿%d/min · break-even %.1f drinks/min" % [model.street.economy.operating_rate(bar),model.street.economy.forecast(bar).break_even],GOLD,13)
+	for i in StreetContent.PROMOTIONS.size():
+		var offer: Dictionary = StreetContent.PROMOTIONS[i]
+		row_button("%s · %s" % [offer.name,cash(offer.fee)],street_action.bind("promotion",i))
+		body(offer.help,MUTED,13)
+		var estimate: Dictionary = model.street.economy.forecast(bar,false,i)
+		body("With promotion fee: break-even %.1f drinks/min · estimated staff-only net %s/min." % [estimate.break_even,cash(estimate.net)],MUTED,12)
+	promotion_report(bar)
 	body("TOYBOX ARCADE",GOLD,12)
-	row_pair("Quick spar",enter_fight.bind(true), "Run the circuit",enter_fight.bind(true,true))
+	row_pair("Quick spar",enter_fight.bind(true),"Run the circuit",enter_fight.bind(true,true))
+
+func promotion_report(bar: Dictionary) -> void:
+	live_body(func() -> String:
+		if not bar.promo.is_empty(): return "%s · %ds remaining · attraction ÷ %d" % [StreetContent.PROMOTIONS[int(bar.promo.kind)].name,bar.promo.remaining,bar.promo.repetition]
+		return "Promotion cooldown: %ds" % bar.promo_cooldown if bar.promo_cooldown>0 else "Ready to promote.",TEAL,14)
+	if bar.promo_report.is_empty(): return
+	var report: Dictionary = bar.promo_report
+	body("LAST PROMOTION · "+StreetContent.PROMOTIONS[int(report.kind)].name,GOLD,13)
+	live_body(func() -> String: return "Pool revenue %s · %d free games\nFees forgone %s\nAttributed customers %d · regulars %d · lost to queues %d\nAttributed drinks %s · stock %s\nShift operating costs %s · promotion fee %s\nAttributed contribution after these costs %s\nBaseline visitors without promotion: %.1f (estimate)" % [cash(report.pool_revenue),report.free_games,cash(int(report.free_games)*50),report.customers,report.regulars,report.lost,cash(report.drink_revenue),cash(report.drink_cost),cash(report.operating),cash(report.fee),cash(int(report.drink_revenue)+int(report.pool_revenue)-int(report.drink_cost)-int(report.operating)-int(report.fee)),float(report.baseline)],WHITE,13)
 
 func tours_panel() -> void:
 	title("City tours")
-	body("Short tours 1 wave · Long tours 2 waves
-Guides get paid if a tour is disrupted.")
+	character_card(Art.STAFF[int(model.s.staff[guide].id)],"Your guide","Voluntary bookings · fair splits")
+	body("Pay a guide upfront to recommend your street this shift. Guides increase its appeal to existing passersby; they do not generate guaranteed ticket income.")
 	var crew: Array = model.s.staff
 	row_pair("Guide: "+Content.STAFF[crew[guide].id][0],func():
 		guide = (guide+1)%crew.size()
@@ -494,9 +559,7 @@ Guides get paid if a tour is disrupted.")
 		row_button(("%s  ·  %s" % [item[0],"Confirmed" if booked else "Short" if item[2] == 1 else "Long"]),func():
 			message = model.booking(guide,i)
 			commit(true),booked)
-		var chance: int = model.tour_disruption_percent(crew[guide],i)
-		var risk_text := declined if not declined.is_empty() else "%d%% disruption" % chance
-		body("%s ticket · %s pay · %s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i)),risk_text],MUTED,12)
+		body("%s route listing · %s guide pay%s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i))," / "+declined if not declined.is_empty() else ""],MUTED,12)
 	body("%d guide bookings tonight" % model.s.bookings.size(),GOLD,13)
 
 func empire_panel() -> void:
@@ -509,7 +572,7 @@ func empire_panel() -> void:
 	for kind in StreetContent.TYPES.size():
 		var info: Dictionary = StreetContent.TYPES[kind]
 		row_button("Buy %s · %s" % [info.name,cash(model.street.purchase_cost(kind))],street_action.bind("buy",kind))
-		body("Needs chapter 2 · %d reputation" % info.rep,MUTED,12)
+		body("Needs chapter 2 · %d reputation\nBare premises: ฿%d/min plus staff; opening reserve ฿%d.\nOne bartender: break-even %.1f drinks/min before pool." % [info.rep,StreetContent.OVERHEAD[kind],model.street.opening_reserve(kind),float(StreetContent.OVERHEAD[kind]+StreetContent.ROLE_WAGES[0])/(int(info.drink)-StreetContent.STOCK_COST)],MUTED,12)
 	row_button("Host After Hours Street Festival",street_action.bind("festival"))
 	body("Needs stage 3 in all three bar types. A warned district boss event completes the first story arc.")
 	body("Anong · %d trust / Neighbours · %d trust\nSafety %d / Permits %d" % [model.s.partner,model.s.trust,model.s.safety,model.s.license],WHITE,14)
@@ -540,6 +603,7 @@ func street_action(id: String,index: int = 0) -> void:
 	if id == "serve":
 		if serve_delay > 0: return
 		serve_delay = 0.2
+		if model.street.economy.pending(model.street.selected())>0: service_animation = 0.7
 	message = model.street.action(id,index)
 	commit(true)
 
@@ -554,32 +618,67 @@ func chapter_panel() -> void:
 
 func street_panel() -> void:
 	var bar: Dictionary = model.street.selected()
+	var eco = model.street.economy
 	var info: Dictionary = StreetContent.TYPES[int(bar.type)]
 	title(bar.name)
 	body("%s · Stage %d/3\n%s" % [info.name,bar.stage,info.stages[int(bar.stage)-1][0]],TEAL,16)
-	body(info.stages[int(bar.stage)-1][1],WHITE,14)
-	live_body(func() -> String: return "฿%d / min net · %d drinks · %d/%d staff available\nStreet ฿%d / min · Offline ฿%d / min (8h cap)" % [model.street.net_rate(bar),bar.stock,model.street.available(bar),bar.crew,model.street.total_rate(),model.street.total_rate(true)],GOLD,14)
-	live_body(func() -> String: return "Reopens in %ds" % bar.closed if bar.closed > 0 else "Next shift in %ds · staff bookings reset" % (model.street.SHIFT_SECONDS-int(model.s.street.seconds)),MUTED,12)
+	live_body(func() -> String:
+		var view: Dictionary = eco.forecast(bar)
+		return "Demand %.1f drinks/min · Staff service %.1f/min\n%d orders waiting · %d/%d customers · %d drinks in stock\nRecent actual net %s/min · Forecast automatic net %s/min\nOperating costs %s/min · Break-even %.1f drinks/min\n%s" % [view.demand,view.service,eco.pending(bar),bar.customers.size(),eco.seats(bar),bar.stock,cash(eco.actual_rate(bar)),cash(view.net),cash(view.costs),view.break_even,view.reason],GOLD,14)
+	row_button("Close venue" if bar.open else "Reopen venue",street_action.bind("open"))
+	if not bar.open:
+		body(bar.close_reason,PINK,13)
+		row_button("Owner-run recovery shift",street_action.bind("recovery"))
 	row_button("Restock fridge · ฿14 per drink",street_action.bind("stock"))
-	if bar.crew < model.street.staff_limit(bar):
-		row_button("Hire %s · %s" % [["server","adult host","adult dancer"][int(bar.type)],cash(600*(int(bar.crew)+1))],street_action.bind("hire"))
+	live_body(func() -> String: return "Next shift in %ds" % (model.street.SHIFT_SECONDS-int(model.s.street.seconds)),MUTED,12)
+	if bar.equipment.pool>0:
+		body("POOL · ฿50 PER GAME",GOLD,14)
+		live_body(func() -> String:
+			var timers := []
+			for game in bar.games: timers.append("%ds (%s)" % [game.remaining,"free" if game.fee==0 else "paid"])
+			return "%d/%d tables busy · %d waiting\n%s\n%d games · %s pool income · %d free games" % [bar.games.size(),bar.equipment.pool,eco.pool_queue(bar).size(),", ".join(timers),bar.pool_games,cash(bar.pool_income),bar.free_games],WHITE,13)
+	body("EQUIPMENT",GOLD,14)
+	for i in StreetContent.EQUIPMENT.size():
+		var item: Dictionary = StreetContent.EQUIPMENT[i]
+		if bar.equipment[item.id]>=item.max or (item.id=="pool" and bar.type!=0): continue
+		row_button("%s · %s" % [item.name,cash(int(item.cost)*(int(bar.equipment[item.id])+1))],street_action.bind("equipment",i))
+		body(item.help,MUTED,12)
+	if bar.type==2:
+		live_body(func() -> String: return "Performance: %s · dancers attract; bartenders serve." % ("on stage" if int(model.s.street.seconds) in range(40,80) else "next set at 40s into each shift"),TEAL,13)
+	body("TEAM & PAYROLL",GOLD,14)
+	if bar.crew<model.street.staff_limit(bar):
+		for role in 3:
+			if role>0 and role!=bar.type: continue
+			row_button("Hire %s · %s" % [StreetContent.ROLE_NAMES[role].to_lower(),cash(600*(int(bar.crew)+1))],street_action.bind("hire",role))
+			body("Adds ฿%d/min. Forecast break-even after hire: %.1f drinks/min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool)/maxf(1,eco.price(bar)-StreetContent.STOCK_COST)),"Serves waiting orders." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
+	for i in bar.team.size():
+		var person: Dictionary = bar.team[i]
+		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
+		if person.role==1: name_text = StreetContent.HOSTS[int(person.host)][0]
+		row_button("%s · %s" % [name_text,"On duty" if person.on else "Off duty"],street_action.bind("rota",i))
+		if bar.type>0: row_button("Reassign role · "+name_text,street_action.bind("role",i))
+		if person.role==1:
+			body(StreetContent.HOSTS[int(person.host)][1],MUTED,12)
+			row_button("Bar-fine request · "+name_text,street_action.bind("bar_fine",i))
+	if bar.type==1: live_body(func() -> String: return "%d actual customer requests · %d hosts away" % [bar.host_requests.size(),bar.away.size()],MUTED,12)
 	if not bar.restock: row_button("Automate deliveries · ฿900",street_action.bind("restock"))
 	if not bar.manager:
 		row_button("Appoint manager · ฿1,800",street_action.bind("manager"))
-		body("Needs stage 2, one staff member and deliveries. Unlocks offline net earnings.",MUTED,12)
-	else: body("Manager on duty · staff, stock and overhead included in offline net.",TEAL,12)
-	if bar.stage < 3:
-		row_button("Upgrade · " + cash(model.street.upgrade_cost(bar)),street_action.bind("upgrade"),true)
-		body("Next: " + info.stages[int(bar.stage)][0],MUTED,12)
-	if bar.type == 1:
-		body("ADULT HOSTS · UPSTAIRS OFF-SCREEN",GOLD,12)
-		for i in int(bar.crew):
-			body("%s · %s" % [StreetContent.HOSTS[i][0],StreetContent.HOSTS[i][1]],WHITE,13)
-			row_button("Away until next shift" if i in bar.away else "Request bar fine · %s" % StreetContent.HOSTS[i][0],street_action.bind("bar_fine",i))
-		body("%d room(s). Accepted requests pay ฿%d net; the host leaves service until the next shift." % [bar.stage,200*int(bar.stage)],MUTED,12)
-	street_event_panel()
+		body("Needs stage 2, a bartender, deliveries and eight healthy shifts. Adds ฿12/min; unlocks demand-limited offline earnings.",MUTED,12)
+	else: body("Manager on duty · offline estimate uses demand, capacity and costs.",TEAL,12)
+	if bar.stage<3:
+		row_button("Upgrade · "+cash(model.street.upgrade_cost(bar)),street_action.bind("upgrade"),true)
+		live_body(func() -> String: return eco.upgrade_reason(bar),MUTED,13)
+	shift_report(bar)
 	chapter_panel()
+	row_button("Promotions & free pool",change_tab.bind(1))
 	row_button("View street & buy bars",change_tab.bind(3))
+
+func shift_report(bar: Dictionary) -> void:
+	if bar.last_shift.is_empty(): return
+	var report: Dictionary = bar.last_shift
+	body("LAST SHIFT",GOLD,14)
+	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
 
 func street_event_panel() -> void:
 	var event: Dictionary = model.s.street.event
@@ -589,7 +688,7 @@ func street_event_panel() -> void:
 	body(info[1],WHITE,14)
 	body([
 		"Without a generator: a 20-second closure.",
-		"Higher takings during shore leave; relief cover increases the bonus.",
+		"More shore-leave customers; stock, seats and service still limit sales.",
 		"Prepare or maintain permits (75) and safety (65). Gaps can mean a fine and 40-second closure.",
 		"Pumps or neighbour trust (60) prevent a 40-second closure. Helping builds trust.",
 		"Beer bars benefit most. Unprotected equipment closes for 20 seconds.",
@@ -597,7 +696,7 @@ func street_event_panel() -> void:
 		"Beer bars retain regular trade; premium venues slow down. A locals' night builds regulars.",
 		"Promote your lineup to capture overflow; otherwise expect quieter trade.",
 		"Preparation adds four seconds to the challenge. A loss closes venues for 30 seconds.",
-		"Double takings during the festival. Preparation adds four seconds against Godzilla."
+		"Double street traffic during the festival. Preparation adds four seconds against Godzilla."
 	][int(event.id)],MUTED,12)
 	live_body(func() -> String: return "%s · %ds · %s" % ["Starts in" if event.phase == "warning" else "Time remaining",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,14)
 	if event.phase == "warning" and not event.prepared:
@@ -608,12 +707,18 @@ func street_event_panel() -> void:
 			commit(),true)
 
 func journal_panel() -> void:
+	character_card("anong","Anong","The street, the stories, and the books.")
 	chapter_panel()
 	body("STREET STORIES",GOLD,12)
 	for line in model.s.street.history: body(str(line),WHITE,13)
+	if not model.s.street.offline_report.is_empty():
+		var report: Dictionary = model.s.street.offline_report
+		body("LAST OFFLINE ESTIMATE",GOLD,14)
+		body("%d minutes · %d customers served\nIncome %s · costs %s · net %s" % [int(report.seconds)/60,report.customers,cash(report.get("income",report.net)),cash(report.get("costs",0)),cash(report.net)],WHITE,13)
+		for note in report.notes: body(str(note),MUTED,12)
 	title("Anong's books")
 	body("Week %d · Till %s · Reserve %s
-Rent and permits due on Tuesday." % [model.week(),cash(model.s.cash),cash(model.s.reserve)])
+Live overhead includes premises costs." % [model.week(),cash(model.s.cash),cash(model.s.reserve)])
 	week_lines(model.s.weekly)
 	if not model.s.last_week.is_empty(): week_lines(model.s.last_week)
 	body("RECENT SHIFTS",GOLD,12)
@@ -631,6 +736,7 @@ func toggle_details() -> void:
 func incident_panel() -> void:
 	var card: Array = model.current_card()
 	title(card[0],PINK)
+	row_button("Hide" if show_details else "Story",toggle_details)
 	if show_details: body(card[1],WHITE)
 	for i in range(2,card.size(),2):
 		var effects: Dictionary = card[i+1]
@@ -704,7 +810,7 @@ func godzilla_panel() -> void:
 	godzilla_meter.add_theme_stylebox_override("fill",box(PINK,PINK))
 	column.add_child(godzilla_meter)
 	godzilla_clock = body("",TEAL,19)
-	body("Tap or press Space when the glass is ready.",MUTED,14)
+	body("Tap Serve a shot or press Space. Give the glass a moment to refill between shots.",MUTED,14)
 	update_godzilla_panel()
 
 func update_godzilla_panel() -> void:
@@ -726,18 +832,24 @@ func serve_godzilla() -> void:
 	else:
 		update_godzilla_panel()
 
+func street_ui_state() -> Array:
+	var bar: Dictionary = model.street.selected()
+	return [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day,model.s.phase,bar.open,bar.promo.is_empty()]
+
 func _process(delta: float) -> void:
+	scene_clock += delta
+	service_animation = maxf(0,service_animation-delta)
 	serve_delay = maxf(0.0,serve_delay-delta)
 	if campaign_before_tutorial == null:
 		live_seconds += minf(delta,1.0)
 		save_seconds += minf(delta,1.0)
 		if live_seconds >= 1.0:
 			live_seconds -= 1.0
-			var before := "%s:%s:%s:%s" % [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day]
+			var before := street_ui_state()
 			model.street.tick(1)
-			var after := "%s:%s:%s:%s" % [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day]
+			var after := street_ui_state()
 			refresh_street = refresh_street or before != after
-			if refresh_street and model.s.phase == "plan" and not is_instance_valid(fight) and not is_instance_valid(district): render(true)
+			if refresh_street and model.s.phase in ["plan","guided","guided_choice","guided_report"] and not is_instance_valid(fight) and not is_instance_valid(district): render(true)
 			for entry in live_labels:
 				if is_instance_valid(entry[0]): entry[0].text = entry[1].call()
 		if save_seconds >= 15.0:
@@ -769,6 +881,7 @@ func report_panel() -> void:
 	body("Bar %s · Payroll %s · Fees %s\nStock used %d · Tour tickets %d" % [
 		cash(n.gross),cash(n.wages),cash(n.fees),n.sold,n.tours],WHITE,14)
 	if int(model.s.day)%7 == 0: week_lines(model.s.last_week)
+	row_button("Hide" if show_details else "Shift log",toggle_details)
 	if not show_details: return
 	var results: Array = n.get("results",[])
 	if not results.is_empty():
@@ -856,14 +969,14 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if campaign_before_tutorial == null: save_state()
 	if what == NOTIFICATION_APPLICATION_RESUMED and campaign_before_tutorial == null:
-		model.street.claim_offline(int(Time.get_unix_time_from_system()))
+		offline_notice = model.street.claim_offline(int(Time.get_unix_time_from_system()))
 		save_state()
 		refresh_street = true
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if is_instance_valid(district): close_district()
 		elif is_instance_valid(fight): leave_fight(fight.result if fight.over else false)
 		elif campaign_before_tutorial != null: finish_tutorial()
-		elif tab != 0 and model.s.phase == "plan": change_tab(0)
+		elif drawer_open and model.s.phase == "plan": close_drawer()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if model.s.phase == "godzilla" and event is InputEventKey and event.physical_keycode == KEY_SPACE and event.pressed and not event.echo:
@@ -872,3 +985,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif campaign_before_tutorial != null and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		finish_tutorial()
+
+	elif event.is_action_pressed("ui_cancel") and drawer_open and model.s.phase == "plan":
+		get_viewport().set_input_as_handled()
+		close_drawer()

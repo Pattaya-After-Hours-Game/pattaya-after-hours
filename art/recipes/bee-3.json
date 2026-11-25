@@ -1,0 +1,12 @@
+{
+  "id": "bee-3",
+  "group": "bee",
+  "ref": "core-cast-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Bee, adult Thai woman age 28, long straight black hair, teal two-piece bikini with full-coverage bottoms, gold hoop earrings and black ankle-strap heels. The reference is for rendering STYLE only, this is a distinct original character. Pose: Upright dance pose, same imaginary pole location, raised hand grips above head, weight on right leg with left knee slightly bent, free arm extended on opposite side. Pole itself is NOT drawn. Non-explicit adult nightlife game art. Square canvas.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-6eddee48-76f9-444f-b550-ed4fc838e624.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/core-cast-reference.png",
+    "/home/zak/projects/pattaya-after-hours/art/sources/bee-0.png"
+  ]
+}

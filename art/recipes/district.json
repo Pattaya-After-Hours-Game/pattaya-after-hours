@@ -1,0 +1,6 @@
+{
+  "generator": "built-in image generation",
+  "prompt": "Production exploration MAP background for Pattaya After Hours using supplied concept as architecture/palette/style reference. Wide 16:9 clean full-bleed illustration, NO UI, NO labels, NO writing anywhere, NO people, NO vehicles. Detailed illustrated pixel art, slightly elevated orthographic neighborhood view. Match layout: blue sea across top 20%, harbor covered pier upper left. Three shop blocks in middle row: night market left, cyan-awning beer bar center, pink boxing-glove-sign gym right. Two buildings in bottom row: warm-lit workshop/rig loft at center, teal vacant shophouse right. Broad clearly walkable horizontal lanes in front of middle buildings around y=60% and in front of bottom buildings around y=88%, connecting vertical alleys at x=5%,32%,62%,94%. Arrange buildings behind these lanes, leaving these pathways fully clear. Coastal Thai shophouses, balconies, hanging cables, palms, warm amber interiors, burgundy timber, cyan/pink neon and plum shadows, wet pavement. Building signs are blank colored panels. No sky or perspective vanishing point, keep explorable map overview.",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-a21e512e-1d12-4827-b63e-d27a3f4ab31a.png",
+  "reference": "references/mockups/district-map-v1.png"
+}

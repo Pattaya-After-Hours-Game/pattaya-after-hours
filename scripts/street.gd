@@ -1,15 +1,20 @@
 extends RefCounted
 
 const C = preload("res://scripts/street_content.gd")
+const Economy = preload("res://scripts/economy.gd")
 const OFFLINE_CAP = 8 * 60 * 60
 const SHIFT_SECONDS = 120
 var s: Dictionary
+var economy: RefCounted
 
-func _init(state: Dictionary) -> void:
+func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
 	if not s.has("street"):
 		var first := make_bar(0, 0)
 		first.stage = clampi(int(s.get("level",1)),1,3)
+		if not fresh and not s.get("practice",false):
+			first.crew = mini(6,s.staff.size())
+			first.stock = int(s.stock)
 		s.street = {"bars":[first], "selected":0, "chapter":0, "served":0, "earned":0,
 			"seconds":0, "cycle":0, "event":{}, "event_wait":180, "event_index":0,
 			"events_survived":0, "reopening":false, "festival":false, "festivals":0,
@@ -24,7 +29,8 @@ func _init(state: Dictionary) -> void:
 	# settle their own stock, wages and overhead through their live sales.
 	s.level = s.street.bars[0].stage
 	s.venue = 1
-	s.version = 2
+	economy = Economy.new(s,fresh)
+	s.version = 3
 
 func make_bar(kind: int, slot: int) -> Dictionary:
 	return {"type":kind, "stage":1, "name":C.NAMES[slot], "crew":0,
@@ -52,43 +58,32 @@ func credit(gross: int, costs: int = 0) -> void:
 	s.street.earned += gross - costs
 
 func capacity(bar: Dictionary) -> int:
-	return 30 + int(bar.stage) * 20
+	return economy.stock_capacity(bar)
 
 func staff_limit(bar: Dictionary) -> int:
-	return int(bar.stage) * 2
+	return int(bar.stage)*2
 
 func upgrade_cost(bar: Dictionary) -> int:
-	return 0 if bar.stage >= 3 else int(C.UPGRADE_COSTS[int(bar.type)][int(bar.stage)-1])
+	return 0 if bar.stage >= 3 else int(C.RENOVATIONS[int(bar.type)][int(bar.stage)-1])
 
 func purchase_cost(kind: int) -> int:
 	var owned := 0
 	for bar in s.street.bars:
 		if bar.type == kind: owned += 1
-	return int(C.TYPES[kind].price) * (2 + owned) / 2
+	return int(C.LEASES[kind])*(2+owned)/2
 
-func drink_value(bar: Dictionary, offline: bool = false) -> int:
-	var value := int(C.TYPES[int(bar.type)].drink) + (int(bar.stage)-1) * 25
-	if offline: return value
-	var event: Dictionary = s.street.event
-	if event.get("phase","") != "active": return value
-	match int(event.id):
-		1: value = int(value * (2.0 if event.prepared else 1.4))
-		4: value = int(value * (1.8 if bar.type == 0 else 1.2))
-		5: value = int(value * (1.7 if event.prepared else 1.1))
-		6: value = int(value * (0.95 if bar.type == 0 else 0.55))
-		7: value = int(value * (1.4 if event.prepared else 0.8))
-		9: value *= 2
-	return value
+func drink_value(bar: Dictionary, _offline: bool = false) -> int:
+	return economy.price(bar)
 
 func available(bar: Dictionary) -> int:
-	return maxi(0,int(bar.crew) - bar.away.size())
+	var count := 0
+	for role in 3: count += economy.on_duty(bar,role)
+	return count
 
 func net_rate(bar: Dictionary, offline: bool = false) -> int:
 	if offline and not bar.manager: return 0
-	if bar.closed > 0 or (bar.stock <= 0 and not bar.restock): return 0
-	var workers := available(bar)
-	# 15 service rounds per minute. Quote profit after stock, wages and overhead.
-	return 15 * workers * maxi(0,drink_value(bar,offline)-14-int(C.TYPES[int(bar.type)].wage))
+	if not bar.open or bar.closed > 0: return 0
+	return floori(economy.forecast(bar,offline).net)
 
 func total_rate(offline: bool = false) -> int:
 	var total := 0
@@ -96,45 +91,15 @@ func total_rate(offline: bool = false) -> int:
 	return total
 
 func _sell(bar: Dictionary, count: int) -> int:
-	if bar.closed > 0: return 0
-	if bar.restock and bar.stock < count:
-		var delivery := capacity(bar) - int(bar.stock)
-		if pay(delivery * 14): bar.stock += delivery
-	var sold := mini(count,int(bar.stock))
-	if sold <= 0: return 0
-	bar.stock -= sold
-	credit(drink_value(bar) * sold, int(C.TYPES[int(bar.type)].wage) * sold)
-	var before := int(s.street.served)
-	s.street.served += sold
-	s.total_guests += sold
-	s.weekly.guests += sold
-	# Reputation comes from reliable service, including automated service.
-	s.rep = mini(100,int(s.rep) + int(s.street.served / 20.0) - int(before / 20.0))
-	if before < 10 and s.street.served >= 10:
-		s.regulars += 1
-		record("Your first new regular: Lek buys a round and declares himself a founding investor.")
-	return sold
+	return economy.serve(bar,count)
 
 func action(id: String, index: int = 0) -> String:
-	if s.phase != "plan": return "Finish the current shift first."
+	if not s.phase in ["plan","guided"]: return "Finish the current decision first."
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve":
-			if _sell(bar,1) == 0: return "Temporarily closed." if bar.closed > 0 else "Out of drinks. Order a delivery."
-			result = "Served at %s · +฿%d after wages" % [bar.name,drink_value(bar)-int(C.TYPES[int(bar.type)].wage)]
-		"stock":
-			var amount := capacity(bar)-int(bar.stock)
-			if amount == 0: return "The fridge is full."
-			if not pay(amount*14): return "Delivery needs ฿%d." % (amount*14)
-			bar.stock += amount
-			result = "Bo found the right bar. %d drinks delivered." % amount
-		"hire":
-			if bar.crew >= staff_limit(bar): return "Upgrade for more team positions."
-			var cost := 600 * (int(bar.crew)+1)
-			if not pay(cost): return "Hiring needs ฿%d." % cost
-			bar.crew += 1
-			result = "An adult %s joins %s. Service now runs automatically." % [["server","host","dancer"][int(bar.type)],bar.name]
+		"serve","stock","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine":
+			result = economy.action(bar,id,index)
 		"restock":
 			if bar.restock: return "Bo already handles deliveries."
 			if not pay(900): return "The supplier agreement needs ฿900."
@@ -142,12 +107,14 @@ func action(id: String, index: int = 0) -> String:
 			result = "Bo handles restocking while you're here. Stock is still charged to the till."
 		"manager":
 			if bar.manager: return "This venue already has a manager."
-			if bar.stage < 2 or bar.crew < 1 or not bar.restock: return "Needs stage 2, a server and automatic deliveries."
-			if not pay(1800): return "Management training needs ฿1,800."
+			if bar.stage < 2 or economy.on_duty(bar,0) < 1 or not bar.restock or bar.healthy < 8: return "Needs stage 2, a bartender, deliveries and eight healthy shifts."
+			if s.cash < 1800+(economy.operating_rate(bar)+12)*2 or not pay(1800): return "Keep one shift of operating costs after the ฿1,800 training fee."
 			bar.manager = true
 			result = "Dao takes the Blue Hour keys. Managed earnings continue offline." if s.street.selected == 0 else "%s's team takes the keys. Pim helps plan the music." % bar.name
 		"upgrade":
 			if bar.stage >= 3: return "This venue is at its final stage."
+			var reason: String = economy.upgrade_reason(bar)
+			if not reason.is_empty(): return reason
 			if not pay(upgrade_cost(bar)): return "Save a little more for the renovation."
 			bar.stage += 1
 			if s.street.selected == 0:
@@ -161,20 +128,14 @@ func action(id: String, index: int = 0) -> String:
 			if s.street.bars.size() >= C.NAMES.size(): return "You own the whole soi. Keep developing your venues."
 			if s.street.chapter < 1: return "Finish the Blue Hour reopening chapter before expanding."
 			if s.rep < C.TYPES[index].rep: return "Needs %d reputation." % C.TYPES[index].rep
-			if not pay(purchase_cost(index)): return "The lease needs ฿%d." % purchase_cost(index)
+			if s.cash < purchase_cost(index)+opening_reserve(index): return "The lease needs ฿%d plus ฿%d for opening stock, hiring and the street payroll." % [purchase_cost(index),opening_reserve(index)]
+			pay(purchase_cost(index))
 			var new_bar := make_bar(index,s.street.bars.size())
 			s.street.bars.append(new_bar)
+			var defaults: Dictionary = economy.new_fields()
+			for key in defaults: new_bar[key] = defaults[key]
 			s.street.selected = s.street.bars.size()-1
 			result = "%s opens. %s" % [new_bar.name,C.TYPES[index].stages[0][2]]
-		"bar_fine":
-			if bar.type != 1 or bar.closed > 0: return "Available at an open Soi bar."
-			if index < 0 or index >= bar.crew: return "This host isn't on the team."
-			if not C.HOSTS[index][2]: return "%s declines. Hosted drinks are their preference." % C.HOSTS[index][0]
-			if index in bar.away: return "Already away for this shift."
-			if bar.away.size() >= bar.stage: return "Upstairs bookings are full this shift."
-			bar.away.append(index)
-			credit(300 * int(bar.stage),100 * int(bar.stage))
-			result = "%s accepts. Bar fee recorded; host unavailable until next shift. Private activity stays off-screen." % C.HOSTS[index][0]
 		"prepare":
 			var event: Dictionary = s.street.event
 			if event.is_empty() or event.phase != "warning": return "Preparation closes when the event starts."
@@ -189,7 +150,7 @@ func action(id: String, index: int = 0) -> String:
 			result = "After Hours Street Festival announced. Prepare the street!"
 		_:
 			return "Unknown street action."
-	if id != "serve": record(result)
+	if not id in ["serve","welcome","stock"]: record(result)
 	check_chapters()
 	return result
 
@@ -251,7 +212,7 @@ func finish_event(won: bool = true) -> void:
 			s.street.festivals += 1
 	if id == 3 and event.prepared: s.trust = mini(100,int(s.trust)+8)
 	if id == 5: s.rep = clampi(int(s.rep)+(4 if event.prepared else -2),0,100)
-	if id == 6 and event.prepared: s.regulars = mini(45,int(s.regulars)+3)
+	if id == 6 and event.prepared: record("The locals appreciate the invitation. Good visits can earn their loyalty.")
 	record(C.EVENTS[id][4])
 	s.street.events_survived += 1
 	s.street.event = {}
@@ -260,18 +221,22 @@ func finish_event(won: bool = true) -> void:
 
 func end_shift() -> void:
 	s.street.seconds = 0
-	for bar in s.street.bars: bar.away.clear()
+	for bar in s.street.bars:
+		bar.away.clear()
+		economy.settle_shift(bar)
+	s.bookings.clear()
 	s.night.erase("godzilla")
 
 # Called for foreground time only. No events or calendar changes during absence.
 func tick(seconds: int) -> void:
-	if s.phase != "plan": return
+	if not s.phase in ["plan","guided"]: return
 	for _second in clampi(seconds,0,60):
+		if not s.phase in ["plan","guided"]: break
 		s.street.seconds += 1
+		economy.tick()
 		s.street.cycle = (int(s.street.cycle)+1) % 4
 		for bar in s.street.bars:
 			bar.closed = maxi(0,int(bar.closed)-1)
-			if s.street.cycle == 0: _sell(bar,available(bar))
 		var event: Dictionary = s.street.event
 		if not event.is_empty():
 			event.remaining -= 1
@@ -290,16 +255,20 @@ func tick(seconds: int) -> void:
 				s.last_week = s.weekly.duplicate()
 				s.weekly = {"revenue":0,"costs":0,"guests":0,"tours":0,"nights":0,"weeks":int(s.day/7.0)+1}
 			s.day += 1
+			if not s.street.guided.is_empty():
+				s.phase = "guided_report"
+		elif not s.street.guided.is_empty() and int(s.street.seconds)%40 == 0:
+			s.street.guided.wave = int(s.street.seconds)/40
+			s.phase = "guided_choice"
 		check_chapters()
 
 func claim_offline(now: int) -> int:
-	var last := int(s.street.last_seen)
-	var elapsed := clampi(now-last,0,OFFLINE_CAP)
-	# A future timestamp never grants a windfall or moves the watermark backwards.
-	s.street.last_seen = maxi(last,now)
-	var earnings := int(total_rate(true) * elapsed / 60.0)
-	s.street.offline = earnings
-	if earnings > 0:
-		credit(earnings)
-		record("Welcome back · managed venues earned ฿%d net. No disasters ran while you were away." % earnings)
+	var earnings: int = economy.offline(now,OFFLINE_CAP)
+	if earnings>0: record("Welcome back · managed venues earned an estimated ฿%d net, limited by demand and operating costs." % earnings)
 	return earnings
+
+func opening_reserve(kind: int) -> int:
+	var amount := int(C.OVERHEAD[kind])*2+600+140
+	for bar in s.street.bars:
+		if bar.open: amount += economy.operating_rate(bar)*2
+	return amount

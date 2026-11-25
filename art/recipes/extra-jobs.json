@@ -1,0 +1,65 @@
+[
+  {
+    "id": "counter",
+    "prompt": "Production foreground prop for the supplied illustrated pixel-art bar. One wide burgundy timber bar counter viewed slightly from above, decorated with a small lime board, metal ice bucket, beer glass and receipt pad with NO writing. Entire isolated counter including wooden front face and polished top. Straight-on horizontal composition, width about four times height. Transparent background, no people, no room, no lettering, no watermark. Amber highlights, plum shadows, cyan edge reflection, crisp detailed pixel illustration. It will be composited in front of a bartender at bottom right of a game screen.",
+    "ref": "beer-1"
+  },
+  {
+    "id": "event-inspection",
+    "prompt": "Single original adult Thai municipal inspector game sprite, middle-aged man in khaki short-sleeved uniform, trousers and polished shoes, holding a clipboard, neutral friendly professional stance. No weapons. Transparent background, no text, no badges with lettering. Full body, detailed illustrated pixel art matching reference palette, warm amber light and plum outlines. Square canvas.",
+    "ref": "core-cast-reference"
+  },
+  {
+    "id": "icon",
+    "prompt": "Original mobile game APP ICON foreground mark, genuine transparent background. Centered neon cyan beer glass with gold liquid and foam, a small magenta crescent and palm frond behind it, subtle burgundy shophouse roof silhouette at base. Bold instantly readable detailed pixel-art emblem for a Thai nightlife management game. No letters, no words, no border, no watermark, no rounded-square background. Keep complete emblem inside middle 65 percent of square canvas for Android adaptive icon safe area. Match supplied game's cyan, amber, burgundy and plum palette.",
+    "ref": "beer-1"
+  },
+  {
+    "id": "monster-0",
+    "group": "monster",
+    "ref": "beer-1",
+    "prompt": "One friendly giant reptilian kaiju character, original teal-green scales, chunky body, long tail, violet crystalline dorsal plates catching cyan neon, golden eyes, expressive rounded snout. Same character in all poses. Detailed illustrated pixel art matching supplied game's amber/plum/cyan palette. Transparent background, entire creature visible, no text, no scenery, no floor or painted shadow. Three-quarter view facing RIGHT. Walking into view with one massive foot raised, head curious."
+  },
+  {
+    "id": "monster-1",
+    "group": "monster",
+    "ref": "beer-1",
+    "prompt": "One friendly giant reptilian kaiju character, original teal-green scales, chunky body, long tail, violet crystalline dorsal plates catching cyan neon, golden eyes, expressive rounded snout. Same character in all poses. Detailed illustrated pixel art matching supplied game's amber/plum/cyan palette. Transparent background, entire creature visible, no text, no scenery, no floor or painted shadow. Three-quarter view facing RIGHT. Standing idle, feet planted, arms loosely forward waiting for a drink."
+  },
+  {
+    "id": "monster-2",
+    "group": "monster",
+    "ref": "beer-1",
+    "prompt": "One friendly giant reptilian kaiju character, original teal-green scales, chunky body, long tail, violet crystalline dorsal plates catching cyan neon, golden eyes, expressive rounded snout. Same character in all poses. Detailed illustrated pixel art matching supplied game's amber/plum/cyan palette. Transparent background, entire creature visible, no text, no scenery, no floor or painted shadow. Three-quarter view facing RIGHT. Lifting a giant glass of golden drink to mouth, happy expression."
+  },
+  {
+    "id": "monster-3",
+    "group": "monster",
+    "ref": "beer-1",
+    "prompt": "One friendly giant reptilian kaiju character, original teal-green scales, chunky body, long tail, violet crystalline dorsal plates catching cyan neon, golden eyes, expressive rounded snout. Same character in all poses. Detailed illustrated pixel art matching supplied game's amber/plum/cyan palette. Transparent background, entire creature visible, no text, no scenery, no floor or painted shadow. Three-quarter view facing RIGHT. Sleeping curled on its side, eyes closed, tail curled along body, peaceful expression."
+  },
+  {
+    "id": "patrons-0",
+    "group": "patrons",
+    "ref": "core-cast-reference",
+    "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Adult male tourist with short greying hair, navy polo shirt, tan shorts and sandals, relaxed standing with glass. New original character, reference used only for rendering style. Square canvas."
+  },
+  {
+    "id": "patrons-1",
+    "group": "patrons",
+    "ref": "core-cast-reference",
+    "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Adult Thai woman with shoulder-length black hair, teal summer dress and sandals, relaxed standing chatting. New original character, reference used only for rendering style. Square canvas."
+  },
+  {
+    "id": "patrons-2",
+    "group": "patrons",
+    "ref": "core-cast-reference",
+    "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Adult Thai man with dark short hair, burgundy short-sleeve shirt and dark trousers, walking right. New original character, reference used only for rendering style. Square canvas."
+  },
+  {
+    "id": "patrons-3",
+    "group": "patrons",
+    "ref": "core-cast-reference",
+    "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Adult woman with short curly brown hair, gold blouse and dark skirt, walking right. New original character, reference used only for rendering style. Square canvas."
+  }
+]

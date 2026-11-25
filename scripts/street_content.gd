@@ -2,23 +2,22 @@ extends RefCounted
 
 # Fictional venues; adult nightlife remains off-screen.
 const TYPES = [
-	{"name":"Beer bar", "price":6000, "rep":0, "drink":55, "wage":10, "stages":[
+	{"name":"Beer bar", "rep":0, "drink":55, "stages":[
 		["Plastic Chairs & Big Dreams", "Bottled beers, basic spirits, six stools and a secondhand fridge.", "Anong: The last owner said this place practically runs itself. He's at the airport. You're on ice duty."],
-		["The Local Favourite", "Cold drinks, a pool table, cocktails and sports screens. Better margins and more regulars.", "The new sign works. The reopening party trips the power. Bo offers a generator with only one previous flood."],
+		["The Local Favourite", "More floor space for pool, cocktails and sports screens. Equipment is purchased separately.", "The new sign works. The reopening party trips the power. Bo offers a generator with only one previous flood."],
 		["Soi Institution", "Live music and a packed terrace. Regulars keep this bar earning in low season.", "Mali's fight night finally pays. A regular asks for his own stool. Anong suggests he start by paying his tab."]]},
-	{"name":"Soi 6-style bar", "price":12000, "rep":20, "drink":85, "wage":20, "stages":[
+	{"name":"Soi 6-style bar", "rep":20, "drink":85, "stages":[
 		["Something Upstairs", "Lady drinks, bar fines and one upstairs room. Adult hosts choose their own bookings.", "The previous owner retires for the fourth time. Dao checks the stairs before anyone checks the till."],
-		["The Busy Staircase", "Two rooms, a larger team and better music. Hosted drinks earn more.", "Pim has a music programme. Bo has delivered a karaoke machine. Neither considers this the same thing."],
+		["The Busy Staircase", "Two rooms, a larger team and better music. Room for more hosted-drink customers.", "Pim has a music programme. Bo has delivered a karaoke machine. Neither considers this the same thing."],
 		["Soi Royalty", "Three rooms, experienced hosts and a recognisable neon frontage.", "Dao can now run both floors without you. Your new job is to stop offering advice during the rush."]]},
-	{"name":"Gogo bar", "price":45000, "rep":45, "drink":140, "wage":45, "stages":[
+	{"name":"Gogo bar", "rep":45, "drink":140, "stages":[
 		["First Spotlight", "One pole stage, an adult dance team and a very enthusiastic DJ.", "Anton sends flowers from Lantern House. The card includes the dimensions of his bigger LED screen."],
 		["Neon Showroom", "Multiple poles, coordinated shows and bottle-service booths.", "Pim books the headline set. Anton announces a grand re-reopening on exactly the same night."],
 		["Walking Street Headliner", "A spectacular three-pole stage, VIP service and queues around the block.", "The opening crowd blocks the street. Anong buys another fridge. Anton orders a screen visible from the moon."]]}
 ]
-const UPGRADE_COSTS = [[1800,6500],[12000,30000],[40000,90000]]
 const NAMES = ["Blue Hour", "High Tide", "Neon Mango", "Lucky Gecko", "Last Baht", "Velvet Tuk Tuk", "Moonlight", "After Eight"]
 const CHAPTERS = [
-	["Rent Is Due on Tuesday", "Fix the fridge (stage 2), serve 10 drinks, hire a server, appoint Dao and survive the reopening."],
+	["Rent Is Due on Tuesday", "Establish a loyal customer base, renovate to stage 2, hire a bartender, appoint Dao and survive the reopening."],
 	["Everybody Knows Your Bar", "Buy a second property. Soi bars unlock at 20 reputation. Anong wants a street worth staying for."],
 	["Upstairs, Downstairs, Everywhere", "Own a Soi bar and give two venues managers. Dao runs the floor; Pim builds the music programme."],
 	["The Neon Arms Race", "Open a gogo and raise it to stage 2. Anton's LED budget is becoming a public nuisance."],
@@ -45,3 +44,48 @@ const HOSTS = [
 	["Fah", "Runs the music; prefers hosted drinks", false],
 	["Nan", "Wants predictable hours; accepts bar-fine requests", true]
 ]
+
+# Economy values use real seconds and baht; day/shift presentation stays compressed.
+const STARTING_CASH = 200
+const STOCK_COST = 14
+const POOL_FEE = 50
+const POOL_SECONDS = 45
+const EQUIPMENT = [
+	{"id":"sign", "name":"Better frontage", "cost":900, "max":1, "help":"More passersby consider entering; no extra service speed."},
+	{"id":"comfort", "name":"Fans & comfortable seats", "cost":900, "max":1, "help":"Guests stay longer and wait more patiently; uses one seat and adds ฿4/min overhead."},
+	{"id":"fridge", "name":"Better fridge", "cost":800, "max":2, "help":"Store 40 more drinks; it cannot create customers."},
+	{"id":"pool", "name":"Pool table", "cost":2000, "max":2, "help":"฿50 per 45-second game; replaces two seats. Beer bars only."},
+	{"id":"seating", "name":"Extra seating", "cost":400, "max":2, "help":"Two more seats; each pool table uses two of them."},
+	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
+	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
+	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Adds premium orders for customers with the budget. Stage 2+."}
+]
+const PROMOTIONS = [
+	{"name":"Free Pool Night", "fee":0, "boost":6, "requires":"pool", "help":"Free games attract pool groups; drinks stay full price."},
+	{"name":"Happy Hour", "fee":80, "boost":4, "requires":"", "help":"20% off newly placed drink orders; more walk-ins, smaller margins."},
+	{"name":"Pool Tournament", "fee":150, "boost":7, "requires":"pool", "help":"Paid games and pool groups; the prize budget is an expense."},
+	{"name":"Sports Night", "fee":100, "boost":5, "requires":"screen", "help":"The screen and fixture bring sports fans; ordinary drink prices."}
+]
+const ROLE_NAMES = ["Bartender", "Adult host", "Adult dancer"]
+const ROLE_WAGES = [24,20,36] # per minute, including quiet periods
+const OVERHEAD = [18,45,90]
+const RENOVATIONS = [[4800,50000],[18000,80000],[45000,150000]]
+const LEASES = [21000,32000,85000]
+const STAGE_GOALS = [
+	{"happy":70,"regulars":10,"healthy":8},
+	{"happy":600,"regulars":70,"healthy":40}
+]
+
+const TRAFFIC_PER_MINUTE = 7.0
+const AUDIENCE_TRAFFIC_BONUS = 2.0
+const BASE_SEATS = [6,12,20]
+const VISIT_SECONDS = 90
+const ORDER_SECONDS = 35
+const PATIENCE_SECONDS = 25
+const REGULAR_CHANCE = 20
+const BARTENDER_SERVICE = 10
+const TRAINING_SERVICE = 5
+const PROMOTION_SECONDS = 120
+const PROMOTION_COOLDOWN = 120
+const POOL_PATIENCE = 30
+const POOL_EXTRA_STAY = 30

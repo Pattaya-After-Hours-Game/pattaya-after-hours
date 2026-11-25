@@ -1,0 +1,6 @@
+{
+  "generator": "built-in image generation",
+  "prompt": "Create the clean PRODUCTION BACKGROUND for this exact Toybox fighting-game reference. Remove both foreground fighters, every spectator and patron, the HUD, portraits, health bars, buttons, all words and letters. Keep the same beautiful detailed illustrated pixel art street-stage setting: open Thai boxing gym at center with punching bags and boxing ring in back, adjacent warm beer bar left, shutters and food cart right, shophouse balconies, cables, cyan/magenta/amber lighting, wet pavement. Main sign over gym is BLANK dark plum with glowing pink border and boxing-glove symbol only. Full bleed 16:9. Flat continuous pavement occupies bottom 30 percent for fighters; no obstacles in playable foreground. No text anywhere, no people, no watermark. Same camera as reference. Rich amber and burgundy buildings, plum shadows.",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-d918cd6e-4edf-4ff8-9e50-9b6b62c9cffd.png",
+  "reference": "fight-reference"
+}

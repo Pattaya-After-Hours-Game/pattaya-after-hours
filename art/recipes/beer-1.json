@@ -1,0 +1,8 @@
+{
+  "generator": "built-in image generation",
+  "prompt": "Production game background for Pattaya After Hours. Use the provided Blue Hour interior ONLY as visual style and architecture reference. Generate a clean 16:9 full-bleed environment plate with NO UI, NO lettering, NO people. Detailed illustrated pixel art, sharp pixel clusters, plum shadows, worn burgundy timber, cyan fluorescent light and warm amber bulbs. Opening stage humble Thai open-front beer bar: left side open to a narrow blue-hour shophouse lane, right rear bottle shelves and a BLANK dark rectangular sign panel, a worn secondhand fridge, six mismatched plastic stools along a simple rear counter. View slightly above eye level into the bar, spacious empty tiled floor across the middle and foreground for separate animated character sprites. No pool table, no televisions, no stage yet. Do not put a counter across the foreground; foreground must be unobstructed tiled floor. Believable shabby but welcoming starter business. No border, no watermark. Match detailed pixel illustration quality of reference. Landscape 1536x1024 or wide.",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-e00ae524-5678-4325-8672-f55748aa8e4a.png",
+  "references": [
+    "references/mockups/blue-hour-interior-v1.png"
+  ]
+}

@@ -10,20 +10,20 @@ Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build th
 
 Incident cards show odds and effects at a glance. Tap **Story** to read the setup. Results appear below the map, and **Shift log** in closeout opens the full decision history.
 
-- **Serve → upgrade → hire → automate → expand.** Tap **Serve a drink** for immediate income. Hire servers, hosts or dancers to serve every four seconds; arrange deliveries, then appoint a manager for offline earnings. Select properties by tapping their buildings or through **Empire**.
+- **Attract → retain → serve → profit → reinvest.** Tap **Serve a drink** to fulfil a waiting order. An empty queue earns nothing and consumes no stock. **Welcome customers** competes for existing street traffic. Bartenders serve; hosts and dancers attract visitors. Arrange deliveries and appoint a manager for offline operation. Select properties by tapping their buildings or through **Empire**.
 - **Three types, three stages each.** Beer bars grow from plastic stools to live-music institutions. Soi-style bars add hosted drinks, bar fines and upstairs rooms. Gogos grow from a single pole to a headline showroom. Each stage has different artwork, earning power and a story beat. Adult activity stays off-screen; hosts choose whether to accept requests and are unavailable for the rest of the shift after accepting.
 - **Own the soi.** Acquire up to eight separate properties. Beer bars stay beer bars; unlock Soi venues at 20 reputation and gogos at 45. Finish the opening chapter before expanding. Tours and crypto are never required.
 - **Milestone story.** Reopen the Blue Hour, give Dao the keys, buy another bar, enter Anton's neon arms race, then bring all three types to stage 3 for the **After Hours Street Festival**. Completing the festival leaves the street open for continued play and repeat events. There is no forced one-year ending.
 - **Prepare for the unexpected.** Blackouts, Navy shore leave, inspections, floods, Songkran, a viral bar crawl, low season, Anton's promotions and Godzilla arrive with a 60-second warning. Tap the pink event banner or open **Events** to prepare. Ordinary events last 90 seconds. Monster events offer a timed serving challenge; damage causes a short, recoverable closure.
-- **Idle income.** A foreground street shift lasts two minutes; host availability resets at the next shift. Managed venues earn up to eight hours of offline net profit. Offline time never advances events or the calendar. Existing closures and unavailable hosts remain paused while away. Live net rates include stock, wages and overhead; restocking still needs cash in the till.
-- **Optional managed shifts.** Scroll down in **Service** to **Open managed shift** for the original early-service/rush/last-call simulation, with its own stock, rota and weekly bills. Street time pauses during those decisions. **Tutorial** teaches this optional mode in an isolated practice save.
+- **Idle income.** A foreground street shift lasts two minutes; host availability resets at the next shift. Viable managed venues receive up to eight hours of demand-limited estimated offline net profit; Journal shows customers, income, costs and limiting factors. Offline time never advances events or the calendar. Existing closures and unavailable hosts remain paused while away. Forecast rates include stock, wages and overhead; actual net is shown separately; restocking still needs cash in the till.
+- **Optional managed shifts.** Scroll down in **Service** to **Open managed shift** for three decisions across the same two-minute simulation. It shares customers, stock, costs and clock with the street. Choices cannot create another income stream or fast-forward progression. **Tutorial** retains the original decision lessons in an isolated practice save.
 - **Keep exploring.** Walk the district, book voluntary tours, or visit Events for Toybox sparring and the arcade circuit. Existing mining rigs remain available under Empire.
 
-The game plays offline and autosaves after decisions and every 15 seconds. Version-one campaigns automatically retain their finances, staff, capped renovations and second lease in the new street model. Previously ended campaigns reopen. Saves retain a backup; the tutorial never overwrites your campaign.
+The game plays offline and autosaves after decisions and every 15 seconds. Version-one and version-two campaigns migrate to version three, retaining their finances, staff, owned stages and properties. Existing stage-2+ beer bars receive a pool table; migrated customer queues begin empty. Previously ended campaigns reopen. Saves retain a backup; the tutorial never overwrites your campaign.
 
 | Where | Controls |
 | --- | --- |
-| Street | Click/tap **Serve a drink**; tap a property to select it. Scroll the right panel for upgrades and management. |
+| Street | Tap **Serve a drink** for waiting orders or **Welcome customers** for walk-ins; tap a property to select it. Scroll the right panel for upgrades and management. |
 | Street events | Tap the pink banner or open **Events**. Prepare before the countdown; use **Face Godzilla** when a monster arrives. |
 | District | WASD/arrows to walk, E to enter, Esc to return. On touch, tap a destination. |
 | Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J to jab, K to kick, L to Burst. Android has touch controls. |
@@ -66,3 +66,40 @@ Implemented **From One Bar to the Whole Soi**, turning the Blue Hour campaign in
 - Added economy, progression, event, offline-income, migration and UI regression tests, plus a graphical preview harness covering all nine venue stages and festival states.
 
 Validation includes the automated Godot suite and rendered desktop previews. Android device playtesting and longer-term economy balancing remain follow-up work. The separate artwork refresh is not included in this gameplay update.
+
+## Development update — Customer demand and sustainable expansion
+
+Replaced guaranteed click/staff income with a shared customer economy. Visitors
+occupy space, place orders, have patience and budgets, and can become regulars.
+Stock, service and demand must all be available for a sale. Different venue types
+compete for local, tourist and nightlife audiences; events primarily change access
+and traffic. Dancers attract crowds during scheduled sets while bartenders serve.
+
+Pool tables are stage-one purchases: ฿50 per table per 45-second game, charged
+once. Added Free Pool Night, Happy Hour, Pool Tournament and Sports Night, with
+cooldowns, repetition fatigue and reports separating actual receipts from estimated
+uplift. Pool players remain customers and keep ordering drinks.
+
+Added equipment, staff rotas, temporary closure, owner-run recovery, per-venue
+loyalty/healthy-shift renovation gates and working-cash reserves. Wages continue
+through quiet trading. The Service panel explains demand, service, occupancy,
+stock and break-even demand; shift reports distinguish full, slow, quiet and
+out-of-stock trading. Renovations no longer increase every drink's price.
+
+Unified guided shifts with the live clock and ledger, added repeat-safe offline
+projections, and migrated older saves without resetting owned progress. The
+current graphics refresh is consumed by the new customer and pool-state display;
+its source checkout remains independent. This branch contains an artwork snapshot;
+Toybox uses its original procedural opponent if that opponent's replacement atlas
+is not yet available. The separate graphics task is still in progress.
+
+Validation: customer/finance/save regression tests, pointer interaction checks,
+thirty paired free-pool scenarios and nine fresh campaigns across three seeds and
+three play styles. Active runs reach pool in **16.7–19.7 minutes**, stage 2 in
+**39.8–43.4 minutes**, a second venue in **131.5–139.3 minutes**, and stage 3 in
+**216.8–225.6 minutes**. These policy simulations exclude offline income; human
+playtesting and Android device verification remain separate work.
+
+See [the economy guide](docs/ECONOMY.md) for rules, model boundaries, migration,
+calibration and test commands. Use a fresh campaign to experience the new curve;
+existing owned stages are intentionally preserved.

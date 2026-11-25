@@ -1,0 +1,8 @@
+{
+  "id": "mali-2",
+  "group": "mali",
+  "ref": "core-cast-reference",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. Mali in her BAR WORK outfit, adult Thai woman with long dark braid, burgundy t-shirt, navy cargo shorts, white hand wraps, trainers. Pose: Walking opposite contact pose, right foot forward and left foot back, gentle opposite arm swing. Same scale and angle. Square canvas. For a walking pose the leading leg and opposite arm must alternate with the previous pose.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-7992ed70-5a67-4e6a-8b39-da83c673b419.png"
+}

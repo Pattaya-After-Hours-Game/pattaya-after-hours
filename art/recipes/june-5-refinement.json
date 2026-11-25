@@ -1,0 +1,11 @@
+{
+  "id": "june-5",
+  "group": "june",
+  "ref": "june-0",
+  "prompt": "Production transparent-background game sprite, ONE full-body character only, no sheet, no labels, no text, no floor, no shadow, no backdrop. Genuine alpha transparency. Detailed illustrated pixel art matching reference, clean sharp silhouette, clustered shading, plum outlines, warm amber highlights. Entire body and shoes visible with generous empty padding. Consistent proportions about six heads tall. Camera frontal three-quarter view facing RIGHT. Preserve character identity and clothing from reference. June, adult Thai woman age 27, dark high ponytail, coral two-piece bikini with full-coverage bottoms, gold earrings and black ankle-strap heels. The reference is for rendering STYLE only, this is a distinct original character. Pose: WALK CYCLE PASSING POSITION. Feet CLOSE TOGETHER directly underneath the hips, straight supporting right leg, left knee bent with heel lifted passing underneath the body. NOT a wide stride. Left hand forward and right hand back. Same adult character and outfit. True alpha, no backdrop or shadow.",
+  "generator": "built-in image generation",
+  "source": "/home/zak/.codex/generated_images/01a21057-6713-7ec1-8eb9-57eb281b2bb9/exec-bef8c159-0ba4-493d-bd6e-0eac5895d676.png",
+  "references": [
+    "/home/zak/projects/pattaya-after-hours/art/sources/june-0.png"
+  ]
+}

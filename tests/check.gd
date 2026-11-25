@@ -15,11 +15,11 @@ func check(condition: bool, message: String) -> void:
 
 func run() -> void:
 	check(C.GOOD.size() == 21 and C.BAD.size() == 30,"Full incident deck")
-	var model = Campaign.new(413)
+	var model = Campaign.new(413,true)
 	for card in C.GOOD + C.BAD:
 		var card_id: int = (C.GOOD + C.BAD).find(card)
 		for option in range(2,card.size(),2):
-			model = Campaign.new(413)
+			model = Campaign.new(413,true)
 			model.s.cash = 20000
 			model.start()
 			model.s.card = card_id
@@ -32,14 +32,14 @@ func run() -> void:
 			if model.s.phase == "fight":
 				model.finish_fight(false)
 				check(model.s.staff[1].hurt > 0 and model.s.night.wave == 1,"Loss consequences")
-	model = Campaign.new(72)
+	model = Campaign.new(72,true)
 	check(model.booking(0,0).contains("Doesn't"),"Guide refuses")
 	check(model.booking(2,2).contains("Confirmed"),"Interested guide accepts")
 	model.s.event = 1
 	check(model.start().is_empty(),"Start paid event")
 	model.pick(0)
 	check(model.save_game() == OK,"Write checkpoint")
-	var restored = Campaign.new(713)
+	var restored = Campaign.new(713,true)
 	check(restored.load_game() and restored.s.card == model.s.card and restored.rng.state == model.rng.state,"Checkpoint round-trip")
 	model.pick(0)
 	restored.pick(0)
@@ -49,10 +49,10 @@ func run() -> void:
 	var corrupted := FileAccess.open(Campaign.SAVE,FileAccess.WRITE)
 	corrupted.store_string("truncated")
 	corrupted.close()
-	check(Campaign.new().load_game(),"Recover a valid save from backup")
+	check(Campaign.new(0,true).load_game(),"Recover a valid save from backup")
 	DirAccess.remove_absolute(Campaign.SAVE)
 	DirAccess.remove_absolute(Campaign.BACKUP)
-	model = Campaign.new(291)
+	model = Campaign.new(291,true)
 	var clean_days := 0
 	var saw_week := false
 	var saw_rush := false
@@ -88,6 +88,7 @@ func run() -> void:
 	load("res://tests/street_check.gd").new().run(self)
 	test_risk()
 	await test_ui()
+	await load("res://tests/art_interaction_check.gd").new().run(self)
 	if failures == 0:
 		print("PASS · incident deck, endless year, street economy, chapters, migration, offline earnings, events, UI, arcade, tutorial, Godzilla and decision odds")
 	quit(1 if failures else 0)
@@ -103,16 +104,13 @@ func test_ui() -> void:
 	var opening_cash := int(app.model.s.cash)
 	use_button(app,"Serve a drink")
 	check(app.model.s.street.served == 1 and app.model.s.cash > opening_cash,"Main clicker button serves and earns")
-	use_button(app,"Hire server · ฿600")
-	app.model.street.tick(4)
+	app.model.s.cash = 2000
+	use_button(app,"Hire bartender · ฿600")
+	app.model.street.tick(6)
 	check(app.model.s.street.served == 2,"Hired staff serve without tapping")
 	app.model.street.announce(3)
 	app.render()
-	var banner_click := InputEventMouseButton.new()
-	banner_click.pressed = true
-	banner_click.button_index = MOUSE_BUTTON_LEFT
-	banner_click.position = Vector2(139,25) * (app.city.size / Vector2(278,188))
-	app.city._gui_input(banner_click)
+	app.event_banner.pressed.emit()
 	check(app.tab == 1,"The event banner opens preparation controls")
 	use_button(app,"Raise stock & share pumps · ฿450")
 	check(app.model.s.street.event.prepared,"Event preparation works through the UI")
@@ -146,13 +144,12 @@ func test_ui() -> void:
 	f._input(exit_touch)
 	check(app.fight == null,"Touch exits sparring safely")
 	app.begin()
-	check(app.model.s.phase == "incident","Opened the doors through UI")
-	var story: String = app.model.current_card()[1]
-	check(not panel_has_text(app,story),"Incident starts compact")
-	use_button(app,"Story")
-	check(panel_has_text(app,story) and app.model.s.night.wave == 0,"Story opens without advancing the wave")
+	check(app.model.s.phase == "guided_choice","Opened guided service through UI")
 	app.choose(0)
-	check(app.model.s.night.wave == 1 and not app.show_details,"New wave returns to compact view")
+	check(app.model.s.phase == "guided","Guided choice resumes live service")
+	app.model.street.tick(34)
+	app.render()
+	check(app.model.s.street.guided.wave == 1,"Next guided wave waits for the clock")
 
 	var live_campaign = app.model
 	var save_before := FileAccess.get_file_as_string(Campaign.SAVE)
@@ -164,6 +161,11 @@ func test_ui() -> void:
 	use_button(app,"Open the doors")
 	for wave in 2:
 		check(app.model.s.phase == "incident" and app.model.s.night.wave == wave,"Practice wave %d" % (wave + 1))
+		if wave == 0:
+			var story: String = app.model.current_card()[1]
+			check(not panel_has_text(app,story),"Legacy incident starts compact")
+			use_button(app,"Story")
+			check(panel_has_text(app,story),"Legacy Story opens without advancing the wave")
 		use_button(app,app.model.current_card()[2])
 	check(app.model.s.phase == "report" and app.model.s.night.guests > 0,"Tutorial reaches a real closeout")
 	check(not panel_has_text(app,"DECISIONS THIS SHIFT"),"Closeout starts with the summary")
@@ -172,7 +174,7 @@ func test_ui() -> void:
 	use_button(app,"Hide")
 	check(not panel_has_text(app,"DECISIONS THIS SHIFT"),"Detailed log can close")
 	use_button(app,"Finish tutorial")
-	check(app.model == live_campaign and app.model.s.night.wave == 1,"Tutorial restores the live shift")
+	check(app.model == live_campaign and app.model.s.street.guided.wave == 1,"Tutorial restores the live shift")
 	check(FileAccess.get_file_as_string(Campaign.SAVE) == save_before,"Practice made no changes to the live save")
 	use_button(app,"Tutorial")
 	var escape := InputEventAction.new()
@@ -242,7 +244,7 @@ func test_risk() -> void:
 	var saw_worked := false
 	var saw_setback := false
 	for seed_value in range(1,61):
-		var model = Campaign.new(seed_value)
+		var model = Campaign.new(seed_value,true)
 		model.start()
 		model.s.card = 100 # Legacy payroll story; milestones now drive new campaigns.
 		var effects: Dictionary = model.current_card()[3]
@@ -257,7 +259,7 @@ func test_risk() -> void:
 		check(result.changes == (risk.plan_changes if result.worked else risk.setback_changes),"Rolled changes match advertised effects")
 		check(result.changes.cash == -400 and result.changes.reserve == 400,"Payroll transfer is honored in both outcomes")
 	check(saw_worked and saw_setback,"Both outcomes can actually occur")
-	var model = Campaign.new(61)
+	var model = Campaign.new(61,true)
 	model.start()
 	model.s.card = 100
 	var delivery := {"cash":-440,"stock":20}
