@@ -24,6 +24,10 @@ Tap **Serve a drink** for a waiting order; use **Welcome customers** when quiet.
 No order means no sale. Open **Service** to see demand, service speed, occupancy,
 stock, payroll and recent actual profit.
 
+Open **Service → Drinks & margins** to compare what your crowd orders with the
+profit per sale. Buy individual drinks or get a mixed delivery for the current
+crowd. The premium menu unlocks Mango cocktails.
+
 Save for signage, seating, a bartender and a pool table. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
 Night attracts visitors but gives up pool fees; Happy Hour, Pool Tournament and

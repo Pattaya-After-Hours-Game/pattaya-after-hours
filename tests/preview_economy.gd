@@ -44,6 +44,10 @@ func run() -> void:
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	await capture(app,"economy-opening")
+	app.model.street.action("stock")
+	app.drink_list_open = true
+	await capture(app,"economy-drinks","FRIDGE")
+	app.drink_list_open = false
 	app.model.s.cash = 250000
 	var first: Dictionary = app.model.street.selected()
 	first.equipment.pool = 1

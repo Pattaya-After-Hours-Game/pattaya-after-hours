@@ -98,13 +98,13 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine":
+		"serve","stock","buy_drink","return_drink","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine":
 			result = economy.action(bar,id,index)
 		"restock":
 			if bar.restock: return "Bo already handles deliveries."
 			if not pay(900): return "The supplier agreement needs ฿900."
 			bar.restock = true
-			result = "Bo handles restocking while you're here. Stock is still charged to the till."
+			result = "Bo reorders drinks you've stocked before. Deliveries still come out of the till."
 		"manager":
 			if bar.manager: return "This venue already has a manager."
 			if bar.stage < 2 or economy.on_duty(bar,0) < 1 or not bar.restock or bar.healthy < 8: return "Needs stage 2, a bartender, deliveries and eight healthy shifts."
@@ -150,7 +150,7 @@ func action(id: String, index: int = 0) -> String:
 			result = "After Hours Street Festival announced. Prepare the street!"
 		_:
 			return "Unknown street action."
-	if not id in ["serve","welcome","stock"]: record(result)
+	if not id in ["serve","welcome","stock","buy_drink","return_drink"]: record(result)
 	check_chapters()
 	return result
 

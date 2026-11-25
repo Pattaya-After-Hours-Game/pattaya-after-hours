@@ -48,6 +48,15 @@ const HOSTS = [
 # Economy values use real seconds and baht; day/shift presentation stays compressed.
 const STARTING_CASH = 200
 const STOCK_COST = 14
+const DRINKS = [
+	{"id":"lager","name":"House lager","cost":STOCK_COST,"offset":0,"substitute":100},
+	{"id":"soda","name":"Lime soda","cost":6,"offset":-10,"substitute":80},
+	{"id":"rum","name":"Rum & cola","cost":19,"offset":18,"substitute":90},
+	{"id":"mango","name":"Mango cocktail","cost":25,"offset":30,"substitute":75},
+]
+# The audience order is locals, visitors, and big spenders.
+const DRINK_TASTES = [[63,24,11,2],[46,10,32,12],[27,8,38,27]]
+const AUDIENCE_AFFINITY = [[1.5,1.0,.5],[.6,1.0,1.6],[.3,1.3,1.5]]
 const POOL_FEE = 50
 const POOL_SECONDS = 45
 const EQUIPMENT = [
@@ -58,7 +67,7 @@ const EQUIPMENT = [
 	{"id":"seating", "name":"Extra seating", "cost":400, "max":2, "help":"Two more seats; each pool table uses two of them."},
 	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
 	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
-	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Adds premium orders for customers with the budget. Stage 2+."}
+	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Lets you stock Mango cocktails. Stage 2+."}
 ]
 const PROMOTIONS = [
 	{"name":"Free Pool Night", "fee":0, "boost":6, "requires":"pool", "help":"Free games attract pool groups; drinks stay full price."},

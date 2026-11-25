@@ -680,18 +680,32 @@ func _read(path: String) -> Variant:
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
 				for key in defaults:
+					if key=="drink_stock" and not bar.has(key): continue
 					if not bar.has(key): return null
 					if defaults[key] is Array and not bar[key] is Array: return null
 					if defaults[key] is Dictionary and not bar[key] is Dictionary: return null
 				for key in defaults.equipment:
 					if not bar.equipment.get(key) is float and not bar.equipment.get(key) is int: return null
+				for key in ["drink_requests","drink_misses"]:
+					if bar.shift.has(key) and not bar.shift[key] is Dictionary: return null
 				for person in bar.team:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
 					if not int(person.role) in [0,1,2] or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
 				for customer in bar.customers:
 					if not customer is Dictionary: return null
-					for key in ["id","life","order","wait","quoted","drinks","next","budget","premium","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
+					for key in ["id","life","order","wait","quoted","drinks","next","budget","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
 						if not customer.has(key): return null
+					if customer.has("drink") and not int(customer.drink) in range(Street.C.DRINKS.size()): return null
+				var specialty_units := 0
+				for sku in bar.get("drink_stock",{}):
+					var units = bar.drink_stock[sku]
+					if not (units is float or units is int) or units<0: return null
+					var known := false
+					for drink in range(1,Street.C.DRINKS.size()):
+						if Street.C.DRINKS[drink].id==sku: known = true
+					if not known: return null
+					specialty_units += int(units)
+				if specialty_units>int(bar.stock): return null
 				for game in bar.games:
 					if not game is Dictionary or not game.get("players") is Array or not game.has("remaining") or not game.has("fee"): return null
 		return parsed

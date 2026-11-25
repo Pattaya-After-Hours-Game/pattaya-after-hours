@@ -13,8 +13,8 @@ campaign using the original decision lessons; it does not spend your real till.
 3. Open **Service**. Read demand, staff service, occupied seats and stock together.
    Manual serving helps when staff capacity is zero. “Forecast automatic net” is
    not a prediction that you will earn nothing while actively serving.
-4. Restock before the fridge empties. Stock costs money when delivered, while
-   wages and overhead accrue during open trading.
+4. Use **Mixed delivery** for a sensible starter fridge. Open **Drinks & margins**
+   when you want to choose what to buy.
 5. Buy the improvement that addresses your current limit. Keep money for the
    next shift rather than spending the till down to zero.
 
@@ -29,7 +29,7 @@ capacity cannot sell drinks to customers who are not there.
 | Few visitors and staff waiting | Welcome, improve frontage or try an appropriate promotion |
 | Orders waiting with stock available | Serve manually, add a bartender or train existing bartenders |
 | Full venue and rejected arrivals | Add seating, renovate when eligible, or stop advertising harder |
-| Empty stock and lost orders | Buy stock; consider a bigger fridge and automatic deliveries |
+| A drink keeps coming up short | Buy that drink; return slow stock if the fridge is full |
 | Sales but negative recent net | Check inventory purchases, wages and promotion costs in the shift report |
 | Dancers but no automatic sales | Hire or reassign a bartender; dancers attract customers, not serve drinks |
 | Plenty of money but a locked renovation | Build that venue's satisfied visits, regulars and healthy shifts |
@@ -37,6 +37,15 @@ capacity cannot sell drinks to customers who are not there.
 Recent net records actual cash movements. A large stock delivery can make the
 current report look worse even though some inventory will sell next shift.
 Forecasts are estimates of automatic operation, not money already in the till.
+
+## Pick what to stock
+
+House lager is an easy sell, especially with locals. Lime soda is cheap to stock,
+and Rum & cola makes more per sale and draws more orders from visitors. The
+stage-2 premium menu lets you stock Mango cocktails for higher-spending crowds.
+Check each drink's expected share of orders, recent requests and shortages before
+buying. Some guests accept a house lager when their first choice runs out.
+Returns free up fridge space at half the wholesale price.
 
 ## Pool and promotions
 
@@ -72,8 +81,8 @@ hired. At Soi venues and gogos, role reassignment changes service and payroll.
 Hosts' preferences still apply, and only an actual customer request can produce
 a bar fine. An accepting host is unavailable for the remainder of the shift.
 
-Automatic deliveries are a paid supplier agreement; delivered stock still costs
-money. A manager needs stage 2, an on-duty bartender, deliveries and eight healthy
+Automatic deliveries reorder house lager and any drinks you've previously stocked.
+Deliveries still cost money. A manager needs stage 2, an on-duty bartender, deliveries and eight healthy
 shifts, plus the hiring fee and operating reserve. Managers enable the offline
 estimate. Check the current prices and requirements in **Service**.
 
@@ -82,8 +91,8 @@ The wealth of another property cannot satisfy those milestones. **Empire** shows
 leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
-The tested active-play curve reaches a first pool table around 17–20 minutes,
-stage 2 around 40–44 minutes and a second property around two hours. These are
+The tested active-play curve reaches a first pool table around 14–17 minutes,
+stage 2 around 36–39 minutes and a second property around two hours. These are
 simulation results for a particular investment strategy, not timers or promises
 for every play style. [Economy details](ECONOMY.md) include the full measurements.
 

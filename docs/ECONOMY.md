@@ -26,8 +26,18 @@ before training, only when real orders and stock exist. Hosts and dancers attrac
 visitors instead. Gogos perform between seconds 40 and 80 of each shift; drinks
 and premium-menu orders are priced independently of renovation stage.
 
-Stock costs ฿14 per drink when delivered. Wages and premises overhead are charged
-throughout open time, including quiet periods. Schedule staff off or close a venue
+Patron preferences are drawn from the audience at each venue. The current crowd
+mix affects the expected demand used by the fridge display and mixed deliveries.
+The display counts requests and shortages across the current and previous shift.
+Products share fridge capacity. Orders reserve their quoted price, and some guests
+will take house lager at its order-time quote if their first choice runs out.
+Unfillable orders can expire even when the fridge has other drinks. A bartender
+can still serve the next guest. Out-of-stock substitutions count as shortages of
+the requested drink. Wholesale costs are charged on delivery. The shift tracks
+the cost of drinks sold separately when calculating operating margin.
+
+Wages and premises overhead are charged throughout open time, including quiet
+periods. Schedule staff off or close a venue
 to reduce charges. An unaffordable operating charge closes the venue before debt
 is created. Staff and equipment remain owned. Anong's owner-run recovery shift
 covers two minutes of overhead; if the fridge is empty, six consignment drinks
@@ -81,14 +91,16 @@ create customers or settle another report. The original tutorial is a separate
 practice campaign. Old saves interrupted inside a legacy shift finish that shift
 once, then enter the live economy.
 
-Version-three saves retain all new queues, game fees, promotion timers and RNG
-state. Version-one/two migration retains money, properties, stages and hires;
+Version-three saves retain queues, game fees, promotion timers and RNG state.
+Saves from before the drink list carry their existing stock forward as house lager
+and keep open orders' prices. Version-one/two migration retains money, properties, stages and hires;
 older beer bars at stage 2+ receive their depicted pool table. New queues start
 empty. Existing progress is not rolled back to enforce the new pacing curve.
 
 Offline trading is an explicitly **estimated** projection, capped at eight hours.
 Only open managed venues qualify. Expected sales are bounded by shared demand,
-space, service and stock; stock and operating costs are deducted. Unviable trading
+space, service and the available stock of each drink. Automatic deliveries cover
+the house lager and drinks previously stocked. Wholesale and operating costs are deducted. Unviable trading
 or insufficient working cash pauses the projection, without spending the opening
 cash reserve. Temporary promotions, customer queues, local milestones, events and
 calendar time do not advance. Reports in Journal list estimated customers served,
@@ -110,13 +122,13 @@ finish without becoming stuck.
 
 | Milestone | Active target | Measured active range |
 | --- | --- | --- |
-| First useful purchase | 2–5 min | 2.2–3.1 min |
-| Pool table | 10–20 min | 16.7–19.7 min |
-| First stage 2 | 30–45 min | 39.8–43.4 min |
-| Second property | 90–150 min | 131.5–139.3 min |
-| First stage 3 | 180–300 min | 216.8–225.6 min |
+| First useful purchase | 2–5 min | 2.2–4.1 min |
+| Pool table | 10–20 min | 14.1–17.2 min |
+| First stage 2 | 30–45 min | 36.2–39.3 min |
+| Second property | 90–150 min | 119.0–124.1 min |
+| First stage 3 | 180–300 min | 196.4–202.9 min |
 
-Mostly-idle runs reach stage 3 in approximately 228–238 minutes, with a slower
+Mostly-idle runs reach stage 3 in approximately 207–216 minutes, with a slower
 opening. These are deterministic policy tests, not a claim about every human
 strategy. Across thirty paired scenario seeds, free pool improved aggregate quiet
 night contribution and reduced full-house contribution. Regression coverage also

@@ -40,6 +40,7 @@ var campaign_before_tutorial: Campaign
 var show_tutorial_hint := false
 var offline_notice := 0
 var drawer_open := false
+var drink_list_open := false
 var drawer: Control
 var event_banner: Button
 var scene_clock := 0.0
@@ -646,6 +647,7 @@ func street_panel() -> void:
 	var info: Dictionary = StreetContent.TYPES[int(bar.type)]
 	title(bar.name)
 	body("%s · Stage %d/3\n%s" % [info.name,bar.stage,info.stages[int(bar.stage)-1][0]],TEAL,16)
+	drink_panel(bar)
 	live_body(func() -> String:
 		var view: Dictionary = eco.forecast(bar)
 		return "Demand %.1f drinks/min · Staff service %.1f/min\n%d orders waiting · %d/%d customers · %d drinks in stock\nRecent actual net %s/min · Forecast automatic net %s/min\nOperating costs %s/min · Break-even %.1f drinks/min\n%s" % [view.demand,view.service,eco.pending(bar),bar.customers.size(),eco.seats(bar),bar.stock,cash(eco.actual_rate(bar)),cash(view.net),cash(view.costs),view.break_even,view.reason],GOLD,14)
@@ -653,7 +655,6 @@ func street_panel() -> void:
 	if not bar.open:
 		body(bar.close_reason,PINK,13)
 		row_button("Owner-run recovery shift",street_action.bind("recovery"))
-	row_button("Restock fridge · ฿14 per drink",street_action.bind("stock"))
 	live_body(func() -> String: return "Next shift in %ds" % (model.street.SHIFT_SECONDS-int(model.s.street.seconds)),MUTED,12)
 	if bar.equipment.pool>0:
 		body("POOL · ฿50 PER GAME",GOLD,14)
@@ -674,7 +675,8 @@ func street_panel() -> void:
 		for role in 3:
 			if role>0 and role!=bar.type: continue
 			row_button("Hire %s · %s" % [StreetContent.ROLE_NAMES[role].to_lower(),cash(600*(int(bar.crew)+1))],street_action.bind("hire",role))
-			body("Adds ฿%d/min. Forecast break-even after hire: %.1f drinks/min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool)/maxf(1,eco.price(bar)-StreetContent.STOCK_COST)),"Serves waiting orders." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
+			var view: Dictionary = eco.forecast(bar)
+			body("Adds ฿%d/min. Forecast break-even after hire: %.1f drinks/min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-view.pool)/maxf(1,view.margin)),"Serves waiting orders." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
 		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
@@ -704,6 +706,25 @@ func shift_report(bar: Dictionary) -> void:
 	var report: Dictionary = bar.last_shift
 	body("LAST SHIFT",GOLD,14)
 	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
+
+func drink_panel(bar: Dictionary) -> void:
+	var eco = model.street.economy
+	live_body(func() -> String:
+		var waiting: int = eco.stock_waiting(bar)
+		return "FRIDGE · %d/%d%s" % [bar.stock,eco.stock_capacity(bar)," · %d orders need stock" % waiting if waiting else ""],GOLD,14)
+	row_pair("Mixed delivery",street_action.bind("stock"),"Hide drink list" if drink_list_open else "Drinks & margins",func() -> void:
+		drink_list_open = not drink_list_open
+		render(true))
+	if not drink_list_open: return
+	for drink in eco.drink_count(bar):
+		var item: Dictionary = StreetContent.DRINKS[drink]
+		live_body(func() -> String:
+			var recent := int(bar.shift.drink_requests.get(item.id,0))+int(bar.last_shift.get("drink_requests",{}).get(item.id,0))
+			var missed := int(bar.shift.drink_misses.get(item.id,0))+int(bar.last_shift.get("drink_misses",{}).get(item.id,0))
+			var popularity := roundi(100.0*eco.drink_popularity(bar)[drink])
+			var price: int = eco.price(bar,drink)
+			return "%s · %d stocked · +฿%d/sale\n%d%% expected · %d asked · %d short" % [item.name,eco.stock_of(bar,drink),price-int(item.cost),popularity,recent,missed],TEAL,13)
+		row_pair("Buy up to 6 · ฿%d ea" % item.cost,street_action.bind("buy_drink",drink),"Return up to 3",street_action.bind("return_drink",drink))
 
 func street_event_panel() -> void:
 	var event: Dictionary = model.s.street.event

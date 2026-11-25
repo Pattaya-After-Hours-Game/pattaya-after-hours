@@ -217,9 +217,85 @@ func run(test: SceneTree) -> void:
 	loaded = Campaign.new(1)
 	test.check(loaded.load_game() and loaded.street.selected().games[0].table==1,"Pool table identity survives reload")
 	test_promotions(test)
+	test_drink_stock(test)
 	test_migration(test)
 	DirAccess.remove_absolute(Campaign.SAVE)
 	DirAccess.remove_absolute(Campaign.BACKUP)
+
+func test_drink_stock(test: SceneTree) -> void:
+	var model = Campaign.new(72)
+	var bar: Dictionary = model.street.selected()
+	var eco = model.street.economy
+	var normal_mix: Array = eco.drink_popularity(bar)
+	model.street.announce(1)
+	model.street.start_event()
+	var tourist_mix: Array = eco.drink_popularity(bar)
+	test.check(tourist_mix[2]>normal_mix[2],"Shore leave increases demand for mixed drinks")
+	test.check(eco.price(bar,2)-Content.DRINKS[2].cost>eco.price(bar)-Content.STOCK_COST,"Rum earns more per sale than house lager")
+	var cash_before := int(model.s.cash)
+	model.street.action("buy_drink",3)
+	test.check(model.s.cash==cash_before and not bar.drink_stock.has("mango"),"Premium stock requires a premium menu")
+	var guest: Dictionary = bar.customers[0]
+	guest.opening = false
+	guest.order = false
+	guest.taste_roll = 99
+	eco.order(bar,guest)
+	guest.lager_quote = 0
+	test.check(guest.drink==2 and bar.shift.drink_requests.rum==1 and eco.stock_waiting(bar)==1,"Unstocked rum demand is recorded even with lager in the fridge")
+	model.street.action("serve")
+	test.check(guest.order and eco.stock_of(bar,0)==17,"An unavailable drink does not block the next guest's order")
+	cash_before = int(model.s.cash)
+	model.street.action("buy_drink",2)
+	test.check(eco.stock_of(bar,2)==6 and model.s.cash==cash_before-114,"A delivery charges the selected drink's actual wholesale cost")
+	model.save_game()
+	var loaded = Campaign.new(11)
+	test.check(loaded.load_game(),"Drink stock saves and loads")
+	bar = loaded.street.selected()
+	eco = loaded.street.economy
+	test.check(eco.stock_of(bar,2)==6 and bar.customers[0].drink==2,"Reload preserves both stock and the pending order")
+	cash_before = int(loaded.s.cash)
+	bar.serve_ready = 0
+	loaded.street.action("serve")
+	test.check(eco.stock_of(bar,2)==5 and loaded.s.cash==cash_before+73 and bar.shift.sold_drink_cost==33,"Serving a rum order consumes rum stock and settles the saved quote and its own cost")
+	loaded.street.action("return_drink",2)
+	test.check(eco.stock_of(bar,2)==2 and loaded.s.cash==cash_before+73+28,"Returning overstock frees fridge space at half wholesale")
+	bar.restock = true
+	test.check(eco.auto_drink(bar,2) and not eco.auto_drink(bar,1),"Automatic deliveries stick to the chosen drinks")
+	var next_guest: Dictionary = bar.customers[2]
+	next_guest.drink = 1
+	next_guest.quoted = 36
+	next_guest.lager_quote = 44
+	cash_before = int(loaded.s.cash)
+	eco.serve(bar)
+	test.check(loaded.s.cash==cash_before+44 and eco.stock_of(bar,1)==0 and bar.shift.drink_misses.soda==1,"A player stocks around unmet demand even when a guest accepts quoted-price lager")
+	eco.change_stock(bar,2,-2)
+	next_guest.order = true
+	next_guest.drink = 2
+	next_guest.quoted = 73
+	cash_before = int(loaded.s.cash)
+	eco.serve(bar)
+	test.check(loaded.s.cash==cash_before+73-4*19 and eco.stock_of(bar,2)==3,"An automated rum delivery pays wholesale and fills the rum order")
+	bar.restock = false
+	bar.manager = true
+	bar.team = [{"role":0,"on":true,"host":-1}]
+	loaded.s.cash = 2000
+	loaded.s.street.last_seen = 1000
+	var offline_gain: int = loaded.street.claim_offline(1600)
+	test.check(offline_gain>0 and eco.stock_of(bar,2)==0 and eco.stock_of(bar,1)==0,"A manager's offline estimate respects the stock limit of each drink")
+	# Shape of a pre-drinks version-three save with an order already in progress.
+	model = Campaign.new(72)
+	bar = model.street.selected()
+	bar.erase("drink_stock")
+	for key in ["drink_requests","drink_misses","sold_drink_cost"]: bar.shift.erase(key)
+	for order in bar.customers:
+		order.erase("drink")
+		order.erase("lager_quote")
+	model.save_game()
+	loaded = Campaign.new(11)
+	test.check(loaded.load_game() and loaded.street.economy.stock_of(loaded.street.selected(),0)==18,"Existing inventory becomes house lager without losing any units")
+	cash_before = int(loaded.s.cash)
+	loaded.street.action("serve")
+	test.check(loaded.s.cash==cash_before+55,"Existing pending orders retain their original quote")
 
 func test_migration(test: SceneTree) -> void:
 	var legacy = Campaign.new(72,true)
