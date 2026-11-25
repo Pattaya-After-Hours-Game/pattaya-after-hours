@@ -21,6 +21,8 @@ campaigns; use the wrapper rather than running them against your personal saves.
 | --- | --- |
 | Customer economy | Real orders, stockouts, service delays, full rooms and bounded shared traffic |
 | Finance | Quiet-period payroll, closure/recovery, raid fine ledgers and local renovation gates |
+| Staff | Exact 25/20/15-second service, individual training, expiry/rehires, skipped/closed/offline time, migration, partial work and UI buttons |
+| Waiting bell | Empty queues, immediate notification, ten-second repeat limit, empty/refilled queues and mute/inactive suppression |
 | Clock and prep | Noon/midnight/1am/3am boundaries, nightly permissions, manager/manual cleaning, skipped work and closure precedence |
 | Peak hours | Separate beer/Soi/gogo windows, midnight wrap, bounded shared demand, double dirt and legal-hours offline segments |
 | Late raids | Per-venue heat counters, cooling, deterministic RNG, immediate saves, capped fines and next-noon recovery |
@@ -32,7 +34,8 @@ campaigns; use the wrapper rather than running them against your personal saves.
 | Pacing | Three seeds × click-heavy, balanced and mostly-idle strategies, with no injected money or offline income |
 
 The six active-strategy runs must meet the configured milestone windows. The
-three mostly-idle runs must complete without getting stuck. Thirty paired
+three mostly-idle runs must stay solvent and complete within ten simulated hours.
+All styles must obey actual order counts and bounded shared traffic. Thirty paired
 promotion scenarios compare quiet and full-house free-pool contribution. These
 are useful repeatable checks; they do not replace human balance testing.
 
@@ -60,6 +63,10 @@ Review these behaviours, not just whether a PNG exists:
 - Use `empty-*`, `full-*` and `closed-*` general-preview filters for all three
   venue types, including the 24-customer maximum. Check character proportions,
   visible feet, counter/table occlusion and a clear outside lane.
+- Use the economy runner with `PATTAYA_PREVIEW_FILTER='staff-*'` for base,
+  trained, expired and rehired cards. Check terms, individual training and rehire
+  buttons; departed staff should disappear from the room. Listen to the bell in
+  normal play and check mute; headless tests verify timing, not listening quality.
 - Empty venues look empty, waiting-order markers match customers, and closed or
   off-duty staff do not appear to be working.
 - Beer-bar pool states distinguish paid, free, idle and not-open facilities.

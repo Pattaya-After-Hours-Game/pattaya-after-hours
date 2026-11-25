@@ -54,6 +54,8 @@ var root_ui: Control
 var fight: Control
 var district: Control
 var music: AudioStreamPlayer
+var order_sound: AudioStreamPlayer
+var order_alert = preload("res://scripts/order_alert.gd").new()
 var sfx: AudioStreamPlayer
 var sfx_streams := {}
 var muted := false
@@ -107,6 +109,10 @@ func _ready() -> void:
 	sfx = AudioStreamPlayer.new()
 	sfx.volume_db = -13
 	add_child(sfx)
+	order_sound = AudioStreamPlayer.new()
+	order_sound.stream = preload("res://assets/order_waiting.wav")
+	order_sound.volume_db = -9
+	add_child(order_sound)
 	for kind in ["click","impact","block","gong"]:
 		sfx_streams[kind] = load("res://assets/%s.wav" % kind)
 	if not muted and DisplayServer.get_name() != "headless": music.play()
@@ -185,7 +191,9 @@ func tone(kind: String) -> void:
 
 func set_sound() -> void:
 	muted = not muted
-	if muted: music.stop()
+	if muted:
+		music.stop()
+		order_sound.stop()
 	elif DisplayServer.get_name() != "headless": music.play()
 	var config := ConfigFile.new()
 	config.set_value("audio","muted",muted)
@@ -689,22 +697,33 @@ func street_panel() -> void:
 	body("EQUIPMENT",GOLD,14)
 	for i in StreetContent.EQUIPMENT.size():
 		var item: Dictionary = StreetContent.EQUIPMENT[i]
-		if bar.equipment[item.id]>=item.max or (item.id=="pool" and bar.type!=0): continue
+		if item.id=="training" or bar.equipment[item.id]>=item.max or (item.id=="pool" and bar.type!=0): continue
 		row_button("%s · %s" % [item.name,cash(int(item.cost)*(int(bar.equipment[item.id])+1))],street_action.bind("equipment",i))
 		body(item.help,MUTED,12)
 	if bar.type==2:
 		live_body(func() -> String: return "Performance: %s · dancers attract; bartenders serve." % ("on stage" if int(model.s.street.seconds) in range(40,80) else "next set at 40s into each shift"),TEAL,13)
 	body("TEAM & PAYROLL",GOLD,14)
+	body("฿4,500 per ten-game-day contract, plus on-duty wages. Closed hours, skipped nights and offline time count. Training stays with the person.",MUTED,12)
 	if bar.crew<model.street.staff_limit(bar):
 		for role in 3:
 			if role>0 and role!=bar.type: continue
-			row_button("Hire %s · %s" % [StreetContent.ROLE_NAMES[role].to_lower(),cash(600*(int(bar.crew)+1))],street_action.bind("hire",role))
-			body("Adds ฿%d/real min. Forecast break-even after hire: %.1f drinks/real min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool)/maxf(1,eco.price(bar)-StreetContent.STOCK_COST)),"Serves waiting orders." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
+			row_button("Hire %s · %s" % [StreetContent.ROLE_NAMES[role].to_lower(),cash(StreetContent.STAFF_CONTRACT_COST)],street_action.bind("hire",role))
+			body("Adds ฿%d/real min. Forecast break-even after hire: %.1f drinks/real min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool)/maxf(1,eco.price(bar)-StreetContent.STOCK_COST)),"One drink every 25s; help with the rush." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
 		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
 		if person.role==1: name_text = StreetContent.HOSTS[int(person.host)][0]
-		character_card(Art.worker_id(bar,i),name_text,"Serves waiting orders" if person.role==0 else "Attracts visitors")
+		character_card(Art.worker_id(bar,i),name_text,"Contract finished" if not eco.contracted(person) else "Serves waiting orders" if person.role==0 else "Attracts visitors")
+		live_body(func() -> String:
+			var remaining := int(person.get("contract_left",StreetContent.STAFF_CONTRACT_MINUTES))
+			return ("Contract: %dd %dh %dm left" % [remaining/1440,remaining%1440/60,remaining%60] if remaining>0 else "Contract finished · rehire available")+" · Training %d/2" % int(person.get("training",0)),GOLD,12)
+		if not eco.contracted(person):
+			row_button("Rehire %s · %s" % [name_text,cash(StreetContent.STAFF_CONTRACT_COST)],street_action.bind("rehire",i))
+			continue
+		if person.role==0:
+			body("One drink every %ds (%.1f/min). You can serve alongside them." % [eco.service_seconds(person),60.0/eco.service_seconds(person)],MUTED,12)
+			if int(person.get("training",0))<StreetContent.STAFF_SERVICE_SECONDS.size()-1:
+				row_button("Train %s · %s" % [name_text,cash(StreetContent.STAFF_TRAINING_COST*(int(person.get("training",0))+1))],street_action.bind("train_staff",i))
 		row_button("%s · %s" % [name_text,"On duty" if person.on else "Off duty"],street_action.bind("rota",i))
 		if bar.type>0: row_button("Reassign role · "+name_text,street_action.bind("role",i))
 		if person.role==1:
@@ -908,6 +927,11 @@ func _process(delta: float) -> void:
 		if save_seconds >= 15.0:
 			save_seconds = 0.0
 			save_state()
+	var alert_enabled: bool = campaign_before_tutorial==null and model.s.phase in ["plan","guided"] and not is_instance_valid(fight) and not is_instance_valid(district) and not muted
+	var waiting := false
+	var selected_bar: Dictionary = model.street.selected()
+	if alert_enabled and model.street.economy.is_trading(selected_bar): waiting = model.street.economy.pending(selected_bar)>0
+	if order_alert.tick(waiting,delta,alert_enabled) and DisplayServer.get_name()!="headless": order_sound.play()
 	if model.s.phase != "godzilla" or godzilla_shots == 0: return
 	godzilla_time = maxf(0.0,godzilla_time - delta)
 	shot_delay = maxf(0.0,shot_delay - delta)
@@ -1050,7 +1074,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _exit_tree() -> void:
 	# Release active playback before the audio server shuts down.
-	for player in [music, sfx]:
+	for player in [music, sfx, order_sound]:
 		if is_instance_valid(player):
 			player.stop()
 			player.stream = null

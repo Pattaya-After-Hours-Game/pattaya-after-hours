@@ -11,7 +11,7 @@ campaign using the original decision lessons; it does not spend your real till.
 2. When no orders are waiting, welcome passersby. Welcoming has a cooldown and a
    capped effect; it cannot create an unlimited crowd.
 3. Open **Service**. Read demand, staff service, occupied seats and stock together.
-   Manual serving helps when staff capacity is zero. “Forecast automatic net” is
+   Manual serving helps when staff are absent or cannot keep up. “Forecast automatic net” is
    not a prediction that you will earn nothing while actively serving.
 4. Restock before the fridge empties. Stock costs money when delivered, while
    wages and overhead accrue during open trading.
@@ -21,6 +21,13 @@ campaign using the original decision lessons; it does not spend your real till.
 The first useful purchase depends on the bar: frontage helps quiet trade,
 seating helps a full room, and a bartender helps unattended orders. More service
 capacity cannot sell drinks to customers who are not there.
+
+A short two-note bell means the selected venue has an order waiting. It repeats
+at most every ten seconds while orders remain; quickly emptying and refilling the
+queue cannot spam it. It is silent in practice, fights and street exploration,
+and follows **Sound / Muted**. A falling order count can mean a served drink or
+an impatient customer leaving; use drink sales and the shift's lost-service or
+lost-stock counts to distinguish them.
 
 ## The clock and tomorrow's opening
 
@@ -119,9 +126,27 @@ is an estimate, not extra customers or income credited to you.
 
 ## Staff, management and growth
 
-Bartenders serve waiting orders. Adult hosts and dancers attract the appropriate
-audience. Use each team member's rota button to schedule them off; staff remain
-hired. At Soi venues and gogos, role reassignment changes service and payroll.
+Each staff hire costs **฿4,500 for ten game days**, plus wages while on duty.
+A base bartender serves one real drink order every **25 seconds** (2.4/min), so
+keep serving alongside them during rushes. **Train** on their individual card
+costs ฿800 for level 1 (20 seconds) and ฿1,600 for level 2 (15 seconds). Training
+does not create customers and is retained across contracts and role changes.
+
+**Service → Team & Payroll** shows the remaining contract time. When it expires,
+the person stops working and stops drawing wages. Their card stays available;
+**Rehire** costs ฿4,500 for another ten days and keeps their training. Rehiring is
+manual, never an automatic charge. Existing saves retain their hires and apply
+previous venue-wide training to those people; new hires start untrained.
+
+One game day is 24 real minutes before skips. Closed hours, off-duty time and
+skipped nights still use the contract. Offline absence also counts at one game
+minute per real second, even though the displayed live calendar pauses. At
+normal hours with overnight skips, ten trading days are about 130 real minutes.
+The manager appointment and supplier agreement remain permanent purchases.
+
+Adult hosts and dancers attract their audience and use the same contracts; they
+do not serve drinks. Use each person's rota to pause wages, not their contract.
+At Soi venues and gogos, role reassignment changes service and payroll.
 Hosts' preferences still apply, and only an actual customer request can produce
 a bar fine. An accepting host is unavailable for the remainder of the shift.
 
@@ -135,8 +160,9 @@ The wealth of another property cannot satisfy those milestones. **Empire** shows
 leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
-The tested active-play curve reaches a first pool table around 16–18 minutes,
-stage 2 around 39–44 minutes and a second property around 129–143 minutes. These are
+The tested active-play curve reaches a first pool table around 12–16 minutes,
+stage 2 around 34–38 minutes and a second property around 142–148 minutes.
+The first Soi lease is ฿26,000 plus opening reserves. These are
 simulation results for a particular investment strategy, not timers or promises
 for every play style. [Economy details](ECONOMY.md) include the full measurements.
 
@@ -144,7 +170,7 @@ for every play style. [Economy details](ECONOMY.md) include the full measurement
 
 Use **Close venue** to pause its payroll and overhead. Off-duty staff do not
 charge wages. If an operating charge becomes unaffordable, the venue closes
-before adding new idle debt, while keeping its hires and upgrades.
+before adding new idle debt, while keeping its staff records and upgrades. Contracts still count down.
 
 At an empty till, a closed venue can take an **Owner-run recovery shift**. Anong
 covers two minutes of overhead and the team is scheduled off. If the fridge is

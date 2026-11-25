@@ -9,7 +9,7 @@ func _initialize() -> void:
 	call_deferred("run")
 
 func find_text(node: Node, text: String) -> Control:
-	if node is Label and node.text.begins_with(text): return node
+	if (node is Label or node is Button) and node.text.begins_with(text): return node
 	for child in node.get_children():
 		var found := find_text(child,text)
 		if found: return found
@@ -22,7 +22,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	await process_frame
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
-		if target: app.scroll.scroll_vertical = int(target.position.y)
+		if target: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
 	get_root().get_texture().get_image().save_png(output.path_join(name_text+".png"))
@@ -44,6 +44,18 @@ func run() -> void:
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	await capture(app,"economy-opening")
+	app.model.s.cash = 50000
+	app.model.street.action("hire",0)
+	await capture(app,"staff-base","Train Bartender 1")
+	app.model.street.action("train_staff",0)
+	await capture(app,"staff-trained","Train Bartender 1")
+	app.model.street.economy.advance_contracts(14400)
+	await capture(app,"staff-expired","Rehire Bartender 1")
+	app.drawer_open = false
+	await capture(app,"staff-expired-scene")
+	app.model.street.action("rehire",0)
+	app.drawer_open = true
+	await capture(app,"staff-rehired","Train Bartender 1")
 	app.model.s.cash = 250000
 	var first: Dictionary = app.model.street.selected()
 	first.equipment.pool = 1

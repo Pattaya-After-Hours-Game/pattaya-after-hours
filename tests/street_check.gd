@@ -16,7 +16,7 @@ func run(test: SceneTree) -> void:
 	m.street.action("hire",0)
 	m.s.street.pass_credit = -10000000
 	m.street.tick(60)
-	test.check(bar.sold==0 and m.s.cash<8800,"Idle staff incur payroll without minting sales")
+	test.check(bar.sold==0 and m.s.cash<1000,"Idle staff incur payroll without minting sales")
 	var paused_cash := int(m.s.cash)
 	m.street.action("open")
 	m.street.tick(60)
@@ -110,7 +110,7 @@ func run(test: SceneTree) -> void:
 	m.street.action("hire",2)
 	test.check(m.street.economy.service_rate(bar)==0 and bar.team[0].role==2,"Dancers attract visitors but do not serve orders")
 	m.street.action("hire",0)
-	test.check(m.street.economy.service_rate(bar)==10,"A bartender adds actual service capacity")
+	test.check(is_equal_approx(m.street.economy.service_rate(bar),2.4),"A bartender adds actual service capacity")
 	# Bar fines need a real request and preserve staff preferences.
 	m.street.action("buy",1)
 	bar = m.street.selected()

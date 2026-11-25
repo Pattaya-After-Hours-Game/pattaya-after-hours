@@ -70,6 +70,12 @@ an empty fridge stays empty. Bo's delivery still costs money.
 
 > **Anong:** “You can skip to opening. The floor can't.”
 
+Staff agree to ten-day contracts. Paying for training develops a person, so those
+skills stay with them if they leave and later return. New bartenders need the
+owner's help with a rush; learning the job gradually buys breathing room.
+
+> **Anong:** “The contract ends. Knowing how to pour a drink doesn't.”
+
 These are current source mechanics. Personal staff quests and other future
 hooks below remain separate ideas.
 

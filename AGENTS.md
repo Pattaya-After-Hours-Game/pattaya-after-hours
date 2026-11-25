@@ -43,6 +43,9 @@ claiming behaviour exists; update the relevant documentation when it changes.
   space and options; it does not automatically raise every drink's price.
   Local satisfaction, regulars and healthy operation matter alongside cash.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.
+  Staff contracts cost ฿4,500 for ten game days, including closed/skipped/offline
+  time. Training belongs to the person and survives expiry/rehire. Base bartender
+  service is one drink per 25 seconds, improving to 20/15 through training.
   Quiet trading still has costs. Preserve rotas, temporary closure and recovery
   instead of forcing idle-mode debt or an unrecoverable failure.
 - The economy's pacing targets are acceptance criteria, not mandatory waiting

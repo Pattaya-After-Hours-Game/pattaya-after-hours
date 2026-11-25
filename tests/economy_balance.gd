@@ -5,11 +5,11 @@ const C = preload("res://scripts/street_content.gd")
 func _initialize() -> void:
 	call_deferred("run")
 
-func simulate(seed_value: int, style: String, minutes: int = 300) -> Dictionary:
+func simulate(seed_value: int, style: String, minutes: int = 600) -> Dictionary:
 	var model = Campaign.new(seed_value)
 	var st = model.street
 	var eco = st.economy
-	var times := {"seed":seed_value,"style":style,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1}
+	var times := {"seed":seed_value,"style":style,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1,"hire":-1}
 	for second in minutes*60:
 		# Real player prep actions; seconds spent cleaning count toward pacing.
 		if st.can_skip():
@@ -31,7 +31,6 @@ func simulate(seed_value: int, style: String, minutes: int = 300) -> Dictionary:
 		# Buy small capacity upgrades before the first renovation; no free money.
 		var next_item := -1
 		if bar.equipment.sign==0: next_item = 0
-		elif bar.team.is_empty() and model.s.cash>=720: st.action("hire",0)
 		elif not bar.restock and model.s.cash>=1100: st.action("restock")
 		elif bar.equipment.seating==0: next_item = 4
 		elif bar.equipment.pool==0: next_item = 3
@@ -42,6 +41,13 @@ func simulate(seed_value: int, style: String, minutes: int = 300) -> Dictionary:
 		if bar.equipment.pool>0 and times.pool<0: times.pool = second
 		if bar.stage==1 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
 		if bar.stage>=2 and times.stage2<0: times.stage2 = second
+		# A contract is a late investment: do not block smaller purchases while saving.
+		if bar.stage>=2 and model.s.cash>=C.STAFF_CONTRACT_COST+1000:
+			if bar.team.is_empty(): st.action("hire",0)
+			elif not eco.contracted(bar.team[0]): st.action("rehire",0)
+		if not bar.team.is_empty():
+			if times.hire<0: times.hire = second
+			if int(bar.team[0].get("training",0))<2 and model.s.cash>2500: st.action("train_staff",0)
 		if bar.stage>=2 and not bar.manager and model.s.cash>2000: st.action("manager")
 		if model.s.street.bars.size()==1 and model.s.street.chapter>=1 and model.s.cash>=st.purchase_cost(1)+st.opening_reserve(1):
 			st.action("buy",1)
@@ -49,7 +55,10 @@ func simulate(seed_value: int, style: String, minutes: int = 300) -> Dictionary:
 		if model.s.street.bars.size()>1:
 			model.s.street.selected = 1
 			var other: Dictionary = st.selected()
-			if other.team.is_empty() and model.s.cash>800: st.action("hire",0)
+			if model.s.cash>C.STAFF_CONTRACT_COST+1000:
+				if other.team.is_empty(): st.action("hire",0)
+				elif not eco.contracted(other.team[0]): st.action("rehire",0)
+			if not other.team.is_empty() and int(other.team[0].get("training",0))<2 and model.s.cash>2500: st.action("train_staff",0)
 			if not other.restock and model.s.cash>1100: st.action("restock")
 			if other.stock<8 and model.s.cash>150: eco.restock(other)
 			model.s.street.selected = 0
@@ -65,6 +74,9 @@ func simulate(seed_value: int, style: String, minutes: int = 300) -> Dictionary:
 	times.regulars = st.selected().regulars
 	times.healthy = st.selected().healthy
 	times.sales = model.s.street.served
+	times.orders = model.s.street.orders
+	times.offered = model.s.street.offered
+	times.arrivals = model.s.street.arrivals
 	return times
 
 func run() -> void:
@@ -73,6 +85,9 @@ func run() -> void:
 		for seed_value in [11,72,291]:
 			var result := simulate(seed_value,style)
 			print(JSON.stringify(result))
+			if result.cash<0 or result.sales>result.orders or result.arrivals>result.offered+3:
+				printerr("ECONOMY FAIL: strategy bypassed cash or customer limits")
+				failures += 1
 			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,9000],"stage3":[10800,18000]}
 			for milestone in bounds:
 				var seconds := int(result[milestone])

@@ -88,6 +88,7 @@ func run() -> void:
 	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
 	load("res://tests/street_check.gd").new().run(self)
 	load("res://tests/clock_check.gd").new().run(self)
+	load("res://tests/staff_check.gd").new().run(self)
 	test_risk()
 	test_windows_updates()
 	await test_ui()
@@ -109,9 +110,9 @@ func test_ui() -> void:
 	var opening_cash := int(app.model.s.cash)
 	use_button(app,"Serve a drink")
 	check(app.model.s.street.served == 1 and app.model.s.cash > opening_cash,"Main clicker button serves and earns")
-	app.model.s.cash = 2000
-	use_button(app,"Hire bartender · ฿600")
-	app.model.street.tick(6)
+	app.model.s.cash = 50000
+	use_button(app,"Hire bartender · ฿4,500")
+	app.model.street.tick(25)
 	check(app.model.s.street.served == 2,"Hired staff serve without tapping")
 	app.model.street.announce(3)
 	app.render()
@@ -120,6 +121,13 @@ func test_ui() -> void:
 	use_button(app,"Raise stock & share pumps · ฿450")
 	check(app.model.s.street.event.prepared,"Event preparation works through the UI")
 	app.model.s.street.event = {}
+	app.change_tab(0)
+	use_button(app,"Train Bartender 1 · ฿800")
+	check(app.model.street.selected().team[0].training==1,"Individual training control works")
+	app.model.street.economy.advance_contracts(14400)
+	app.render()
+	use_button(app,"Rehire Bartender 1 · ฿4,500")
+	check(app.model.street.selected().team[0].training==1 and app.model.street.selected().team[0].on,"Rehire control retains training")
 	for i in 5:
 		app.change_tab(i)
 		check(app.column.get_child_count() > 0,"Rendered tab %d" % i)

@@ -106,7 +106,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine","clean":
+		"serve","stock","hire","welcome","equipment","promotion","rota","role","open","recovery","bar_fine","clean","rehire","train_staff":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:
@@ -119,6 +119,7 @@ func action(id: String, index: int = 0) -> String:
 				result = "%s can trade until 3am tonight. Heat and raid risk rise after 1am." % bar.name
 		"skip":
 			if not can_skip(): return "Skip is available after 1am when every venue has stopped trading."
+			economy.advance_contracts(C.OPEN_MINUTE-int(s.street.minute))
 			s.street.minute = C.OPEN_MINUTE
 			reopen_noon()
 			s.street.offline_cursor = C.OPEN_MINUTE
@@ -345,6 +346,7 @@ func tick(seconds: int) -> void:
 				if s.street.event_wait<=0:
 					announce(1+int(s.street.event_index)%8)
 					s.street.event_index += 1
+		economy.advance_contracts(1)
 		s.street.minute = (int(s.street.minute)+1)%C.DAY_MINUTES
 		if s.street.minute==0: next_calendar_day()
 		if s.street.minute==C.OPEN_MINUTE: reopen_noon()
@@ -368,7 +370,7 @@ func claim_offline(now: int) -> int:
 	return earnings
 
 func opening_reserve(kind: int) -> int:
-	var amount := int(C.OVERHEAD[kind])*2+600+140
+	var amount := int(C.OVERHEAD[kind])*2+C.STAFF_CONTRACT_COST+140
 	for bar in s.street.bars:
 		if bar.open: amount += economy.operating_rate(bar)*2
 	return amount
