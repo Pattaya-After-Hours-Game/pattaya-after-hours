@@ -4,7 +4,7 @@ Run from any directory. Sources, crop recipes and receipts live in art/.
 """
 import hashlib, json, sys
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
 ROOT = Path(__file__).resolve().parents[1]
 SRC, OUT = ROOT/'art/sources', ROOT/'assets/art'
 OUT.mkdir(parents=True, exist_ok=True)
@@ -125,6 +125,34 @@ if recipe.exists():
             head.thumbnail((88,92),NEAREST)
             portrait.alpha_composite(head,((96-head.width)//2,96-head.height))
             portrait.convert('RGB').save(OUT/('portrait-'+name.removeprefix('fight-')+'.png'))
+# Ownership patches use generated fan-free walls, cropped only at the fan.
+# Original venue plates remain byte-for-byte unchanged.
+fan_recipe=json.loads((ROOT/'art/recipes/fan-ownership.json').read_text())
+for item in fan_recipe['assets']:
+    source=SRC/(item['id']+'.png')
+    if not source.exists():
+        if '--partial' in sys.argv: continue
+        raise SystemExit('Missing fan artwork: '+str(source))
+    im=Image.open(source).convert('RGBA')
+    if 'crop' in item:
+        x,y,w,h=item['crop']
+        im=im.resize((960,540),NEAREST).crop((x,y,x+w,y+h))
+        # Package only the removed fixture's footprint, keeping surrounding
+        # boards from the untouched plate and softening the join by one pixel.
+        mask=Image.new('L',(w,h))
+        pen=ImageDraw.Draw(mask)
+        pen.ellipse(tuple(item['mask_ellipse']),fill=255)
+        pen.rounded_rectangle(tuple(item['mask_mount']),radius=3,fill=255)
+        mask=mask.filter(ImageFilter.GaussianBlur(item['mask_feather']))
+        im.putalpha(mask)
+    else:
+        im.putalpha(im.getchannel('A').point(lambda a: 0 if a<160 else 255))
+        im=im.crop(im.getbbox())
+        im.thumbnail(tuple(item['output_size']),NEAREST)
+        canvas=Image.new('RGBA',tuple(item['output_size']))
+        canvas.alpha_composite(im,((canvas.width-im.width)//2,0))
+        im=canvas
+    im.save(OUT/(item['id']+'.png'))
 manifest={}
 for p in sorted(OUT.glob('*.png')):
     im=Image.open(p)

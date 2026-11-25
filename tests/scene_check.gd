@@ -25,6 +25,21 @@ func run(test: SceneTree) -> void:
 	city.bars = model.s.street.bars
 	city.street_state = model.s.street
 	var bar: Dictionary = model.street.selected()
+	# Ownership, not renovation or rendering, controls the fan.
+	test.check(not City.fan_owned(bar),"Opening bar has no purchased fan")
+	model.street.action("equipment",1)
+	test.check(not City.fan_owned(bar),"Failed comfort purchase does not display a fan")
+	bar.stage = 3
+	test.check(not City.fan_owned(bar),"Renovation alone does not grant a fan")
+	model.s.cash = 10000
+	model.street.action("equipment",1)
+	test.check(City.fan_owned(bar),"Comfort purchase installs the fan")
+	var saved_bar: Dictionary = JSON.parse_string(JSON.stringify(bar))
+	test.check(City.fan_owned(saved_bar),"Saved equipment ownership retains the installed fan")
+	bar.open = false
+	test.check(City.fan_owned(bar),"Closure retains the owned fan")
+	bar.open = true
+	bar.equipment.comfort = 0
 	# Rendering is a read-only view of real orders, even at full occupancy.
 	for kind in 3:
 		for stage in range(1,4):

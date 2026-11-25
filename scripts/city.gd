@@ -40,7 +40,7 @@ func _draw() -> void:
 	var bar: Dictionary = bars[selected_bar] if not bars.is_empty() else {"type":0,"stage":clampi(level,1,3),"crew":legacy_staff.size(),"away":[],"closed":0,"name":"Blue Hour"}
 	var kind := int(bar.type)
 	var stage := int(bar.stage)
-	var backdrop := Art.venue(kind,stage)
+	var backdrop := Art.venue(kind,stage,fan_owned(bar))
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
 	var closed: bool = bar.closed > 0 or not bar.get("open",true)
 	# Only the street opening contains ambient traffic. Interior sprites come
@@ -97,8 +97,8 @@ func _draw() -> void:
 	var neon: Color = [TEAL,PINK,GOLD][kind]
 	neon = neon.darkened(.025+.025*sin(clock*2.3))
 	draw_string(font,Vector2(676,101),sign_name,HORIZONTAL_ALIGNMENT_CENTER,208,24,neon)
-	# The fan blades rotate over the centre of the illustrated fan cage.
-	if kind != 1:
+	# Owned fans stay installed when closed, but only spin during trading.
+	if fan_owned(bar) and not closed:
 		var fan := Vector2(502,122) if kind==0 else Vector2(266,92)
 		for i in 3:
 			var ray := Vector2.from_angle(clock*9+i*TAU/3)*23
@@ -115,6 +115,9 @@ func _draw() -> void:
 		var state := 3 if godzilla == "asleep" else 2 if shot_flash > .1 else 1 if arrival_time > 1.0 else int(arrival_time*4)%2
 		Art.frame(self,"monster",state,Vector2(400-maxf(0,1-arrival_time)*500,460),1.2,false,Vector2(320,320),Color.WHITE,Vector2(1,1+.012*sin(clock*(1.5 if state==3 else 3))))
 		if shot_flash > .1: draw_circle(Vector2(445,255),9*shot_flash,Color(1,.8,.3,shot_flash*.6))
+
+static func fan_owned(bar: Dictionary) -> bool:
+	return int(bar.get("equipment",{}).get("comfort",0))>0
 
 static func pool_rect(table: int) -> Rect2:
 	return Rect2(270+table*200,274+table*12,165,78)

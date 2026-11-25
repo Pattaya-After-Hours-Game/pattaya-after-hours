@@ -11,6 +11,27 @@ func run(test: SceneTree) -> void:
 			if tex: test.check(tex.get_size()==Vector2(960,540),"Venue uses presentation resolution")
 			var front := Art.frontage(kind,stage)
 			test.check(front != null and front.get_size()==Vector2(320,256),"Matching property frontage: %d/%d" % [kind,stage])
+	# Composite variants may change only the equipment region. This protects
+	# all surrounding production art, and exercises cache switching both ways.
+	for kind in 3:
+		for stage in range(1,4):
+			var plain := Art.venue(kind,stage,false).get_image()
+			var equipped := Art.venue(kind,stage,true).get_image()
+			plain.convert(Image.FORMAT_RGBA8)
+			equipped.convert(Image.FORMAT_RGBA8)
+			var rect := Art.fan_region(kind)
+			test.check(plain.get_region(rect).get_data()!=equipped.get_region(rect).get_data(),"Fan purchase visibly changes every venue stage")
+			var strips := [Rect2i(0,0,960,rect.position.y),Rect2i(0,rect.end.y,960,540-rect.end.y),Rect2i(0,rect.position.y,rect.position.x,rect.size.y),Rect2i(rect.end.x,rect.position.y,960-rect.end.x,rect.size.y)]
+			for strip in strips:
+				test.check(plain.get_region(strip).get_data()==equipped.get_region(strip).get_data(),"Fan ownership preserves all pixels outside the equipment region")
+			var cached := Art.venue(kind,stage,false).get_image()
+			cached.convert(Image.FORMAT_RGBA8)
+			test.check(cached.get_data()==plain.get_data(),"Switching fan state cannot mutate the cached unowned room")
+			if kind!=1:
+				var patch := Art.texture("fan-hidden-%s-%d" % [Art.TYPES[kind],stage])
+				test.check(patch!=null and patch.get_size()==Vector2(rect.size),"Fan cover fits the illustrated fixture")
+	var fan := Art.texture("wall-fan")
+	test.check(fan!=null and fan.get_image().get_pixel(0,0).a==0,"Purchased Soi fan preserves transparent edges")
 	for id in ["district","toybox","counter","event-inspection"]:
 		test.check(Art.texture(id) != null,"Scene/prop artwork exists: "+id)
 	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid"]:

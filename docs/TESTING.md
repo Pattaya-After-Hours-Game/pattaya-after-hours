@@ -57,6 +57,9 @@ Review these behaviours, not just whether a PNG exists:
 - Use `passerby-*` to inspect six consecutive crossings and the empty gap.
   Appearances change between crossings, remain stable during each crossing, and
   face their travel direction without entering the bar.
+- Use `fan-*` for owned/unowned pairs at all nine venue stages. The economy
+  runner includes `fan-before-purchase` and `fan-after-purchase` using the actual
+  upgrade action. Check room artwork and property thumbnails together.
 - Empty venues look empty, waiting-order markers match customers, and closed or
   off-duty staff do not appear to be working.
 - Beer-bar pool states distinguish paid, free, idle and not-open facilities.

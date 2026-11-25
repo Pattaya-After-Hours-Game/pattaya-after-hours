@@ -18,6 +18,9 @@ campaign using the original decision lessons; it does not spend your real till.
 5. Buy the improvement that addresses your current limit. Keep money for the
    next shift rather than spending the till down to zero.
 
+Wall fans appear after buying **Fans & comfortable seats**. They remain installed
+when the venue closes, but stop spinning. Renovating does not buy this equipment.
+
 The first useful purchase depends on the bar: frontage helps quiet trade,
 seating helps a full room, and a bartender helps unattended orders. More service
 capacity cannot sell drinks to customers who are not there.
