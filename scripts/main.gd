@@ -287,8 +287,9 @@ func render(keep_scroll: bool = false) -> void:
 				card.add_theme_font_size_override("font_size",11)
 	var first_shift := show_tutorial_hint and not practicing
 	var log_text := "Serve → upgrade → hire → grow" if first_shift else str(model.s.log.front())
-	pane(root_ui,Rect2(14,390,540,27),Color("#21161fdd"))
-	var note := abs_text(root_ui,Rect2(20,393,530,22),message if not message.is_empty() else log_text,13,GOLD)
+	var note_y := 148 if event_banner != null else 56
+	pane(root_ui,Rect2(14,note_y,540,27),Color("#21161fdd"))
+	var note := abs_text(root_ui,Rect2(20,note_y+3,530,22),message if not message.is_empty() else log_text,13,GOLD)
 	note.clip_text = true
 	pane(root_ui,Rect2(0,482,960,58),Color("#21161ff8"))
 	for index in TAB_NAMES.size():

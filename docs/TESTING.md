@@ -51,6 +51,9 @@ packing instructions are in [art/README.md](../art/README.md).
 
 Review these behaviours, not just whether a PNG exists:
 
+- Use `empty-*`, `full-*` and `closed-*` general-preview filters for all three
+  venue types, including the 24-customer maximum. Check character proportions,
+  visible feet, counter/table occlusion and a clear outside lane.
 - Empty venues look empty, waiting-order markers match customers, and closed or
   off-duty staff do not appear to be working.
 - Beer-bar pool states distinguish paid, free, idle and not-open facilities.
@@ -113,3 +116,16 @@ and header-layout checks. Linux, Windows and macOS packages exported successfull
 and the Linux startup smoke test passed. The exact inputs and maintainer notes
 are recorded in [MERGE_HANDOFF.md](MERGE_HANDOFF.md). Windows update execution and
 rollback still require Windows testing.
+
+## Bar-scene perspective correction — 25 November 2026
+
+The scene uses one depth-based scale for interior adults, counter occlusion for
+bartenders, indoor customer/table positions, and overhead order markers. The
+message strip no longer covers the floor. Production textures are unchanged.
+
+Verified with Godot 4.7.2: `tools/test.sh` (including all nine pacing campaigns),
+65 general captures, the complete economy preview, and six wider-window views.
+The added scene checks cover real occupancy/orders, available staff, closure,
+read-only rendering, floor bounds and surviving pool-table identity. Visual review
+included all nine stages, empty/full rooms, inspection and other event treatments,
+management drawers and pool states. Device playtesting remains outstanding.
