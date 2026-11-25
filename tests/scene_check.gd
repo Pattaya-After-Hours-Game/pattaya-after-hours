@@ -42,6 +42,35 @@ func run(test: SceneTree) -> void:
 	test.check(City.fan_owned(bar),"Closure retains the owned fan")
 	bar.open = true
 	bar.equipment.comfort = 0
+	# A purchase, not a renovation, enables the sports screen; existing save
+	# ownership works without another payment or a new save field.
+	model.s.cash = 0
+	model.street.action("equipment",5)
+	test.check(not City.screen_owned(bar),"Failed TV purchase leaves the room unequipped")
+	model.s.cash = 10000
+	model.street.action("equipment",5)
+	test.check(City.screen_owned(bar),"Buying a sports screen enables its artwork")
+	model.save_game()
+	var loaded := Campaign.new()
+	test.check(loaded.load_game() and City.screen_owned(loaded.street.selected()),"TV artwork follows saved ownership after reload")
+	bar.open = false
+	test.check(City.screen_owned(bar),"Closing does not uninstall the TV")
+	bar.open = true
+	var customer: Dictionary = bar.customers[0]
+	customer.wait = 34
+	test.check(marker_color(city,bar,customer.id)==City.GOLD,"Opening guest stays yellow with eleven seconds of patience")
+	customer.wait = 35
+	test.check(marker_color(city,bar,customer.id)==City.ORDER_URGENT,"Waiting marker becomes red at ten seconds remaining")
+	bar.equipment.comfort = 1
+	test.check(marker_color(city,bar,customer.id)==City.GOLD,"Comfort's extra patience delays the red warning")
+	bar.equipment.comfort = 0
+	model.street.action("chat")
+	test.check(customer.chatted and marker_color(city,bar,customer.id)==City.GOLD,"Successful Chat updates the marker from the extended patience")
+	customer.life = 10
+	test.check(marker_color(city,bar,customer.id)==City.ORDER_URGENT,"A visit ending soon is urgent even with order patience left")
+	model.street.action("serve")
+	var served: Dictionary = city.scene_people(bar).filter(func(p: Dictionary) -> bool: return p.get("customer_id",-1)==customer.id)[0]
+	test.check(not served.order,"Serving removes the warning rather than leaving a red dot")
 	# Rendering is a read-only view of real orders, even at full occupancy.
 	for kind in 3:
 		for stage in range(1,4):
@@ -111,3 +140,7 @@ func run(test: SceneTree) -> void:
 	for table in 2:
 		test.check(City.pool_rect(table).position.x>230 and City.pool_rect(table).end.x<650,"Both pool tables are indoors")
 	city.free()
+
+func marker_color(city: Control, bar: Dictionary, id: int) -> Color:
+	var person: Dictionary = city.scene_people(bar).filter(func(p: Dictionary) -> bool: return p.get("customer_id",-1)==id)[0]
+	return City.order_color(person.order_seconds_left)

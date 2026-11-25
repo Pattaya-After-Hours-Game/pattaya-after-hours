@@ -11,7 +11,8 @@ campaign using the original decision lessons; it does not spend your real till.
 
 ## Your first shift
 
-1. Serve the three opening customers. A gold dot above a customer marks an order. Each successful
+1. Serve the three opening customers. A yellow/gold dot marks an order; red means
+   ten seconds or less before the guest loses patience or their visit ends. Each successful
    click sells one drink and consumes one unit of stock, then refills for ten seconds.
    No order or unavailable stock means no spent cooldown.
 2. When no orders are waiting, welcome passersby. Welcoming has a cooldown and a
@@ -26,6 +27,9 @@ campaign using the original decision lessons; it does not spend your real till.
 
 Wall fans appear after buying **Fans & comfortable seats**. They remain installed
 when the venue closes, but stop spinning. Renovating does not buy this equipment.
+Buying **Sports screen** puts a TV on the wall and unlocks Sports Night. The room
+and property thumbnail reflect the purchase immediately, including on saved games.
+Fitted screens in beer-bar stages 2 and 3 stay dark until you buy the upgrade.
 
 The first useful purchase depends on the bar: frontage helps quiet trade,
 seating helps a full room, and a bartender helps unattended orders. More service
@@ -46,6 +50,7 @@ staff training improves bartenders separately and survives rehiring.
 **Have a chat** helps the eligible guest nearest walking out, when they have ten
 seconds or less left to wait. It adds ten seconds of patience and visit time,
 once per visit. You still need to fulfil their orders to earn satisfaction.
+The order dot returns to yellow if the chat gives them more than ten seconds left.
 Chat and Welcome share a timer: welcoming uses its current cooldown; chatting
 locks both for twenty seconds, even with upgraded welcoming. Serve stays separate.
 This creates a choice between attracting newcomers and looking after a queue.

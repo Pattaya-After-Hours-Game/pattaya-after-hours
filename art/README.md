@@ -172,6 +172,13 @@ come from live occupancy, and gogo pole performances follow the shift schedule.
 Pool games keep stable table IDs through completion and save migration. All
 replacement fighter atlases are present, so the temporary fallback is removed.
 
+Sports-screen ownership now uses the existing stage-two beer-bar TV artwork.
+The engine composites that crop onto the wall (or the Soi karaoke display),
+and fitted stage-two/three beer-bar displays stay dark until purchased. Room
+views and property thumbnails share cached fan/screen variants. No source PNGs,
+manifest entries or generated art are replaced. Waiting-order dots use model
+patience/visit time: yellow/gold normally, red at ten seconds or less remaining.
+
 The combined gameplay, art integrity, transformed-input and nine-campaign pacing
 suite passes. The integration review captured 51 general graphics views and 23
 economy views, plus wider-window pool/layout checks. Linux export and its isolated

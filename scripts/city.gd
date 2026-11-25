@@ -6,6 +6,7 @@ const INK = Color("#21131e")
 const TEAL = Color("#73f5dc")
 const PINK = Color("#f37ab0")
 const GOLD = Color("#e8ba7b")
+const ORDER_URGENT = Color("#ff514d")
 var clock := 0.0
 var street_state: Dictionary = {}
 var arrival_time := 0.0
@@ -41,7 +42,7 @@ func _draw() -> void:
 	var bar: Dictionary = bars[selected_bar] if not bars.is_empty() else {"type":0,"stage":clampi(level,1,3),"crew":legacy_staff.size(),"away":[],"closed":0,"name":"Blue Hour"}
 	var kind := int(bar.type)
 	var stage := int(bar.stage)
-	var backdrop := Art.venue(kind,stage,fan_owned(bar))
+	var backdrop := Art.venue(kind,stage,fan_owned(bar),screen_owned(bar))
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
 	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
 	# Only the street opening contains ambient traffic. Interior sprites come
@@ -78,7 +79,7 @@ func _draw() -> void:
 		if person.order:
 			var marker := order_position(person)
 			draw_circle(marker,6,INK)
-			draw_circle(marker,4,GOLD)
+			draw_circle(marker,4,order_color(person.order_seconds_left))
 	if bar.has("games") and bar.equipment.pool>0:
 		# Status is model-owned; the artwork never creates a pool fee.
 		for i in int(bar.equipment.pool):
@@ -127,6 +128,12 @@ func _draw() -> void:
 
 static func fan_owned(bar: Dictionary) -> bool:
 	return int(bar.get("equipment",{}).get("comfort",0))>0
+
+static func screen_owned(bar: Dictionary) -> bool:
+	return int(bar.get("equipment",{}).get("screen",0))>0
+
+static func order_color(seconds_left: int) -> Color:
+	return ORDER_URGENT if seconds_left<=Content.CHAT_THRESHOLD else GOLD
 
 static func pool_rect(table: int) -> Rect2:
 	return Rect2(270+table*200,274+table*12,165,78)
@@ -235,6 +242,7 @@ func scene_people(bar: Dictionary) -> Array:
 		var customer_id: int = int(bar.customers[i].id) if bar.has("customers") else i+1
 		var appearance := Art.customer_sprite(customer_id)
 		people.append({"who":appearance[0],"pose":appearance[1],"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})
+		people.back().order_seconds_left = Economy.order_seconds_left(bar,bar.customers[i]) if bar.has("customers") else Content.PATIENCE_SECONDS
 	people.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.foot.y<b.foot.y)
 	return people
 

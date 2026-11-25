@@ -88,6 +88,15 @@ func run() -> void:
 	await capture(app,"fan-before-purchase")
 	app.model.street.action("equipment",1)
 	await capture(app,"fan-after-purchase")
+	await capture(app,"tv-before-purchase")
+	app.model.street.action("equipment",5)
+	await capture(app,"tv-after-purchase")
+	first.customers[0].wait = app.model.street.economy.patience(first,first.customers[0])-10
+	await capture(app,"tv-orders-urgent")
+	app.model.street.action("chat")
+	await capture(app,"tv-orders-reassured")
+	app.model.street.action("serve")
+	await capture(app,"tv-orders-served")
 	app.drawer_open = true
 	first.equipment.pool = 1
 	first.equipment.seating = 1
@@ -144,6 +153,10 @@ func run() -> void:
 			app.model.s.street.seconds = 60
 			app.drawer_open = false
 			await capture(app,"type-%d-stage-%d" % [kind,stage])
+			bar.equipment.screen = 0
+			await capture(app,"tv-type-%d-stage-%d-unowned" % [kind,stage])
+			app.model.street.action("equipment",5)
+			await capture(app,"tv-type-%d-stage-%d-owned" % [kind,stage])
 	app.drawer_open = true
 	app.tab = 3
 	await capture(app,"empire")

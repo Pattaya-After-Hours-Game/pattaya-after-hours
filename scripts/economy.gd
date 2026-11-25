@@ -370,15 +370,18 @@ func start_cooldown(bar: Dictionary, id: String, duration: float) -> void:
 	bar[id+"_duration"] = duration
 	bar[id+"_ready"] = action_time()+duration
 
-func patience(bar: Dictionary, customer: Dictionary) -> int:
+static func patience(bar: Dictionary, customer: Dictionary) -> int:
 	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)
+
+static func order_seconds_left(bar: Dictionary, customer: Dictionary) -> int:
+	return mini(patience(bar,customer)-int(customer.wait),int(customer.life))
 
 func chat_target(bar: Dictionary) -> Dictionary:
 	var target := {}
 	var shortest := C.CHAT_THRESHOLD+1
 	for customer in bar.customers:
 		if not customer.order or customer.missed or customer.get("chatted",false): continue
-		var remaining := mini(patience(bar,customer)-int(customer.wait),int(customer.life))
+		var remaining := order_seconds_left(bar,customer)
 		if remaining>=0 and remaining<shortest:
 			shortest = remaining
 			target = customer

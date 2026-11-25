@@ -4,6 +4,17 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Unreleased — Visible sports screens and impatient customers
+
+- Sports-screen purchases now appear on the wall and in property thumbnails
+  across all venue stages, using the existing TV artwork. Fitted beer-bar screens
+  stay dark until purchased; existing saved purchases show immediately.
+- Waiting-order dots turn red with ten seconds or less before patience or visit
+  time expires, using the same model rule as Chat. Comfort and reassurance extend
+  the warning window; fulfilled orders lose their dot.
+- Added purchase/reload and presentation regression coverage plus owned/unowned
+  TV and order-warning captures. No balance, prices or save-format changes.
+
 ## Unreleased — Completed-chat consolidation and builds
 
 - Combined the completed customer cast, New Game / Resume, day/clock, cooldown

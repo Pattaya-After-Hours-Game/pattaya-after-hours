@@ -54,7 +54,9 @@ not a guaranteed sale or a new friendship. The bell means a real order is waitin
 The crowd includes familiar faces and visitors with different clothes and looks.
 Their appearance stays with them throughout a visit; it does not decide their
 budget or behaviour. A better bar changes in visible ways: buying fans installs
-fans, while renovating alone does not give away the equipment.
+fans, and buying a sports screen gives the regulars a match to argue over.
+Renovating alone does not give away the equipment; fitted beer-bar screens
+stay dark until the sports upgrade is bought.
 
 ## Noon, last orders and tomorrow's mop
 

@@ -56,8 +56,11 @@ save. Existing scheduled inspections retain their separate preparation mechanics
 ## Playing the first bar
 
 Start with ฿200, 18 drinks and three forgiving opening customers. Serve their
-actual orders; welcome passersby when there are no orders. A gold dot marks a
-waiting order. Customers can buy two drinks during a visit, have a spending
+actual orders; welcome passersby when there are no orders. A yellow/gold dot marks a
+waiting order and turns red when the lesser of remaining order patience and
+visit time is ten seconds or less. The display uses the same remaining-time rule
+as Chat, including comfort and reassurance bonuses; it adds no new timers.
+Customers can buy two drinks during a visit, have a spending
 budget, and leave unhappy when an order waits too long. A quiet click neither
 uses stock nor earns money. Manual service immediately sells one ordered drink,
 then refills for ten foreground seconds. Failed attempts consume no cooldown.

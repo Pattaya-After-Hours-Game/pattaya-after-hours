@@ -25,21 +25,42 @@ static func fan_region(kind: int) -> Rect2i:
 	if kind==1: return Rect2i(238,60,56,84)
 	return Rect2i(235,60,62,96)
 
-static func venue(kind: int, stage: int, has_fan: bool = true) -> Texture2D:
+static func screen_region(kind: int, stage: int) -> Rect2i:
+	if kind==0:
+		return Rect2i(395,180,81,54) if stage==3 else Rect2i(336,195,96,61)
+	if kind==1:
+		return Rect2i(421,193,96,61) if stage==1 else Rect2i(397,193,114,64)
+	return Rect2i(300,147,96,61)
+
+static func venue(kind: int, stage: int, has_fan: bool = true, has_screen: bool = false) -> Texture2D:
 	kind = clampi(kind,0,2)
-	var id := "%s-%d" % [TYPES[kind],clampi(stage,1,3)]
+	stage = clampi(stage,1,3)
+	var id := "%s-%d" % [TYPES[kind],stage]
 	var original := texture(id)
-	# Beer/gogo plates contain a fan; Soi plates need the purchased prop added.
-	if original==null or has_fan==(kind!=1): return original
-	var key := id+"#fan" if has_fan else id+"#no-fan"
+	if original==null: return null
+	var key := "%s#fan-%s#screen-%s" % [id,has_fan,has_screen]
 	if not textures.has(key):
-		var patch := texture("wall-fan" if kind==1 else "fan-hidden-"+id)
-		if patch==null: return original
 		var plate: Image = original.get_image().duplicate()
 		plate.convert(Image.FORMAT_RGBA8)
-		var overlay: Image = patch.get_image().duplicate()
-		overlay.convert(Image.FORMAT_RGBA8)
-		plate.blend_rect(overlay,Rect2i(Vector2i.ZERO,overlay.get_size()),fan_region(kind).position)
+		# Beer/gogo plates contain a fan; Soi plates need the purchased prop added.
+		if has_fan!=(kind!=1):
+			var patch := texture("wall-fan" if kind==1 else "fan-hidden-"+id)
+			if patch!=null:
+				var overlay: Image = patch.get_image().duplicate()
+				overlay.convert(Image.FORMAT_RGBA8)
+				plate.blend_rect(overlay,Rect2i(Vector2i.ZERO,overlay.get_size()),fan_region(kind).position)
+		var screen := screen_region(kind,stage)
+		if has_screen:
+			# Reuse the finished sports TV from the production beer-bar artwork.
+			# Renovated beer bars already contain it at their own fitted size.
+			if kind!=0 or stage==1:
+				var television := texture("beer-2").get_image().get_region(screen_region(0,2))
+				television.convert(Image.FORMAT_RGBA8)
+				television.resize(screen.size.x,screen.size.y,Image.INTERPOLATE_NEAREST)
+				plate.blit_rect(television,Rect2i(Vector2i.ZERO,television.get_size()),screen.position)
+		elif kind==0 and stage>1:
+			# The fitted bezel remains, but its display is off until purchased.
+			plate.fill_rect(screen.grow(-4),Color("#171824"))
 		textures[key] = ImageTexture.create_from_image(plate)
 	return textures[key]
 

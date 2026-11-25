@@ -26,6 +26,14 @@ use [the economy table](ECONOMY.md#balance-verification) for combined pacing.
 Remaining checks: Windows/macOS execution, Android on-device input and lifecycle,
 Windows update/restart/rollback on Windows, and human balance/audio feedback.
 
+### Sports-screen and order-warning follow-up
+
+Godot 4.7.2 `tools/test.sh` passes, including all fifteen pacing campaigns.
+The economy preview rendered 23 TV/patience scenarios at 960 × 540; wall placement
+was reviewed across all nine stages, alongside dark fitted beer-bar screens and
+purchase/urgent/Chat/served states. Order-warning captures were also checked at
+1280 × 720. Android device playtesting and release publication remain separate.
+
 ## Automated suite
 
 Run from the repository root with Godot 4.7.2:
@@ -99,6 +107,11 @@ Review these behaviours, not just whether a PNG exists:
 - Use `fan-*` for owned/unowned pairs at all nine venue stages. The economy
   runner includes `fan-before-purchase` and `fan-after-purchase` using the actual
   upgrade action. Check room artwork and property thumbnails together.
+- Use the economy runner with `PATTAYA_PREVIEW_FILTER='tv-*'` for a real screen
+  purchase, all nine owned/unowned room pairs, and urgent/reassured/served order
+  dots. Check the TV remains on the wall and the red marker clears after service.
+  Regression checks cover saved ownership, property cache isolation, unchanged
+  surrounding art, and patience/comfort/Chat/visit-time warning boundaries.
 
 - Use the economy runner with `PATTAYA_PREVIEW_FILTER='staff-*'` for base,
   trained, expired and rehired cards. Check terms, individual training and rehire

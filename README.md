@@ -30,7 +30,9 @@ Welcome’s timer and takes twenty seconds to recover. No order means no sale. O
 stock, payroll and recent actual profit. Waiting-order bells respect Sound / Muted.
 
 Inside the scene, customers stand on the public side of the bar, bartenders
-work behind the counters, and gold dots above customers mark waiting orders.
+work behind the counters, and yellow/gold dots above customers mark waiting orders.
+Dots turn red with ten seconds or less before patience or visit time runs out;
+comfortable seating and a successful chat extend that time.
 The smaller passerby in the left street opening is background traffic, not an
 extra customer. Messages sit above the room so the floor remains visible.
 The customer cast includes older regulars and Indian, Korean, Black and Thai
@@ -38,6 +40,8 @@ visitors, with outfits ranging from scruffy holiday wear to tailored clubwear.
 Looks stay consistent during each visit and do not determine spending behaviour.
 Wall fans appear only after buying **Fans & comfortable seats**, including in
 the property thumbnail; renovation alone does not install them.
+Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.
+Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
 Save for signage, seating and a pool table, then invest in staff contracts. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
