@@ -6,9 +6,9 @@ advances this model once per foreground second and settles reports every 120
 seconds of street trading, plus one partial report at overnight closure. UI and artwork consume this state; they never award sales themselves.
 Balance and purchase definitions live in `scripts/street_content.gd`.
 
-The [seating/six-pack/promoter proposal](design/PROMOTER_CAPACITY_PLAN.md) records
-the next requested design and its analytical estimates. It is not implemented;
-the rules below still describe the current game.
+The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
+implemented. Its initial forecast examples are analytical estimates; measured
+campaign outcomes appear below.
 
 ## Clock, closing and preparation
 
@@ -110,10 +110,56 @@ is created. Staff records and equipment remain; contracts continue to expire. An
 covers two minutes of overhead; if the fridge is empty, six consignment drinks
 are paid for only when a real customer buys them. No buyer means no income.
 
+## Compact layout, deliveries and the frontage promoter
+
+Beer-bar seating levels cost ฿400, ฿800 and ฿1,200. Stage-one capacity before
+furniture is 6/8/10/12. Pool normally uses two places per table and comfort one;
+the third seating level recovers up to three furniture places. Thus every legal
+stage-one combination holds twelve. Stage two holds eighteen with one table and
+comfort, sixteen with two. Other venue types retain two seating upgrades.
+Purchases preserve the next shift's operating reserve and show actual capacity.
+
+`stock_offer` and `restock` settle exactly six drinks for ฿84, never a partial
+pack or a full-fridge purchase. Manual buying needs six free spaces and ฿84;
+it shows cash afterward and the next operating charge. Supplier deliveries buy
+one pack below six stock when orders are pending, retaining the next one-second
+operating charge. Bo's six recovery drinks remain a consignment exception, paid
+once on sale in live or offline accounting. Fridge sizes and saved stock remain
+unchanged; a 70-unit fridge can have four unusable spaces for the next pack.
+
+Nida costs ฿1,200 for ten game days plus 10% of drink receipts, with no additional
+hourly wage. One frontage slot is separate from seats and floor staffing. While
+contracted/on duty, her attraction weight is +4.8; the model uses the greater of
+her bonus and owner Welcome, never their sum. Welcome is disabled while she
+works; Chat retains its existing social timer. She does not serve, stock, manage
+or accept host requests. Closure and expiry remove her from the entrance.
+
+Stage two unlocks audience training for ฿800; stage three unlocks another tier
+for ฿1,600. Promoter weights become +6.0/+7.2. Dancer training scales only the
+individual's existing attraction/show contribution by ×1.25/×1.5, with no extra
+service or drink commission. This track is distinct from bartender training and
+persists across expiry/rehire. Stage alone grants no training.
+
+Commission settles once per actual drink, including premium and discounted
+orders, excluding pool and host fees. Add `receipt × 10` to a saved percentage
+remainder, pay integer baht divided by 100, retain modulo 100. Two ฿55 beers pay
+฿11 total across reloads. Every sale while the promoter works qualifies. Visits
+admitted on duty retain eligibility for the visit; existing orders committed
+while she works remain eligible after rota changes or expiry. Abandoned orders
+cost nothing. Flags never stack two commissions on one sale.
+
+Gross drink income and commission are separate ledger entries. Weekly costs,
+shift net/healthy margin, promotion contribution, forecasts and offline estimates
+include commission once. Hire previews show post-hire cash and the required
+one-shift payroll plus ฿84 reserve, arrivals, unattended and owner-active net,
+and whole-street impact. These are capacity estimates, not promises of revenue;
+they account for other properties losing some shared visitors. Hiring more
+attraction into a service bottleneck can reduce net profit.
+
 ## Staff contracts and alerts
 
-Staff contracts last 14,400 game minutes (ten days) and cost ฿4,500 per hire or
-rehire. Remaining minutes are stored per person, alongside their training and
+Bartender, host and dancer contracts last 14,400 game minutes (ten days) and
+cost ฿4,500 per hire or rehire. Nida uses the separate ฿1,200 promoter contract. Remaining minutes are stored per person, alongside their training and
 service timer. Foreground clock ticks, skipped overnight minutes and the full
 offline gap consume time, including closed/off-duty periods. Only live simulation
 phases advance contracts in the foreground. Backward wall clocks never extend
@@ -125,11 +171,13 @@ serve, attract, accept bar fines, draw wages or be reactivated through the rota.
 Rehire starts a fresh term and resets work progress without resetting training.
 Role changes retain training; service training only benefits bartenders. Training
 and rehire require the next shift's operating reserve. Rosters retain at most two
-people per stage; rehire an expired slot rather than replacing its person.
+floor workers per stage, plus one frontage promoter; rehire an expired slot
+rather than replacing its person. Promoters cannot be reassigned into cheaper
+bartender/dancer hires.
 
 Older saves initialise missing contract fields and copy the venue's old training
 level to its existing staff. Future hires start at level zero. Optional fields
-are validated on loading; the compatibility equipment key remains in schema 5,
+are validated on loading; the compatibility equipment key remains in schema 6,
 but venue-wide training purchases are disabled. Normal offline catch-up applies
 after migration. Existing money, venues and staff records are retained.
 
@@ -168,7 +216,7 @@ not additional revenue. Late purchases from attributed guests update the report.
 Stage 2 requires 70 satisfied visits, 10 local regulars and eight healthy shifts.
 Stage 3 requires 600 satisfied visits, 70 local regulars and forty healthy shifts.
 A healthy shift serves at least four orders, fulfils at least 80% of orders and
-has positive operating margin after stock consumed, payroll, promotion costs and fines.
+has positive operating margin after stock consumed, payroll, promotion costs, fines and drink commission.
 The cash report separately records inventory purchases when paid.
 
 Milestones belong to the venue. Renovation also requires its fee and the next
@@ -195,6 +243,11 @@ create customers or settle another report. The original tutorial is a separate
 practice campaign. Old saves interrupted inside a legacy shift finish that shift
 once, then enter the live economy.
 
+Version-six saves retain the frontage roster, audience training, commission carry
+and customer commitments, plus fractional offline sales/cost/pool credits. Older
+saves gain zeroed fields without free purchases or fees. Save validation supports
+six floor staff plus one promoter and rejects invalid new fields.
+
 Version-five saves additionally retain fractional foreground time, action upgrade
 levels, cooldown durations/deadlines and per-visit chat allowance. Versions 1–4
 migrate with unpurchased upgrades and their existing deadlines preserved.
@@ -218,9 +271,15 @@ Also split at every staff contract expiry across all venues, so expired staff
 stop contributing service, attraction and payroll at the correct projected minute.
 Consume contract time across the full absence, even beyond the eight-hour earning
 cap, and include expiry notices in the offline report. Never auto-renew contracts.
-Expected sales are bounded by shared demand, space, service and stock; stock and operating costs are deducted. Unviable trading
-or insufficient working cash pauses the projection, without spending the opening
-cash reserve. Temporary promotions, customer queues, local milestones, events and
+Expected sales are bounded by shared demand, space, service and stock. Estimated
+sales consume owned stock; supplier purchases add complete six-packs at ฿84.
+Only surplus generated within that claim funds packs: existing cash is protected,
+so an empty fridge cannot bootstrap itself while away. Operating costs and
+commission settle with projected receipts; fractional sales and their associated
+costs/pool income persist together so short claims cannot avoid charges.
+Repeated claims at the same timestamp credit nothing. Splitting a long absence
+can be more conservative when a fresh claim lacks pack working capital; it does
+not create free inventory. Unviable trading pauses without idle-mode cash debt. Temporary promotions, customer queues, local milestones, events and
 calendar time, dirt, cleaning, heat and raids do not advance. Reports in Journal
 separate time away from eligible trading seconds and list estimated customers served,
 income, costs, net profit and limiting factors. Monotonic saved claim timestamps
@@ -229,7 +288,7 @@ prevent repeat rewards, including clock rollback.
 ## Balance verification
 
 Run `tools/test.sh` with Godot 4.7.2. It uses temporary save directories and runs
-both the regression suite and `tests/economy_balance.gd`.
+the regression suite, `tests/economy_balance.gd` and `tests/promoter_balance.gd`.
 
 The combined balance runner uses fresh campaigns with seeds 11, 72 and 291,
 without injected cash or offline income. Attentive players check ready actions
@@ -251,14 +310,14 @@ Existing money, properties and upgrades are never reset; no refunds are minted.
 
 | Milestone | Original active target | Measured combined active range |
 | --- | --- | --- |
-| First useful purchase | 2–5 min | 2.7–4.4 min |
-| Pool table | 10–20 min | 15.8–18.6 min |
-| First stage 2 | 30–45 min | 33.6–39.2 min |
-| Second property | 90–150 min | 132.2–143.4 min |
-| First stage 3 | 180–300 min | 260.6–277.8 min |
+| First useful purchase | 2–5 min | 2.5–4.4 min |
+| Pool table | 10–20 min | 15.9–18.5 min |
+| First stage 2 | 30–45 min | 33.6–36.8 min |
+| Second property | 90–150 min | 126.8–137.9 min |
+| First stage 3 | 180–300 min | 257.3–283.2 min |
 
-Mostly-idle campaigns reach stage 3 in 420–434 minutes. No-chat manual-upgrade
-campaigns take 268–273 minutes; no-chat staff-first campaigns take 309–313 minutes.
+Mostly-idle campaigns reach stage 3 in 413–427 minutes. No-chat manual-upgrade
+campaigns take 263–283 minutes; no-chat staff-first campaigns take 308–313 minutes.
 The six active target runs must satisfy every original window; the other nine
 must remain viable and complete within the ten-hour simulation limit. All target
 runs also check sales against orders and arrivals against shared street supply.
@@ -268,6 +327,24 @@ night contribution and reduced full-house contribution. Regression coverage also
 includes empty-order clicks, stockouts, service queues, shared demand, timed wages,
 closure/recovery, pool/save idempotency, role separation, local renovation gates,
 consensual customer-originated bar fines, offline claims and guided shift timing.
+
+Twelve additional campaigns compare promoter-before-renovation, service-first,
+compact-first and no-promoter/no-Chat paths using the same seeds and paid actions.
+All finish solvent within ten hours and respect order/shared-traffic limits.
+These optional investments are not forced into the baseline milestone windows:
+
+| Purchase route | Stage 2 | Second property | Stage 3 |
+| --- | ---: | ---: | ---: |
+| Promoter before renovation | 47.3–47.5 min | 144.6–153.3 min | 275.0–302.2 min |
+| Service first, promoter after renovation | 43.4–44.0 min | 144.3–148.8 min | 274.0–280.7 min |
+| Compact layout, no promoter | 38.7–42.2 min | 133.6–139.2 min | 260.9–261.9 min |
+
+The early promoter route buys pouring level two and compact seating before Nida,
+yet still delays renovation: automatic welcoming is a convenience with a real
+cost, not a compulsory profit upgrade. The original six active target runs still
+pass every original pacing window. No baseline prices or traffic were raised to
+hide the trade-off. Dancer stage gates/retained skills and service separation
+have regression coverage, not a new full-gogo campaign balancing claim.
 
 The graphical preview harness renders the opening, pool, free-pool report,
 recovery, all nine venue stages and festival states. It consumes the current

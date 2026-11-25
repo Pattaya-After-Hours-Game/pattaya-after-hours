@@ -1,0 +1,7 @@
+{
+  "prompt": "Production game prop on genuinely transparent background, a compact straight wall bench for the Blue Hour beer bar in the reference. Single freestanding furniture prop, three-quarter frontal view with a shallow visible seat top, dark stained wood frame, burgundy upholstered tufted seat and low back, subtle brass trim, short wooden legs, 3 seating places. Crisp illustrated pixel-art style matching the existing room, teal and magenta rim light, enough detail at 150 pixels wide. Wide horizontal composition, no people, no wall, no floor, no text, no cast shadow, no glow halo. Preserve genuine alpha outside the bench. This is a separate furniture sprite, not an edit of the room.",
+  "tool": "Built-in image_gen.imagegen",
+  "source": "/home/zak/.codex/generated_images/01a21041-6023-7780-a8a2-477e04f47d85/exec-8d276647-8ae0-4674-bcdf-517471bddfe7.png",
+  "target": "art/sources/compact-bench.png",
+  "transparent_background": true
+}

@@ -56,7 +56,20 @@ Their appearance stays with them throughout a visit; it does not decide their
 budget or behaviour. A better bar changes in visible ways: buying fans installs
 fans, and buying a sports screen gives the regulars a match to argue over.
 Renovating alone does not give away the equipment; fitted beer-bar screens
-stay dark until the sports upgrade is bought.
+stay dark until the sports upgrade is bought. Compact benches make room for
+twelve people without losing the pool table or fans. Bo now sells whole six-packs;
+“almost enough room in the fridge” is not a delivery agreement.
+
+Nida, 28, is the adult promoter at the entrance: friendly, practical and fond of
+music nights. She welcomes passersby while the owner pours. Her ten-day contract
+and share of drink takings make the partnership a business choice. She can bring
+people through the door; she cannot rescue a queue that nobody serves. Training
+lets her take on a busier frontage as the venue grows.
+
+> **Anong:** “She can get them through the door. You still have to get them a drink.”
+
+This is her playable role, not a new scripted quest. She leaves her post when
+off duty or out of contract, and keeps her training if she returns.
 
 ## Noon, last orders and tomorrow's mop
 
@@ -264,10 +277,6 @@ Let customers remember good service, and let failure lead to another shift.
 
 Future hooks, not implemented quests:
 
-- Nida, an adult street promoter, welcomes passersby outside the Blue Hour while
-  the owner handles service. Her proposed contract and commission make attracting
-  a crowd a business decision. See the [design plan](docs/design/PROMOTER_CAPACITY_PLAN.md)
-  and concept art; she is not yet part of the playable roster.
 - June's cafe fund becomes a neighbourhood collaboration rather than a purchase
   of her loyalty.
 - Pim attempts a first original-music night with a budget the business can afford.

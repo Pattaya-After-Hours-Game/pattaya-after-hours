@@ -63,7 +63,7 @@ recipe=ROOT/'art/packing.json'
 # allowed only during the art pass; final preparation fails closed.
 groups={}
 missing=[]
-for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json','frontage-jobs.json','customer-jobs.json']:
+for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json','frontage-jobs.json','customer-jobs.json','nida-jobs.json']:
     for job in json.loads((ROOT/'art/recipes'/filename).read_text()):
         if not (SRC/(job['id']+'.png')).exists(): missing.append(job['id'])
         if 'group' in job: groups.setdefault(job['group'],[]).append(job['id']+'.png')
@@ -84,6 +84,8 @@ for name,frames in groups.items():
         spec.update(cell=[320,256],height=200,frame_heights=[200,200,200,160,185,185,200,190,185,195,52,235])
     if name=='monster': spec.update(cell=[320,320],height=290,frame_heights=[290,290,290,210])
     packing[name]=spec
+normalize(Image.open(SRC/'compact-bench.png'),(240,128),120,False).save(OUT/'compact-bench.png')
+Image.open(SRC/'portrait-nida.png').convert('RGBA').resize((96,96),NEAREST).save(OUT/'portrait-nida.png')
 recipe.write_text(json.dumps(packing,indent=2)+'\n')
 # Transparent foreground props retain their own aspect ratios.
 for name,target in [('counter',(800,236)),('event-inspection',(160,192))]:

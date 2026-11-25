@@ -20,7 +20,8 @@ campaign using the original decision lessons; it does not spend your real till.
 3. Open **Service**. Read demand, staff service, occupied seats and stock together.
    Manual serving helps when staff are absent or cannot keep up. “Forecast automatic net” is
    not a prediction that you will earn nothing while actively serving.
-4. Restock before the fridge empties. Stock costs money when delivered, while
+4. Restock before the fridge empties. **Buy 6 drinks · ฿84** requires room for all
+   six and the full price. Failed purchases change nothing. Stock costs money when delivered, while
    wages and overhead accrue during open trading.
 5. Buy the improvement that addresses your current limit. Keep money for the
    next shift rather than spending the till down to zero.
@@ -172,7 +173,7 @@ is an estimate, not extra customers or income credited to you.
 
 ## Staff, management and growth
 
-Each staff hire costs **฿4,500 for ten game days**, plus wages while on duty.
+Each bartender, host or dancer hire costs **฿4,500 for ten game days**, plus wages while on duty.
 A base bartender serves one real drink order every **25 seconds** (2.4/min), so
 keep serving alongside them during rushes. **Train** on their individual card
 costs ฿800 for level 1 (20 seconds) and ฿1,600 for level 2 (15 seconds). Training
@@ -196,8 +197,9 @@ At Soi venues and gogos, role reassignment changes service and payroll.
 Hosts' preferences still apply, and only an actual customer request can produce
 a bar fine. An accepting host is unavailable for the remainder of the shift.
 
-Automatic deliveries are a paid supplier agreement; delivered stock still costs
-money. A manager needs stage 2, an on-duty bartender, deliveries and eight healthy
+Automatic deliveries are a paid supplier agreement. They buy one ฿84 six-pack
+when stock is below six and orders are waiting, retaining the next operating
+charge. They cannot buy a partial pack or fill an idle bar speculatively. A manager needs stage 2, an on-duty bartender, deliveries and eight healthy
 shifts, plus the hiring fee and operating reserve. Managers enable the offline
 estimate. Check the current prices and requirements in **Service**.
 
@@ -234,11 +236,39 @@ limited demand, stock, saved dirt, each venue's peak windows and costs. An unvia
 of consuming your starting cash. It does not advance the visible clock, cleaning,
 heat, raids, promotions, disasters or local milestones. **Journal** distinguishes
 time away from eligible trading time and reports the estimate and limiting factors.
+Owned stock is consumed; further six-packs must be funded by earnings from that
+claim, never your opening cash. Leave stock in the fridge before going away.
+Commission is included. Short claims retain fractional sales and costs, although
+restarting a claim can reduce available pack working capital.
 
 **Open managed shift** offers decisions across the same live two-minute shift.
 The decision screens pause the model; continuing does not skip the clock or
 create another stream of money. Exploring the district and Toybox sparring are
 optional. The street continues after the festival.
+
+## Twelve places and Nida outside
+
+Beer bars offer three seating purchases: ฿400, ฿800 and **Compact layout · ฿1,200**.
+At stage one, the last purchase holds **twelve customers with pool and fans**.
+The wall benches show the new arrangement. It increases room, not demand or speed.
+
+Find **Frontage promoter** in Service. **Nida** costs ฿1,200 for ten days plus
+10% of all venue drink receipts while working. She welcomes automatically and
+has no hourly wage, but she never pours drinks. Her slot does not consume a
+bartender position. Compare the hire preview's unattended net with its estimate
+when you serve whenever ready. If service is already limiting sales, improve it
+before paying to attract a longer queue.
+
+Welcome reads **Nida is welcoming** while she works; you can still Serve and Chat.
+Her rota stops new attraction, but commission committed to existing visits/orders
+still settles. Pool games and bar fines do not pay drink commission. The card
+shows commission paid and fractional carry; it is not another fee. At expiry,
+rehire the same person for ฿1,200. Closed/skipped/offline time counts toward her term.
+
+At venue stage two, train Nida or a dancer for ฿800; stage three unlocks a second
+฿1,600 tier. These improve audience appeal, never bartender speed. Skills stay
+with the person after rehiring. Attraction still competes for shared street
+visitors; it does not guarantee a sale.
 
 ## Saves and versions
 
@@ -246,8 +276,9 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Save schema 5 preserves action upgrades, fractional cooldowns and customer chat
-allowances. Existing venues begin with unpurchased action upgrades. Migration from
+Save schema 6 adds promoter/training state, commission commitments and fractional
+offline accounting to the existing action timers and Chat. Migration does not
+grant a promoter, compact layout or audience training for free. Migration from
 pre-clock saves introduces noon on the campaign’s existing day,
 with initially clean venues. Old campaigns preserve owned progress when migrated, so an existing stage-3 bar
 will not revert to stage 1 for the new balance. Use a fresh campaign if you want

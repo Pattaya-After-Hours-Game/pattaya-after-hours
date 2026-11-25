@@ -417,5 +417,18 @@
       192
     ],
     "height": 180
+  },
+  "nida": {
+    "frames": [
+      "nida-0.png",
+      "nida-1.png",
+      "nida-2.png",
+      "nida-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
   }
 }

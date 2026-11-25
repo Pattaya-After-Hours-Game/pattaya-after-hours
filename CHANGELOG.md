@@ -4,7 +4,23 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
-## Unreleased — Visible sports screens and impatient customers
+## Source update — Compact seating, whole packs and Nida
+
+- Added beer-bar seating level three: twelve guests at stage one with pool/fans,
+  with compact bench production artwork and capacity previews.
+- Manual and supplier purchases now buy exactly six drinks for ฿84 with shared
+  cash/space checks. Offline deliveries consume actual inventory and buy whole
+  packs from newly generated surplus; consignment costs are repaid once.
+- Added Nida's separate frontage slot, ฿1,200 ten-day contract and 10% drink-only
+  commission, retained visit/order commitments and saved fractional carry.
+- Added stage-gated, retained audience training for promoters/dancers; forecasts,
+  shift/promotion reports and offline accounting include commissions.
+- Added four production poses, a portrait, schema-six migration, boundary/ledger
+  regressions and twelve feature campaigns alongside the fifteen baseline runs.
+- Updated product, story, player, economy, developer, art, testing and agent docs.
+  Publication uses the main-branch signed multi-platform release workflow.
+
+## Source update — Visible sports screens and impatient customers
 
 - Sports-screen purchases now appear on the wall and in property thumbnails
   across all venue stages, using the existing TV artwork. Fitted beer-bar screens
@@ -15,7 +31,7 @@ player-facing overview is in [README.md](README.md).
 - Added purchase/reload and presentation regression coverage plus owned/unowned
   TV and order-warning captures. No balance, prices or save-format changes.
 
-## Unreleased — Completed-chat consolidation and builds
+## v1.0.13 source — Completed-chat consolidation and builds
 
 - Combined the completed customer cast, New Game / Resume, day/clock, cooldown
   upgrades/Chat, staff contracts and current main's fan/passerby fixes.

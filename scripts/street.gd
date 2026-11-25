@@ -39,7 +39,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			bar.merge(Economy.clock_fields(),true)
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	economy = Economy.new(s,fresh)
-	s.version = 5
+	s.version = 6
 
 func make_bar(kind: int, slot: int) -> Dictionary:
 	return {"type":kind, "stage":1, "name":C.NAMES[slot], "crew":0,
@@ -107,7 +107,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","rehire","train_staff":
+		"serve","stock","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","rehire","train_staff","train_audience":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:

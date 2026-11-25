@@ -22,7 +22,9 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	await process_frame
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
-		if target: app.scroll.ensure_control_visible(target)
+		if target:
+			if name_text.begins_with("promoter-"): app.scroll.scroll_vertical = int(target.position.y)
+			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
 	get_root().get_texture().get_image().save_png(output.path_join(name_text+".png"))
@@ -169,6 +171,53 @@ func run() -> void:
 	app.model.finish_godzilla(true)
 	app.tab = 0
 	await capture(app,"festival-complete")
+	# Promoter controls and compact layout use the real paid actions.
+	app.model = Campaign.new(72)
+	app.model.s.cash = 50000
+	app.drawer_open = false
+	app.tab = 0
+	app.message = ""
+	var promo_bar: Dictionary = app.model.street.selected()
+	await capture(app,"promoter-before-hire")
+	app.drawer_open = true
+	await capture(app,"promoter-hire-forecast","Hire Nida")
+	app.drawer_open = false
+	app.model.street.action("hire",3)
+	await capture(app,"promoter-working")
+	app.drawer_open = true
+	await capture(app,"promoter-contract","FRONTAGE PROMOTER")
+	app.model.street.action("rota",0)
+	app.drawer_open = false
+	await capture(app,"promoter-off-duty")
+	app.model.street.action("rota",0)
+	for i in 3: app.model.street.action("equipment",4)
+	app.model.street.action("equipment",1)
+	app.model.street.action("equipment",3)
+	promo_bar.customers.clear()
+	await capture(app,"promoter-compact-empty")
+	while promo_bar.customers.size()<12: app.model.street.economy.admit(promo_bar)
+	for guest in promo_bar.customers: guest.wait = 20
+	await capture(app,"promoter-twelve-guests")
+	promo_bar.stage = 2
+	app.model.street.action("train_audience",0)
+	app.drawer_open = true
+	await capture(app,"promoter-trained","FRONTAGE PROMOTER")
+	promo_bar.team[0].contract_left = 0
+	promo_bar.team[0].on = false
+	await capture(app,"promoter-expired","Rehire Nida")
+	app.model.street.action("rehire",0)
+	app.drawer_open = false
+	for kind in 3:
+		for stage in range(1,4):
+			promo_bar.type = kind
+			promo_bar.stage = stage
+			promo_bar.equipment.pool = 1 if kind==0 else 0
+			promo_bar.equipment.seating = 3 if kind==0 else 2
+			promo_bar.customers.clear()
+			while promo_bar.customers.size()<mini(12,app.model.street.economy.seats(promo_bar)): app.model.street.economy.admit(promo_bar)
+			await capture(app,"promoter-type-%d-stage-%d" % [kind,stage])
+	promo_bar.open = false
+	await capture(app,"promoter-closed")
 	# Clock and prep scenes use the same live actions/state as the game.
 	app.model = Campaign.new(72)
 	app.model.s.cash = 10000

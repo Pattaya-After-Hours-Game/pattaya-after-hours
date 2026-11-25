@@ -85,7 +85,7 @@ static func frame(canvas: CanvasItem, id: String, index: int, foot: Vector2, sca
 	canvas.draw_texture_rect_region(tex,dest,region,tint)
 
 static func atlas_specs() -> Dictionary:
-	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),9],"monster":[Vector2(320,320),4]}
+	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),9],"nida":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
 	for id in STAFF: specs[id] = [Vector2(160,192),4]
 	for id in HOSTS: specs[id] = [Vector2(160,256),6]
 	for id in ["mali","juno","vega","orchid"]: specs["fight-"+id] = [Vector2(320,256),12]
@@ -102,6 +102,7 @@ static func animation_frames(id: String, state: String) -> Array:
 	if id.begins_with("fight-"):
 		return {"idle":[0],"walk":[1,2],"jump":[3],"guard":[4],"anticipation":[5],"jab":[6],"kick":[7],"burst":[8],"hit":[9],"ko":[10],"victory":[11]}.get(state,[0])
 	if id == "monster": return {"arrival":[0,1],"idle":[1],"drinking":[2,1],"sleep":[3]}.get(state,[1])
+	if id=="nida": return {"idle":[0],"welcome":[0,1,1,0,2,0,3,0]}.get(state,[0])
 	if id in HOSTS: return {"idle":[0],"carry":[1],"serve":[1,0],"dance":[2,3],"walk":[4,5]}.get(state,[0])
 	return {"idle":[0],"walk":[1,2],"carry":[3],"serve":[3,0]}.get(state,[0])
 
@@ -116,6 +117,7 @@ static func event_treatment(id: int) -> String:
 static func worker_id(bar: Dictionary, index: int) -> String:
 	if bar.has("team") and index<bar.team.size():
 		var person: Dictionary = bar.team[index]
+		if person.role==3: return "nida"
 		if person.role==1: return HOSTS[clampi(int(person.host),0,HOSTS.size()-1)]
 		if person.role==2: return HOSTS[index%HOSTS.size()]
 		return STAFF[index%STAFF.size()]

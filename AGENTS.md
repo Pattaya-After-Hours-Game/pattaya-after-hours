@@ -43,11 +43,20 @@ claiming behaviour exists; update the relevant documentation when it changes.
   space and options; it does not automatically raise every drink's price.
   Local satisfaction, regulars and healthy operation matter alongside cash.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.
-  Staff contracts cost ฿4,500 for ten game days, including closed/skipped/offline
+  Bartender/host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped/offline
   time. Training belongs to the person and survives expiry/rehire. Base bartender
   service is one drink per 25 seconds, improving to 20/15 through training.
   Quiet trading still has costs. Preserve rotas, temporary closure and recovery
   instead of forcing idle-mode debt or an unrecoverable failure.
+- Nida uses one separate frontage slot: ฿1,200/ten days plus 10% of actual drink
+  receipts, no hourly wage and no serving. Preserve existing visit/order commission
+  commitments after rota/expiry and the saved fractional carry; exclude pool fees.
+  Welcome and promoter attraction never stack. Audience training is stage-gated,
+  separate from service training, and persists after rehire.
+- Buy stock in complete six-drink packs for ฿84, requiring cash and room. Supplier
+  automation retains its next operating charge. Bo’s consignment remains the
+  recovery exception. Third beer-bar seating must hold twelve with pool and fans.
+  Schema 6 migration grants no free promoter, equipment or audience training.
 - The economy's pacing targets are acceptance criteria, not mandatory waiting
   timers. Use fresh campaigns for balance tests; preserve existing owned progress.
 - Offline earnings remain demand/cost limited, repeat-safe and capped at eight

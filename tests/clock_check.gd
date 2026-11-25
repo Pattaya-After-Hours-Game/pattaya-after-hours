@@ -12,7 +12,7 @@ func managed() -> RefCounted:
 	var bar: Dictionary = m.street.selected()
 	bar.manager = true
 	bar.restock = true
-	bar.team = [{"role":0,"on":true,"host":-1,"training":2,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES},{"role":0,"on":true,"host":-1,"training":2,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES}]
+	bar.team = [{"role":0,"on":true,"host":-1,"training":2,"audience_training":0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES},{"role":0,"on":true,"host":-1,"training":2,"audience_training":0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES}]
 	bar.crew = 2
 	return m
 
@@ -148,7 +148,7 @@ func cleaning(test: SceneTree) -> void:
 	var stock := int(bar.stock)
 	m.s.cash = 10000
 	m.street.action("stock")
-	test.check(bar.stock==eco.stock_capacity(bar) and m.s.cash==10000-(bar.stock-stock)*14,"Closed-hour restocking pays the real stock cost")
+	test.check(bar.stock==stock+6 and m.s.cash==10000-84,"Closed-hour restocking pays the real stock cost")
 
 func raids(test: SceneTree) -> void:
 	var m = Campaign.new(72)
@@ -287,7 +287,7 @@ func saves(test: SceneTree) -> void:
 	var migrated = Campaign.new(9)
 	test.check(migrated.load_game(),"Version-three save without new fields loads")
 	var restored: Dictionary = migrated.street.selected()
-	test.check(migrated.s.version==5 and migrated.s.day==47 and migrated.s.cash==9926 and migrated.s.street.minute==720,"Migration preserves day and money and introduces noon")
+	test.check(migrated.s.version==6 and migrated.s.day==47 and migrated.s.cash==9926 and migrated.s.street.minute==720,"Migration preserves day and money and introduces noon")
 	test.check(restored.customers==customers and restored.games==games and restored.closed==9 and not restored.promo.is_empty() and restored.dirt==0,"Migration preserves queues, paid games, promotions and event closures")
 	migrated.save_game()
 	migrated.save_game()

@@ -6,10 +6,12 @@ Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build th
 
 ![The Blue Hour and its neighborhood at dusk](docs/blue-hour.png)
 
-This consolidated source includes the new customer cast, owned fans, varied street
-passersby, New Game / Resume, a saved day/night clock, action cooldown upgrades,
-customer chat, and ten-day staff contracts with retained training. Latest work is
-on `codex/consolidated-build`; released downloads can lag behind this checkout.
+This source includes the full customer cast, New Game / Resume, the day/night
+clock, owner cooldowns/Chat and retained staff training. The latest update adds
+a twelve-person compact beer-bar layout, six-pack deliveries and Nida, an adult
+promoter who works outside the entrance. Purchased TVs appear on the wall and
+waiting-order dots turn red as patience runs out. Source and release downloads
+are tracked separately; the download links above select the latest published build.
 See [the current handover](docs/MERGE_HANDOFF.md) for chat and branch status.
 
 ## Start playing
@@ -43,18 +45,31 @@ the property thumbnail; renovation alone does not install them.
 Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.
 Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
+Buy stock in complete **six-drink packs for ฿84**. You need room for all six and
+enough cash; the button explains any shortfall. Supplier automation uses the
+same pack size. Stage-1 beer bars can buy a third seating level, **Compact layout
+for ฿1,200**, reaching twelve customers even with pool and fans installed.
+
 Save for signage, seating and a pool table, then invest in staff contracts. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
 Night attracts visitors but gives up pool fees; Happy Hour, Pool Tournament and
 Sports Night have their own costs and trade-offs. Promotions last two minutes,
 then have a two-minute cooldown.
 
-Bartenders serve orders; hosts and dancers attract visitors. Hiring or rehiring
+Bartenders serve orders; hosts and dancers attract visitors. Their hiring or rehiring
 costs **฿4,500 for ten game days**, plus on-duty wages. A base bartender serves
 one drink every **25 seconds**; individual training improves this to 20 and then
 15 seconds. Help serve during a rush. Contracts expire, but each person's training
 stays with them when rehired. Service shows the remaining term and rehire controls.
 Closed hours, skipped nights and offline time count toward contracts.
+
+In **Service → Frontage promoter**, hire **Nida for ฿1,200 per ten game days plus
+10% of drink receipts**. She replaces Welcome taps, uses a separate roster slot
+and never serves drinks. Her preview shows estimated demand, commission and net
+profit with and without owner service. Bringing more customers to an already
+slow bar can lose money. Existing visit/order commissions remain due after she
+goes off duty. Promoters and dancers unlock separate audience training at stages
+2 and 3 for ฿800 and ฿1,600; their skills survive rehire.
 
 A two-note bell alerts you to waiting orders at the selected venue, repeating at
 most once every ten seconds. **Sound / Muted** controls it along with game audio.
@@ -128,10 +143,11 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 5.
+retain money, staff, venues and owned stages when migrated to save schema 6.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
-Schema 5 preserves fractional action timers and chat allowances; old venues
-start with unpurchased action upgrades. A fresh campaign is
+Schema 6 adds promoter contracts, audience training, commission commitments and
+fractional offline accounting; schema 5 introduced action timers and Chat.
+Existing venues receive no free compact layout, promoter or training. A fresh campaign is
 needed to experience the revised progression from the beginning.
 
 Business reports use two real minutes of trading. Viable managed venues receive
@@ -155,17 +171,18 @@ practice campaign and never overwrites your campaign.
 | [Art pipeline](art/README.md) | Asset provenance, packing, animation catalog and visual review |
 | [Merge handover](docs/MERGE_HANDOFF.md) | Current chat audit, included branches and build handoff |
 | [Research roadmap](docs/INCREMENTAL_GAME_ROADMAP.md) | Design research, future proposals and one-feature-at-a-time coordination |
-| [Seating, six-packs and promoter plan](docs/design/PROMOTER_CAPACITY_PLAN.md) | Proposed twelve-person layout, pack purchases, commission/training balance and frontage concept; not implemented |
+| [Seating, six-packs and promoter plan](docs/design/PROMOTER_CAPACITY_PLAN.md) | Implemented design, trade-offs and original analytical estimates |
 | [Changelog](CHANGELOG.md) | Progression, economy, graphics and documentation changes |
 
 ## Project status
 
-The current source includes 69 runtime textures, twenty-one sprite atlases with
-145 frames, nine interiors and nine matching exterior illustrations. Gameplay,
+The current source includes 72 runtime textures, twenty-two sprite atlases with
+149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
-are checked together with fifteen fresh-campaign simulations. Active target runs
-reach stage 2 in 34–40 minutes, a second venue in 132–144 minutes and stage 3 in
-261–278 minutes. Mostly-idle play takes longer; upgrades and Chat remain optional.
+are checked together with twenty-seven fresh-campaign simulations. Baseline active
+runs reach stage 2 in 34–37 minutes, a second venue in 127–138 minutes and stage 3
+in 257–284 minutes. Optional promoter-first investment takes longer to repay;
+service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
 
@@ -201,3 +218,11 @@ rehiring use the agreed ฿4,500 fee; the first Soi lease is ฿16,000 to accomm
 the new hiring reserve and training costs. Existing hires and training migrate,
 and offline projections stop crediting staff service at contract expiry. See the
 [player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).
+
+## More room and a face out front
+
+The compact layout, whole-pack stocking and Nida's commission now use the shared
+economy, including guided shifts, save migration and managed estimates. Her four
+production poses and portrait join the existing art; compact benches visibly mark
+the third seating purchase. This update also brings the earlier TV installation
+and urgent-order marker fixes into the same release branch.

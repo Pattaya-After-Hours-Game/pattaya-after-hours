@@ -63,6 +63,14 @@
     ],
     "sha256": "7586e298f452d5bcc06d080ccc563b9dc928cc4c820515118c749f56f6cc1196"
   },
+  "compact-bench": {
+    "file": "res://assets/art/compact-bench.png",
+    "size": [
+      240,
+      128
+    ],
+    "sha256": "4edf7b6b669760e7f5a2e4839537cd0138326426509b0dd5c40354d49aef24ef"
+  },
   "counter": {
     "file": "res://assets/art/counter.png",
     "size": [
@@ -351,6 +359,14 @@
     ],
     "sha256": "9a62460c1b3ce901af761053fc2000a09391215a6472e86d5be463602dc509b2"
   },
+  "nida": {
+    "file": "res://assets/art/nida.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "a02a37143457d0d5f9383a31129c0eb57db02e7790308037239f13b8a6f27a6c"
+  },
   "nok": {
     "file": "res://assets/art/nok.png",
     "size": [
@@ -478,6 +494,14 @@
       96
     ],
     "sha256": "b33cfd457435a250b92ea67e9d573695fbd719312156c26a116cd4e1c2c808d0"
+  },
+  "portrait-nida": {
+    "file": "res://assets/art/portrait-nida.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "018f86e3dc86fc1e229de5b66fea987a1e1d412b969937503088759f73096825"
   },
   "portrait-nok": {
     "file": "res://assets/art/portrait-nok.png",

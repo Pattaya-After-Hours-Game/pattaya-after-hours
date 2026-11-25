@@ -1,14 +1,16 @@
 # More room, six-packs and a face out front
 
-**Status: proposed implementation, with analytical balance estimates and concept
-art. No gameplay or save-format changes are implemented by this document.**
+**Status: implemented in `codex/promoter-implementation`, including schema-six
+migration and production artwork. The design below retains its original
+analytical examples; current rules and measured campaign outcomes are in
+[ECONOMY.md](../ECONOMY.md) and [TESTING.md](../TESTING.md).**
 
 Requested and confirmed on 25 November 2026: a third stage-1 beer-bar seating
 upgrade must hold **12 customers with the pool table and fans installed**;
 restocking buys complete six-packs; an adult promoter costs **฿1,200 per ten-day
 contract plus 10% of all venue drink sales while on duty**. Promoters and dancers
 gain stage-gated training. This plan builds on source `0d7bb90`, including the
-TV/patience fix, which is separately awaiting integration/release.
+TV/patience fix, included in the same implementation/release branch.
 
 ## The intended experience
 
@@ -336,3 +338,20 @@ explicitly in numeric restoration. Loading alone must remain read-only until Res
 No implementation or public release is implied by committing this plan. Reconcile
 the existing TV/patience branch and other contributors before starting the next
 gameplay implementation; do not silently take another contributor's active slot.
+
+## Implementation record — 25 November 2026
+
+The agreed prices, capacity, commission basis and stage gates are implemented.
+Nida uses four production poses plus a portrait; the room uses a separately
+generated compact bench prop. Earlier concept images remain authoring references.
+
+Offline operations settle whole drinks and whole packs with fractional estimate
+credits saved alongside their costs. Each claim protects its starting cash, so
+a fresh claim cannot use an earlier claim's banked profit to bootstrap an empty
+fridge. This intentionally conservative detail is exposed in the player guide.
+
+The baseline active pacing windows pass. Optional promoter-first spending delays
+stage two to about 47 minutes and can push stage three slightly beyond five
+hours; service-first investment is faster. This is documented as a real trade-off,
+not hidden by higher baseline income. Dancer training has role/gate/save checks;
+a full dancer-versus-bartender gogo campaign comparison is future balance work.

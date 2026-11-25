@@ -73,7 +73,9 @@ git status --short
 ```
 
 Set `GODOT_BIN` if the pinned editor is not the default `godot` command.
-The test script imports assets, then runs `tests/check.gd` and nine target campaigns plus six no-chat comparisons in `tests/economy_balance.gd`. It uses temporary
+The test script imports assets, then runs `tests/check.gd`, nine target campaigns plus six no-chat comparisons in
+`tests/economy_balance.gd`, and twelve feature/alternative campaigns in
+`tests/promoter_balance.gd`. It uses temporary
 data and configuration directories, preserving your campaign and editor
 settings. Run this wrapper rather than running the test script directly:
 the tests deliberately create, corrupt, and remove test saves.
@@ -156,11 +158,14 @@ per-customer chat state. Action deadlines are fractional foreground seconds;
 Do not run both `advance` and `tick` for the same elapsed interval.
 
 Changes to the save dictionary need compatibility handling; the current schema
-version is 5. `Street.new(state)` migrates version-one/two
+version is 6. Promoter roster/commission fields and fractional offline accounting
+are migrated without granting purchases. Keep whole-pack delivery and commission
+settlement inside `economy.gd`; UI/animation code must not mint receipts. `Street.new(state)` migrates version-one/two
 properties, stages, hires and finances. Older stage-2+ beer bars receive their
 pool table; queues start empty. Existing version-three pool games gain stable
 table IDs without changing fees or timers. Load validates
-the street shape, v4 clock/prep fields and v5 action timers/levels before accepting a save. Version-three
+the street shape, v4 clock/prep fields, v5 action timers/levels and v6 promoter/
+commission fields before accepting a save. Version-three
 queues, stock, promotions, paid/free pool identity, money and owned progress are
 preserved; migration starts at noon on the existing day with clean venues. New
 saves retain nightly permissions, raid counters, cleaning progress, heat cooling

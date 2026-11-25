@@ -5,11 +5,11 @@ const C = preload("res://scripts/street_content.gd")
 func _initialize() -> void:
 	call_deferred("run")
 
-func simulate(seed_value: int, style: String, minutes: int = 600, opening: String = "manual", use_chat: bool = true) -> Dictionary:
+func simulate(seed_value: int, style: String, minutes: int = 600, opening: String = "manual", use_chat: bool = true, feature: String = "") -> Dictionary:
 	var model = Campaign.new(seed_value)
 	var st = model.street
 	var eco = st.economy
-	var times := {"seed":seed_value,"style":style,"opening":opening,"chat":use_chat,"hire":-1,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1}
+	var times := {"seed":seed_value,"style":style,"opening":opening,"chat":use_chat,"feature":feature,"promoter":-1,"compact":-1,"hire":-1,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1}
 	for second in minutes*60:
 		# Real player prep actions; seconds spent cleaning count toward pacing.
 		if st.can_skip():
@@ -49,17 +49,32 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 			st.action("equipment",next_item)
 			if bar.equipment[C.EQUIPMENT[next_item].id]>0 and times.first<0: times.first = second
 		if bar.equipment.pool>0 and times.pool<0: times.pool = second
+		if not feature.is_empty() and bar.equipment.pool>0:
+			if feature=="compact-first" and bar.equipment.seating<3: st.action("equipment",4)
+			if feature in ["promoter-first","service-first"]:
+				if bar.action_levels.pouring<2: st.action("action_upgrade",0)
+				elif bar.equipment.seating<3: st.action("equipment",4)
+				elif eco.promoter_index(bar)<0 and (feature=="promoter-first" or bar.stage>=2): st.action("hire",3)
+			var promoter: int = eco.promoter_index(bar)
+			if promoter>=0:
+				if times.promoter<0: times.promoter = second
+				if not eco.contracted(bar.team[promoter]): st.action("rehire",promoter)
+				if bar.stage>=2 and bar.team[promoter].audience_training<int(bar.stage)-1: st.action("train_audience",promoter)
+			if bar.equipment.seating==3 and times.compact<0: times.compact = second
 		if bar.stage==1 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
 		if bar.stage>=2 and times.stage2<0: times.stage2 = second
 		if owner_first and bar.stage>=2 and bar.action_levels.pouring<3:
 			st.action("action_upgrade",0)
 		# A contract is a late investment: do not block smaller purchases while saving.
 		if bar.stage>=2 and model.s.cash>=C.STAFF_CONTRACT_COST+1000:
-			if bar.team.is_empty(): st.action("hire",0)
-			elif not eco.contracted(bar.team[0]): st.action("rehire",0)
-		if not bar.team.is_empty():
+			if eco.floor_staff(bar)==0: st.action("hire",0)
+			else:
+				for member in bar.team.size():
+					if bar.team[member].role==0 and not eco.contracted(bar.team[member]): st.action("rehire",member)
+		if eco.floor_staff(bar)>0:
 			if times.hire<0: times.hire = second
-			if int(bar.team[0].get("training",0))<2 and model.s.cash>2500: st.action("train_staff",0)
+			for member in bar.team.size():
+				if bar.team[member].role==0 and int(bar.team[member].get("training",0))<2 and model.s.cash>2500: st.action("train_staff",member)
 		if bar.stage>=2 and not bar.manager and model.s.cash>2000: st.action("manager")
 		if bar.manager and opening=="manual" and style!="mostly-idle" and bar.action_levels.welcoming==0:
 			st.action("action_upgrade",1)

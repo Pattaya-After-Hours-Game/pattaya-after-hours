@@ -47,9 +47,9 @@ func run(test: SceneTree) -> void:
 				for strip in [Rect2i(0,0,960,rect.position.y),Rect2i(0,rect.end.y,960,540-rect.end.y),Rect2i(0,rect.position.y,rect.position.x,rect.size.y),Rect2i(rect.end.x,rect.position.y,960-rect.end.x,rect.size.y)]:
 					test.check(plain.get_region(strip).get_data()==equipped.get_region(strip).get_data(),"Sports screen preserves the surrounding production artwork")
 				test.check(Art.venue(kind,stage,has_fan,false).get_image().get_data()==plain.get_data(),"Switching properties cannot leak purchased TV artwork to another room")
-	for id in ["district","toybox","counter","event-inspection"]:
+	for id in ["district","toybox","counter","event-inspection","compact-bench"]:
 		test.check(Art.texture(id) != null,"Scene/prop artwork exists: "+id)
-	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid"]:
+	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid","nida"]:
 		var tex := Art.texture("portrait-"+id)
 		test.check(tex != null,"Portrait exists: "+id)
 		if tex: test.check(tex.get_size()==Vector2(96,96),"Portrait dimensions: "+id)

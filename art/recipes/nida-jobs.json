@@ -1,0 +1,31 @@
+[
+  {
+    "id": "nida-0",
+    "prompt": "Use case: identity-preserve. Production full-body character sprite on genuinely transparent background. Isolate the clearly adult 28-year-old Thai promoter Nida from this concept reference, retaining her identity and outfit: dark high ponytail, teal sleeveless collared top with gold trim, dark tailored shorts, white trainers, small gold earrings, menu flyer. relaxed idle, both feet grounded, small menu flyer held at her waist. Match the reference game's crisp illustrated pixel-art rendering, mature adult proportions, teal/pink rim lights. Single person only, three-quarter frontal view, full body and both shoes visible, centred with generous transparent padding; keep consistent scale and silhouette for animation. No floor, backdrop or cast shadow. No writing, extra people, bar furniture, watermark, school styling or nudity. This is one individual pose, not a sprite sheet.",
+    "source": "/home/zak/.codex/generated_images/01a21041-6023-7780-a8a2-477e04f47d85/exec-6f7db2d2-275f-40e9-9d6e-5612cead3132.png",
+    "group": "nida"
+  },
+  {
+    "id": "nida-1",
+    "prompt": "Use case: identity-preserve. Production full-body character sprite on genuinely transparent background. Isolate the clearly adult 28-year-old Thai promoter Nida from this concept reference, retaining her identity and outfit: dark high ponytail, teal sleeveless collared top with gold trim, dark tailored shorts, white trainers, small gold earrings, menu flyer. friendly welcoming wave, one open hand raised beside her head, menu in other hand. Match the reference game's crisp illustrated pixel-art rendering, mature adult proportions, teal/pink rim lights. Single person only, three-quarter frontal view, full body and both shoes visible, centred with generous transparent padding; keep consistent scale and silhouette for animation. No floor, backdrop or cast shadow. No writing, extra people, bar furniture, watermark, school styling or nudity. This is one individual pose, not a sprite sheet.",
+    "source": "/home/zak/.codex/generated_images/01a21041-6023-7780-a8a2-477e04f47d85/exec-b688824a-0361-4b40-8029-2a023f5e8895.png",
+    "group": "nida"
+  },
+  {
+    "id": "nida-2",
+    "prompt": "Use case: identity-preserve. Production full-body character sprite on genuinely transparent background. Isolate the clearly adult 28-year-old Thai promoter Nida from this concept reference, retaining her identity and outfit: dark high ponytail, teal sleeveless collared top with gold trim, dark tailored shorts, white trainers, small gold earrings, menu flyer. indicating the entrance to her right with an open palm, feet grounded, flyer in other hand. Match the reference game's crisp illustrated pixel-art rendering, mature adult proportions, teal/pink rim lights. Single person only, three-quarter frontal view, full body and both shoes visible, centred with generous transparent padding; keep consistent scale and silhouette for animation. No floor, backdrop or cast shadow. No writing, extra people, bar furniture, watermark, school styling or nudity. This is one individual pose, not a sprite sheet.",
+    "source": "/home/zak/.codex/generated_images/01a21041-6023-7780-a8a2-477e04f47d85/exec-3ad5a4e2-7665-4f00-b04b-3a1a7618cfa7.png",
+    "group": "nida"
+  },
+  {
+    "id": "nida-3",
+    "prompt": "Use case: identity-preserve. Production full-body character sprite on genuinely transparent background. Isolate the clearly adult 28-year-old Thai promoter Nida from this concept reference, retaining her identity and outfit: dark high ponytail, teal sleeveless collared top with gold trim, dark tailored shorts, white trainers, small gold earrings, menu flyer. brief friendly acknowledging nod with hand over heart, flyer in other hand. Match the reference game's crisp illustrated pixel-art rendering, mature adult proportions, teal/pink rim lights. Single person only, three-quarter frontal view, full body and both shoes visible, centred with generous transparent padding; keep consistent scale and silhouette for animation. No floor, backdrop or cast shadow. No writing, extra people, bar furniture, watermark, school styling or nudity. This is one individual pose, not a sprite sheet.",
+    "source": "/home/zak/.codex/generated_images/01a21041-6023-7780-a8a2-477e04f47d85/exec-e5cabf6c-1748-4c9d-a1ce-fdc78c6cdb98.png",
+    "group": "nida"
+  },
+  {
+    "id": "portrait-nida",
+    "prompt": "Use case: identity-preserve. Production portrait on genuinely transparent background. Isolate the clearly adult 28-year-old Thai promoter Nida from this concept reference, retaining her identity and outfit: dark high ponytail, teal sleeveless collared top with gold trim, dark tailored shorts, white trainers, small gold earrings, menu flyer. portrait, head and shoulders only, friendly expression. Match the reference game's crisp illustrated pixel-art rendering, mature adult proportions, teal/pink rim lights. Square portrait centered with head fully visible. No writing, extra people, bar furniture, watermark, school styling or nudity. This is one individual pose, not a sprite sheet.",
+    "source": "/home/zak/.codex/generated_images/01a21041-6023-7780-a8a2-477e04f47d85/exec-6b5d0578-ecc3-4c52-9cd7-7ce6e7d8800d.png"
+  }
+]

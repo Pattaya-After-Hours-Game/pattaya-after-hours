@@ -56,6 +56,7 @@ func _draw() -> void:
 	if backdrop:
 		for region in counter_regions(kind,stage):
 			draw_texture_rect_region(backdrop,region,region)
+	if kind==0 and bar.get("equipment",{}).get("seating",0)==3: _draw_compact_layout()
 	# Tables and people share the depth order. The original illustrated table
 	# remains visible (but labelled not open) when it is not owned.
 	var floor_items := people.filter(func(person: Dictionary) -> bool: return not person.behind_bar)
@@ -125,6 +126,10 @@ func _draw() -> void:
 		var state := 3 if godzilla == "asleep" else 2 if shot_flash > .1 else 1 if arrival_time > 1.0 else int(arrival_time*4)%2
 		Art.frame(self,"monster",state,Vector2(400-maxf(0,1-arrival_time)*500,460),1.2,false,Vector2(320,320),Color.WHITE,Vector2(1,1+.012*sin(clock*(1.5 if state==3 else 3))))
 		if shot_flash > .1: draw_circle(Vector2(445,255),9*shot_flash,Color(1,.8,.3,shot_flash*.6))
+
+func _draw_compact_layout() -> void:
+	# Fitted wall benches leave the pool aisle clear; actual guests draw above.
+	for x in [257,465]: Art.image(self,"compact-bench",Rect2(x,294,150,80))
 
 static func fan_owned(bar: Dictionary) -> bool:
 	return int(bar.get("equipment",{}).get("comfort",0))>0
@@ -196,6 +201,9 @@ func scene_people(bar: Dictionary) -> Array:
 		if i in bar.away or (bar.has("team") and i < bar.team.size() and not bar.team[i].on): continue
 		var role: int = int(bar.team[i].role) if bar.has("team") and i < bar.team.size() else (2 if kind==2 else 0)
 		var who := Art.worker_id(bar,i)
+		if role==3:
+			people.append({"who":who,"pose":Art.animation_frame(who,"welcome",clock,1),"foot":Vector2(207,362),"flip":false,"order":false,"customer":false,"behind_bar":false})
+			continue
 		if bars.is_empty() and i < legacy_staff.size():
 			if not legacy_staff[i].work or legacy_staff[i].hurt: continue
 			who = Art.STAFF[int(legacy_staff[i].id)]

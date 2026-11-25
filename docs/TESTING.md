@@ -3,36 +3,45 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Combined verification — 25 November 2026
+## Current verification — 25 November 2026
 
-The current integration includes all completed chats listed in
-[the handover](MERGE_HANDOFF.md). Individual-feature records below are historical;
-use [the economy table](ECONOMY.md#balance-verification) for combined pacing.
+The frontage/stock/capacity implementation includes the earlier TV/patience fix
+and v1.0.13 consolidation. The [handover](MERGE_HANDOFF.md) identifies scope;
+older individual-feature records below are historical.
 
-- Full Godot 4.7.2 regression suite, including staff, cooldowns, startup isolation,
-  schema-five migration, artwork, pool, clock/raids and Windows updater checks.
-- Fifteen fresh campaigns: six active target runs, three mostly-idle runs and six
-  no-chat/manual-versus-staff comparisons. The original active milestone windows
-  remain the acceptance criteria; alternative routes have a ten-hour horizon.
-- Standard economy captures cover action refills/chat, contract expiry/rehire,
-  fans, pool, all venue types/stages, closure, festival and saved day display.
-- Thirty-four wide captures cover startup/confirmation, customer cast, full rooms,
-  purchased/unpurchased fans and changing street passersby. Captures were inspected
-  at 960 × 540 and 1280 × 720 actual captured pixels (the desktop clamped the
-  requested 1560-pixel window). They are layout checks, not target-device playtests.
-- Local export identity and package checksums are recorded beside the build in
-  `dist/BUILD_INFO.txt` and `dist/SHA256SUMS.txt`. Exports are not a public release.
+- Godot 4.7.2 `tools/test.sh` passes: gameplay, staff timing, startup isolation,
+  migration through schema six, pool, clock/raids, guided/tutorial flows, art,
+  input and Windows updater regressions.
+- Twenty-seven fresh campaigns pass: nine baseline target runs, six no-chat
+  comparisons and twelve feature/alternative runs. Original active windows apply
+  to the six active baseline runs. Optional promoter investment has a documented
+  payback delay, not a new mandatory gate. See [measured pacing](ECONOMY.md#balance-verification).
+- `tests/promoter_check.gd` covers all stage-one furniture combinations at twelve
+  places; pack cash/room boundaries and supplier reserve; dedicated roster slots;
+  commission rounding across reloads/rota/expiry; premium/discount drinks and pool
+  exclusion; seven-person saves and corrupt-field rejection; retained stage-gated
+  dancer/promoter training; no-order/no-sale; offline repeat/split claims, pack
+  ledger reconciliation, protected opening cash and consignment repayment.
+- Production previews cover Nida before hire, working/off duty, forecast/card,
+  training/expiry, empty compact layout and twelve customers, all nine venue
+  stages and closure. Nineteen promoter captures were generated at both 960 × 540
+  and 1280 × 720. Inspected all nine room stages, entrance placement, readable
+  hire/training/expiry controls and twelve-person order markers. Existing
+  production room/cast assets are preserved.
+- Source/art manifests and local documentation links are checked with the final
+  diff. CI repeats the suite before signed Android and desktop export, checksum
+  verification, Linux smoke testing and release publication.
 
-Remaining checks: Windows/macOS execution, Android on-device input and lifecycle,
-Windows update/restart/rollback on Windows, and human balance/audio feedback.
+Remaining verification: Android device input/lifecycle and human balance/audio
+feedback, Windows/macOS execution and Windows update/restart/rollback. Desktop
+captures and successful exports do not substitute for those playtests.
 
-### Sports-screen and order-warning follow-up
+### Earlier sports-screen and order-warning checks
 
-Godot 4.7.2 `tools/test.sh` passes, including all fifteen pacing campaigns.
-The economy preview rendered 23 TV/patience scenarios at 960 × 540; wall placement
-was reviewed across all nine stages, alongside dark fitted beer-bar screens and
-purchase/urgent/Chat/served states. Order-warning captures were also checked at
-1280 × 720. Android device playtesting and release publication remain separate.
+The preceding source passed all fifteen baseline pacing campaigns and rendered
+23 TV/patience scenarios at 960 × 540, plus urgent-order checks at 1280 × 720.
+Wall placement was inspected across nine stages, alongside dark fitted screens
+and purchase/urgent/Chat/served states. These fixes are included in this branch.
 
 ## Automated suite
 
@@ -64,7 +73,7 @@ campaigns; use the wrapper rather than running them against your personal saves.
 | Startup menu | No simulation or writes before selection, disabled Resume without a valid save, backup recovery, cancellation, immediate new-game save and removal of erased progress from backups |
 | Story and legacy modes | Incident responses, ongoing campaign, tutorial isolation and Godzilla outcomes |
 | Presentation | Catalog resources/hashes, atlas frames/padding, host identity, property hit regions, scrolling, district paths and combat input |
-| Pacing | Nine target campaigns plus six no-chat/manual-versus-staff comparisons, with no injected money or offline income |
+| Pacing | Nine target campaigns, six no-chat comparisons, twelve feature/alternative campaigns; no injected money or offline income |
 
 The six active-strategy runs must meet the configured milestone windows. The
 three mostly-idle runs must complete without getting stuck. Six additional

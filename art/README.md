@@ -4,10 +4,13 @@ This directory contains authoring material only. `.gdignore` and the export
 presets keep it out of the game. Runtime PNGs are in `assets/art/`; there are no
 concept-board textures in the runtime catalog.
 
-The proposed adult promoter Nida has a [frontage concept](concepts/promoter-frontage-v1.png)
-and [generation receipt](recipes/promoter-frontage-v1.json). This is design-only
-art, not a replacement room plate or runtime sprite. Production poses and exact
-engine placement remain work in the [implementation plan](../docs/design/PROMOTER_CAPACITY_PLAN.md).
+Nida has four production poses (idle, wave, indicate entrance, acknowledge) and
+a portrait, with [source receipts](recipes/nida-jobs.json). Her earlier
+[frontage concept](concepts/promoter-frontage-v1.png) stays authoring-only. The
+[compact bench receipt](recipes/compact-bench.json) records the new seating prop.
+Existing room plates and cast artwork remain unchanged. Nida appears at the
+entrance only while contracted, scheduled on and trading; benches appear only
+for purchased level-three beer-bar seating.
 
 ## Provenance
 
@@ -21,7 +24,7 @@ record their original locations. No ComfyUI server or external generation
 service was used.
 
 `service-jobs.json`, `remaining-jobs.json`, `extra-jobs.json`, and
-`locomotion-jobs.json`, and `frontage-jobs.json` define the source inventory. Each production pose is an
+`locomotion-jobs.json`, `frontage-jobs.json`, and `nida-jobs.json` define the source inventory. Each production pose is an
 individual generated image, except Anong's previously generated four-direction
 walking reference, whose 16 frames are extracted with fixed cell boundaries.
 `*-refinement.json` records replacements of a first iteration. Superseded local
@@ -138,7 +141,7 @@ were added. Only actual admitted customers are drawn; closures still empty rooms
 Use the `customers-men-*` preview filter to see the cast in each venue type,
 or `customer-beard-glasses-*` for a small group led by the reference guest.
 
-The consolidated catalog has 69 runtime textures, 21 sprite atlases and 145 frames,
+The consolidated catalog has 72 runtime textures, 22 sprite atlases and 149 frames,
 including the fan ownership overlays and nine additional male customers.
 See [the cast lineup](../docs/customer-cast.png) and
 [testing notes](../docs/TESTING.md) for review coverage.

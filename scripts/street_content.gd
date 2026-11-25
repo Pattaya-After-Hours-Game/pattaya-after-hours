@@ -84,7 +84,7 @@ const EQUIPMENT = [
 	{"id":"comfort", "name":"Fans & comfortable seats", "cost":900, "max":1, "help":"Guests stay longer and wait more patiently; uses one seat and adds ฿4/min overhead."},
 	{"id":"fridge", "name":"Better fridge", "cost":800, "max":2, "help":"Store 40 more drinks; it cannot create customers."},
 	{"id":"pool", "name":"Pool table", "cost":2000, "max":2, "help":"฿50 per 45-second game; replaces two seats. Beer bars only."},
-	{"id":"seating", "name":"Extra seating", "cost":400, "max":2, "help":"Two more seats; each pool table uses two of them."},
+	{"id":"seating", "name":"Extra seating", "cost":400, "max":3, "help":"Two more seats. Beer bars gain a third compact layout, recovering up to three furniture places."},
 	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
 	# Legacy slot retained for save/action indices; training is now per person.
 	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
@@ -96,8 +96,8 @@ const PROMOTIONS = [
 	{"name":"Pool Tournament", "fee":150, "boost":7, "requires":"pool", "help":"Paid games and pool groups; the prize budget is an expense."},
 	{"name":"Sports Night", "fee":100, "boost":5, "requires":"screen", "help":"The screen and fixture bring sports fans; ordinary drink prices."}
 ]
-const ROLE_NAMES = ["Bartender", "Adult host", "Adult dancer"]
-const ROLE_WAGES = [24,20,36] # per minute, including quiet periods
+const ROLE_NAMES = ["Bartender", "Adult host", "Adult dancer", "Adult promoter"]
+const ROLE_WAGES = [24,20,36,0] # per minute, including quiet periods
 const OVERHEAD = [18,45,90]
 const RENOVATIONS = [[4800,50000],[18000,80000],[45000,150000]]
 const LEASES = [21000,16000,85000] # The retired owner's Soi lease leaves room for staff and action investments.
@@ -123,3 +123,10 @@ const PROMOTION_SECONDS = 120
 const PROMOTION_COOLDOWN = 120
 const POOL_PATIENCE = 30
 const POOL_EXTRA_STAY = 30
+
+const STOCK_PACK = 6
+const PROMOTER_CONTRACT_COST = 1200
+const PROMOTER_BONUS = [4.8,6.0,7.2]
+const AUDIENCE_TRAINING_COST = 800
+const DANCER_TRAINING = [1.0,1.25,1.5]
+const COMMISSION_PERCENT = 10

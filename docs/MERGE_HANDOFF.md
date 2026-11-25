@@ -1,4 +1,27 @@
-# Consolidated game and build handoff
+# Current implementation and release handoff
+
+Updated **25 November 2026** in `/home/zak/projects/pattaya-after-hours`.
+The authorized work is on **`codex/promoter-implementation`**, based on the
+committed plan `7f881e5`, TV/patience fix `0d7bb90` and main consolidation `7a95d58`
+(released as v1.0.13). The user explicitly requested commit and deployment.
+
+This slice adds twelve-person compact seating, exact six-pack restocking, Nida's
+contract/commission/frontage artwork and retained promoter/dancer training.
+It preserves the earlier cast, startup menu, clock, cooldowns and optional arcade.
+Schema 6 retains older progress; the catalog has 72 textures/22 atlases/149 frames.
+
+Run `tools/test.sh`: regression coverage plus 27 fresh campaigns. The latest
+[testing record](TESTING.md) and [economy evidence](ECONOMY.md#balance-verification)
+are authoritative. Main pushes run signed Android and desktop exports; a source
+commit alone is not a published download. Check the release workflow and
+[latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+for the published version and source commit. Device playtesting remains separate.
+
+Other worktrees and user attachments were preserved. Upstream PRs #4 and #5 from
+the prior audit remain outside this feature's scope; this is not another claim
+that all work in every chat has been merged. The audit below is historical.
+
+## Historical consolidation audit
 
 Checked on **25 November 2026**. The integration branch is
 **`codex/consolidated-build`**, based on the completed local clock/perspective

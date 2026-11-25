@@ -22,14 +22,14 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Combined-game consolidation and build handoff |
-| Status | Integrated locally; awaiting maintainer/device review |
+| Active feature | Compact seating, six-packs and frontage promoter |
+| Status | Implemented and verified; authorized main/release handoff |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Maintainer and invited device testers; not yet assigned |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/consolidated-build`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Combine completed chats, verify the shared economy, refresh docs and build |
-| Next handoff / blocker | Review the combined build; keep new gameplay changes coordinated |
+| Working branch / chat / PR | `codex/promoter-implementation`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Shared economy/UI/saves, production Nida/bench assets, tests and docs |
+| Next handoff / blocker | 27 campaigns pass; publish via main workflow, then device playtesting |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-25 |
 
