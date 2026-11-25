@@ -57,7 +57,7 @@ func run() -> void:
 	var saw_week := false
 	var saw_rush := false
 	var saw_flood := false
-	var saw_godzilla := false
+
 	while model.s.phase != "end" and clean_days < 365:
 		if model.s.stock < 85:
 			model.action("buy")
@@ -69,10 +69,6 @@ func run() -> void:
 		if model.s.condition < 34: model.action("repair")
 		if model.s.staff[2].work: model.booking(2,0)
 		model.start()
-		if model.s.phase == "godzilla":
-			check(not saw_godzilla and model.s.day <= 3,"One early Godzilla encounter")
-			saw_godzilla = true
-			model.finish_godzilla(true)
 		check(model.s.phase == "incident","Started day %d" % model.s.day)
 		while model.s.phase == "incident":
 			saw_rush = saw_rush or model.s.card == 20
@@ -87,12 +83,13 @@ func run() -> void:
 			saw_week = model.s.last_week.nights == 7 and model.s.last_week.costs > 0
 		clean_days += 1
 		model.next_day()
-	check(clean_days == 365 and model.s.phase == "end","Campaign completes the first year")
-	check(saw_week and saw_rush and saw_flood and saw_godzilla and model.s.wins > 0,"Weekly ledger and anchor incidents")
+	check(clean_days == 365 and model.s.phase == "plan" and model.s.day == 366,"Street continues beyond the first year")
+	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
+	load("res://tests/street_check.gd").new().run(self)
 	test_risk()
 	await test_ui()
 	if failures == 0:
-		print("PASS · all 51 cards and responses, autosave recovery, full year, UI, arcade, tutorial, Godzilla and decision odds")
+		print("PASS · incident deck, endless year, street economy, chapters, migration, offline earnings, events, UI, arcade, tutorial, Godzilla and decision odds")
 	quit(1 if failures else 0)
 
 func test_ui() -> void:
@@ -103,6 +100,23 @@ func test_ui() -> void:
 	use_button(app,"Tutorial")
 	check(not FileAccess.file_exists(Campaign.SAVE),"Opening a tutorial creates no campaign save")
 	use_button(app,"Exit")
+	var opening_cash := int(app.model.s.cash)
+	use_button(app,"Serve a drink")
+	check(app.model.s.street.served == 1 and app.model.s.cash > opening_cash,"Main clicker button serves and earns")
+	use_button(app,"Hire server · ฿600")
+	app.model.street.tick(4)
+	check(app.model.s.street.served == 2,"Hired staff serve without tapping")
+	app.model.street.announce(3)
+	app.render()
+	var banner_click := InputEventMouseButton.new()
+	banner_click.pressed = true
+	banner_click.button_index = MOUSE_BUTTON_LEFT
+	banner_click.position = Vector2(139,25) * (app.city.size / Vector2(278,188))
+	app.city._gui_input(banner_click)
+	check(app.tab == 1,"The event banner opens preparation controls")
+	use_button(app,"Raise stock & share pumps · ฿450")
+	check(app.model.s.street.event.prepared,"Event preparation works through the UI")
+	app.model.s.street.event = {}
 	for i in 5:
 		app.change_tab(i)
 		check(app.column.get_child_count() > 0,"Rendered tab %d" % i)
@@ -190,8 +204,10 @@ func use_button(app: Control, label: String) -> void:
 
 func test_godzilla(app: Control) -> void:
 	app.model = Campaign.new(104)
-	app.model.s.day = Campaign.GODZILLA_TEST_DAY
-	app.begin()
+	app.model.street.announce(8)
+	app.model.street.start_event()
+	app.model.start_street_boss()
+	app.commit()
 	check(app.model.s.phase == "godzilla" and app.city.godzilla == "attack","Godzilla appears before guests are served")
 	var reloaded = Campaign.new(302)
 	check(reloaded.load_game() and reloaded.s.phase == "godzilla","Pending encounter resumes from save")
@@ -203,23 +219,23 @@ func test_godzilla(app: Control) -> void:
 	for i in range(1,app.SHOT_GOAL):
 		app._process(app.SHOT_INTERVAL + 0.01)
 		use_button(app,"Serve a shot")
-	check(app.model.s.phase == "incident" and app.city.godzilla == "asleep","Filling the meter resumes service and shows Godzilla asleep")
+	check(app.model.s.phase == "plan" and app.city.godzilla == "asleep","Filling the meter resumes service and shows Godzilla asleep")
 	check(reloaded.load_game() and reloaded.s.night.godzilla == "asleep","Sleeping Godzilla survives a reload")
-	while app.model.s.phase == "incident":
-		app.model.fallback()
+	app.model.street.end_shift()
 	app.render()
-	check(app.city.godzilla == "asleep" and app.model.s.night.gross > 0,"Normal sales and sleeping sprite through closeout")
-	app.advance()
-	check(app.city.godzilla.is_empty() and not app.model.s.night.has("godzilla"),"Godzilla is gone the next day")
+	check(app.city.godzilla.is_empty(),"Godzilla is gone the next shift")
 
 	app.model = Campaign.new(104)
-	app.model.s.day = Campaign.GODZILLA_TEST_DAY
-	app.begin()
+	app.model.street.announce(8)
+	app.model.street.start_event()
+	app.model.start_street_boss()
+	app.commit()
 	use_button(app,"Serve a shot")
 	app._process(app.GODZILLA_SECONDS + 0.01)
-	check(app.model.s.phase == "report" and app.model.s.night.godzilla == "scared","Timeout goes straight to closeout")
-	check(app.model.s.night.gross == 0 and app.model.s.night.guests == 0 and app.model.s.night.wages > 0,
-		"Frightened patrons buy nothing but staff are paid")
+	check(app.model.s.phase == "plan" and app.model.s.night.godzilla == "scared","Timeout returns to the street")
+	check(app.model.street.selected().closed == 30,"Monster loss causes a temporary closure")
+	app.model.street.tick(30)
+	check(app.model.street.selected().closed == 0,"The street recovers after monster damage")
 
 
 func test_risk() -> void:
@@ -228,6 +244,7 @@ func test_risk() -> void:
 	for seed_value in range(1,61):
 		var model = Campaign.new(seed_value)
 		model.start()
+		model.s.card = 100 # Legacy payroll story; milestones now drive new campaigns.
 		var effects: Dictionary = model.current_card()[3]
 		var before: Dictionary = model.s.duplicate(true)
 		var rng_before: int = model.rng.state
@@ -242,6 +259,7 @@ func test_risk() -> void:
 	check(saw_worked and saw_setback,"Both outcomes can actually occur")
 	var model = Campaign.new(61)
 	model.start()
+	model.s.card = 100
 	var delivery := {"cash":-440,"stock":20}
 	model.s.supplier = 5
 	var low_chance: int = model.response_risk(delivery).chance

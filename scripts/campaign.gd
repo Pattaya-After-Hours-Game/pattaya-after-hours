@@ -3,7 +3,7 @@ extends RefCounted
 const C = preload("res://scripts/content.gd")
 const SAVE = "user://campaign.json"
 const BACKUP = "user://campaign.backup"
-const MAX_DAY = 365
+const Street = preload("res://scripts/street.gd")
 const HOURS = ["Early close", "Standard", "Late close"]
 const PROMOS = ["Regular prices", "Happy hour", "Loyalty night", "Big campaign"]
 const SECURITY = ["House team", "Licensed crew", "Shoreline Desk"]
@@ -15,9 +15,8 @@ const NIGHT_EFFECTS = ["demand","capacity","tour","mine"]
 const TEAM_EFFECTS = ["skill","morale","fatigue"]
 const LOWER_IS_BETTER = ["heat","fatigue","rival"]
 const COMMITMENTS = ["reserve","debt","security","exit"]
-# Temporary test schedule. Move this trigger when making the encounter rare.
-const GODZILLA_TEST_DAY = 3
 var s: Dictionary
+var street: RefCounted
 var rng := RandomNumberGenerator.new()
 
 func _init(seed_value: int = 0) -> void:
@@ -40,6 +39,7 @@ func _init(seed_value: int = 0) -> void:
 		_add_staff(i)
 	_reset_week()
 	_forecast()
+	street = Street.new(s)
 
 func _add_staff(id: int) -> void:
 	s.staff.append({"id":id,"skill":C.STAFF[id][2],"guide":C.STAFF[id][3],"morale":72,"fatigue":12,"work":true,"hurt":0})
@@ -149,12 +149,11 @@ func action(id: String, index: int = 0) -> String:
 			_add_staff(s.staff.size())
 			return "%s joined the team." % C.STAFF[s.staff.back().id][0]
 		"reno":
-			if s.level >= 4: return "The venue is fully renovated."
-			if not spend(1800 * int(s.level)): return "The renovation needs more cash."
-			s.level += 1
-			s.condition = mini(100, s.condition + 18)
-			s.safety = mini(100, s.safety + 10)
-			return "Renovation complete. More room and safer service."
+			var previous: int = s.street.selected
+			s.street.selected = 0
+			var result: String = street.action("upgrade")
+			s.street.selected = previous
+			return result
 		"repair":
 			if s.condition == 100: return "Everything is working."
 			if not spend(500): return "Repairs cost ฿500."
@@ -167,12 +166,7 @@ func action(id: String, index: int = 0) -> String:
 			s.food = 1
 			return "Small plates increase spend and keep quiet shifts viable."
 		"venue":
-			if s.venue == 2: return "Both venues are open."
-			if s.rep < 42 or s.partner < 40: return "Needs 42 reputation and 40 co-owner trust."
-			if not spend(9600): return "The second lease costs ฿9,600."
-			s.venue = 2
-			s.heat += 9
-			return "Anong signs the lease on High Tide."
+			return street.action("buy",0)
 		"rig":
 			if s.rig > 0: return "The rig is already installed."
 			if s.day < 12 or s.rep < 25: return "Available from day 12 with 25 reputation."
@@ -235,16 +229,25 @@ func start() -> String:
 		else:
 			s.night.notes.append("%s delayed · starts at the rush" % event[0])
 			s.night.delayed = true
-	if s.day == GODZILLA_TEST_DAY:
-		s.night.godzilla = "attack"
-		s.phase = "godzilla"
-	else:
-		s.phase = "incident"
-		s.card = _draw_card()
+	s.phase = "incident"
+	s.card = _draw_card()
+	return ""
+
+func start_street_boss() -> String:
+	var event: Dictionary = s.street.event
+	if s.phase != "plan" or event.get("phase","") != "active" or not int(event.get("id",-1)) in [8,9]:
+		return "Wait for the announced monster event."
+	s.night = {"godzilla":"attack", "street_boss":true}
+	s.phase = "godzilla"
 	return ""
 
 func finish_godzilla(won: bool) -> void:
 	if s.phase != "godzilla": return
+	if s.night.get("street_boss",false):
+		street.finish_event(won)
+		s.night.godzilla = "asleep" if won else "scared"
+		s.phase = "plan"
+		return
 	if won:
 		s.night.godzilla = "asleep"
 		s.night.notes.append("Godzilla passed out on the curb. The bar stayed open.")
@@ -265,9 +268,6 @@ func rest() -> void:
 	_close()
 
 func _draw_card() -> int:
-	if s.night.wave == 0:
-		for i in C.STORY.size():
-			if C.STORY[i][0] == s.day: return 100 + i
 	if s.day == 6 and s.night.wave == 1: return 20
 	if s.day == 8 and s.night.wave == 1: return FIGHT_CARD
 	if s.day == 13 and s.night.wave == 1: return 42
@@ -581,12 +581,10 @@ func _close() -> void:
 	if int(s.day) % 7 == 0: s.last_week = s.weekly.duplicate()
 	s.report = n.notes.duplicate()
 	s.phase = "report"
-	if s.debt >= 11500: s.end = "The Final Notice"
-	elif s.day >= MAX_DAY:
-		if s.exit: s.end = "A Different Shore"
-		elif s.partner < 28: s.end = "The Empty Office"
-		elif s.venue == 2 or s.rig > 0: s.end = "The Neon Empire"
-		else: s.end = "The Neighborhood Institution"
+	if s.debt >= 11500:
+		n.notes.append("Anong arranges a repayment plan. The street remains open; idle profits can fund recovery.")
+	s.end = ""
+	street.check_chapters()
 	log_message("Day %d · %+d net · %d guests" % [s.day,n.cash,n.guests])
 
 func next_day() -> void:
@@ -596,7 +594,7 @@ func next_day() -> void:
 		return
 	var reset := int(s.day) % 7 == 0
 	s.day += 1
-	s.night.erase("godzilla")
+	street.end_shift()
 	if reset: _reset_week()
 	s.phase = "plan"
 	s.bookings.clear()
@@ -605,6 +603,7 @@ func next_day() -> void:
 	_forecast()
 
 func save_game() -> int:
+	s.street.last_seen = maxi(int(s.street.last_seen),int(Time.get_unix_time_from_system()))
 	s.rng = str(rng.state)
 	var temporary := SAVE + ".tmp"
 	var file := FileAccess.open(temporary, FileAccess.WRITE)
@@ -624,7 +623,28 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and parsed.get("version") == 1 and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2] and parsed.has("staff") and parsed.has("phase"):
+		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
+			if not parsed.has(key): return null
+		if parsed.version == 2:
+			if not parsed.get("street") is Dictionary: return null
+			var data: Dictionary = parsed.street
+			for key in ["bars","selected","chapter","served","earned","seconds","cycle","event","event_wait","event_index","events_survived","reopening","festival","festivals","last_seen","offline","history"]:
+				if not data.has(key): return null
+			if not data.bars is Array or data.bars.is_empty() or data.bars.size() > Street.C.NAMES.size(): return null
+			if int(data.selected) < 0 or int(data.selected) >= data.bars.size(): return null
+			if int(data.chapter) < 0 or int(data.chapter) >= Street.C.CHAPTERS.size(): return null
+			for bar in data.bars:
+				if not bar is Dictionary: return null
+				for key in ["type","stage","name","crew","stock","restock","manager","away","closed"]:
+					if not bar.has(key): return null
+				if not int(bar.type) in [0,1,2] or not int(bar.stage) in [1,2,3]: return null
+				if int(bar.crew) < 0 or int(bar.crew) > 6 or not bar.away is Array: return null
+			if not data.event is Dictionary: return null
+			if not data.event.is_empty():
+				for key in ["id","phase","remaining","prepared"]:
+					if not data.event.has(key): return null
+				if int(data.event.id) < 0 or int(data.event.id) >= Street.C.EVENTS.size(): return null
 		return parsed
 	return null
 
@@ -634,6 +654,11 @@ func load_game() -> bool:
 	if parsed == null: return false
 	s = _restore_numbers(parsed)
 	rng.state = int(str(s.rng))
+	street = Street.new(s)
+	if s.phase == "end":
+		s.phase = "plan"
+		s.end = ""
+		street.record("Anong reopens the books. Your street's story continues beyond the first year.")
 	return true
 
 

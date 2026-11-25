@@ -19,7 +19,11 @@ var rig := 0
 var last_frame := -1
 var font = ThemeDB.fallback_font
 var placement: Array = []
+var bars: Array = []
+var selected_bar := 0
+var street_event: Dictionary = {}
 signal site(tab: int)
+signal select_bar(index: int)
 
 func _ready() -> void:
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -37,6 +41,16 @@ func _process(delta: float) -> void:
 func _gui_input(input: InputEvent) -> void:
 	if input is InputEventMouseButton and input.pressed and input.button_index == MOUSE_BUTTON_LEFT:
 		var point: Vector2 = input.position / (size / Vector2(278,188))
+		if not bars.is_empty():
+			if point.y < 32 and not street_event.is_empty():
+				accept_event()
+				site.emit(1)
+			if point.y >= 138 and point.y < 171:
+				var index := int((point.x-7)/33.0)
+				if point.x >= 7 and index >= 0 and index < bars.size():
+					accept_event()
+					select_bar.emit(index)
+			return
 		for item in LABELS:
 			var p: Vector2 = item[1]
 			if Rect2(p - Vector2(28,8), Vector2(56,16)).has_point(point):
@@ -49,6 +63,9 @@ func px(x: float,y: float,w: float,h: float,col: Color) -> void:
 
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO,0,size / Vector2(278,188))
+	if not bars.is_empty():
+		_draw_soi()
+		return
 	var dusk := Color("#250f45") if night else Color("#342048")
 	for i in 38:
 		px(0,i * 3,278,3,dusk.lerp(Color("#9c2f5c") if night else Color("#de735f"),i / 55.0))
@@ -113,6 +130,127 @@ func _draw() -> void:
 			draw_line(rain,rain+Vector2(-2,5 + int(weather == 6) * 2),Color("#81bad27d"),1)
 		if weather == 6:
 			for i in 8: px(9+i*35,155+i%3,17+i%4*2,1,Color("#618bc6"))
+
+func _draw_soi() -> void:
+	var bar: Dictionary = bars[selected_bar]
+	var kind := int(bar.type)
+	var stage := int(bar.stage)
+	var tint: Color = [TEAL,PINK,GOLD][kind]
+	for i in 38:
+		px(0,i*5,278,5,Color("#18122f").lerp(Color("#69284e"),i/55.0))
+	draw_circle(Vector2(247,19),10,Color("#ffbd73"))
+	for i in 20:
+		px(i*15,28-(i*7)%13,10,20,Color("#21172f"))
+	_sign("PATTAYA / AFTER HOURS SOI",Vector2(124,12),GOLD)
+	if not street_event.is_empty():
+		var event_name: String = preload("res://scripts/street_content.gd").EVENTS[int(street_event.id)][0]
+		_sign("%s %ds / %s" % ["SOON" if street_event.phase == "warning" else "LIVE",street_event.remaining,event_name.left(30)],Vector2(139,26),PINK)
+	# Selected venue: a cutaway with one distinct layout per type and stage.
+	px(14,32,250,94,INK)
+	px(17,35,244,87,Color("#442743"))
+	px(20,48,238,69,Color("#24192e"))
+	px(17,35,244,2,tint)
+	px(17,120,244,3,tint.darkened(.55))
+	var sign_name: String = "BLUE HO" if selected_bar == 0 and stage == 1 else str(bar.name).to_upper()
+	_sign(sign_name,Vector2(139,43),tint)
+	for i in stage:
+		px(240-i*6,40,3,3,GOLD)
+	if kind == 0:
+		# Fridge, fans and six stools become a pool bar, then a live-music terrace.
+		px(24,58,18,34,Color("#686483"))
+		px(26,60,14,27,Color("#4c9497") if stage > 1 else Color("#716273"))
+		for i in 6: px(28+(i%3)*4,65+(i/3)*10,2,6,TEAL.darkened(.3))
+		for x in [73,139,205]:
+			draw_circle(Vector2(x,57),6,Color("#534258"))
+			var blade := Vector2(cos(clock*8),sin(clock*8))*5
+			draw_line(Vector2(x,57)-blade,Vector2(x,57)+blade,GOLD,1)
+		px(50,84,112,8,Color("#b16e71"))
+		px(50,92,112,12,Color("#5b334d"))
+		for i in 6:
+			px(55+i*18,111,6,2,PINK if stage == 1 else GOLD)
+			px(57+i*18,113,2,5,Color("#7f5f7b"))
+		if stage >= 2:
+			px(180,78,49,26,Color("#a26868"))
+			px(183,81,43,20,Color("#2b7c6d"))
+			px(195,87,2,2,Color("#f6e4f3"))
+			px(213,94,2,2,GOLD)
+			px(102,53,24,15,Color("#101524"))
+			px(104,55,20,11,Color("#486f87"))
+		if stage == 3:
+			px(175,57,62,15,Color("#713e68"))
+			for i in 3: _person(185+i*19,70,i,false)
+			px(177,52,4,18,INK)
+			px(233,52,4,18,INK)
+	elif kind == 1:
+		# Closed upstairs doors make rooms legible without depicting activity.
+		px(24,77,229,3,Color("#b66d89"))
+		for i in stage:
+			var x := 60+i*58
+			px(x,52,29,24,Color("#643454"))
+			px(x+3,54,23,22,Color("#3a203d"))
+			px(x+22,64,2,2,GOLD)
+			_sign(str(i+1),Vector2(x+14,59),PINK)
+		for i in 7: px(28+i*4,111-i*5,5,3,GOLD.darkened(.3))
+		px(81,95,120,8,Color("#a95d7d"))
+		for i in stage+1:
+			px(96+i*28,114,8,2,PINK)
+			px(99+i*28,116,2,4,Color("#815874"))
+		if stage >= 2:
+			px(225,88,13,20,INK)
+			draw_circle(Vector2(231,94),4,PINK.darkened(.4))
+		if stage == 3:
+			for x in range(25,253,12): px(x,49,3,2,PINK if int(clock*3+x)%2 else GOLD)
+	else:
+		px(49,103,176,10,Color("#a34f86"))
+		px(54,107,166,3,PINK)
+		for i in stage:
+			var x := 93+i*45-(stage-1)*18
+			px(x,55,2,48,GOLD)
+			if i < int(bar.crew):
+				var sway := sin(clock*2+i)*3
+				_person(x+5+sway,99,i+1,false)
+				draw_line(Vector2(x+5+sway,94),Vector2(x,89),PINK,1)
+		if stage >= 2:
+			for x in [28,234]:
+				px(x,82,17,19,Color("#71345b"))
+				px(x+3,89,11,2,GOLD)
+		if stage == 3:
+			for i in 5:
+				var x := 52+i*42
+				draw_line(Vector2(x,50),Vector2(x+sin(clock+i)*20,101),Color("#ff63ae44"),3)
+	# More crew and higher stages visibly populate each venue.
+	for i in int(bar.crew):
+		if not i in bar.away and kind != 2: _person(70+i*25,94 if kind == 0 else 93,i,false)
+	if bar.closed == 0:
+		for i in 2+stage*2:
+			_person(58+i*23,119,i,true)
+	else:
+		_sign("TEMPORARILY CLOSED",Vector2(139,104),GOLD)
+	var type_name: String = ["BEER BAR", "SOI BAR", "GOGO"][kind]
+	_sign("%s / STAGE %d / %d STAFF" % [type_name,stage,bar.crew],Vector2(139,130),tint)
+	# Every acquired property lights up its own lot. Tap a lot to inspect it.
+	for i in 8:
+		var x := 7+i*33
+		px(x,144,29,25,Color("#281c35"))
+		if i < bars.size():
+			var building: Dictionary = bars[i]
+			var neon: Color = [TEAL,PINK,GOLD][int(building.type)]
+			px(x,144,29,2,neon)
+			for j in int(building.stage):
+				px(x+4+j*8,150,5,7,neon.darkened(.4))
+			px(x+12,160,6,9,neon.darkened(.6))
+			if i == selected_bar: draw_rect(Rect2(x-1,142,31,28),GOLD,false,1)
+		else:
+			_sign("LET",Vector2(x+14,158),Color("#766380"))
+	px(0,171,278,17,Color("#292039"))
+	for i in 12: px(i*24,180,12,1,Color("#a16d79"))
+	for i in 5+bars.size():
+		_person(fposmod(i*33+clock*(5+i%3),278),175+i%2,i,true)
+	_traffic(fposmod(clock*20,300)-10,184,1)
+	if street_event.get("phase","") == "active" and street_event.get("id",-1) in [3,4]:
+		for i in 18: px(fposmod(i*31-clock*18,278),172+(i%5)*3,12,1,Color("#71c6da88"))
+	if godzilla in ["attack","asleep"]: _draw_godzilla()
+
 
 func _sign(value: String, p: Vector2, tint: Color) -> void:
 	var width := int(font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,7).x) + 8
