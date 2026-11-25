@@ -121,7 +121,7 @@ func booking(index: int, route_id: int) -> String:
 
 func action(id: String, index: int = 0) -> String:
 	if not legacy_mode() and id in ["buy","hire","rota","train","reno"]:
-		return street.action({"buy":"stock","hire":"hire","rota":"rota","train":"equipment","reno":"upgrade"}[id],6 if id=="train" else index)
+		return street.action({"buy":"stock","hire":"hire","rota":"rota","train":"train_staff","reno":"upgrade"}[id],index)
 	if s.phase != "plan":
 		return "Finish the current night first."
 	match id:
@@ -706,6 +706,9 @@ func _read(path: String) -> Variant:
 				for person in bar.team:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
 					if not int(person.role) in [0,1,2] or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
+					for key in ["training","service_clock","contract_left"]:
+						if person.has(key) and (not (person[key] is int or person[key] is float) or person[key]<0): return null
+					if int(person.get("training",0))>=Street.C.STAFF_SERVICE_SECONDS.size() or int(person.get("contract_left",0))>Street.C.STAFF_CONTRACT_MINUTES: return null
 				for customer in bar.customers:
 					if not customer is Dictionary: return null
 					for key in ["id","life","order","wait","quoted","drinks","next","budget","premium","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:

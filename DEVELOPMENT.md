@@ -136,6 +136,11 @@ On default Linux installations, campaign files live at:
 Godot's `user://` path varies by OS and `XDG_DATA_HOME`. Back up both campaign
 files before experimenting with save changes. Writes use a temporary file,
 preserve a backup, and store RNG state so decisions resume deterministically.
+Staff records retain individual training, service progress and contract minutes.
+Old staff inherit their venue training; their missing contract fields migrate to
+a ten-day term before normal offline catch-up. Expiry keeps the record available
+for manual rehire. Regenerate the original waiting bell with
+`python3 tools/order-chime.py` (standard library only).
 Campaign fights reload at the beginning of the bout.
 
 Changes to the save flow must preserve the boot menu's read-only state: startup probes the save and

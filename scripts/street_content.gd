@@ -86,6 +86,7 @@ const EQUIPMENT = [
 	{"id":"pool", "name":"Pool table", "cost":2000, "max":2, "help":"฿50 per 45-second game; replaces two seats. Beer bars only."},
 	{"id":"seating", "name":"Extra seating", "cost":400, "max":2, "help":"Two more seats; each pool table uses two of them."},
 	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
+	# Legacy slot retained for save/action indices; training is now per person.
 	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
 	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Adds premium orders for customers with the budget. Stage 2+."}
 ]
@@ -99,7 +100,7 @@ const ROLE_NAMES = ["Bartender", "Adult host", "Adult dancer"]
 const ROLE_WAGES = [24,20,36] # per minute, including quiet periods
 const OVERHEAD = [18,45,90]
 const RENOVATIONS = [[4800,50000],[18000,80000],[45000,150000]]
-const LEASES = [21000,32000,85000]
+const LEASES = [21000,26000,85000] # Soi entry offsets the first contract reserve and individual training.
 const STAGE_GOALS = [
 	{"happy":70,"regulars":10,"healthy":8},
 	{"happy":600,"regulars":70,"healthy":40}
@@ -112,8 +113,12 @@ const VISIT_SECONDS = 90
 const ORDER_SECONDS = 35
 const PATIENCE_SECONDS = 25
 const REGULAR_CHANCE = 20
-const BARTENDER_SERVICE = 10
-const TRAINING_SERVICE = 5
+const STAFF_CONTRACT_COST = 4500
+const STAFF_CONTRACT_DAYS = 10
+const STAFF_CONTRACT_MINUTES = STAFF_CONTRACT_DAYS * DAY_MINUTES
+const STAFF_SERVICE_SECONDS = [25,20,15] # One drink, per bartender; training stays with the person.
+const STAFF_TRAINING_COST = 800
+const ORDER_ALERT_SECONDS = 10.0
 const PROMOTION_SECONDS = 120
 const PROMOTION_COOLDOWN = 120
 const POOL_PATIENCE = 30

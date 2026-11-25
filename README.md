@@ -37,14 +37,22 @@ Looks stay consistent during each visit and do not determine spending behaviour.
 Wall fans appear only after buying **Fans & comfortable seats**, including in
 the property thumbnail; renovation alone does not install them.
 
-Save for signage, seating, a bartender and a pool table. Pool is available at
+Save for signage, seating and a pool table, then invest in staff contracts. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
 Night attracts visitors but gives up pool fees; Happy Hour, Pool Tournament and
 Sports Night have their own costs and trade-offs. Promotions last two minutes,
 then have a two-minute cooldown.
 
-Bartenders serve orders; hosts and dancers attract visitors. Staff cost money
-while on duty, even when the bar is quiet. Use the rota or temporarily close if
+Bartenders serve orders; hosts and dancers attract visitors. Hiring or rehiring
+costs **฿4,500 for ten game days**, plus on-duty wages. A base bartender serves
+one drink every **25 seconds**; individual training improves this to 20 and then
+15 seconds. Help serve during a rush. Contracts expire, but each person's training
+stays with them when rehired. Service shows the remaining term and rehire controls.
+Closed hours, skipped nights and offline time count toward contracts.
+
+A two-note bell alerts you to waiting orders at the selected venue, repeating at
+most once every ten seconds. **Sound / Muted** controls it along with game audio.
+Staff cost money while on duty, even when the bar is quiet. Use the rota or temporarily close if
 costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
 cash for the next shift—not just a large bank balance.
@@ -175,3 +183,12 @@ GODOT_BIN=/path/to/godot tools/release.sh
 For a signed Android export, set `ANDROID_HOME`, `JAVA_HOME`, `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. Keep the same signing key and increase Android's `version/code` for each published update. Keep the version in `project.godot` and the export presets in sync with the release tag. Windows updates use the published ZIP and `SHA256SUMS.txt`. The script writes packages and checksums to `dist/`.
 
 The streets, businesses, characters, artwork, and arcade moves are original fictional content. The game and original assets are [MIT licensed](LICENSE). Godot and the bundled [DejaVu font](assets/DejaVu-LICENSE.txt) have their own notices.
+
+## Staff contracts and waiting-order alerts
+
+This update adds ten-day staff contracts, individual training that survives
+rehiring, measured 25/20/15-second service, and a waiting-order bell. Hiring and
+rehiring use the agreed ฿4,500 fee; the first Soi lease is ฿26,000 to accommodate
+the new hiring reserve and training costs. Existing hires and training migrate,
+and offline projections stop crediting staff service at contract expiry. See the
+[player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).

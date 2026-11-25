@@ -12,8 +12,8 @@ func managed() -> RefCounted:
 	var bar: Dictionary = m.street.selected()
 	bar.manager = true
 	bar.restock = true
-	bar.team = [{"role":0,"on":true,"host":-1}]
-	bar.crew = 1
+	bar.team = [{"role":0,"on":true,"host":-1,"training":2,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES},{"role":0,"on":true,"host":-1,"training":2,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES}]
+	bar.crew = 2
 	return m
 
 func run(test: SceneTree) -> void:
@@ -36,7 +36,7 @@ func clock_and_closures(test: SceneTree) -> void:
 	m.s.street.minute = 1439
 	m.street.tick(1)
 	test.check(m.s.day==8 and m.street.clock_text()=="12:00am" and not m.s.last_week.is_empty(),"Midnight advances the day and closes weekly accounts once")
-	m.s.cash = 100000
+	m.s.cash = 200000
 	m.s.rep = 100
 	m.s.street.chapter = 1
 	m.street.action("buy",1)
@@ -194,7 +194,7 @@ func raids(test: SceneTree) -> void:
 	test.check(not loaded.street.selected().raided and loaded.street.selected().recovery==120,"Raid victims retain owner-run recovery after noon")
 	# Two late venues contribute independently; owner/event closures do not.
 	m = managed()
-	m.s.cash = 100000
+	m.s.cash = 200000
 	m.s.rep = 100
 	m.s.street.chapter = 1
 	m.street.action("late")
@@ -320,7 +320,7 @@ func peaks(test: SceneTree) -> void:
 	advance(m,20)
 	test.check(bar.dirt<=dirt,"A closed peak-hour venue does not accumulate mess")
 	m = managed()
-	m.s.cash = 100000
+	m.s.cash = 200000
 	m.s.rep = 100
 	m.s.street.chapter = 1
 	m.street.action("buy",2)

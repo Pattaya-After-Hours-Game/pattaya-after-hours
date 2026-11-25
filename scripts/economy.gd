@@ -26,6 +26,11 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			# Old crew served drinks: keep them as bartenders, never remove a hire.
 			for _i in int(bar.crew): bar.team.append({"role":0,"on":true,"host":-1})
 			if bar.type == 0 and bar.stage >= 2: bar.equipment.pool = 1
+		for person in bar.team:
+			if not person.has("contract_left"): person.contract_left = C.STAFF_CONTRACT_MINUTES
+			if not person.has("training"): person.training = int(bar.equipment.training)
+			if not person.has("service_clock"): person.service_clock = 0
+			if person.contract_left<=0: person.on = false
 	if fresh:
 		s.cash = C.STARTING_CASH
 		st.bars[0].stock = 18
@@ -77,6 +82,7 @@ func close_customers(bar: Dictionary) -> void:
 	bar.host_requests.clear()
 	bar.welcome = 0
 	bar.service_clock = 0
+	for person in bar.team: person.service_clock = 0
 	finish_promotion(bar)
 	if bar.manager and bar.dirt>0 and bar.clean_remaining==0 and not bar.clean_auto_started:
 		bar.clean_remaining = C.CLEAN_SECONDS
@@ -123,20 +129,59 @@ func seats(bar: Dictionary) -> int:
 func stock_capacity(bar: Dictionary) -> int:
 	return 30 + int(bar.equipment.fridge)*40 + (int(bar.stage)-1)*20
 
-func on_duty(bar: Dictionary, role: int) -> int:
+static func contracted(person: Dictionary, offset: int = 0) -> bool:
+	return int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES))>offset
+
+static func service_seconds(person: Dictionary) -> int:
+	return C.STAFF_SERVICE_SECONDS[clampi(int(person.get("training",0)),0,C.STAFF_SERVICE_SECONDS.size()-1)]
+
+func advance_contracts(minutes: int) -> void:
+	if minutes<=0: return
+	for bar in s.street.bars:
+		for i in bar.team.size():
+			var person: Dictionary = bar.team[i]
+			if not contracted(person): continue
+			person.contract_left = maxi(0,int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES))-minutes)
+			if person.contract_left==0:
+				person.on = false
+				person.service_clock = 0
+				bar.away.erase(i)
+				var notice := "%s · %s %d finished their ten-day contract. Rehire in Service; training is retained." % [bar.name,C.ROLE_NAMES[int(person.role)],i+1]
+				s.log.push_front(notice)
+				s.street.history.push_front(notice)
+				if s.log.size()>30: s.log.pop_back()
+				if s.street.history.size()>60: s.street.history.pop_back()
+
+func on_duty(bar: Dictionary, role: int, offset: int = 0) -> int:
 	var total := 0
 	for i in bar.team.size():
-		if bar.team[i].on and bar.team[i].role == role and not i in bar.away: total += 1
+		if contracted(bar.team[i],offset) and bar.team[i].on and bar.team[i].role == role and not i in bar.away: total += 1
 	return total
 
-func service_rate(bar: Dictionary) -> int:
-	return on_duty(bar,0) * (C.BARTENDER_SERVICE + int(bar.equipment.training)*C.TRAINING_SERVICE)
+func service_rate(bar: Dictionary, offset: int = 0) -> float:
+	var rate := 0.0
+	for i in bar.team.size():
+		var person: Dictionary = bar.team[i]
+		if contracted(person,offset) and person.on and person.role==0 and not i in bar.away:
+			rate += 60.0/service_seconds(person)
+	return rate
 
-func operating_rate(bar: Dictionary) -> int:
+func staff_service(bar: Dictionary) -> void:
+	for i in bar.team.size():
+		var person: Dictionary = bar.team[i]
+		if not contracted(person) or not person.on or person.role!=0 or i in bar.away or pending(bar)==0 or bar.stock==0:
+			person.service_clock = 0
+			continue
+		person.service_clock = int(person.get("service_clock",0))+1
+		if person.service_clock>=service_seconds(person):
+			serve(bar,1)
+			person.service_clock = 0
+
+func operating_rate(bar: Dictionary, offset: int = 0) -> int:
 	if bar.get("recovery",0)>0: return 0
 	var amount := int(C.OVERHEAD[int(bar.type)]) + int(bar.equipment.comfort)*4 + (12 if bar.manager else 0)
 	for person in bar.team:
-		if person.on: amount += C.ROLE_WAGES[int(person.role)]
+		if contracted(person,offset) and person.on: amount += C.ROLE_WAGES[int(person.role)]
 	return amount
 
 func price(bar: Dictionary, premium: bool = false) -> int:
@@ -162,13 +207,13 @@ func traffic_rate(offline: bool = false) -> float:
 	if s.weather >= 5: rate *= .8
 	return rate
 
-func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minute: int = -1) -> float:
+func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minute: int = -1, offset: int = 0) -> float:
 	if not is_trading(bar,offline): return 0.0
 	var value := 4.0 + (int(bar.stage)-1)*1.0 + int(bar.equipment.sign)*2 + int(bar.equipment.pool)*1.5
 	value += minf(3.0,int(bar.regulars)/15.0) + minf(1.5,int(s.rep)/80.0)
 	if not offline: value += s.bookings.size()*.5
-	value += on_duty(bar,1)*.6 + on_duty(bar,2)*.9
-	if bar.type==2: value += on_duty(bar,2)*(.6 if offline else 1.8 if int(s.street.seconds) in range(40,80) else 0.0)
+	value += on_duty(bar,1,offset)*.6 + on_duty(bar,2,offset)*.9
+	if bar.type==2: value += on_duty(bar,2,offset)*(.6 if offline else 1.8 if int(s.street.seconds) in range(40,80) else 0.0)
 	if not offline:
 		value += int(bar.welcome)*.4
 		if not bar.promo.is_empty(): value += float(C.PROMOTIONS[int(bar.promo.kind)].boost)/int(bar.promo.repetition)
@@ -184,7 +229,7 @@ func audience_weights(offline: bool = false) -> Array:
 	if not offline and event_id()==6: return [70,20,10]
 	return [40,35,25]
 
-func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minute: int = -1) -> Dictionary:
+func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minute: int = -1, offset: int = 0) -> Dictionary:
 	var original := bar
 	var promotion_cost := 0.0
 	if promotion>=0 and promotion<C.PROMOTIONS.size():
@@ -196,18 +241,18 @@ func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minut
 	var mix := audience_weights(offline)
 	for audience in 3:
 		var total := 5.0
-		for other in s.street.bars: total += attraction(bar if other==original else other,offline,audience,minute)
-		arrivals += traffic_rate(offline)*float(mix[audience])/100.0*attraction(bar,offline,audience,minute)/total
+		for other in s.street.bars: total += attraction(bar if other==original else other,offline,audience,minute,offset)
+		arrivals += traffic_rate(offline)*float(mix[audience])/100.0*attraction(bar,offline,audience,minute,offset)/total
 	var space_limit := seats(bar)/1.5 # Typical 90-second stay.
 	var demand := minf(arrivals,space_limit)*2.0
-	var service := float(service_rate(bar))
+	var service := service_rate(bar,offset)
 	var sales := minf(demand,service)
 	if bar.stock == 0 and not bar.restock: sales = 0
 	var unit_margin := int(C.TYPES[int(bar.type)].drink)-C.STOCK_COST
 	var pool := minf(60.0/C.POOL_SECONDS*int(bar.equipment.pool),minf(arrivals,space_limit)*.2)*C.POOL_FEE
 	if not offline and bar.promo.get("kind",-1) == 0: pool = 0
 	if not offline and bar.promo.get("kind",-1) == 1: unit_margin = price(bar)-C.STOCK_COST
-	var costs := operating_rate(bar)+promotion_cost if is_trading(bar,offline) else 0.0
+	var costs := operating_rate(bar,offset)+promotion_cost if is_trading(bar,offline) else 0.0
 	var net := sales*unit_margin+pool-costs
 	var reason := "Quiet: attract customers before hiring."
 	if not is_trading(bar,offline): reason = status(bar)
@@ -452,6 +497,7 @@ func buy_equipment(bar: Dictionary, index: int) -> String:
 	if index<0 or index>=C.EQUIPMENT.size(): return "Unknown equipment."
 	var item: Dictionary = C.EQUIPMENT[index]
 	var id: String = item.id
+	if id=="training": return "Choose an individual team member to train in Service."
 	if bar.equipment[id]>=item.max: return "Already fully equipped."
 	if id=="pool" and bar.type!=0: return "Pool tables belong in beer bars."
 	if id=="pool" and bar.equipment.pool>=bar.stage: return "Upgrade the venue before adding another table."
@@ -530,12 +576,16 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			return "Anong covers two minutes of overhead. Staff are off duty; Bo's six recovery drinks cost ฿14 only when sold. Serve and welcome manually."
 		"rota":
 			if index<0 or index>=bar.team.size(): return "Unknown team member."
+			if not contracted(bar.team[index]): return "Rehire this team member first."
+			bar.team[index].service_clock = 0
 			bar.team[index].on = not bar.team[index].on
 			return "Rota updated. Off-duty staff do not incur wages."
 		"role":
 			if bar.type==0 or index<0 or index>=bar.team.size(): return "Choose a team member at a Soi bar or gogo."
 			if index in bar.away: return "Wait until this team member returns."
 			var person: Dictionary = bar.team[index]
+			if not contracted(person): return "Rehire this team member first."
+			person.service_clock = 0
 			person.role = int(bar.type) if person.role==0 else 0
 			person.host = free_host(bar) if person.role==1 else -1
 			return "Role changed to %s. Payroll and service forecasts updated." % C.ROLE_NAMES[int(person.role)]
@@ -544,17 +594,41 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if index==1 and bar.type!=1: return "Hosts work in Soi venues."
 			if index==2 and bar.type!=2: return "Dancers work in gogos."
 			if bar.team.size()>=int(bar.stage)*2: return "Upgrade for more team positions."
-			var amount: int = 600*(bar.team.size()+1)
+			var amount: int = C.STAFF_CONTRACT_COST
 			if s.cash<amount+(operating_rate(bar)+int(C.ROLE_WAGES[index]))*2: return "Keep a shift's payroll after hiring."
 			s.cash -= amount
 			s.weekly.costs += amount
 			var host := free_host(bar) if index==1 else -1
-			bar.team.append({"role":index,"on":true,"host":host})
+			bar.team.append({"role":index,"on":true,"host":host,"training":0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES})
 			bar.crew = bar.team.size()
-			return "%s hired. Wages: ฿%d/real min while trading on duty." % [C.ROLE_NAMES[index],C.ROLE_WAGES[index]]
+			return "%s hired for ten game days (฿4,500). Wages: ฿%d/real min while trading on duty." % [C.ROLE_NAMES[index],C.ROLE_WAGES[index]]
+		"rehire":
+			if index<0 or index>=bar.team.size(): return "Unknown team member."
+			var person: Dictionary = bar.team[index]
+			if contracted(person): return "This contract is still active."
+			if s.cash<C.STAFF_CONTRACT_COST+(operating_rate(bar)+int(C.ROLE_WAGES[int(person.role)]))*2: return "Keep a shift's payroll after the ฿4,500 rehire fee."
+			s.cash -= C.STAFF_CONTRACT_COST
+			s.weekly.costs += C.STAFF_CONTRACT_COST
+			person.contract_left = C.STAFF_CONTRACT_MINUTES
+			person.on = true
+			person.service_clock = 0
+			return "Rehired for ten game days. Their training is unchanged."
+		"train_staff":
+			if index<0 or index>=bar.team.size(): return "Choose a team member."
+			var person: Dictionary = bar.team[index]
+			if not contracted(person): return "Rehire this team member before training."
+			if person.role!=0: return "Service training is for bartenders. Reassign their role first."
+			var level := int(person.get("training",0))
+			if level>=C.STAFF_SERVICE_SECONDS.size()-1: return "Already fully trained."
+			var amount := C.STAFF_TRAINING_COST*(level+1)
+			if s.cash<amount+operating_rate(bar)*2: return "Keep a shift's operating reserve after training."
+			s.cash -= amount
+			s.weekly.costs += amount
+			person.training = level+1
+			return "Training retained for future contracts. Now serves one drink every %ds." % service_seconds(person)
 		"bar_fine":
 			if index<0 or index>=bar.team.size() or bar.team[index].role!=1: return "Choose an adult host."
-			if not is_trading(bar) or not bar.team[index].on or index in bar.away: return "This host is unavailable."
+			if not is_trading(bar) or not contracted(bar.team[index]) or not bar.team[index].on or index in bar.away: return "This host is unavailable."
 			if not C.HOSTS[int(bar.team[index].host)][2]: return "The host declines; hosted drinks are their preference."
 			if bar.host_requests.is_empty(): return "No customer has requested a bar fine."
 			if bar.away.size()>=bar.stage: return "Upstairs bookings are full this shift."
@@ -657,17 +731,14 @@ func tick() -> void:
 					var pool_report := promotion_record(bar,int(customer.promo))
 					if not pool_report.is_empty(): pool_report.lost += 1
 			if customer.life<=0 and not customer.playing: depart(bar,customer)
-		bar.service_clock += service_rate(bar)
-		var portions := int(bar.service_clock)/60
-		bar.service_clock = int(bar.service_clock)%60
-		if portions>0: serve(bar,portions)
+		staff_service(bar)
 		pool_tick(bar)
 
 func offline(now: int, cap_seconds: int) -> int:
 	var gap := maxi(0,now-int(s.street.last_seen))
 	var elapsed := mini(gap,cap_seconds)
 	var legal_seconds := legal_open_minutes(int(s.street.offline_cursor),elapsed)
-	var windows := offline_windows(int(s.street.offline_cursor),elapsed)
+	var windows := contract_windows(int(s.street.offline_cursor),elapsed)
 	# Even capped-away time advances the projection cursor, never the live clock.
 	s.street.offline_cursor = (int(s.street.offline_cursor)+gap)%C.DAY_MINUTES
 	s.street.last_seen = maxi(now,int(s.street.last_seen))
@@ -693,7 +764,7 @@ func offline(now: int, cap_seconds: int) -> int:
 				break
 			# Every venue competes at the same projected minute. Peak attraction
 			# cannot create a private supply of customers or exceed staff service.
-			var view := forecast(bar,true,-1,int(window.minute))
+			var view := forecast(bar,true,-1,int(window.minute),int(window.offset))
 			if view.net<=0:
 				limit = "unviable trading windows"
 				continue
@@ -715,6 +786,11 @@ func offline(now: int, cap_seconds: int) -> int:
 		notes.append("%s: estimated ฿%d net across %.1f legal trading minutes; peak hours included; limited by %s." % [bar.name,gain,traded,limit])
 	# A conservative net projection; it never debits opening cash or progresses
 	# queues, promotions, events, local milestones or calendar time.
+	for bar in s.street.bars:
+		for person in bar.team:
+			if contracted(person) and int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES))<=gap:
+				notes.append(str(bar.name)+": a staff contract expired; rehire in Service. Training retained.")
+	advance_contracts(gap)
 	s.cash += net
 	s.weekly.revenue += gross
 	s.weekly.costs += expenses
@@ -767,7 +843,24 @@ static func offline_windows(start: int, duration: int) -> Array:
 				break
 		var span := mini(remaining,boundary-minute)
 		if minute>=C.OPEN_MINUTE or minute<C.CLOSE_MINUTE:
-			windows.append({"minute":minute,"seconds":span})
+			windows.append({"minute":minute,"seconds":span,"offset":duration-remaining})
 		remaining -= span
 		minute = (minute+span)%C.DAY_MINUTES
+	return windows
+
+# Split every legal offline window at all staff expiries, including competitors.
+func contract_windows(start: int, duration: int) -> Array:
+	var expiries: Array[int] = []
+	for bar in s.street.bars:
+		for person in bar.team:
+			expiries.append(int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES)))
+	expiries.sort()
+	var windows := []
+	for window in offline_windows(start,duration):
+		var cursor := int(window.offset)
+		var finish := cursor+int(window.seconds)
+		for expiry in expiries+[finish]:
+			if expiry<=cursor or expiry>finish: continue
+			windows.append({"minute":(start+cursor)%C.DAY_MINUTES,"seconds":expiry-cursor,"offset":cursor})
+			cursor = expiry
 	return windows
