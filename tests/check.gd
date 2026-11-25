@@ -133,8 +133,12 @@ func test_ui() -> void:
 	check(app.fight == null,"Touch exits sparring safely")
 	app.begin()
 	check(app.model.s.phase == "incident","Opened the doors through UI")
+	var story: String = app.model.current_card()[1]
+	check(not panel_has_text(app,story),"Incident starts compact")
+	use_button(app,"Story")
+	check(panel_has_text(app,story) and app.model.s.night.wave == 0,"Story opens without advancing the wave")
 	app.choose(0)
-	check(app.model.s.night.wave == 1,"Resolved a card through UI")
+	check(app.model.s.night.wave == 1 and not app.show_details,"New wave returns to compact view")
 
 	var live_campaign = app.model
 	var save_before := FileAccess.get_file_as_string(Campaign.SAVE)
@@ -148,6 +152,11 @@ func test_ui() -> void:
 		check(app.model.s.phase == "incident" and app.model.s.night.wave == wave,"Practice wave %d" % (wave + 1))
 		use_button(app,app.model.current_card()[2])
 	check(app.model.s.phase == "report" and app.model.s.night.guests > 0,"Tutorial reaches a real closeout")
+	check(not panel_has_text(app,"DECISIONS THIS SHIFT"),"Closeout starts with the summary")
+	use_button(app,"Shift log")
+	check(panel_has_text(app,"DECISIONS THIS SHIFT"),"Shift log retains all decisions")
+	use_button(app,"Hide")
+	check(not panel_has_text(app,"DECISIONS THIS SHIFT"),"Detailed log can close")
 	use_button(app,"Finish tutorial")
 	check(app.model == live_campaign and app.model.s.night.wave == 1,"Tutorial restores the live shift")
 	check(FileAccess.get_file_as_string(Campaign.SAVE) == save_before,"Practice made no changes to the live save")
@@ -161,6 +170,11 @@ func test_ui() -> void:
 	app.queue_free()
 	await process_frame
 
+
+func panel_has_text(app: Control, label: String) -> bool:
+	for node in app.column.get_children():
+		if node is Label and node.text == label: return true
+	return false
 
 func find_button(app: Control, label: String) -> Button:
 	for b: Button in app.root_ui.find_children("*","Button",true,false):

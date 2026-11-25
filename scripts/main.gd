@@ -17,6 +17,11 @@ const PRACTICE_STOCK = 24
 const SHOT_GOAL = 10
 const SHOT_INTERVAL = 0.60
 const GODZILLA_SECONDS = 10.0
+const COMPACT_EFFECTS = {
+	"trust":"neighbors","supplier":"supplier","morale":"morale","fatigue":"fatigue",
+	"skill":"skill","condition":"condition","rival":"rivals","mine":"rig output",
+	"tour":"tours","route":"tour route","demand":"demand","capacity":"capacity","partner":"Anong trust",
+}
 const EFFECT_LABELS = {
 	"cash":"Till","reserve":"Reserve","debt":"Debt","stock":"Stock","rep":"Reputation",
 	"trust":"Neighborhood trust","partner":"Anong trust","safety":"Safety","heat":"Heat",
@@ -47,6 +52,7 @@ var training := false
 var arcade_circuit := false
 
 var confirmation := false
+var show_details := false
 var godzilla_shots := 0
 var godzilla_time := 0.0
 var shot_delay := 0.0
@@ -214,7 +220,7 @@ func render(keep_scroll: bool = false) -> void:
 		var last: Dictionary = results.back()
 		var heading := abs_text(root_ui,Rect2(26,465,524,17),result_heading(last),13,TEAL if last.worked else PINK)
 		heading.clip_text = true
-		var detail := abs_text(root_ui,Rect2(26,482,524,27),effect_text(last.changes),12,WHITE)
+		var detail := abs_text(root_ui,Rect2(26,482,524,27),effect_text(last.changes,true),12,WHITE)
 		detail.clip_text = true
 		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		detail.max_lines_visible = 2
@@ -226,10 +232,18 @@ func render(keep_scroll: bool = false) -> void:
 	if not practicing and model.s.phase == "plan":
 		at_button(root_ui,Rect2(435,473,117,41),"Walk district",walk_district)
 	pane(root_ui,Rect2(576,66,370,460),DARK)
-	for index in TAB_NAMES.size():
-		var b := at_button(root_ui,Rect2(582 + 71*index,72,69,37),TAB_NAMES[index],change_tab.bind(index),tab == index and model.s.phase == "plan" and not practicing)
-		b.add_theme_font_size_override("font_size",13)
-		b.disabled = model.s.phase != "plan" or practicing
+	if model.s.phase == "plan" and not practicing:
+		for index in TAB_NAMES.size():
+			var b := at_button(root_ui,Rect2(582 + 71*index,72,69,37),TAB_NAMES[index],change_tab.bind(index),tab == index)
+			b.add_theme_font_size_override("font_size",13)
+	elif model.s.phase in ["incident","report"]:
+		var section := "SHIFT SUMMARY"
+		var details := "Shift log"
+		if model.s.phase == "incident":
+			section = "WAVE %d / %d" % [int(model.s.night.wave)+1,2 if model.s.hours == 0 else 3]
+			details = "Story"
+		abs_text(root_ui,Rect2(586,72,220,37),section,13,GOLD)
+		at_button(root_ui,Rect2(842,72,94,37),"Hide" if show_details else details,toggle_details)
 	scroll = ScrollContainer.new()
 	scroll.position = Vector2(586,119)
 	scroll.size = Vector2(350,330)
@@ -248,11 +262,10 @@ func render(keep_scroll: bool = false) -> void:
 			if practicing:
 				title("1 / 3    Stock the bar")
 				if model.s.stock == PRACTICE_STOCK:
-					body("Check STOCK at the top. Every two guests use one unit. Buy a delivery before opening.")
+					body("Buy stock to open the bar.")
 					row_button(stock_label(),do_action.bind("buy"),true)
 				else:
-					body("Delivery in. Open the doors to serve two waves of guests.",TEAL)
-				body("Dao, Mali, and Fern are on tonight. In the campaign, give tired staff a night off.")
+					body("Stock is ready. Open the doors.",TEAL)
 			else:
 				match tab:
 					0: service_panel()
@@ -265,7 +278,7 @@ func render(keep_scroll: bool = false) -> void:
 		"incident":
 			if practicing:
 				title("2 / 3    Run the shift")
-				body("Every response has odds. Check both results, then see what happened below the map.")
+				body("Pick a response. The result appears below the map.")
 			incident_panel()
 			action_label = "Scale back service"
 			action = func():
@@ -274,7 +287,7 @@ func render(keep_scroll: bool = false) -> void:
 		"report":
 			if practicing:
 				title("3 / 3    Check the books")
-				body("Compare sales with payroll and fees. Check guests turned away and stock used before planning tomorrow.")
+				body("Check the net and how many guests you served.")
 			report_panel()
 			if practicing:
 				action_label = "Finish tutorial"
@@ -356,6 +369,7 @@ func do_action(id: String,index: int = 0) -> void:
 	commit(true)
 
 func commit(keep_scroll: bool = false) -> void:
+	show_details = false
 	save_state()
 	render(keep_scroll)
 
@@ -372,6 +386,7 @@ func advance() -> void:
 
 func start_tutorial() -> void:
 	if campaign_before_tutorial != null: return
+	show_details = false
 	campaign_before_tutorial = model
 	show_tutorial_hint = false
 	confirmation = false
@@ -383,6 +398,7 @@ func start_tutorial() -> void:
 
 func finish_tutorial() -> void:
 	if campaign_before_tutorial == null: return
+	show_details = false
 	model = campaign_before_tutorial
 	campaign_before_tutorial = null
 	message = ""
@@ -394,7 +410,7 @@ func stock_label() -> String:
 
 func service_panel() -> void:
 	title("Set the shift")
-	body("%s traffic expected. Standard shifts have three waves." % ("Heavy" if model.s.forecast >= 9 else "Light" if model.s.forecast < 0 else "Steady"))
+	body("%s traffic expected" % ("Heavy" if model.s.forecast >= 9 else "Light" if model.s.forecast < 0 else "Steady"))
 	row_pair("Hours: "+Campaign.HOURS[int(model.s.hours)],cycle.bind("hours",Campaign.HOURS),
 		Campaign.PROMOS[int(model.s.promo)],cycle.bind("promo",Campaign.PROMOS))
 	row_pair(stock_label(),do_action.bind("buy"),"Hire · ฿980",do_action.bind("hire"))
@@ -414,7 +430,8 @@ func events_panel() -> void:
 	title("What's on tonight?")
 	var disrupted: int = model.event_disruption_percent()
 	var canceled := disrupted * Campaign.CANCEL_IF_DISRUPTED
-	body("Paid events · %d%% on time / %.1f%% delayed / %.1f%% canceled. A cancellation costs the booking fee." % [100-disrupted,disrupted-canceled,canceled])
+	body("%d%% on time · %.1f%% delayed · %.1f%% canceled
+Booking fee applies if canceled." % [100-disrupted,disrupted-canceled,canceled])
 	for i in Content.EVENTS.size():
 		var item: Array = Content.EVENTS[i]
 		var value: String = item[0]+(" · "+cash(item[1]) if item[1] else "")
@@ -433,7 +450,8 @@ func events_panel() -> void:
 
 func tours_panel() -> void:
 	title("City tours")
-	body("Guides opt in. Short tours use one wave. Long tours use two. Pay is due even if the route is disrupted.")
+	body("Short tours 1 wave · Long tours 2 waves
+Guides get paid if a tour is disrupted.")
 	var crew: Array = model.s.staff
 	row_pair("Guide: "+Content.STAFF[crew[guide].id][0],func():
 		guide = (guide+1)%crew.size()
@@ -483,32 +501,35 @@ func week_lines(entry: Dictionary) -> void:
 	body("WEEK %d    %d shifts / %d guests / %d tour tickets" % [entry.weeks,entry.nights,entry.guests,entry.tours],GOLD,12)
 	body("Intake %s   ·   Costs %s\nNet %s" % [cash(entry.revenue),cash(entry.costs),cash(entry.revenue-entry.costs)],WHITE,15)
 
+func toggle_details() -> void:
+	show_details = not show_details
+	render()
+
 func incident_panel() -> void:
 	var card: Array = model.current_card()
-	body("%s   /   WAVE %d" % [["EARLY SERVICE","THE RUSH","LAST CALL"][int(model.s.night.wave)],int(model.s.night.wave)+1],GOLD,12)
 	title(card[0],PINK)
-	body(card[1],WHITE)
+	if show_details: body(card[1],WHITE)
 	for i in range(2,card.size(),2):
 		var effects: Dictionary = card[i+1]
 		var option := button(card[i],choose.bind((i-2)/2))
 		option.disabled = model.s.cash < -int(effects.get("cash",0))
 		column.add_child(option)
-		if option.disabled: body("The till can't cover this response.",PINK,12)
+		if option.disabled: body("Not enough cash",PINK,12)
 		if effects.has("fight"):
-			body("Win the bout · Reputation rises and rival pressure falls. Repairs cost ฿240.",TEAL,12)
-			body("Lose the bout · Reputation falls, Mali needs paid leave, and repairs cost ฿740.",PINK,12)
+			body("Win · ฿240 repairs · Reputation up · Rivals back off",TEAL,12)
+			body("Lose · ฿740 repairs · Reputation down · Mali off",PINK,12)
 		else:
 			response_odds(effects)
-	body("SCALE BACK SERVICE",GOLD,12)
-	response_odds(Campaign.SCALE_BACK)
-	body("%d served so far   ·   %d turned away" % [model.s.night.guests,model.s.night.turned],GOLD,13)
+	if show_details:
+		body("SCALE BACK SERVICE",GOLD,12)
+		response_odds(Campaign.SCALE_BACK)
 
 func response_odds(effects: Dictionary) -> void:
 	var risk: Dictionary = model.response_risk(effects)
-	body("%d%% Goes to plan  ·  %s" % [risk.chance,effect_text(risk.plan_changes)],TEAL,12)
-	body("%d%% Setback  ·  %s" % [100-int(risk.chance),effect_text(risk.setback_changes)],PINK,12)
+	body("%d%% works · %s" % [risk.chance,effect_text(risk.plan_changes,not show_details)],TEAL,13)
+	body("%d%% setback · %s" % [100-int(risk.chance),effect_text(risk.setback_changes,not show_details)],PINK,13)
 
-func effect_text(changes: Dictionary) -> String:
+func effect_text(changes: Dictionary, compact: bool = false) -> String:
 	var details := PackedStringArray()
 	for key in changes:
 		var delta: Variant = changes[key]
@@ -529,7 +550,11 @@ func effect_text(changes: Dictionary) -> String:
 					value = ("+" if int(delta) > 0 else "") + cash(delta)
 				else:
 					value = signed_delta(int(delta))
-				details.append("%s %s" % [EFFECT_LABELS[key],value])
+				if compact:
+					var label: String = COMPACT_EFFECTS.get(key,str(EFFECT_LABELS[key]).to_lower())
+					details.append(value if key == "cash" else "%s %s" % [value,label])
+				else:
+					details.append("%s %s" % [EFFECT_LABELS[key],value])
 	return " · ".join(details) if not details.is_empty() else "No direct changes"
 
 func signed_delta(value: int) -> String:
@@ -546,7 +571,7 @@ func choose(index: int) -> void:
 
 func godzilla_panel() -> void:
 	title("Godzilla attacks!",PINK)
-	body("Godzilla is blocking the door. Feed it shots until it passes out, or the bar will lose tonight's customers.",WHITE)
+	body("10 shots to save tonight’s bar sales.",WHITE)
 	godzilla_meter_label = body("",GOLD,14)
 	godzilla_meter = ProgressBar.new()
 	godzilla_meter.custom_minimum_size.y = 22
@@ -556,7 +581,7 @@ func godzilla_panel() -> void:
 	godzilla_meter.add_theme_stylebox_override("fill",box(PINK,PINK))
 	column.add_child(godzilla_meter)
 	godzilla_clock = body("",TEAL,19)
-	body("Tap Serve a shot or press Space. Give the glass a moment to refill between shots.",MUTED,14)
+	body("Tap or press Space when the glass is ready.",MUTED,14)
 	update_godzilla_panel()
 
 func update_godzilla_panel() -> void:
@@ -605,8 +630,7 @@ func report_panel() -> void:
 	body("Bar %s · Payroll %s · Fees %s\nStock used %d · Tour tickets %d" % [
 		cash(n.gross),cash(n.wages),cash(n.fees),n.sold,n.tours],WHITE,14)
 	if int(model.s.day)%7 == 0: week_lines(model.s.last_week)
-	if campaign_before_tutorial != null:
-		body("Book guides in Tours or find Toybox sparring under Events. Check Journal for Tuesday's rent and permits.",GOLD,13)
+	if not show_details: return
 	var results: Array = n.get("results",[])
 	if not results.is_empty():
 		body("DECISIONS THIS SHIFT",GOLD,12)

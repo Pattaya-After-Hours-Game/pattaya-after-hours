@@ -8,7 +8,7 @@ Run the Blue Hour in a fictional neon harbor district. Anong wants a payroll res
 
 ## Play
 
-Incident responses show the odds and effects of both outcomes. After choosing, look beneath the map for the result and the last wave’s sales or bottleneck. The closeout keeps the decisions for the whole shift.
+Incident cards show odds and effects at a glance. Tap **Story** to read the setup. Results appear below the map, and **Shift log** in closeout opens the full decision history.
 
 Select **Tutorial** at the top of the game to run a short practice shift. Learn to restock, make service decisions, and read the closeout. You can exit or replay it any time without changing your campaign.
 
