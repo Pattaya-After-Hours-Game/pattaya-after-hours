@@ -7,7 +7,8 @@ Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build th
 ![The Blue Hour and its neighborhood at dusk](docs/blue-hour.png)
 
 This source includes the full customer cast, New Game / Resume, the day/night
-clock, owner cooldowns/Chat and retained staff training. The latest update adds
+clock, owner cooldowns/Chat and retained staff training. Recent updates add music, auto-serve, two-second pouring, supplier discounts,
+manager income and a five-second ฿/s display, alongside
 a twelve-person compact beer-bar layout, six-pack deliveries and Nida, an adult
 promoter who works outside the entrance. Purchased TVs appear on the wall and
 waiting-order dots turn red as patience runs out. Source and release downloads
@@ -27,7 +28,8 @@ godot --path .
 Tap **Serve a drink** for a waiting order; use **Welcome customers** when quiet.
 Both actions refill over ten seconds. In **Service**, buy **Faster pouring** and
 **Better welcoming** to reduce each venue’s cooldowns to eight, six, then four
-seconds. **Have a chat** buys an urgent waiting guest ten more seconds; it shares
+seconds. Pouring has an additional **two-second tier for ฿5,600**, available from
+stage 2. **Have a chat** buys an urgent waiting guest ten more seconds; it shares
 Welcome’s timer and takes twenty seconds to recover. No order means no sale. Open **Service** to see demand, service speed, occupancy,
 stock, payroll and recent actual profit. Waiting-order bells respect Sound / Muted.
 
@@ -45,9 +47,9 @@ the property thumbnail; renovation alone does not install them.
 Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.
 Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
-Buy stock in complete **six-drink packs for ฿84**. You need room for all six and
+Buy stock in complete **six-drink packs, starting at ฿84**. You need room for all six and
 enough cash; the button explains any shortfall. Supplier automation uses the
-same pack size. Stage-1 beer bars can buy a third seating level, **Compact layout
+same pack size; supplier levels 2–5 reduce pack prices to ฿72/60/48/36. Stage-1 beer bars can buy a third seating level, **Compact layout
 for ฿1,200**, reaching twelve customers even with pool and fans installed.
 
 Save for signage, seating and a pool table, then invest in staff contracts. Pool is available at
@@ -77,6 +79,27 @@ Staff cost money while on duty, even when the bar is quiet. Use the rota or temp
 costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
 cash for the next shift—not just a large bank balance.
+
+## Music, automation and management income
+
+| Purchase | Price and effect |
+| --- | --- |
+| Music system | ฿1,200; repeat drink orders after 25 seconds instead of 35. Visitors still need budget, stock and service. |
+| Auto-serve | ฿6,000 per venue; automatically uses the existing Serve timer. Manual taps share it. Toggle it in Service. |
+| Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
+| Manager levels 1 / 2 / 3 | ฿18,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
+| Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; six-pack prices ฿84 / ฿72 / ฿60 / ฿48 / ฿36. |
+
+Manager income is separate from drink/pool receipts, uses no stock and pays no
+drink commission. It stops on closure and does not grant satisfied customers.
+Operating costs still apply. Managed offline estimates include it during legal
+opening windows. Existing appointments are retained as level 1.
+
+The **฿/s beneath the till** refreshes every five foreground seconds and shows
+net street trading: receipts minus stock purchases, operating costs, commission
+and fines. It excludes equipment/contract purchases and offline lump sums.
+Nida now faces toward the street; a purchased music system has a playing/off
+indicator. Sound/Muted remains independent of the business upgrade.
 
 ## Opening time, prep and late nights
 
@@ -143,9 +166,12 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 6.
+retain money, staff, venues and owned stages when migrated to save schema 7.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
-Schema 6 adds promoter contracts, audience training, commission commitments and
+Schema 7 adds purchased automation, music, supplier/manager levels, inventory
+purchase costs and the five-second earnings sample. Existing supplier/manager
+appointments become level 1; new upgrades must be bought. Schema 6 added
+promoter contracts, audience training, commission commitments and
 fractional offline accounting; schema 5 introduced action timers and Chat.
 Existing venues receive no free compact layout, promoter or training. A fresh campaign is
 needed to experience the revised progression from the beginning.
@@ -179,9 +205,9 @@ practice campaign and never overwrites your campaign.
 The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
-are checked together with twenty-seven fresh-campaign simulations. Baseline active
-runs reach stage 2 in 34–37 minutes, a second venue in 127–138 minutes and stage 3
-in 257–284 minutes. Optional promoter-first investment takes longer to repay;
+are checked together with thirty-nine fresh-campaign simulations. Baseline active
+runs reach stage 2 in 34–37 minutes, a second venue in 135–147 minutes and stage 3
+in 186–199 minutes. Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).

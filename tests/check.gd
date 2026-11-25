@@ -92,6 +92,7 @@ func run() -> void:
 
 	load("res://tests/staff_check.gd").new().run(self)
 	load("res://tests/promoter_check.gd").new().run(self)
+	load("res://tests/automation_check.gd").new().run(self)
 	test_risk()
 	test_windows_updates()
 	load("res://tests/boot_menu_check.gd").new().run(self)

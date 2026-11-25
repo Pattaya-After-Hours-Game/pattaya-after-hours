@@ -39,7 +39,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			bar.merge(Economy.clock_fields(),true)
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	economy = Economy.new(s,fresh)
-	s.version = 6
+	s.version = 7
 
 func make_bar(kind: int, slot: int) -> Dictionary:
 	return {"type":kind, "stage":1, "name":C.NAMES[slot], "crew":0,
@@ -107,7 +107,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","rehire","train_staff","train_audience":
+		"serve","stock","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","rehire","train_staff","train_audience","auto_serve":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:
@@ -125,17 +125,8 @@ func action(id: String, index: int = 0) -> String:
 			reopen_noon()
 			s.street.offline_cursor = C.OPEN_MINUTE
 			result = "12pm. Unfinished cleaning was skipped; check the prep list."
-		"restock":
-			if bar.restock: return "Bo already handles deliveries."
-			if not pay(900): return "The supplier agreement needs ฿900."
-			bar.restock = true
-			result = "Bo handles restocking while you're here. Stock is still charged to the till."
-		"manager":
-			if bar.manager: return "This venue already has a manager."
-			if bar.stage < 2 or economy.on_duty(bar,0) < 1 or not bar.restock or bar.healthy < 8: return "Needs stage 2, a bartender, deliveries and eight healthy shifts."
-			if s.cash < 1800+(economy.operating_rate(bar)+12)*2 or not pay(1800): return "Keep one shift of operating costs after the ฿1,800 training fee."
-			bar.manager = true
-			result = "Dao takes the Blue Hour keys. Managed earnings continue offline." if s.street.selected == 0 else "%s's team takes the keys. Pim helps plan the music." % bar.name
+		"restock": result = economy.buy_supplier(bar)
+		"manager": result = economy.buy_manager(bar)
 		"upgrade":
 			if bar.stage >= 3: return "This venue is at its final stage."
 			var reason: String = economy.upgrade_reason(bar)
@@ -159,6 +150,7 @@ func action(id: String, index: int = 0) -> String:
 			s.street.bars.append(new_bar)
 			var defaults: Dictionary = economy.new_fields()
 			for key in defaults: new_bar[key] = defaults[key]
+			economy.ensure_stock_lots(new_bar)
 			s.street.selected = s.street.bars.size()-1
 			result = "%s opens. %s" % [new_bar.name,C.TYPES[index].stages[0][2]]
 		"prepare":
@@ -344,6 +336,7 @@ func tick(seconds: int) -> void:
 		for bar in s.street.bars: economy.prep_tick(bar)
 		tick_heat()
 		economy.tick()
+		economy.sample_earnings()
 		s.street.cycle = (int(s.street.cycle)+1)%4
 		for bar in s.street.bars: bar.closed = maxi(0,int(bar.closed)-1)
 		var event: Dictionary = s.street.event

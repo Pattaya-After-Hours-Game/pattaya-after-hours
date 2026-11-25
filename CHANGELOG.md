@@ -4,7 +4,23 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
-## Source update — Compact seating, whole packs and Nida
+## Source update — Music and automation
+
+- Music costs ฿1,200 and reduces repeat-order time from 35 to 25 seconds.
+- Nida faces toward the street using the existing production atlas.
+- Auto-serve costs ฿6,000 and shares the manual Serve timer; pouring gains a
+  stage-two two-second tier for ฿5,600. Welcome and Chat limits are unchanged.
+- Manager tiers cost ฿18,000/36,000/72,000, earning separate ฿10/20/40 per open
+  real second. They stop on closure and do not create drink sales or regulars.
+- Supplier levels discount whole packs to ฿72/60/48/36. Saved inventory lots
+  retain actual purchase costs; old stock is never repriced or refunded.
+- Till shows net street trading per second, sampled every five foreground
+  seconds. Updated forecasts, reports, legal-hours offline estimates and schema
+  seven migration preserve existing paid appointments and prevent repeat credit.
+- Added twelve feature campaigns alongside the existing 27, regression cases,
+  focused visual previews and updated game/developer/agent documentation.
+
+## v1.0.14 source — Compact seating, whole packs and Nida
 
 - Added beer-bar seating level three: twelve guests at stage one with pool/fans,
   with compact bench production artwork and capacity previews.

@@ -53,13 +53,25 @@ claiming behaviour exists; update the relevant documentation when it changes.
   commitments after rota/expiry and the saved fractional carry; exclude pool fees.
   Welcome and promoter attraction never stack. Audience training is stage-gated,
   separate from service training, and persists after rehire.
-- Buy stock in complete six-drink packs for ฿84, requiring cash and room. Supplier
+- Buy stock in complete six-drink packs, requiring cash and room. Supplier
+  levels 1–5 cost ฿900/1,200/2,400/4,800/9,600 and price packs at
+  ฿84/72/60/48/36. Preserve inventory purchase costs; discounts never refund old stock. Supplier
   automation retains its next operating charge. Bo’s consignment remains the
   recovery exception. Third beer-bar seating must hold twelve with pool and fans.
-  Schema 6 migration grants no free promoter, equipment or audience training.
+  Schema 7 preserves paid manager/supplier appointments as level 1 and grants no
+  free music/auto-serve or higher levels. Manager income is an explicit exception
+  to customer-based receipts: ฿10/20/40 per trading second at levels 1/2/3, with
+  purchase prices ฿18,000/36,000/72,000. Keep it separate from drink/pool sales,
+  commission, customer counters and healthy-service milestones. No closed income.
+- Music costs ฿1,200 and shortens repeat-order timing 35→25 seconds; budgets and
+  visit limits still apply. Auto-serve costs ฿6,000 per venue and uses the SAME
+  Serve deadline as manual clicks. Never award extra service for toggles/reloads.
+  Till ฿/s is a five-second sample of actual net trading, excluding investments
+  and offline claims; no simulation or accounting belongs in the HUD.
 - The economy's pacing targets are acceptance criteria, not mandatory waiting
   timers. Use fresh campaigns for balance tests; preserve existing owned progress.
-- Offline earnings remain demand/cost limited, repeat-safe and capped at eight
+- Offline drink earnings remain demand/cost limited; manager income is separate.
+  All offline earnings remain repeat-safe and capped at eight
   hours. They must not spend the opening cash reserve, replay promotions or
   advance unseen disasters. Label estimates separately from actual revenue.
 - Keep Anong, the existing cast, district exploration and optional Toybox fights.
@@ -96,7 +108,8 @@ coordinate one gameplay feature at a time. Existing research proposals are not
 shipped features or permission to implement the whole backlog. Changes made in
 separate chats must pass combined tests before a build is called ready.
 
-Owner actions start at ten seconds, with per-venue 8/6/4-second upgrades. Chat
+Owner actions start at ten seconds, with per-venue 8/6/4-second upgrades and a
+stage-two 2-second pouring tier for ฿5,600. Welcome still caps at four seconds. Chat
 shares Welcome's timer and always takes twenty seconds to recover. Staff clocks
 remain independent. New Game / Resume must stay read-only and paused until the
 player selects an option; no contract ageing, offline claim or autosave on the menu.

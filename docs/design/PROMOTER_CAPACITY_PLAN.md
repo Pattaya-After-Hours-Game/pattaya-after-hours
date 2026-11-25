@@ -339,6 +339,15 @@ No implementation or public release is implied by committing this plan. Reconcil
 the existing TV/patience branch and other contributors before starting the next
 gameplay implementation; do not silently take another contributor's active slot.
 
+## Later automation update
+
+The subsequent [economy rules](../ECONOMY.md) extend this implementation with
+supplier discounts, music, owner automation and separate manager income.
+The fixed ฿84 pack assumption below now describes supplier level zero/one;
+higher levels discount future packs. Nida's terms and commission rules persist,
+and she now faces toward the street. Current pacing measurements supersede this
+plan's original forecasts.
+
 ## Implementation record — 25 November 2026
 
 The agreed prices, capacity, commission basis and stage gates are implemented.

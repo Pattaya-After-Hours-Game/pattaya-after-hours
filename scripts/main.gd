@@ -542,7 +542,12 @@ func metric(x: int,name_text: String,value: String,tint: Color) -> void:
 		heading.clip_text = true
 		heading.tooltip_text = "In-game day of this campaign. Starts at Day 1 and advances at midnight."
 		live_labels.append([heading,func() -> String: return "DAY %d" % model.s.day])
-	var label := abs_text(root_ui,Rect2(x,20,105,24),value,18,tint)
+	var label := abs_text(root_ui,Rect2(x,13 if name_text=="TILL" and campaign_before_tutorial==null else 20,105,24),value,16 if name_text=="TILL" else 18,tint)
+	if name_text=="TILL" and campaign_before_tutorial==null:
+		var rate := abs_text(root_ui,Rect2(x,33,105,14),"",10,TEAL)
+		rate.tooltip_text = "Net street trading over the last five foreground seconds: income less stock, wages, commission and fines. Excludes upgrade purchases and offline claims."
+		live_labels.append([rate,func() -> String: return "%s฿%.2f/s" % ["+" if model.s.street.net_per_second>=0 else "−",absf(model.s.street.net_per_second)]])
+		rate.text = live_labels.back()[1].call()
 	if campaign_before_tutorial == null:
 		live_labels.append([label,func() -> String:
 			match name_text:
@@ -787,26 +792,26 @@ func update_action_controls() -> void:
 		elif not state.enabled and entry[4]=="serve": detail = "No orders" if eco.pending(bar)==0 else "Restock fridge"
 		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
 		elif not state.enabled and entry[4]=="welcome" and eco.promoter_bonus(bar)>0: detail = "Nida is welcoming"
-		entry[2].text = entry[3]+"\n"+detail
+		entry[2].text = ("Auto-serve" if entry[4]=="serve" and eco.automatic_service(bar) else entry[3])+"\n"+detail
 		entry[2].modulate = DARK if state.enabled and entry[4]=="serve" else WHITE if state.enabled or state.remaining>0 else MUTED
 	for button in stock_controls:
 		if not is_instance_valid(button): continue
 		var offer: Dictionary = eco.stock_offer(bar)
 		button.disabled = not offer.enabled
 		button.tooltip_text = "Six drinks; cash after purchase %s" % cash(offer.remaining_cash) if offer.enabled else offer.reason
-		button.text = "Buy 6 drinks · ฿84"+("\n"+offer.reason if not offer.enabled else "")
+		button.text = "Buy 6 drinks · %s" % cash(offer.price)+("\n"+offer.reason if not offer.enabled else "")
 	for entry in upgrade_controls:
 		if not is_instance_valid(entry[0]): continue
 		var item: Dictionary = StreetContent.ACTION_UPGRADES[entry[1]]
 		var state: Dictionary = eco.action_upgrade_status(bar,entry[1])
 		entry[0].disabled = not state.enabled
 		entry[0].add_theme_color_override("font_disabled_color",MUTED)
-		entry[0].text = "%s · %ds · MAX" % [item.name,state.current] if state.level==3 else "%s · %ds → %ds · %s%s" % [item.name,state.current,state.next,cash(state.price),"\nNeed %s more incl. reserve" % cash(state.shortfall) if state.shortfall>0 else ""]
+		entry[0].text = "%s · %ds · MAX" % [item.name,state.current] if state.maxed else "%s · %ds → %ds · %s%s" % [item.name,state.current,state.next,cash(state.price),"\nNeed %s more incl. reserve" % cash(state.shortfall) if state.shortfall>0 else "\nNeeds stage 2" if not state.stage_ok else ""]
 
 func stock_button() -> void:
 	stock_controls.append(row_button("Buy 6 drinks · ฿84",street_action.bind("stock")))
 	var bar: Dictionary = model.street.selected()
-	live_body(func() -> String: return "%d/%d stocked · cash after pack %s · next operating charge ≤%s" % [bar.stock,model.street.capacity(bar),cash(int(model.s.cash)-84),cash(ceili(model.street.economy.operating_rate(bar)/60.0))],MUTED,12)
+	live_body(func() -> String: return "%d/%d stocked · cash after pack %s · next operating charge ≤%s" % [bar.stock,model.street.capacity(bar),cash(int(model.s.cash)-model.street.economy.pack_price(bar)),cash(ceili(model.street.economy.operating_rate(bar)/60.0))],MUTED,12)
 
 func live_body(value: Callable,tint: Color = MUTED,px: int = 15) -> void:
 	var label := body(value.call(),tint,px)
@@ -827,6 +832,8 @@ func street_panel() -> void:
 	live_body(func() -> String: return eco.peak_status(bar),TEAL,12)
 	body("YOUR ACTION UPGRADES",GOLD,14)
 	body("Per venue · prices preserve next shift’s reserve.",MUTED,12)
+	row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off") if bar.auto_serve else "Buy auto-serve · ฿6,000",street_action.bind("auto_serve"))
+	body("Uses your existing Serve cooldown, real orders and stock. Manual taps share that timer. Staff work independently.",MUTED,12)
 	for i in StreetContent.ACTION_UPGRADES.size():
 		var button := row_button("",street_action.bind("action_upgrade",i))
 		upgrade_controls.append([button,i])
@@ -845,7 +852,7 @@ func street_panel() -> void:
 	else:
 		live_body(func() -> String:
 			var view: Dictionary = eco.forecast(bar)
-			return "Rates per real minute\nDemand %.1f drinks · Staff service %.1f\n%d orders · %d/%d customers · Stock %d\nRecent net %s · Auto forecast %s\nCosts %s · Break-even %.1f drinks\n%s" % [view.demand,view.service,eco.pending(bar),bar.customers.size(),eco.seats(bar),bar.stock,cash(eco.actual_rate(bar)),cash(view.net),cash(view.costs),view.break_even,view.reason],GOLD,13)
+			return "Rates per real minute\nDemand %.1f drinks · Automatic service %.1f\n%d orders · %d/%d customers · Stock %d\nRecent net %s · Auto forecast %s\nCosts %s · Break-even %.1f drinks\n%s" % [view.demand,view.service,eco.pending(bar),bar.customers.size(),eco.seats(bar),bar.stock,cash(eco.actual_rate(bar)),cash(view.net),cash(view.costs),view.break_even,view.reason],GOLD,13)
 		live_body(func() -> String: return "Cleanliness %d%% · %.1f%% less attraction" % [100-int(bar.dirt),float(bar.dirt)/StreetContent.DIRT_LIMIT*StreetContent.DIRT_ATTRACTION_PENALTY*100.0],MUTED,12)
 		stock_button()
 	if not bar.raided and (bar.late_open or model.s.street.minute>=StreetContent.OPEN_MINUTE or model.s.street.minute<StreetContent.CLOSE_MINUTE):
@@ -881,7 +888,7 @@ func street_panel() -> void:
 		for role in 3:
 			if role>0 and role!=bar.type: continue
 			row_button("Hire %s · %s" % [StreetContent.ROLE_NAMES[role].to_lower(),cash(StreetContent.STAFF_CONTRACT_COST)],street_action.bind("hire",role))
-			body("Adds ฿%d/real min. Forecast break-even after hire: %.1f drinks/real min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool)/maxf(1,eco.price(bar)*(0.9 if eco.promoter_bonus(bar)>0 else 1.0)-StreetContent.STOCK_COST)),"One drink every 25s; help with the rush." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
+			body("Adds ฿%d/real min. Forecast break-even after hire: %.1f drinks/real min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool-eco.forecast(bar).manager)/maxf(1,eco.price(bar)*(0.9 if eco.promoter_bonus(bar)>0 else 1.0)-eco.stock_unit_cost(bar))),"One drink every 25s; help with the rush." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
 	body("FRONTAGE PROMOTER",GOLD,14)
 	body("Nida · adult promoter · ฿1,200 / ten days + 10% of drink receipts. No hourly wage. One frontage slot; never serves drinks.",MUTED,12)
 	live_body(func() -> String: return "Commission paid %s · carry %d/100 baht. Existing visits/orders retain commission when she goes off duty." % [cash(bar.commission_paid),bar.commission_carry],MUTED,12)
@@ -890,7 +897,7 @@ func street_panel() -> void:
 		live_body(func() -> String:
 			var auto: Dictionary = eco.promoter_forecast(bar)
 			var active: Dictionary = eco.promoter_forecast(bar,true)
-			return "Estimate after hire · cash %s; retain %s plus ฿84 stock.\nArrivals %.1f → %.1f/min · staff service %.1f/min\nUnattended net %s → %s/min · commission %s/min\nOwner serving whenever ready: net %s → %s/min\nStreet net change: %s/min unattended; %s/min owner-active.\n%s" % [cash(int(model.s.cash)-1200),cash(eco.operating_rate(bar)*2),auto.before.arrivals,auto.after.arrivals,auto.after.service,cash(auto.before.net),cash(auto.after.net),cash(auto.after.commission),cash(active.before.net),cash(active.after.net),cash(auto.street_delta),cash(active.street_delta),"Service is limiting sales; improve pouring/staff first." if auto.after.service<auto.after.demand else "Requires stock and spare seats; estimates are not actual income."],MUTED,12)
+			return "Estimate after hire · cash %s; retain %s plus %s stock.\nArrivals %.1f → %.1f/min · staff service %.1f/min\nUnattended net %s → %s/min · commission %s/min\nOwner serving whenever ready: net %s → %s/min\nStreet net change: %s/min unattended; %s/min owner-active.\n%s" % [cash(int(model.s.cash)-1200),cash(eco.operating_rate(bar)*2),cash(eco.pack_price(bar)),auto.before.arrivals,auto.after.arrivals,auto.after.service,cash(auto.before.net),cash(auto.after.net),cash(auto.after.commission),cash(active.before.net),cash(active.after.net),cash(auto.street_delta),cash(active.street_delta),"Service is limiting sales; improve pouring/staff first." if auto.after.service<auto.after.demand else "Requires stock and spare seats; estimates are not actual income."],MUTED,12)
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
 		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
@@ -918,11 +925,19 @@ func street_panel() -> void:
 			body(StreetContent.HOSTS[int(person.host)][1],MUTED,12)
 			row_button("Bar-fine request · "+name_text,street_action.bind("bar_fine",i))
 	if bar.type==1: live_body(func() -> String: return "%d actual customer requests · %d hosts away" % [bar.host_requests.size(),bar.away.size()],MUTED,12)
-	if not bar.restock: row_button("Automate deliveries · ฿900",street_action.bind("restock"))
-	if not bar.manager:
-		row_button("Appoint manager · ฿1,800",street_action.bind("manager"))
-		body("Needs stage 2, a bartender, deliveries and eight healthy shifts. Adds ฿12/real min; unlocks demand-limited offline earnings.",MUTED,12)
-	else: body("Manager on duty · offline estimate uses demand, capacity and costs.",TEAL,12)
+	body("SUPPLIER AGREEMENT",GOLD,14)
+	var supplier: Dictionary = eco.supplier_offer(bar)
+	body("Level %d/5 · %s per drink · %s per six-pack" % [bar.supplier_level,cash(eco.stock_unit_cost(bar)),cash(eco.pack_price(bar))],TEAL,13)
+	if supplier.level<5:
+		row_button("Supplier level %d · %s" % [supplier.level+1,cash(supplier.price)],street_action.bind("restock"))
+		body("Next packs: %s. %s" % [cash(supplier.pack),supplier.reason],MUTED,12)
+	body("MANAGEMENT",GOLD,14)
+	var manager: Dictionary = eco.manager_offer(bar)
+	body("Level %d/3 · %s per game minute (real second) while open" % [bar.manager_level,cash(eco.manager_rate(bar))],TEAL,13)
+	body("Separate manager income; no stock used and no drink commission. Adds ฿12/real min overhead. Managed bars also project demand-limited drink sales offline.",MUTED,12)
+	if manager.level<3:
+		row_button("Manager level %d · %s · +%s/s total" % [manager.level+1,cash(manager.price),cash(manager.rate)],street_action.bind("manager"))
+		body(manager.reason if not manager.reason.is_empty() else "Ready. Keep next shift's operating reserve.",MUTED,12)
 	if bar.stage<3:
 		row_button("Upgrade · "+cash(model.street.upgrade_cost(bar)),street_action.bind("upgrade"),true)
 		live_body(func() -> String: return eco.upgrade_reason(bar),MUTED,13)
@@ -935,7 +950,7 @@ func shift_report(bar: Dictionary) -> void:
 	if bar.last_shift.is_empty(): return
 	var report: Dictionary = bar.last_shift
 	body("LAST SHIFT",GOLD,14)
-	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s · fines %s · commission %s\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.get("fines",0)),cash(report.get("commission",0)),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
+	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s · fines %s · commission %s\nManager income %s (included in revenue)\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.get("fines",0)),cash(report.get("commission",0)),cash(report.get("manager_income",0)),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
 
 func street_event_panel() -> void:
 	var event: Dictionary = model.s.street.event

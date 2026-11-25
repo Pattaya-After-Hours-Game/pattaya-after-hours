@@ -20,7 +20,7 @@ campaign using the original decision lessons; it does not spend your real till.
 3. Open **Service**. Read demand, staff service, occupied seats and stock together.
    Manual serving helps when staff are absent or cannot keep up. “Forecast automatic net” is
    not a prediction that you will earn nothing while actively serving.
-4. Restock before the fridge empties. **Buy 6 drinks · ฿84** requires room for all
+4. Restock before the fridge empties. **Buy 6 drinks** starts at ฿84 and requires room for all
    six and the full price. Failed purchases change nothing. Stock costs money when delivered, while
    wages and overhead accrue during open trading.
 5. Buy the improvement that addresses your current limit. Keep money for the
@@ -197,7 +197,7 @@ At Soi venues and gogos, role reassignment changes service and payroll.
 Hosts' preferences still apply, and only an actual customer request can produce
 a bar fine. An accepting host is unavailable for the remainder of the shift.
 
-Automatic deliveries are a paid supplier agreement. They buy one ฿84 six-pack
+Automatic deliveries are a paid supplier agreement. They buy one complete six-pack at your supplier price
 when stock is below six and orders are waiting, retaining the next operating
 charge. They cannot buy a partial pack or fill an idle bar speculatively. A manager needs stage 2, an on-duty bartender, deliveries and eight healthy
 shifts, plus the hiring fee and operating reserve. Managers enable the offline
@@ -209,7 +209,7 @@ leases and their opening reserves. Finish the Blue Hour opening chapter before
 buying a second venue. Soi venues require 20 reputation; gogos require 45.
 
 The combined active-play checks reach pool around 16–19 minutes, stage 2 around
-34–40 minutes and a second property around 132–144 minutes. After stage 2, the
+34–40 minutes and a second property around 135–147 minutes. After stage 2, the
 active policy improves pouring, trains staff and then saves for expansion.
 The first Soi lease is ฿16,000 plus opening reserves. These are
 simulation results for a particular investment strategy, not timers or promises
@@ -237,7 +237,8 @@ of consuming your starting cash. It does not advance the visible clock, cleaning
 heat, raids, promotions, disasters or local milestones. **Journal** distinguishes
 time away from eligible trading time and reports the estimate and limiting factors.
 Owned stock is consumed; further six-packs must be funded by earnings from that
-claim, never your opening cash. Leave stock in the fridge before going away.
+claim, never your opening cash. Manager income can fund that next pack;
+leaving stock in the fridge lets drink service begin sooner.
 Commission is included. Short claims retain fractional sales and costs, although
 restarting a claim can reduce available pack working capital.
 
@@ -270,14 +271,45 @@ At venue stage two, train Nida or a dancer for ฿800; stage three unlocks a sec
 with the person after rehiring. Attraction still competes for shared street
 visitors; it does not guarantee a sale.
 
+## Music and automation purchases
+
+Buy **Music system · ฿1,200** in Service equipment. Customers ask for their next
+round after 25 seconds rather than 35; they still need money and service. The
+Music indicator shows playing while open and off while closed. Muting the game
+does not remove the upgrade's effect.
+
+**Buy auto-serve · ฿6,000** replaces repeated Serve taps. It uses the same timer,
+stock and real orders, with an on/off toggle. It does not make that timer faster.
+At stage two, the final **Faster pouring · ฿5,600** purchase reduces future refills
+from four seconds to two. Current refills finish normally. Welcome still caps
+at four seconds and Chat still takes twenty.
+
+Supplier upgrades cost ฿900/1,200/2,400/4,800/9,600 for levels 1–5. Packs then
+cost ฿84/72/60/48/36. Levels three/four need venue stage two; level five needs
+stage three. Discounts affect new stock, including manual purchases. Previously
+bought drinks keep their paid cost in profit reports.
+
+Managers cost ฿18,000, then ฿36,000 and ฿72,000 to upgrade. They generate a
+separate ฿10/฿20/฿40 per game minute (real second) while the venue trades,
+before operating costs. Level one needs stage two, a bartender, deliveries and
+eight healthy shifts; later levels need stage three. They also keep their
+cleaning/offline duties. Manager income does not create drink sales or regulars,
+uses no stock and pays no drink commission. Closure stops it.
+
+The **฿/s under the till** refreshes every five foreground seconds. It covers net
+trading across your street, including stock purchases, wages, commission and
+fines. It excludes one-off investments and offline payouts. Buying a pack can
+make one sample negative; look at several samples and the full shift report.
+
 ## Saves and versions
 
 There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Save schema 6 adds promoter/training state, commission commitments and fractional
-offline accounting to the existing action timers and Chat. Migration does not
+Save schema 7 preserves music, auto-serve, supplier/manager tiers, stock purchase
+costs and the five-second net sample alongside existing timers and commission.
+Existing manager/supplier appointments become level one without another fee. Migration does not
 grant a promoter, compact layout or audience training for free. Migration from
 pre-clock saves introduces noon on the campaign’s existing day,
 with initially clean venues. Old campaigns preserve owned progress when migrated, so an existing stage-3 bar

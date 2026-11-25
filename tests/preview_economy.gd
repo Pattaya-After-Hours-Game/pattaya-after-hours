@@ -23,7 +23,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("promoter-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("promoter-") or name_text.begins_with("automation-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -218,6 +218,44 @@ func run() -> void:
 			await capture(app,"promoter-type-%d-stage-%d" % [kind,stage])
 	promo_bar.open = false
 	await capture(app,"promoter-closed")
+	# Purchased automation, supply and management use model operations.
+	app.model = Campaign.new(72)
+	app.model.s.cash = 300000
+	app.drawer_open = false
+	app.tab = 0
+	var automated: Dictionary = app.model.street.selected()
+	await capture(app,"automation-before")
+	app.model.street.action("equipment",8)
+	app.model.street.action("hire",3)
+	await capture(app,"automation-music-nida")
+	app.model.street.action("serve")
+	app.model.street.action("auto_serve")
+	app.model.street.advance(4)
+	app.drawer_open = true
+	await capture(app,"automation-controls","YOUR ACTION UPGRADES")
+	automated.stage = 2
+	for i in 4: app.model.street.action("action_upgrade",0)
+	await capture(app,"automation-two-second","YOUR ACTION UPGRADES")
+	app.model.street.action("hire",0)
+	for i in 4: app.model.street.action("restock")
+	automated.healthy = 8
+	app.model.street.action("manager")
+	await capture(app,"automation-supplier-manager","SUPPLIER AGREEMENT")
+	app.drawer_open = false
+	automated.customers.clear()
+	app.model.s.street.pass_credit = -10000000
+	app.model.street.advance(15)
+	await capture(app,"automation-manager-income")
+	automated.stage = 3
+	app.model.street.action("restock")
+	app.model.street.action("manager")
+	app.model.street.action("manager")
+	app.drawer_open = true
+	await capture(app,"automation-max-tiers","SUPPLIER AGREEMENT")
+	app.drawer_open = false
+	app.model.street.action("open")
+	app.model.street.advance(10)
+	await capture(app,"automation-closed")
 	# Clock and prep scenes use the same live actions/state as the game.
 	app.model = Campaign.new(72)
 	app.model.s.cash = 10000

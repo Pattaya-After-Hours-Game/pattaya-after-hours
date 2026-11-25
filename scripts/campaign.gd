@@ -666,7 +666,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -693,6 +693,8 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)<7:
+					for key in Street.Economy.automation_fields(): defaults.erase(key)
 				if int(parsed.version)<6:
 					for key in Street.Economy.promoter_fields(): defaults.erase(key)
 				if int(parsed.version)<5:
@@ -704,6 +706,7 @@ func _read(path: String) -> Variant:
 					if defaults[key] is Array and not bar[key] is Array: return null
 					if defaults[key] is Dictionary and not bar[key] is Dictionary: return null
 				for key in defaults.equipment:
+					if key=="music" and int(parsed.version)<7: continue
 					if not bar.equipment.get(key) is float and not bar.equipment.get(key) is int: return null
 				for person in bar.team:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
@@ -735,7 +738,7 @@ func _read(path: String) -> Variant:
 			for bar in parsed.street.bars:
 				for key in ["pouring","welcoming"]:
 					var level: Variant = bar.action_levels.get(key)
-					if not _finite_number(level,0,3) or float(level)!=floorf(float(level)): return null
+					if not _finite_number(level,0,4 if key=="pouring" and int(parsed.version)>=7 else 3) or float(level)!=floorf(float(level)): return null
 				for key in ["serve_ready","welcome_ready","welcome_until"]:
 					if not _finite_number(bar.get(key),0,1.0e15): return null
 				for key in ["serve_duration","welcome_duration"]:
@@ -758,6 +761,17 @@ func _read(path: String) -> Variant:
 				for customer in bar.customers:
 					if not customer.get("commission_visit") is bool or not customer.get("commission_order") is bool: return null
 
+		if int(parsed.version)>=7:
+			for key in ["earnings_seconds","earnings_net","net_per_second"]:
+				if not _finite_number(parsed.street.get(key),-1e15,1e15): return null
+			if parsed.street.earnings_seconds<0 or parsed.street.earnings_seconds>=5: return null
+			for bar in parsed.street.bars:
+				if not _finite_number(bar.manager_level,0,3) or float(bar.manager_level)!=floorf(bar.manager_level): return null
+				if not bar.auto_serve is bool or not bar.auto_serve_on is bool: return null
+				if not _finite_number(bar.supplier_level,0,5) or float(bar.supplier_level)!=floorf(bar.supplier_level): return null
+				if not _finite_number(bar.equipment.get("music"),0,1): return null
+				for lot in bar.stock_lots:
+					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),6,14): return null
 		return parsed
 	return null
 
@@ -781,7 +795,7 @@ func _restore_numbers(value: Variant, field: String = "") -> Variant:
 	# Preserve explicit fractional action clocks; legacy numeric fields stay integers.
 	match typeof(value):
 		TYPE_FLOAT:
-			if field in ["tick_fraction","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending"]: return value
+			if field in ["tick_fraction","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
 			return int(value)
 		TYPE_ARRAY:
 			for i in value.size(): value[i] = _restore_numbers(value[i])

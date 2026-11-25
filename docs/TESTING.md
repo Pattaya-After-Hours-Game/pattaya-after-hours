@@ -3,7 +3,36 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current verification — 25 November 2026
+## Current music/automation verification — 25 November 2026
+
+Godot 4.7.2 `tools/test.sh` passed the shared-economy regressions and **39 fresh campaigns**:
+15 baseline/no-Chat runs, 12 promoter/alternative runs and 12 music/automation/
+supplier runs. Six active baseline runs retain all original milestone windows.
+Feature routes pay their own prices and must remain solvent, complete stage three
+within ten simulated hours, and respect real orders and bounded street traffic.
+Auto-serve policies stop manual Serve clicks once it is purchased.
+
+`tests/automation_check.gd` covers music timing/budgets, purchase prices,
+auto/manual timer sharing, fractional deadlines and rapid toggles, no-order
+stock safety, two-second pouring, supplier levels/reserves and FIFO paid costs,
+manager income without fabricated sales, closure, healthy-service exclusion,
+five-second sampling, facing, schema-seven migration and repeat/split offline
+settlement. Existing startup/clock/contracts/commission/tutorial/art checks remain.
+
+Focused economy previews cover music and reversed Nida, ready/refilling/maxed
+auto-serve, supplier and manager tiers, an empty managed bar's net rate and
+closure. Eight scenarios were rendered at 960 × 540 and 1280 × 720. Production
+textures are unchanged; indicators and mirrored facing are engine presentation.
+Local Markdown targets and `git diff --check` are verified before commit.
+
+The signed main-branch release workflow repeats tests, exports Android/Linux/
+Windows/macOS, verifies the APK signer and checksums, and smoke-tests Linux.
+Android device play, Windows/macOS execution, Windows updater execution and
+human balance/audio feedback remain unverified. A build is not a device playtest.
+Higher manager/supplier tiers have model regression coverage, not a fully measured
+post-stage-three campaign balance claim.
+
+## Previous v1.0.14 verification — 25 November 2026
 
 The frontage/stock/capacity implementation includes the earlier TV/patience fix
 and v1.0.13 consolidation. The [handover](MERGE_HANDOFF.md) identifies scope;
@@ -73,13 +102,11 @@ campaigns; use the wrapper rather than running them against your personal saves.
 | Startup menu | No simulation or writes before selection, disabled Resume without a valid save, backup recovery, cancellation, immediate new-game save and removal of erased progress from backups |
 | Story and legacy modes | Incident responses, ongoing campaign, tutorial isolation and Godzilla outcomes |
 | Presentation | Catalog resources/hashes, atlas frames/padding, host identity, property hit regions, scrolling, district paths and combat input |
-| Pacing | Nine target campaigns, six no-chat comparisons, twelve feature/alternative campaigns; no injected money or offline income |
+| Pacing | Nine targets, six no-chat comparisons, twelve promoter/alternative runs, twelve automation runs; no injected money or offline income |
 
 The six active-strategy runs must meet the configured milestone windows. The
 three mostly-idle runs must complete without getting stuck. Six additional
-manual-first/staff-first comparisons must finish without Chat. Thirty paired
-
-three mostly-idle runs must stay solvent and complete within ten simulated hours.
+manual-first/staff-first comparisons must finish without Chat. The mostly-idle and feature runs must stay solvent and complete within ten simulated hours.
 All styles must obey actual order counts and bounded shared traffic. Thirty paired
 promotion scenarios compare quiet and full-house free-pool contribution. These
 are useful repeatable checks; they do not replace human balance testing.

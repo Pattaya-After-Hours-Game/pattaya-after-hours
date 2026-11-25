@@ -70,8 +70,8 @@ const STARTING_CASH = 200
 const STOCK_COST = 14
 const POOL_FEE = 50
 const POOL_SECONDS = 45
-const ACTION_COOLDOWNS = [10,8,6,4]
-const ACTION_UPGRADE_COSTS = [900,1400,2800]
+const ACTION_COOLDOWNS = [10,8,6,4,2]
+const ACTION_UPGRADE_COSTS = [900,1400,2800,5600]
 const ACTION_UPGRADES = [
 	{"id":"pouring","name":"Faster pouring","action":"serve"},
 	{"id":"welcoming","name":"Better welcoming","action":"welcome"}
@@ -88,7 +88,8 @@ const EQUIPMENT = [
 	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
 	# Legacy slot retained for save/action indices; training is now per person.
 	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
-	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Adds premium orders for customers with the budget. Stage 2+."}
+	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Adds premium orders for customers with the budget. Stage 2+."},
+	{"id":"music", "name":"Music system", "cost":1200, "max":1, "help":"Repeat drink orders arrive after 25s instead of 35s. Budgets, two-drink limit and service still apply."}
 ]
 const PROMOTIONS = [
 	{"name":"Free Pool Night", "fee":0, "boost":6, "requires":"pool", "help":"Free games attract pool groups; drinks stay full price."},
@@ -130,3 +131,12 @@ const PROMOTER_BONUS = [4.8,6.0,7.2]
 const AUDIENCE_TRAINING_COST = 800
 const DANCER_TRAINING = [1.0,1.25,1.5]
 const COMMISSION_PERCENT = 10
+
+const AUTO_SERVE_COST = 6000
+const MUSIC_ORDER_SECONDS = 25
+const SUPPLIER_PRICES = [900,1200,2400,4800,9600]
+const SUPPLIER_UNIT_COSTS = [14,14,12,10,8,6]
+const SUPPLIER_STAGES = [1,1,2,2,3]
+const MANAGER_PRICES = [18000,36000,72000]
+const MANAGER_INCOME = [0,10,20,40]
+const MANAGER_STAGES = [2,3,3]

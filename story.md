@@ -68,6 +68,13 @@ lets her take on a busier frontage as the venue grows.
 
 > **Anong:** “She can get them through the door. You still have to get them a drink.”
 
+Nida faces the street to welcome passersby. Pim’s purchasable music system
+brings the next round forward; the bartender still has to pour it. Auto-serve
+buys the owner relief from constant tapping, not extra time on the clock.
+Dao’s management tiers bring predictable income while the venue trades, alongside
+the ordinary customers’ tabs. Better supplier agreements make future deliveries
+cheaper; Bo does not refund yesterday’s fridge.
+
 This is her playable role, not a new scripted quest. She leaves her post when
 off duty or out of contract, and keeps her training if she returns.
 

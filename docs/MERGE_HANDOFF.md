@@ -1,25 +1,29 @@
 # Current implementation and release handoff
 
-Updated **25 November 2026** in `/home/zak/projects/pattaya-after-hours`.
-The authorized work is on **`codex/promoter-implementation`**, based on the
-committed plan `7f881e5`, TV/patience fix `0d7bb90` and main consolidation `7a95d58`
-(released as v1.0.13). The user explicitly requested commit and deployment.
+Updated **25 November 2026**. The music/automation work is on
+**`codex/music-and-automation`**, based on `e20864d` (published v1.0.14).
+The previous seating/Nida/TV changes are already on main; their handoff is no
+longer a pending integration. Other worktrees and user attachments are preserved.
 
-This slice adds twelve-person compact seating, exact six-pack restocking, Nida's
-contract/commission/frontage artwork and retained promoter/dancer training.
-It preserves the earlier cast, startup menu, clock, cooldowns and optional arcade.
-Schema 6 retains older progress; the catalog has 72 textures/22 atlases/149 frames.
+This slice implements the user's music add-on, reversed Nida facing, purchased
+auto-serve with a shared cooldown, two-second pouring, manager income tiers,
+supplier discounts and a five-second net-trading readout. Manager income is
+confirmed by the user as extra income while open, with a higher purchase price;
+it is kept separate from actual sales.
 
-Run `tools/test.sh`: regression coverage plus 27 fresh campaigns. The latest
-[testing record](TESTING.md) and [economy evidence](ECONOMY.md#balance-verification)
-are authoritative. Main pushes run signed Android and desktop exports; a source
-commit alone is not a published download. Check the release workflow and
-[latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for the published version and source commit. Device playtesting remains separate.
+Schema 7 retains paid supplier/manager appointments as level one, old inventory
+costs, timers and ownership. It grants no unpurchased auto-serve/music. Assets
+remain 72 textures/22 atlases/149 frames; scene facing and indicators use Godot.
 
-Other worktrees and user attachments were preserved. Upstream PRs #4 and #5 from
-the prior audit remain outside this feature's scope; this is not another claim
-that all work in every chat has been merged. The audit below is historical.
+`tools/test.sh` covers regressions and 39 fresh campaigns. The [testing record](TESTING.md)
+and [economy evidence](ECONOMY.md#balance-verification) record the outcome and
+limits. Publication is the signed main-branch release workflow; check its run
+and [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+for the actual published tag and source revision. Source commits alone are not
+released downloads. Android device and Windows/macOS playtesting remain separate.
+
+The earlier PR #4/#5 review scope is unchanged. This is a feature handoff, not a
+new audit of every conversation. The consolidation audit below is historical.
 
 ## Historical consolidation audit
 

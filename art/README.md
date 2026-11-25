@@ -211,3 +211,12 @@ and `assets/art/wall-fan.png`. The original room sources and packed pixels remai
 
 Use the `fan-*` general-preview filter to inspect owned/unowned pairs across
 all nine stages; the economy preview includes a real comfort purchase.
+
+## Music and automation presentation
+
+Nida's existing four-frame production atlas is mirrored in-engine so she faces
+the street. No artwork pixels or manifest hashes change. A purchased music
+system receives an engine-drawn playing/off indicator beneath the venue sign.
+The till gains a compact five-second net-trading readout; all amounts and
+automation states come from the shared model. Use the `automation-*` economy
+preview filter for controls, supplier/manager tiers, refills and closure.

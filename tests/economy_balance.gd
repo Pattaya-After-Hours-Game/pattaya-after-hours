@@ -24,7 +24,7 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		model.s.street.selected = 0
 		var bar: Dictionary = st.selected()
 		var click_interval := 1 if style=="click-heavy" else 2 if style=="balanced" else 15
-		if second%click_interval==0 and eco.action_status(bar,"serve").enabled: st.action("serve")
+		if not eco.automatic_service(bar) and second%click_interval==0 and eco.action_status(bar,"serve").enabled: st.action("serve")
 		if use_chat and style!="mostly-idle" and second%click_interval==0 and eco.action_status(bar,"chat").enabled:
 			st.action("chat")
 		elif second%(10 if style=="click-heavy" else 30 if style=="balanced" else 120)==0 and eco.action_status(bar,"welcome").enabled:
@@ -61,6 +61,12 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 				if not eco.contracted(bar.team[promoter]): st.action("rehire",promoter)
 				if bar.stage>=2 and bar.team[promoter].audience_training<int(bar.stage)-1: st.action("train_audience",promoter)
 			if bar.equipment.seating==3 and times.compact<0: times.compact = second
+		if feature in ["music-first","auto-serve","supplier-first","automation-bundle"] and bar.equipment.pool>0:
+			if feature in ["music-first","automation-bundle"] and not bar.equipment.music: st.action("equipment",8)
+			if feature in ["auto-serve","automation-bundle"] and bar.stage>=2:
+				if not bar.auto_serve: st.action("auto_serve")
+				elif bar.action_levels.pouring<4: st.action("action_upgrade",0)
+			if feature in ["supplier-first","automation-bundle"] and bar.stage>=2 and bar.supplier_level<3: st.action("restock")
 		if bar.stage==1 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
 		if bar.stage>=2 and times.stage2<0: times.stage2 = second
 		if owner_first and bar.stage>=2 and bar.action_levels.pouring<3:
@@ -98,6 +104,9 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if not model.s.street.event.is_empty() and model.s.street.event.phase=="warning" and model.s.cash>700:
 			if model.s.street.event.id in [0,3]: st.action("prepare")
 		st.tick(1)
+	times.music = st.selected().equipment.music
+	times.auto_serve = st.selected().auto_serve
+	times.supplier = st.selected().supplier_level
 	times.cash = model.s.cash
 	times.happy = st.selected().happy
 	times.regulars = st.selected().regulars

@@ -10,7 +10,8 @@ godot_bin="${GODOT_BIN:-godot}"
 "$godot_bin" --headless --path . --script tests/check.gd 2>&1 | tee "$scratch/test.log"
 "$godot_bin" --headless --path . --script tests/economy_balance.gd 2>&1 | tee "$scratch/balance.log"
 "$godot_bin" --headless --path . --script tests/promoter_balance.gd 2>&1 | tee "$scratch/promoter-balance.log"
-if grep -Eq 'SCRIPT ERROR:|^ERROR:|Parse Error:|Compile Error:' "$scratch/import.log" "$scratch/test.log" "$scratch/balance.log" "$scratch/promoter-balance.log"; then
+"$godot_bin" --headless --path . --script tests/automation_balance.gd 2>&1 | tee "$scratch/automation-balance.log"
+if grep -Eq 'SCRIPT ERROR:|^ERROR:|Parse Error:|Compile Error:' "$scratch/import.log" "$scratch/test.log" "$scratch/balance.log" "$scratch/promoter-balance.log" "$scratch/automation-balance.log"; then
   echo "Godot reported an error; checks failed." >&2
   exit 1
 fi

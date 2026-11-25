@@ -6,6 +6,7 @@ var s: Dictionary
 func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
 	var st: Dictionary = s.street
+	st.merge({"earnings_seconds":0,"earnings_net":0,"net_per_second":0.0})
 	if not st.has("economy_seed"): st.economy_seed = 1
 	if not st.has("next_group"): st.next_group = 1
 	for entry in {"elapsed":0,"next_customer":1,"pass_credit":0,"offered":0,"arrivals":0,"orders":0,"guided":{},"offline_report":{}}:
@@ -16,10 +17,14 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		for key in defaults:
 			if not bar.has(key): bar[key] = defaults[key]
 		for key in ["serve_ready","welcome_ready","welcome_until"]: bar[key] = float(bar[key])
+		bar.equipment.merge({"music":0})
+		if int(s.get("version",1))<7:
+			bar.supplier_level = 1 if bar.restock else 0
+			bar.manager_level = 1 if bar.manager else 0
+		ensure_stock_lots(bar)
 		for customer in bar.customers: customer.merge(customer_action_fields())
-		bar.shift.merge({"fines":0,"commission":0})
-		if not bar.last_shift.is_empty(): bar.last_shift.merge({"fines":0,"commission":0})
-		for report in bar.recent: report.merge({"fines":0,"commission":0})
+		for report in [bar.shift,bar.last_shift]+bar.recent:
+			if not report.is_empty(): report.merge({"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.STOCK_COST,"manager_income":0})
 		for table in bar.games.size():
 			if not bar.games[table].has("table"): bar.games[table].table = table
 		if migrated:
@@ -35,6 +40,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if fresh:
 		s.cash = C.STARTING_CASH
 		st.bars[0].stock = 18
+		ensure_stock_lots(st.bars[0])
 		# A small opening rush, not an endlessly replenished tutorial grant.
 		for _i in 3: admit(st.bars[0],false,true)
 
@@ -108,15 +114,95 @@ static func customer_action_fields() -> Dictionary:
 	return {"chatted":false,"chat_until":0.0,"commission_visit":false,"commission_order":false}
 
 static func new_fields() -> Dictionary:
-	var fields := {"customers":[],"team":[],"equipment":{"sign":0,"comfort":0,"fridge":0,"pool":0,"seating":0,"screen":0,"training":0,"menu":0},
+	var fields := {"customers":[],"team":[],"equipment":{"sign":0,"comfort":0,"fridge":0,"pool":0,"seating":0,"screen":0,"training":0,"menu":0,"music":0},
 		"open":true,"close_reason":"","recovery":0,"consignment":0,"games":[],"promo":{},"promo_report":{},"promo_id":0,"promo_cooldown":0,"last_promo":-1,"promo_repeats":0,"ordinary_seconds":0,
 		"welcome":0,"welcome_until":0.0,"welcome_ready":0.0,"serve_ready":0.0,"service_clock":0,"cost_credit":0,
 		"regulars":0,"happy":0,"healthy":0,"shift":ledger(),"last_shift":{},"recent":[],"recent_sales":[],"recent_orders":[],
 		"pool_games":0,"pool_income":0,"free_games":0,"arrivals":0,"orders":0,"sold":0,"lost_full":0,"lost_service":0,"lost_stock":0,"host_requests":[]}
+	fields.merge(automation_fields())
 	fields.merge(promoter_fields())
 	fields.merge(clock_fields())
 	fields.merge(action_fields())
 	return fields
+
+static func automation_fields() -> Dictionary:
+	return {"auto_serve":false,"auto_serve_on":true,"supplier_level":0,"stock_lots":[],"manager_level":0}
+
+static func stock_unit_cost(bar: Dictionary) -> int:
+	return C.SUPPLIER_UNIT_COSTS[int(bar.get("supplier_level",0))]
+
+static func pack_price(bar: Dictionary) -> int:
+	return C.STOCK_PACK*stock_unit_cost(bar)
+
+static func ensure_stock_lots(bar: Dictionary) -> void:
+	var units := 0
+	for lot in bar.stock_lots: units += int(lot.units)
+	if units!=int(bar.stock):
+		bar.stock_lots = [{"units":int(bar.stock),"cost":stock_unit_cost(bar)}] if bar.stock>0 else []
+
+static func consume_stock(bar: Dictionary) -> int:
+	ensure_stock_lots(bar)
+	var lot: Dictionary = bar.stock_lots[0]
+	var unit_cost := int(lot.cost)
+	lot.units -= 1
+	if lot.units==0: bar.stock_lots.pop_front()
+	bar.stock -= 1
+	return unit_cost
+
+static func automatic_service(bar: Dictionary) -> bool:
+	return bar.get("auto_serve",false) and bar.get("auto_serve_on",true)
+
+static func manager_rate(bar: Dictionary) -> int:
+	return C.MANAGER_INCOME[int(bar.get("manager_level",0))] if bar.manager and bar.get("recovery",0)==0 else 0
+
+func manager_offer(bar: Dictionary) -> Dictionary:
+	var level := int(bar.manager_level)
+	var reason := ""
+	var amount := 0
+	if level>=3: reason = "Manager fully developed."
+	else:
+		amount = C.MANAGER_PRICES[level]
+		if bar.stage<C.MANAGER_STAGES[level]: reason = "Needs venue stage %d." % C.MANAGER_STAGES[level]
+		elif level==0 and (on_duty(bar,0)<1 or not bar.restock or bar.healthy<8): reason = "Needs a bartender, deliveries and eight healthy shifts."
+		elif s.cash<amount+(operating_rate(bar)+(12 if not bar.manager else 0))*2: reason = "Keep the next shift's operating reserve."
+	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"rate":C.MANAGER_INCOME[mini(level+1,3)]}
+
+func buy_manager(bar: Dictionary) -> String:
+	var offer := manager_offer(bar)
+	if not offer.enabled: return offer.reason
+	s.cash -= offer.price
+	s.weekly.costs += offer.price
+	bar.manager = true
+	bar.manager_level += 1
+	return "Manager level %d: ฿%d per game minute (real second) while trading, plus managed offline operation." % [bar.manager_level,manager_rate(bar)]
+
+func supplier_offer(bar: Dictionary) -> Dictionary:
+	var level := int(bar.supplier_level)
+	var reason := ""
+	var amount := 0
+	if level>=C.SUPPLIER_PRICES.size(): reason = "Best supplier agreement reached."
+	else:
+		amount = C.SUPPLIER_PRICES[level]
+		if bar.stage<C.SUPPLIER_STAGES[level]: reason = "Needs venue stage %d." % C.SUPPLIER_STAGES[level]
+		elif s.cash<amount+operating_rate(bar)*2: reason = "Keep the next shift's operating reserve."
+	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"pack":C.STOCK_PACK*C.SUPPLIER_UNIT_COSTS[mini(level+1,5)]}
+
+func buy_supplier(bar: Dictionary) -> String:
+	ensure_stock_lots(bar)
+	var offer := supplier_offer(bar)
+	if not offer.enabled: return offer.reason
+	s.cash -= offer.price
+	s.weekly.costs += offer.price
+	bar.supplier_level += 1
+	bar.restock = true
+	return "Supplier level %d: six drinks cost ฿%d. Existing stock keeps its purchase cost." % [bar.supplier_level,pack_price(bar)]
+
+func sample_earnings() -> void:
+	s.street.earnings_seconds += 1
+	if s.street.earnings_seconds>=5:
+		s.street.net_per_second = float(s.street.earnings_net)/5.0
+		s.street.earnings_seconds = 0
+		s.street.earnings_net = 0
 
 static func promoter_fields() -> Dictionary:
 	return {"commission_carry":0,"commission_paid":0,"offline_sales_credit":0.0,"offline_cost_pending":0.0,"offline_pool_pending":0.0}
@@ -151,7 +237,7 @@ func commit_orders(bar: Dictionary) -> void:
 		if guest.order: guest.commission_order = true
 
 func stock_offer(bar: Dictionary, automatic: bool = false) -> Dictionary:
-	var amount := C.STOCK_PACK*C.STOCK_COST
+	var amount := pack_price(bar)
 	var room := stock_capacity(bar)-int(bar.stock)
 	var reserve := ceili(operating_rate(bar)/60.0) if automatic else 0
 	var reason := ""
@@ -160,7 +246,7 @@ func stock_offer(bar: Dictionary, automatic: bool = false) -> Dictionary:
 	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"room":room,"remaining_cash":int(s.cash)-amount}
 
 static func ledger() -> Dictionary:
-	return {"revenue":0,"stock_cost":0,"operating":0,"promo_cost":0,"fines":0,"commission":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}
+	return {"revenue":0,"stock_cost":0,"operating":0,"promo_cost":0,"fines":0,"commission":0,"consumed_stock":0,"manager_income":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}
 
 func roll(limit: int) -> int:
 	s.street.economy_seed = (int(s.street.economy_seed)*48271) % 2147483647
@@ -294,23 +380,24 @@ func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minut
 		arrivals += traffic_rate(offline)*float(mix[audience])/100.0*attraction(bar,offline,audience,minute,offset)/total
 	var space_limit := seats(bar)/1.5 # Typical 90-second stay.
 	var demand := minf(arrivals,space_limit)*2.0
-	var service := service_rate(bar,offset)+(60.0/action_cooldown(bar,"serve") if owner_active and not offline else 0.0)
+	var service := service_rate(bar,offset)+(60.0/action_cooldown(bar,"serve") if automatic_service(bar) or (owner_active and not offline) else 0.0)
 	var sales := minf(demand,service)
 	if bar.stock == 0 and not bar.restock: sales = 0
-	var unit_margin := float(int(C.TYPES[int(bar.type)].drink)-C.STOCK_COST)
+	var unit_margin := float(int(C.TYPES[int(bar.type)].drink)-stock_unit_cost(bar))
 	var pool := minf(60.0/C.POOL_SECONDS*int(bar.equipment.pool),minf(arrivals,space_limit)*.2)*C.POOL_FEE
 	if not offline and bar.promo.get("kind",-1) == 0: pool = 0
-	if not offline and bar.promo.get("kind",-1) == 1: unit_margin = price(bar)-C.STOCK_COST
+	if not offline and bar.promo.get("kind",-1) == 1: unit_margin = price(bar)-stock_unit_cost(bar)
 	var costs := operating_rate(bar,offset)+promotion_cost if is_trading(bar,offline) else 0.0
 	var commission := sales*(int(C.TYPES[int(bar.type)].drink) if offline else price(bar))*C.COMMISSION_PERCENT/100.0 if promoter_bonus(bar,offset)>0 else 0.0
 	if promoter_bonus(bar,offset)>0: unit_margin -= (int(C.TYPES[int(bar.type)].drink) if offline else price(bar))*C.COMMISSION_PERCENT/100.0
-	var net := sales*unit_margin+pool-costs
+	var management := manager_rate(bar)*60 if is_trading(bar,offline) else 0
+	var net := sales*unit_margin+pool+management-costs
 	var reason := "Quiet: attract customers before hiring."
 	if not is_trading(bar,offline): reason = status(bar)
 	elif bar.stock <= 0: reason = "Out of stock: order a delivery."
 	elif bar.customers.size() >= seats(bar): reason = "Full: more seats or shorter queues would help."
 	elif pending(bar) > 0 and service < demand: reason = "Slow service: serve orders or add a bartender."
-	return {"arrivals":arrivals,"demand":demand,"service":service,"sales":sales,"costs":costs,"net":net,"break_even":maxf(0,(costs-pool)/maxf(1,unit_margin)),"pool":pool,"commission":commission,"reason":reason}
+	return {"arrivals":arrivals,"demand":demand,"service":service,"sales":sales,"costs":costs,"net":net,"break_even":maxf(0,(costs-pool-management)/maxf(1,unit_margin)),"pool":pool,"manager":management,"commission":commission,"reason":reason}
 
 func promoter_forecast(bar: Dictionary, owner_active: bool = false) -> Dictionary:
 	var proposed := bar.duplicate(true)
@@ -334,10 +421,12 @@ func cost(bar: Dictionary, amount: int, category: String) -> bool:
 	if s.cash < amount: return false
 	s.cash -= amount
 	s.weekly.costs += amount
+	s.street.earnings_net -= amount
 	bar.shift[category] += amount
 	return true
 
 func income(bar: Dictionary, amount: int) -> void:
+	s.street.earnings_net += amount
 	s.cash += amount
 	s.weekly.revenue += amount
 	s.street.earned += amount
@@ -345,7 +434,9 @@ func income(bar: Dictionary, amount: int) -> void:
 
 func restock(bar: Dictionary, automatic: bool = false) -> bool:
 	if not stock_offer(bar,automatic).enabled: return false
-	if not cost(bar,C.STOCK_PACK*C.STOCK_COST,"stock_cost"): return false
+	if not cost(bar,pack_price(bar),"stock_cost"): return false
+	ensure_stock_lots(bar)
+	bar.stock_lots.append({"units":C.STOCK_PACK,"cost":stock_unit_cost(bar)})
 	bar.stock += C.STOCK_PACK
 	return true
 
@@ -407,11 +498,12 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		if bar.get("consignment",0)>0:
 			cost(bar,C.STOCK_COST,"stock_cost")
 			bar.consignment -= 1
-		bar.stock -= 1
+		var consumed := consume_stock(bar)
+		bar.shift.consumed_stock += consumed
 		customer.budget -= customer.quoted
 		customer.order = false
 		customer.drinks += 1
-		customer.next = C.ORDER_SECONDS
+		customer.next = C.MUSIC_ORDER_SECONDS if bar.equipment.get("music",0)>0 else C.ORDER_SECONDS
 		bar.dirt = mini(C.DIRT_LIMIT,int(bar.dirt)+(C.PEAK_DIRT_PER_DRINK if peak(int(bar.type),int(s.street.minute)) else 1))
 		bar.sold += 1
 		bar.shift.sales += 1
@@ -420,7 +512,7 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		var report := promotion_record(bar,int(customer.promo))
 		if not report.is_empty():
 			report.drink_revenue += int(customer.quoted)
-			report.drink_cost += C.STOCK_COST
+			report.drink_cost += consumed
 			report["commission"] = int(report.get("commission",0))+commission
 		if bar.type == 1 and customer.drinks == 2 and on_duty(bar,1)>0 and customer.fine_budget>=300*int(bar.stage) and roll(100)<40:
 			bar.host_requests.append(int(customer.id))
@@ -474,15 +566,18 @@ func action_status(bar: Dictionary, id: String) -> Dictionary:
 func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var item: Dictionary = C.ACTION_UPGRADES[index]
 	var level := int(bar.action_levels[item.id])
-	var price := 0 if level==3 else int(C.ACTION_UPGRADE_COSTS[level])
+	var cap := 4 if index==0 else 3
+	var price := 0 if level==cap else int(C.ACTION_UPGRADE_COSTS[level])
+	var stage_ok: bool = not (index==0 and level==3 and bar.stage<2)
 	var shortfall := maxi(0,price+operating_rate(bar)*2-int(s.cash))
-	return {"level":level,"price":price,"shortfall":shortfall,"enabled":level<3 and shortfall==0,
-		"current":C.ACTION_COOLDOWNS[level],"next":C.ACTION_COOLDOWNS[mini(3,level+1)]}
+	return {"level":level,"price":price,"shortfall":shortfall,"enabled":level<cap and shortfall==0 and stage_ok,"maxed":level==cap,"stage_ok":stage_ok,
+		"current":C.ACTION_COOLDOWNS[level],"next":C.ACTION_COOLDOWNS[mini(cap,level+1)]}
 
 func buy_action_upgrade(bar: Dictionary, index: int) -> String:
 	if index<0 or index>=C.ACTION_UPGRADES.size(): return "Unknown action upgrade."
 	var state := action_upgrade_status(bar,index)
-	if state.level==3: return "Already at the fastest cooldown."
+	if state.maxed: return "Already at the fastest cooldown."
+	if not state.stage_ok: return "Two-second pouring needs venue stage 2."
 	if not state.enabled: return "Need ฿%d more, including next shift's operating reserve." % state.shortfall
 	var item: Dictionary = C.ACTION_UPGRADES[index]
 	s.cash -= state.price
@@ -594,6 +689,16 @@ func upgrade_reason(bar: Dictionary) -> String:
 
 func action(bar: Dictionary, id: String, index: int) -> String:
 	match id:
+		"auto_serve":
+			if bar.auto_serve:
+				bar.auto_serve_on = not bar.auto_serve_on
+				return "Auto-serve %s. The existing Serve cooldown is unchanged." % ("on" if bar.auto_serve_on else "off")
+			if s.cash<C.AUTO_SERVE_COST+operating_rate(bar)*2: return "Keep the next shift's reserve after the ฿6,000 auto-serve purchase."
+			s.cash -= C.AUTO_SERVE_COST
+			s.weekly.costs += C.AUTO_SERVE_COST
+			bar.auto_serve = true
+			bar.auto_serve_on = true
+			return "Auto-serve purchased. It uses real orders, stock and your existing Serve cooldown."
 		"serve":
 			var state := action_status(bar,id)
 			if not state.enabled: return state.reason
@@ -650,6 +755,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if bar.stock==0:
 				bar.stock = 6
 				bar.consignment = 6
+				bar.stock_lots = [{"units":6,"cost":C.STOCK_COST}]
 			return "Anong covers two minutes of overhead. Staff are off duty; Bo's six recovery drinks cost ฿14 only when sold. Serve and welcome manually."
 		"rota":
 			if index<0 or index>=bar.team.size(): return "Unknown team member."
@@ -675,7 +781,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if index==3 and promoter_index(bar)>=0: return "Rehire your existing promoter instead."
 			if index!=3 and floor_staff(bar)>=int(bar.stage)*2: return "Upgrade for more team positions."
 			var amount := contract_cost(index)
-			if s.cash<amount+(operating_rate(bar)+int(C.ROLE_WAGES[index]))*2+(84 if index==3 else 0): return "Keep a shift's payroll after hiring."
+			if s.cash<amount+(operating_rate(bar)+int(C.ROLE_WAGES[index]))*2+(pack_price(bar) if index==3 else 0): return "Keep a shift's payroll after hiring."
 			s.cash -= amount
 			s.weekly.costs += amount
 			var host := free_host(bar) if index==1 else -1
@@ -688,7 +794,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			var person: Dictionary = bar.team[index]
 			if contracted(person): return "This contract is still active."
 			var amount := contract_cost(int(person.role))
-			if s.cash<amount+(operating_rate(bar)+int(C.ROLE_WAGES[int(person.role)]))*2+(84 if person.role==3 else 0): return "Keep a shift's payroll and the required stock reserve after rehiring."
+			if s.cash<amount+(operating_rate(bar)+int(C.ROLE_WAGES[int(person.role)]))*2+(pack_price(bar) if person.role==3 else 0): return "Keep a shift's payroll and the required stock reserve after rehiring."
 			s.cash -= amount
 			s.weekly.costs += amount
 			person.contract_left = C.STAFF_CONTRACT_MINUTES
@@ -749,7 +855,7 @@ func settle_shift(bar: Dictionary) -> void:
 	elif report.lost_full>0: report.reason = "Full: improve layout or seating before advertising harder."
 	elif report.occupied_seconds<report.open_seconds*seats(bar)*.4: report.reason = "Quiet: try signage, welcoming or a targeted promotion."
 	# Inventory purchases are investments in later sales: assess operating margin.
-	if report.sales>=4 and report.sales>=report.orders*.8 and int(report.revenue)-int(report.sales)*C.STOCK_COST-int(report.operating)-int(report.promo_cost)-int(report.get("fines",0))-int(report.get("commission",0))>0:
+	if report.sales>=4 and report.sales>=report.orders*.8 and int(report.revenue)-int(report.get("manager_income",0))-int(report.consumed_stock)-int(report.operating)-int(report.promo_cost)-int(report.get("fines",0))-int(report.get("commission",0))>0:
 		bar.healthy += 1
 	bar.last_shift = report
 	bar.recent.append(report)
@@ -795,6 +901,10 @@ func tick() -> void:
 		else: bar.ordinary_seconds += 1
 		if not is_trading(bar): continue
 		bar.recovery = maxi(0,int(bar.recovery)-1)
+		var managed := manager_rate(bar)
+		if managed>0:
+			income(bar,managed)
+			bar.shift.manager_income += managed
 		bar.cost_credit += operating_rate(bar)
 		var charge := int(bar.cost_credit)/60
 		if not cost(bar,charge,"operating"):
@@ -829,6 +939,7 @@ func tick() -> void:
 					if not pool_report.is_empty(): pool_report.lost += 1
 			if customer.life<=0 and not customer.playing: depart(bar,customer)
 		if bar.restock and bar.stock<C.STOCK_PACK and pending(bar)>0: restock(bar,true)
+		if automatic_service(bar): serve(bar,1,true)
 		staff_service(bar)
 		pool_tick(bar)
 
@@ -854,27 +965,47 @@ func offline(now: int, cap_seconds: int) -> int:
 		var commission_total := 0
 		var packs := 0
 		var traded := 0
+		var management_total := 0
 		var limit := "customer demand / space"
 		var projection: Dictionary = bar.duplicate(true)
 		for window in windows:
 			var view := forecast(bar,true,-1,int(window.minute),int(window.offset))
-			if view.net<=0 or view.sales<=0:
+			if view.net<=0 or (view.sales<=0 and view.manager<=0):
 				limit = "unviable trading windows"
 				continue
 			if view.service<view.demand: limit = "service"
 			for _second in int(window.seconds):
+				var management := manager_rate(bar)
+				if management>0:
+					# Separate manager takings: no fabricated drinks or commission.
+					projection.offline_cost_pending += view.costs/60.0
+					var operating_now := floori(projection.offline_cost_pending)
+					if bank+management<operating_now: break
+					projection.offline_cost_pending -= operating_now
+					bank += management-operating_now
+					venue_gross += management
+					venue_cost += operating_now
+					management_total += management
+				if view.sales<=0:
+					traded += 1
+					continue
 				# Each claim protects the cash present when it starts. Only its
 				# newly generated surplus funds complete supplier packs.
 				if projection.stock==0:
-					if not bar.restock or bank<C.STOCK_PACK*C.STOCK_COST:
+					if not bar.restock or bank<pack_price(bar):
 						limit = "stock / six-pack working capital"
+						if management>0:
+							traded += 1
+							continue
 						break
-					bank -= C.STOCK_PACK*C.STOCK_COST
-					venue_cost += C.STOCK_PACK*C.STOCK_COST
+					bank -= pack_price(bar)
+					venue_cost += pack_price(bar)
+					ensure_stock_lots(projection)
+					projection.stock_lots.append({"units":C.STOCK_PACK,"cost":stock_unit_cost(bar)})
 					projection.stock += C.STOCK_PACK
 					packs += 1
 				projection.offline_sales_credit += view.sales/60.0
-				projection.offline_cost_pending += view.costs/60.0
+				if management==0: projection.offline_cost_pending += view.costs/60.0
 				projection.offline_pool_pending += view.pool/60.0
 				traded += 1
 				if projection.offline_sales_credit<1.0: continue
@@ -892,7 +1023,7 @@ func offline(now: int, cap_seconds: int) -> int:
 					projection.offline_pool_pending = 0.0
 					limit = "unviable trading windows"
 					break
-				projection.stock -= 1
+				consume_stock(projection)
 				projection.offline_sales_credit -= 1.0
 				projection.offline_cost_pending -= operating
 				if consignment_cost>0: projection.consignment -= 1
@@ -904,14 +1035,14 @@ func offline(now: int, cap_seconds: int) -> int:
 				sales += 1
 		# Pending sub-sale time/costs are estimate credits, not live debts.
 		# Persist both sides so repeated short claims cannot avoid costs.
-		for key in ["stock","consignment","commission_carry","offline_sales_credit","offline_cost_pending","offline_pool_pending"]:
+		for key in ["stock","stock_lots","consignment","commission_carry","offline_sales_credit","offline_cost_pending","offline_pool_pending"]:
 			bar[key] = projection[key]
 		bar.commission_paid += commission_total
 		net += bank
 		gross += venue_gross
 		expenses += venue_cost
 		visits += sales/2
-		notes.append("%s: estimated ฿%d net, %d drinks / %.1f legal trading minutes; %d six-packs, ฿%d commission; limited by %s." % [bar.name,bank,sales,traded/60.0,packs,commission_total,limit])
+		notes.append("%s: estimated ฿%d net, %d drinks / %.1f legal trading minutes; %d six-packs, ฿%d commission, ฿%d manager income; limited by %s." % [bar.name,bank,sales,traded/60.0,packs,commission_total,management_total,limit])
 
 	# A conservative net projection; it never debits opening cash or progresses
 	# queues, promotions, events, local milestones or calendar time.

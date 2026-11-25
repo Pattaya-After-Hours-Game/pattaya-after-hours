@@ -93,6 +93,9 @@ func _draw() -> void:
 	if kind==0 and stage>1 and bar.has("equipment") and bar.equipment.pool==0:
 		draw_style_box(_sign_box(),Rect2(300,306,155,31))
 		draw_string(font,Vector2(307,327),"POOL / NOT OPEN",HORIZONTAL_ALIGNMENT_LEFT,145,14,GOLD)
+	if bar.get("equipment",{}).get("music",0)>0:
+		draw_style_box(_sign_box(),Rect2(674,116,142,22))
+		draw_string(font,Vector2(681,132),"MUSIC / "+("OFF" if closed else "PLAYING"),HORIZONTAL_ALIGNMENT_LEFT,130,12,TEAL)
 	# Anong remains available at the service position even before the first hire.
 	var idle := 0 if service_flash <= 0 or closed else 3
 	Art.frame(self,"anong-service",idle,Vector2(817,418),person_scale(418),false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
@@ -202,7 +205,7 @@ func scene_people(bar: Dictionary) -> Array:
 		var role: int = int(bar.team[i].role) if bar.has("team") and i < bar.team.size() else (2 if kind==2 else 0)
 		var who := Art.worker_id(bar,i)
 		if role==3:
-			people.append({"who":who,"pose":Art.animation_frame(who,"welcome",clock,1),"foot":Vector2(207,362),"flip":false,"order":false,"customer":false,"behind_bar":false})
+			people.append({"who":who,"pose":Art.animation_frame(who,"welcome",clock,1),"foot":Vector2(207,362),"flip":true,"order":false,"customer":false,"behind_bar":false})
 			continue
 		if bars.is_empty() and i < legacy_staff.size():
 			if not legacy_staff[i].work or legacy_staff[i].hurt: continue
