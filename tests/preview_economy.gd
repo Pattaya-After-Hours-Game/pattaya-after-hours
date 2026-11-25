@@ -94,6 +94,23 @@ func run() -> void:
 	app.drawer_open = true
 	await capture(app,"staff-ready-price","YOUR ACTION UPGRADES")
 	app.model = Campaign.new(72)
+	app.model.s.cash = 10000
+	app.model.street.action("hire",0)
+	app.model.street.action("hire",3)
+	app.model.street.action("auto_serve")
+	app.model.street.economy.advance_contracts(14400)
+	app.model.s.cash = 1200
+	await capture(app,"staff-ready-nida-shortfall","FRONTAGE PROMOTER")
+	app.model.s.cash = 2000
+	await capture(app,"staff-ready-nida-renew","FRONTAGE PROMOTER")
+	app.model.street.action("rehire",1)
+	await capture(app,"staff-ready-nida-renewed","FRONTAGE PROMOTER")
+	app.model.s.cash = 10000
+	app.model.street.action("rehire",0)
+	app.model.street.selected().customers.clear()
+	app.model.street.economy.admit(app.model.street.selected())
+	await capture(app,"staff-ready-relief","YOUR ACTION UPGRADES")
+	app.model = Campaign.new(72)
 	app.model.s.day = 6
 	app.drawer_open = false
 	await capture(app,"party-tomorrow-scene")

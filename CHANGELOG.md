@@ -4,6 +4,15 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Source update — Bartender priority and Nida renewal
+
+- Owner auto-serve now backs up staffed venues during queue overflow or imminent
+  missed orders; quiet orders go to bartenders. Price remains ฿3,000.
+- Nida renewal is visible in Frontage promoter, with the exact fee, retained
+  payroll/stock reserve and missing cash. Contract expiry refreshes roster controls.
+- Added live dispatch, renewal boundary and UI regression coverage; existing
+  training, contracts, deadlines, stock commitments and saves are retained.
+
 ## Source update — Ready bartenders and affordable auto-serve
 
 - Reduced owner auto-serve from ฿6,000 to ฿3,000; existing ownership is preserved.

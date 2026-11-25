@@ -210,6 +210,33 @@ func run(test: SceneTree) -> void:
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 
+	# Expired frontage contracts retain their slot; quote the whole cash requirement.
+	m = Campaign.new(72)
+	m.s.cash = 20000
+	bar = m.street.selected()
+	eco = m.street.economy
+	m.street.action("hire",0)
+	m.street.action("hire",0)
+	m.street.action("hire",3)
+	bar.team[2].audience_training = 1
+	bar.team[2].contract_left = 1
+	eco.advance_contracts(1)
+	var offer: Dictionary = eco.rehire_offer(bar,2)
+	m.s.cash = int(offer.required)-1
+	var before_rehire := JSON.stringify(m.s)
+	var refusal: String = m.street.action("rehire",2)
+	test.check(refusal.contains("Need ฿1 more") and not eco.contracted(bar.team[2]),"Nida renewal explains exact shortfall, including stock and payroll reserve")
+	test.check(m.s.cash==int(offer.required)-1 and bar.team.size()==3,"Rejected rehire charges nothing and preserves the full roster")
+	before_rehire = JSON.stringify(m.s)
+	eco.rehire_offer(bar,2)
+	test.check(JSON.stringify(m.s)==before_rehire,"Renewal quote is a pure read")
+	m.s.cash = offer.required
+	m.street.action("rehire",2)
+	test.check(m.s.cash==offer.reserve and bar.team[2].on and bar.team[2].audience_training==1 and eco.contracted(bar.team[2]),"Exact renewal threshold rehires Nida even with all floor positions occupied")
+	money = m.s.cash
+	m.street.action("rehire",2)
+	test.check(m.s.cash==money and bar.team.size()==3,"Repeated renew clicks cannot charge twice or create a second Nida")
+
 func offline_model():
 	var m = Campaign.new(72)
 	m.s.cash = 100000

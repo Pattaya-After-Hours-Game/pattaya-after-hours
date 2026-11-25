@@ -22,16 +22,16 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Ready bartenders, visible staff service and affordable auto-serve |
-| Status | Verified locally; ready for main release after v1.0.17 |
+| Active feature | Bartender-first relief auto-serve and visible Nida renewal |
+| Status | REVIEW; local verification passed; previous feature shipped in v1.0.18 (`0799a00`) |
 | Implementer | Codex in Build out Pattaya bar game |
-| Reviewer / playtester | Maintainer and invited device testers; not yet assigned |
+| Reviewer / playtester | Codex verified tests and layout; independent device play pending |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/bartender-ready-indicator`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Staff cooldowns, real-sale indicator/poses, auto-serve price, saves, tests and docs |
-| Next handoff / blocker | Full suite and readiness previews passed; signed release and device feedback remain |
+| Working branch / chat / PR | `codex/staff-priority-nida-renewal`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Relief dispatch, renewal affordability/controls, regression tests and docs |
+| Next handoff / blocker | Full suite and four previews passed; ready for authorized main merge/release; device play remains |
 | Recommended next, when free | **IF-01 — Guided next goal** |
-| Last updated | 2026-11-25 |
+| Last updated | 2026-11-26 |
 
 An empty or stale table is **not evidence that the other contributor is idle**.
 Never overwrite an existing claim or abandon another contributor's unfinished work.

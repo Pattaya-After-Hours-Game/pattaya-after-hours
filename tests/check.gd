@@ -144,6 +144,21 @@ func test_ui() -> void:
 	app.render()
 	use_button(app,"Rehire Bartender 1 · ฿1,200")
 	check(app.model.street.selected().team[0].training==1 and app.model.street.selected().team[0].on,"Rehire control retains training")
+	use_button(app,"Hire Nida · ฿1,200 + 10% drinks")
+	var nida: Dictionary = app.model.street.selected().team.back()
+	nida.contract_left = 1
+	nida.audience_training = 1
+	app.model.s.cash = 1200
+	app.render()
+	var renewal_state: Array = app.street_ui_state()
+	app._process(1.0)
+	check(renewal_state!=app.street_ui_state(),"Contract expiry invalidates Service controls directly")
+	check(find_button(app,"Rehire Nida · ฿1,200").disabled,"Nida renewal disables for insufficient cash including reserve")
+	app.model.s.cash = 50000
+	app._process(1.0)
+	check(not find_button(app,"Rehire Nida · ฿1,200").disabled,"Earning the missing reserve enables renewal without reopening the drawer")
+	use_button(app,"Rehire Nida · ฿1,200")
+	check(nida.on and nida.contract_left>0 and nida.audience_training==1,"Nida renews through frontage UI after live expiry with training retained")
 	for i in 5:
 		app.change_tab(i)
 		check(app.column.get_child_count() > 0,"Rendered tab %d" % i)

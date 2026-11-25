@@ -84,3 +84,41 @@ func run(test: SceneTree) -> void:
 	test.check(loaded.load_game() and is_equal_approx(loaded.street.selected().team[0].service_ready,25.37),"Fractional staff deadlines survive save/restore")
 	loaded.street.economy.staff_service(loaded.street.selected())
 	test.check(loaded.street.selected().team[0].drinks_served==1,"Repeated calls at a fractional timestamp cannot create another serve")
+
+	# Owner automation is relief for a staffed bar, not competition for quiet orders.
+	m = Campaign.new(72)
+	m.s.cash = 20000
+	m.s.street.pass_credit = -10000000
+	b = m.street.selected()
+	e = m.street.economy
+	m.street.action("hire",0)
+	m.street.action("auto_serve")
+	e.staff_service(b)
+	b.customers.clear()
+	e.admit(b)
+	m.street.tick(1)
+	test.check(b.team[0].drinks_served==1 and e.pending(b)==1 and b.serve_ready==0,"Quiet order waits for recovering bartender without spending owner's timer")
+	m.save_game()
+	loaded = Campaign.new(1)
+	test.check(loaded.load_game() and not loaded.street.economy.owner_relief_needed(loaded.street.selected()),"Reload does not turn a quiet order into a rush")
+	e.admit(b)
+	m.street.tick(1)
+	test.check(e.pending(b)==1 and b.serve_ready==e.action_time()+10 and b.team[0].drinks_served==1,"Overflow gets one owner sale on the unchanged shared cooldown")
+	b.customers.clear()
+	e.admit(b)
+	var urgent: Dictionary = b.customers.back()
+	urgent.wait = e.patience(b,urgent)-10
+	test.check(e.owner_relief_needed(b),"Owner rescues urgent order when bartender would miss its deadline")
+	b.team[0].service_ready = e.action_time()+2
+	test.check(not e.owner_relief_needed(b),"A bartender recovering before the deadline still owns a quiet urgent order")
+	b.team[0].service_ready = 0
+	m.street.tick(1)
+	test.check(b.team[0].drinks_served==2 and e.pending(b)==0,"Ready bartender still wins before owner relief")
+	m.street.action("rota",0)
+	e.admit(b)
+	test.check(e.owner_relief_needed(b),"Off-duty staff do not block owner auto-serve coverage")
+	b.team[0].on = true
+	b.team[0].contract_left = 0
+	test.check(e.owner_relief_needed(b),"Expired staff do not block owner coverage")
+	b.customers.clear()
+	test.check(not e.owner_relief_needed(b),"Relief never creates demand")

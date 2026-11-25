@@ -3,7 +3,28 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current ready-bartender / auto-serve verification — 25 November 2026
+## Current bartender-priority / renewal verification — 26 November 2026
+
+`tools/test.sh` passes on Godot 4.7.2: regressions, 42 fresh campaigns and 60
+paired celebration scenarios, with no changed pacing thresholds. Auto-serve
+routes reach the second property in 142.3–149.8 minutes and stage three in
+189.6–196.2 minutes. Baseline manual routes are unchanged.
+
+New checks cover quiet queues waiting for staff without spending the owner timer,
+overflow service on the same ten-second owner deadline, urgency versus staff
+recovery, first staff priority, reload, absent/expired staff and no fake demand.
+Renewal checks cover exact reserve boundaries, full floor rosters, retained
+training, pure quotes and repeated clicks. UI checks expire Nida live, verify
+insufficient cash disables renewal, then enable it after adding cash without
+reopening the drawer and rehire successfully. The expanded UI checks were rerun
+in isolated save/config directories after the full suite and passed.
+
+Four economy previews show Nida's shortfall, funded renewal, renewed contract
+and the owner relief status at 960 × 540; renewal also checked at 1280 × 720.
+No production art changed. Local links and whitespace are checked before commit.
+No Android device playtest or new human balance study has been performed.
+
+## Previous ready-bartender / auto-serve verification — 25 November 2026
 
 The full Godot 4.7.2 suite passes regressions, 42 fresh campaigns and 60 paired
 party scenarios. Active baseline second-property times are 117.7–122.2 minutes;

@@ -157,6 +157,27 @@ static func consume_stock(bar: Dictionary) -> int:
 static func automatic_service(bar: Dictionary) -> bool:
 	return bar.get("auto_serve",false) and bar.get("auto_serve_on",true)
 
+func owner_relief_needed(bar: Dictionary) -> bool:
+	# Staff have already taken their turn. Leave a quiet queue to the team;
+	# the owner's separate timer handles overflow and otherwise lost orders.
+	var workers := on_duty(bar,0)
+	if workers==0: return pending(bar)>0
+	if pending(bar)>workers: return true
+	var next := 1e15
+	for i in bar.team.size():
+		var person: Dictionary = bar.team[i]
+		if contracted(person) and person.on and person.role==0 and not i in bar.away:
+			next = minf(next,maxf(0.0,float(person.get("service_ready",0))-action_time()))
+	for guest in bar.customers:
+		if guest.order and order_seconds_left(bar,guest)<=C.AUTO_SERVE_URGENT_SECONDS and next>=order_seconds_left(bar,guest): return true
+	return false
+
+func auto_serve_status(bar: Dictionary) -> String:
+	if not automatic_service(bar): return "Owner auto-serve is off."
+	if not is_trading(bar): return "Owner auto-serve · venue closed"
+	if on_duty(bar,0)==0: return "Owner auto-serve · covering the bar"
+	return "Owner auto-serve · helping the rush" if owner_relief_needed(bar) else "Owner auto-serve · leaving quiet orders to staff"
+
 static func manager_rate(bar: Dictionary) -> int:
 	return C.MANAGER_INCOME[int(bar.get("manager_level",0))] if bar.manager and bar.get("recovery",0)==0 else 0
 
@@ -365,6 +386,17 @@ func staff_service(bar: Dictionary) -> void:
 			person.last_served = action_time()
 			person.drinks_served += 1
 			person.service_clock = 0 # Retained only for old-save compatibility.
+
+func rehire_offer(bar: Dictionary, index: int) -> Dictionary:
+	if index<0 or index>=bar.team.size(): return {"enabled":false,"reason":"Unknown team member.","price":0,"reserve":0,"required":0}
+	var person: Dictionary = bar.team[index]
+	var amount := contract_cost(int(person.role))
+	var reserve := (operating_rate(bar)+(0 if contracted(person) and person.on else int(C.ROLE_WAGES[int(person.role)])))*2+(pack_price(bar) if person.role==3 else 0)
+	var required := amount+reserve
+	var reason := "Ready to rehire; training is retained."
+	if contracted(person): reason = "Contract still active. Use On duty / Off duty to resume work."
+	elif s.cash<required: reason = "Need ฿%d more: ฿%d fee + ฿%d reserve = ฿%d cash required." % [required-s.cash,amount,reserve,required]
+	return {"enabled":not contracted(person) and s.cash>=required,"reason":reason,"price":amount,"reserve":reserve,"required":required}
 
 func operating_rate(bar: Dictionary, offset: int = 0) -> int:
 	if bar.get("recovery",0)>0: return 0
@@ -901,8 +933,9 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if index<0 or index>=bar.team.size(): return "Unknown team member."
 			var person: Dictionary = bar.team[index]
 			if contracted(person): return "This contract is still active."
-			var amount := contract_cost(int(person.role))
-			if s.cash<amount+(operating_rate(bar)+int(C.ROLE_WAGES[int(person.role)]))*2+(pack_price(bar) if person.role==3 else 0): return "Keep a shift's payroll and the required stock reserve after rehiring."
+			var offer := rehire_offer(bar,index)
+			if not offer.enabled: return offer.reason
+			var amount: int = offer.price
 			s.cash -= amount
 			s.weekly.costs += amount
 			person.contract_left = C.STAFF_CONTRACT_MINUTES
@@ -1049,7 +1082,7 @@ func tick() -> void:
 			if customer.life<=0 and not customer.playing: depart(bar,customer)
 		if bar.restock and bar.stock<pack_quantity(bar) and pending(bar)>0: restock(bar,true)
 		staff_service(bar)
-		if automatic_service(bar): serve(bar,1,true)
+		if automatic_service(bar) and owner_relief_needed(bar): serve(bar,1,true)
 		pool_tick(bar)
 
 func offline(now: int, cap_seconds: int) -> int:

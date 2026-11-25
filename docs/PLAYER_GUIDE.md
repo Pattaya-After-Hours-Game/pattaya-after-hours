@@ -53,7 +53,10 @@ pose now follows an actual sale. Ready staff get the first order before owner
 auto-serve; both still respect the same real stock and customers.
 
 **Owner auto-serve now costs ฿3,000.** It automates your Serve button at its current
-speed, separately from hired bartenders. Existing purchases remain owned; there
+speed as relief: staff lead quiet service; it helps when orders outnumber on-duty
+bartenders or a guest would leave before staff recover (ten seconds or less left).
+With no available bartender it covers all orders. Manual taps still work normally.
+Existing purchases remain owned; there
 is no refund or new purchase required.
 
 ## Your first shift
@@ -320,7 +323,10 @@ her attraction or shorten Chat’s twenty-second recovery.
 Her rota stops new attraction, but commission committed to existing visits/orders
 still settles. Pool games and bar fines do not pay drink commission. The card
 shows commission paid and fractional carry; it is not another fee. At expiry,
-rehire the same person for ฿1,200. Closed/skipped/offline time counts toward her term.
+rehire the same person for ฿1,200. Find **Rehire Nida** directly under Frontage
+promoter. Keep the displayed payroll and one-pack reserve after the fee; the
+control shows exactly how much cash is missing. If her contract is active but
+she is off duty, use her rota instead. Closed/skipped/offline time counts toward her term.
 
 At venue stage two, train Nida or a dancer for ฿800; stage three unlocks a second
 ฿1,600 tier. These improve audience appeal, never bartender speed. Skills stay

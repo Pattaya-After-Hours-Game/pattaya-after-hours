@@ -223,6 +223,16 @@ eligibility, deadline, real orders and stock; a successful settlement records
 processed before owner auto-serve so the purchase cannot continually pre-empt
 them. Multiple workers share the same queue and cannot sell one order twice.
 
+After staff service, owner auto-serve intervenes only when pending orders exceed
+the count of contracted, on-duty, present bartenders, or an order has at most ten
+seconds before patience/visit expiry and even the next bartender cannot recover
+before that deadline. With no eligible bartender it serves normally. Quiet orders
+leave the owner timer untouched; manual service remains unrestricted by this
+relief policy and shares its existing deadline with automation. Promoters, hosts
+and dancers never count as bartenders. The ฿3,000 price is unchanged.
+Forecasts and offline income retain demand-limited sustained capacity estimates;
+they do not simulate the live queue dispatch or promise its exact throughput.
+
 The base cooldown is 25 seconds; training makes subsequent cooldowns 20/15.
 Training preserves a deadline already running. Owner clicks, empty queues,
 stockouts, rotas, closure, reassignments and reloads never reset it. Foreground
@@ -528,3 +538,13 @@ The graphical preview harness renders the opening, pool, free-pool report,
 recovery, all nine venue stages and festival states. It consumes the current
 artwork refresh; it does not replace that artwork. Device playtesting remains
 separate from automated desktop checks.
+
+## Renewal availability
+
+`rehire_offer` supplies the action and UI with the same fee and reserve quote.
+Nida's reserve is two minutes of current payroll plus one delivery at the current
+supplier tier. The cash stays in the till; only the contract fee is charged.
+The frontage section always exposes her renewal control after the first hire,
+with a live shortfall/active-contract explanation. Roster expiry explicitly
+invalidates the UI, independently of history notices. Full floor staffing never
+blocks her separate frontage renewal. No schema change or new rehire reward.

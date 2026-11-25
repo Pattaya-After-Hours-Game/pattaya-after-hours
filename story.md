@@ -89,7 +89,12 @@ clearing a queue no longer sends them back to the beginning of a warmup. Their
 serving pose and the bottom-right staff tally confirm what they sold. When the
 fridge is empty, the indicator says so instead of pretending someone is pouring.
 At ฿3,000, owner auto-serve is a separate convenience for the owner's tapping;
-it does not replace the colleague's own clock or create buyers.
+it does not replace the colleague's own clock or create buyers. Quiet orders
+belong to the bartender. Owner automation steps in when the queue outgrows the
+on-duty team, or a guest would leave before anyone recovers. Without a bartender,
+the owner covers normal service. Nida's return is a clear contract renewal at the
+door: her skills stay, and Anong insists on keeping payroll and a delivery in
+reserve after paying her fee.
 
 > **Anong:** “She's ready. Give her an order, not another stopwatch.”
 

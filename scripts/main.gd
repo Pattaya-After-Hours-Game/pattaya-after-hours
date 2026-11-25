@@ -850,7 +850,8 @@ func street_panel() -> void:
 	body("YOUR ACTION UPGRADES",GOLD,14)
 	body("Per venue · prices preserve next shift’s reserve.",MUTED,12)
 	row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off") if bar.auto_serve else "Buy auto-serve · "+cash(StreetContent.AUTO_SERVE_COST),street_action.bind("auto_serve"))
-	body("Uses your existing Serve cooldown, real orders and stock. Manual taps share that timer. Staff work independently.",MUTED,12)
+	body("Staff serve first. Owner auto-serve helps when orders outnumber on-duty bartenders or an urgent guest would leave before staff recover. Without bartenders it covers all orders. Manual taps share its cooldown.",MUTED,12)
+	live_body(func() -> String: return eco.auto_serve_status(bar),TEAL,12)
 	for i in StreetContent.ACTION_UPGRADES.size():
 		var button := row_button("",street_action.bind("action_upgrade",i))
 		upgrade_controls.append([button,i])
@@ -917,6 +918,13 @@ func street_panel() -> void:
 			var auto: Dictionary = eco.promoter_forecast(bar)
 			var active: Dictionary = eco.promoter_forecast(bar,true)
 			return "Estimate after hire · cash %s; retain %s plus %s stock.\nArrivals %.1f → %.1f/min · staff service %.1f/min\nUnattended net %s → %s/min · commission %s/min\nOwner serving whenever ready: net %s → %s/min\nStreet net change: %s/min unattended; %s/min owner-active.\n%s" % [cash(int(model.s.cash)-1200),cash(eco.operating_rate(bar)*2),cash(eco.pack_price(bar)),auto.before.arrivals,auto.after.arrivals,auto.after.service,cash(auto.before.net),cash(auto.after.net),cash(auto.after.commission),cash(active.before.net),cash(active.after.net),cash(auto.street_delta),cash(active.street_delta),"Service is limiting sales; improve pouring/staff first." if auto.after.service<auto.after.demand else "Requires stock and spare seats; estimates are not actual income."],MUTED,12)
+	else:
+		var nida_index: int = eco.promoter_index(bar)
+		var renew := row_button("Rehire Nida · ฿1,200",street_action.bind("rehire",nida_index))
+		live_body(func() -> String:
+			var offer: Dictionary = eco.rehire_offer(bar,nida_index)
+			renew.disabled = not offer.enabled
+			return "Renewal: ฿%d fee; keep ฿%d for payroll and one delivery. %s" % [offer.price,offer.reserve,offer.reason],GOLD,12)
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
 		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
@@ -927,7 +935,9 @@ func street_panel() -> void:
 			var remaining := int(person.get("contract_left",StreetContent.STAFF_CONTRACT_MINUTES))
 			return ("Contract: %dd %dh %dm left" % [remaining/1440,remaining%1440/60,remaining%60] if remaining>0 else "Contract finished · rehire available")+" · Training %d/2" % int(person.get("audience_training",0) if person.role in [2,3] else person.get("training",0)),GOLD,12)
 		if not eco.contracted(person):
-			row_button("Rehire %s · %s" % [name_text,cash(eco.contract_cost(int(person.role)))],street_action.bind("rehire",i))
+			if person.role!=3:
+				row_button("Rehire %s · %s" % [name_text,cash(eco.contract_cost(int(person.role)))],street_action.bind("rehire",i))
+				live_body(func() -> String: return eco.rehire_offer(bar,i).reason,MUTED,12)
 			continue
 		if person.role==0:
 			live_body(func() -> String: return eco.staff_status(bar,person).text+" · %d staff drinks served" % int(person.get("drinks_served",0)),TEAL,12)
@@ -1145,7 +1155,9 @@ func serve_godzilla() -> void:
 func street_ui_state() -> Array:
 	var bar: Dictionary = model.street.selected()
 	var state := [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day,model.s.phase,bar.open,bar.promo.is_empty(),model.street.economy.is_trading(bar),bar.late_open,bar.raided,bar.clean_remaining>0,bar.dirt==0,model.street.can_skip(),int(model.s.street.minute)/30,"" if model.s.street.history.is_empty() else model.s.street.history.front()]
-	for venue in model.s.street.bars: state.append([venue.raided,venue.clean_remaining>0,venue.dirt==0])
+	for venue in model.s.street.bars:
+		state.append([venue.raided,venue.clean_remaining>0,venue.dirt==0])
+		for person in venue.team: state.append([model.street.economy.contracted(person),person.on,person.role])
 	return state
 
 func _process(delta: float) -> void:

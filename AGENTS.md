@@ -49,7 +49,10 @@ claiming behaviour exists; update the relevant documentation when it changes.
   for switching back. Training belongs to the person and survives expiry/rehire. Base bartender
   service starts ready: sell one real order, then recover for 25 seconds, improving
   to 20/15 through training. Keep the saved deadline through queue changes, owner
-  clicks, rota/role changes and reloads. Staff precede purchased owner auto-serve.
+  clicks, rota/role changes and reloads. Staff precede purchased owner auto-serve. Owner automation is relief: serve
+  when pending orders exceed available bartenders, or a guest has at most ten
+  seconds left and no bartender can recover before their deadline. No eligible
+  bartender means normal owner automation. Manual taps retain their own choice.
   Schema 9 preserves fractional staff deadlines and actual-sale counters; the
   bottom-right indicator and serving poses must reflect those sales, not decorative
   timer loops or offline estimates.
@@ -60,7 +63,9 @@ claiming behaviour exists; update the relevant documentation when it changes.
   commitments after rota/expiry and the saved fractional carry; exclude pool fees.
   Welcome and promoter attraction never stack. Faster Welcome only helps while
   the promoter is off duty/expired; it does not speed Chat or boost her appeal. Audience training is stage-gated,
-  separate from service training, and persists after rehire.
+  separate from service training, and persists after rehire. Keep renewal visible
+  in the frontage section, with exact payroll/stock reserve and shortfall. Expiry
+  must refresh controls independently of history text; never duplicate her slot.
 - Buy stock in complete packs requiring cash and room: six for ฿84 at supplier
   levels 0/1, twelve for ฿144/120/96/72 at levels 2/3/4/5. Supplier upgrades
   cost ฿900/1,200/2,400/4,800/9,600. Preserve inventory purchase costs; discounts never refund old stock. Supplier

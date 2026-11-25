@@ -89,7 +89,7 @@ cash for the next shift—not just a large bank balance.
 | Purchase | Price and effect |
 | --- | --- |
 | Music system | ฿1,200; repeat drink orders after 25 seconds instead of 35. Visitors still need budget, stock and service. |
-| Auto-serve | ฿3,000 per venue; automatically uses the existing Serve timer. Manual taps share it. Toggle it in Service. |
+| Auto-serve | ฿3,000 per venue; uses the existing Serve timer as rush backup for bartenders, or covers the bar without them. Manual taps share it. |
 | Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
 | Manager levels 1 / 2 / 3 | ฿18,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
 | Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; delivery prices ฿84 for 6, then ฿144 / ฿120 / ฿96 / ฿72 for 12. |
@@ -303,3 +303,19 @@ queues and owner clicks do not restart her cooldown. Quiet time readies one
 serve, never a burst of banked sales. Staff get first chance at an order when
 purchased owner auto-serve is also ready; owner manual taps retain their own timer.
 Auto-serve now costs **฿3,000**. Previously owned automation stays owned.
+
+## Bartenders lead; the owner covers the rush
+
+With auto-serve on, staff serve first. Quiet orders wait for the bartender;
+owner automation helps when the queue exceeds the number of on-duty bartenders,
+or a guest has ten seconds or less left and staff cannot recover in time.
+Without an available contracted bartender it covers normal service. Manual taps
+remain available and share the owner's unchanged cooldown. The price stays
+฿3,000 while this division of work is evaluated.
+
+Nida's **Rehire** button now sits directly under **Frontage promoter**, with the
+full cash requirement and exact shortfall. Her ฿1,200 renewal also requires a
+reserve for two minutes of payroll and one current-price delivery. For a basic
+bar without other staff this means ฿1,320 cash: ฿1,200 paid, ฿120 retained.
+Active contracts cannot be renewed early; use her rota if she is off duty.
+Expiry refreshes the controls, and rehiring retains her training and roster slot.

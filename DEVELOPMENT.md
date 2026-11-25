@@ -361,3 +361,9 @@ Schema 9 preserves fractional deadlines and converts old partial work once.
 `tests/staff_ready_check.gd` covers ready service, toggle/reload protection, stock,
 queue sharing, owner separation and migration. The `staff-ready-*` economy preview
 group checks the bottom-right indicator, real serving poses and purchase price.
+
+Owner relief dispatch belongs to `economy.gd::owner_relief_needed`, called after
+staff service. UI status reads this predicate without settling sales. Renewal
+quotes use `rehire_offer` for both validation and frontage UI; contract state is
+part of `street_ui_state` so expiry does not depend on a changed history notice.
+No save schema change is needed for these rules.

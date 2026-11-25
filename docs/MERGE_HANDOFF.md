@@ -1,31 +1,29 @@
 # Current implementation and release handoff
 
-Updated **25 November 2026**. Ready bartenders and the reduced auto-serve price
-are on **`codex/bartender-ready-indicator`**, based on main `fb8ee0f` (published
-v1.0.17). The birthday, bulk deliveries, affordable contracts and earlier graphics
-work are already integrated. Other worktrees and user attachments are preserved.
+Updated **26 November 2026**. The previous ready-bartender feature is merged in
+main at `0799a00` and published as v1.0.18. The follow-up
+**`codex/staff-priority-nida-renewal`** adds bartender-first owner relief and
+clear Nida renewal controls. Other worktrees and user attachments are preserved.
 
-Owner auto-serve costs ฿3,000. Bartenders serve when ready, then recover for
-25/20/15 seconds. Clearing a queue no longer resets their wait. Rotas, closing,
-training and reloads preserve the deadline. Staff precede purchased owner
-automation, sharing real orders and stock. The bottom-right HUD and actual serving
-poses expose their work; no new production assets are introduced.
+Staff always settle first. Owner auto-serve leaves quiet orders to the team,
+helping with overflow or a guest whose deadline staff cannot meet. Without
+eligible bartenders it covers ordinary service. Price remains ฿3,000; manual
+clicks and saved cooldowns are unchanged. No save schema change is needed.
 
-Schema 9 retains fractional deadlines, last-serve timestamps and staff sale
-counts. Existing contracts, training and owned equipment remain; old partial
-work keeps the remaining wait and historical sales are not invented. There is
-no retroactive refund for the lower auto-serve price. Offline estimates retain
-sustained demand-limited service and do not inflate live counters.
+Nida's renewal lives in Frontage promoter, showing the exact fee, payroll and
+stock reserve, and cash shortfall. Expiry refreshes the roster independently of
+history messages. Tests cover live expiry, earning the missing reserve, renewing
+with a full floor roster and retaining training without duplicate charges.
 
-Verification uses the full regression/pacing suite, paired celebration scenarios
-and readiness previews. See [testing](TESTING.md) and [economy](ECONOMY.md) for
-measured results. Publication follows the authorized main-branch signed build
-workflow; verify its run and
+Full regressions, 42 fresh campaigns, 60 paired celebration scenarios and four
+960 × 540 previews pass; renewal is also inspected at 1280 × 720. See
+[testing](TESTING.md) for results and device limitations. Documentation and story
+reflect the resulting rules. The feature is ready for the authorized main merge
+and signed release workflow. Verify the workflow and
 [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for the actual tag/source. Device play and human balance feedback remain separate.
+for the actual published tag/source; this source handoff does not predict it.
 
-The earlier PR #4/#5 review scope is unchanged. This is a feature handoff, not a
-new audit of every conversation. The consolidation audit below is historical.
+The consolidation audit below is historical, not a new audit of every chat.
 
 ## Historical consolidation audit
 
