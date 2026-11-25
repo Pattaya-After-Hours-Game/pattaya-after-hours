@@ -15,6 +15,11 @@ player-facing overview is in [README.md](README.md).
 - Retained progression targets with tested investment strategies; manual upgrades
   and Chat remain optional. Added action, UI, save and no-chat balance regressions.
 
+## Unreleased — Visible campaign day counter
+
+- Show an explicit DAY number above the clock, starting at Day 1 and using the
+  existing saved calendar. Midnight advances it; offline estimates do not.
+
 ## Unreleased — Game clock and overnight preparation
 
 - Added a one-game-minute-per-second clock, noon opening, 1am closing and nightly

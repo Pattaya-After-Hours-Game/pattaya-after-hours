@@ -53,7 +53,9 @@ cash for the next shift—not just a large bank balance.
 
 The clock runs at **one game minute per real second**. Venues open at **12pm**
 and normally close at **1am**: thirteen real minutes of trading. The date changes
-at midnight; business reports still cover two real minutes of trading.
+at midnight; the **DAY** counter above the clock tracks your campaign from
+**Day 1** onward and is kept in your save. Business reports still cover two real
+minutes of trading.
 
 Each venue has its own peak: **beer bars 5–9pm**, **Soi venues 7–11pm**, and
 **gogos 10pm–2am**. Peak trade adds 50% attraction and doubles dirt per drink sold;
