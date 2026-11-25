@@ -101,7 +101,7 @@ opening windows. Existing appointments are retained as level 1.
 
 The **฿/s beneath the till** refreshes every five foreground seconds and shows
 net street trading: receipts minus stock purchases, operating costs, commission
-and fines. It excludes equipment/contract purchases and offline lump sums.
+and fines. It excludes equipment/contract purchases, nightly tip counts and offline lump sums.
 Nida now faces toward the street; a purchased music system has a playing/off
 indicator. Sound/Muted remains independent of the business upgrade.
 
@@ -170,7 +170,7 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 10.
+retain money, staff, venues and owned stages when migrated to save schema 11.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
 Schema 9 preserves staff cooldown deadlines and actual service counters. Older
 partial work is converted once; existing purchases get no refund. Schema 8 retains celebration dates, active/last reports and visitor patience,
@@ -212,8 +212,8 @@ The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
 are checked together with 42 fresh-campaign simulations plus 60 paired celebration scenarios. Baseline active
-runs reach stage 2 in 34–37 minutes, a second venue in 102–105 minutes and stage 3
-in 142–145 minutes. Optional promoter-first investment takes longer to repay;
+runs with nightly tips reach stage 2 in 32–34 minutes, a second venue in 94–98 minutes and stage 3
+in 131–136 minutes. Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
@@ -357,3 +357,18 @@ At zero, completed cleaning is retained and the existing skip moves the clock
 to noon. Stock is not bought, no income is awarded, and contracts age through the
 skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
 The date already advanced at midnight, so the jump does not add another day.
+
+## Anong counts the tip jar
+
+Each customer visit earns **฿10 on its first successfully served drink**. Extra
+rounds do not tip again. At nightly street closure, Anong counts the jars and adds
+the money to your till before the fifteen-second clean-up. Service and Journal
+show pending visits, the last payout and total tips. Cancelling the jump, reloading
+or reopening the report cannot pay twice. Offline estimates earn no tips.
+
+For **zero stock and too little cash for a pack**, Service now shows **Bo's
+recovery delivery · 6 drinks** beside the stock control. It costs nothing upfront:
+฿14 is repaid on each sale, staff go off duty and Anong covers two minutes of
+overhead. Existing orders remain. That gets a ฿39 till trading again immediately;
+nightly tips help fund the next opening. Normal deliveries still require the full
+pack price and room. See the [tip/recovery design](docs/design/NIGHTLY_TIPS.md).

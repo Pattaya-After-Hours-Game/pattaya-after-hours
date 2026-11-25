@@ -89,6 +89,7 @@ func run() -> void:
 	load("res://tests/street_check.gd").new().run(self)
 	load("res://tests/clock_check.gd").new().run(self)
 	load("res://tests/night_prep_check.gd").new().run(self)
+	load("res://tests/tips_check.gd").new().run(self)
 	load("res://tests/action_check.gd").new().run(self)
 
 	load("res://tests/staff_check.gd").new().run(self)
@@ -102,6 +103,7 @@ func run() -> void:
 	test_windows_updates()
 	load("res://tests/boot_menu_check.gd").new().run(self)
 	await load("res://tests/action_check.gd").new().run_ui(self)
+	await load("res://tests/tips_check.gd").new().run_ui(self)
 	await load("res://tests/balance_guidance_check.gd").new().run_ui(self)
 	await test_ui()
 	load("res://tests/art_check.gd").new().run(self)

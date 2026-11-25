@@ -73,6 +73,25 @@ With no available bartender it covers all orders. Manual taps still work normall
 Existing purchases remain owned; there
 is no refund or new purchase required.
 
+## Empty fridge and not enough cash?
+
+Look directly below **Buy drinks** for **Bo's recovery delivery · 6 drinks**.
+It appears when you have no stock and cannot afford your current pack. You can
+use it while open: waiting orders stay, staff go off duty, and you take over
+serving. Anong covers overhead for two minutes. Bo takes ฿14 per consignment
+drink when sold. Repeated clicks cannot add more stock or restart that cover.
+
+At ฿39, two ordinary ฿55 beers leave ฿121 after repaying Bo: enough for a normal
+฿84 six-pack. Outstanding Nida commissions can reduce this; existing commissions
+remain due. Budget room and cash for the whole pack as usual. Closed venues also
+retain Owner-run recovery; raids/closed hours must finish before reopening.
+
+**Nightly tips:** one served visit adds ฿10 pending, regardless of how many rounds
+that guest buys. All bars' jars are counted once after the last nightly closure,
+before clean-up. Service and Journal show the amounts. No customer served means
+no tip. Pool and manager income do not tip; offline estimates never add tips.
+The pending jar is not spendable until counted. Keep stock money aside meanwhile.
+
 ## Your first shift
 
 1. Serve the three opening customers. A yellow/gold dot marks an order; red means

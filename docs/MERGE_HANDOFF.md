@@ -1,23 +1,29 @@
 # Current implementation and release handoff
 
-Updated **26 November 2026**. Main `e71d156` shipped as **v1.0.20**. The follow-up
-**`codex/automatic-night-prep`** adds the requested automatic closing routine.
-After the last nightly venue closure, all dirty venues clean for fifteen seconds
-and the street jumps to noon. The prominent Stay here button cancels the jump
-for this night while cleaning continues; manual skip remains available.
+Updated **26 November 2026**. Main `f345971` shipped as **v1.0.21**. The follow-up
+**`codex/nightly-tips-recovery`** adds Anong's nightly tip jar and exposes Bo's
+existing consignment recovery beside an unaffordable stock purchase.
 
-Late-trading venues delay the countdown, and temporary event closures cannot
-prematurely end their scheduled night. Menu/offline time does not advance it;
-district/arcade views pause the countdown while its control is hidden. Existing
-noon behaviour retains owner closures, stock, contract ageing and the date.
-Schema 10 preserves remaining time/cancellation; older saves gain no pending jump.
+Earn ฿10 once per visit with a real drink sale, regardless of server. Count all
+jars after the last nightly closure, before the fifteen-second clean-up; Stay,
+reload and manual skip cannot repeat the payout. Tips stay separate from drink
+sales, staff commission, healthy margins and the five-second trading rate.
+Schema 11 preserves pending/paid counts and the settled night; older saves retain
+owned progress with no retrospective tips. Offline estimates earn no tips.
 
-Full regressions, 42 fresh campaigns and sixty paired party scenarios pass with
-unchanged balance bounds. Four 960 × 540 previews and the 1280 × 720 cancellation
-state are reviewed. See [testing](TESTING.md). No production art changed.
+An empty fridge with insufficient full-pack cash offers six consignment drinks:
+no upfront payment, ฿14 paid per drink sold, staff off duty and two minutes of
+Anong's overhead cover. Existing orders and cooldowns remain. Repeated clicks
+cannot stack stock or cover; legal opening and raid restrictions still apply.
 
-Ready for authorized main integration and the signed release workflow. Verify
-its run and the [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+Full regressions, 42 fresh campaigns and sixty paired party scenarios pass.
+The active stage-three lower bound moves explicitly from 135 to 130 minutes for
+this earned bonus; other acceptance bounds are unchanged. Five economy states
+are reviewed at 960 × 540 and 1280 × 720. See [testing](TESTING.md) and the
+[design](design/NIGHTLY_TIPS.md). No production art changed.
+
+Ready for the user-authorized main integration and signed release workflow.
+Verify its run and the [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
 for the published source/tag. Device play remains unverified. Other worktrees and
 user attachments are preserved. The audit below is historical.
 

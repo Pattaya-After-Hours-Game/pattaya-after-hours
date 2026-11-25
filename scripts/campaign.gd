@@ -666,7 +666,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -693,6 +693,8 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)<11:
+					for key in Street.Economy.tip_fields(): defaults.erase(key)
 				if int(parsed.version)<7:
 					for key in Street.Economy.automation_fields(): defaults.erase(key)
 				if int(parsed.version)<6:
@@ -787,6 +789,15 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=11:
+			if not _finite_number(parsed.street.get("tip_night"),-1,1e12) or float(parsed.street.tip_night)!=floorf(float(parsed.street.tip_night)): return null
+			for bar in parsed.street.bars:
+				for key in ["tip_visits","tips_total"]:
+					if not _finite_number(bar.get(key),0,1e15) or float(bar[key])!=floorf(float(bar[key])): return null
+				if not bar.last_tips.is_empty():
+					for key in ["day","visits","amount"]:
+						if not _finite_number(bar.last_tips.get(key),0,1e15) or float(bar.last_tips[key])!=floorf(float(bar.last_tips[key])): return null
+					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT: return null
 		if int(parsed.version)>=10:
 			var prep: Variant = parsed.street.get("night_prep")
 			if not prep is Dictionary: return null

@@ -7,6 +7,8 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
 	var st: Dictionary = s.street
 	st.merge({"celebration":{"day":0,"report":{},"last_report":{}}})
+	st.merge({"tip_night":-1})
+	if int(s.get("version",1))<11: st.tip_night = -1
 	st.merge({"earnings_seconds":0,"earnings_net":0,"net_per_second":0.0})
 	if not st.has("economy_seed"): st.economy_seed = 1
 	if not st.has("next_group"): st.next_group = 1
@@ -17,6 +19,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		var defaults := new_fields()
 		for key in defaults:
 			if not bar.has(key): bar[key] = defaults[key]
+		if int(s.get("version",1))<11: bar.merge(tip_fields(),true)
 		for key in ["serve_ready","welcome_ready","welcome_until"]: bar[key] = float(bar[key])
 		bar.equipment.merge({"music":0})
 		if int(s.get("version",1))<7:
@@ -121,11 +124,45 @@ static func new_fields() -> Dictionary:
 		"welcome":0,"welcome_until":0.0,"welcome_ready":0.0,"serve_ready":0.0,"service_clock":0,"cost_credit":0,
 		"regulars":0,"happy":0,"healthy":0,"shift":ledger(),"last_shift":{},"recent":[],"recent_sales":[],"recent_orders":[],
 		"pool_games":0,"pool_income":0,"free_games":0,"arrivals":0,"orders":0,"sold":0,"lost_full":0,"lost_service":0,"lost_stock":0,"host_requests":[]}
+	fields.merge(tip_fields())
 	fields.merge(automation_fields())
 	fields.merge(promoter_fields())
 	fields.merge(clock_fields())
 	fields.merge(action_fields())
 	return fields
+
+static func tip_fields() -> Dictionary:
+	return {"tip_visits":0,"tips_total":0,"last_tips":{}}
+
+func settle_tips() -> Dictionary:
+	var report := {"visits":0,"amount":0}
+	if s.phase!="plan" or s.street.minute<C.CLOSE_MINUTE or s.street.minute>=C.OPEN_MINUTE: return report
+	for venue in s.street.bars:
+		if is_trading(venue): return report
+	if int(s.street.tip_night)==int(s.day): return report
+	# The street calls this only at a real nightly closure or explicit night skip.
+	s.street.tip_night = int(s.day)
+	for bar in s.street.bars:
+		var visits := int(bar.tip_visits)
+		var amount := visits*C.TIP_PER_VISIT
+		bar.last_tips = {"day":maxi(1,int(s.day)-1),"visits":visits,"amount":amount}
+		bar.tip_visits = 0
+		bar.tips_total += amount
+		report.visits += visits
+		report.amount += amount
+	s.cash += report.amount
+	s.weekly.revenue += report.amount
+	s.street.earned += report.amount
+	return report
+
+func tips_text(bar: Dictionary) -> String:
+	var text := "Tip jar: %d served visits × ฿%d = ฿%d pending. Counted at street closing." % [bar.tip_visits,C.TIP_PER_VISIT,int(bar.tip_visits)*C.TIP_PER_VISIT]
+	if not bar.last_tips.is_empty():
+		text += "\nLast count · day %d: %d served visits · ฿%d paid. Total tips ฿%d." % [bar.last_tips.day,bar.last_tips.visits,bar.last_tips.amount,bar.tips_total]
+	return text
+
+func emergency_stock_available(bar: Dictionary) -> bool:
+	return bar.stock==0 and s.cash<pack_price(bar) and int(bar.recovery)==0 and bar.closed==0 and not bar.raided and scheduled(bar,int(s.street.minute))
 
 static func automation_fields() -> Dictionary:
 	return {"auto_serve":false,"auto_serve_on":true,"supplier_level":0,"stock_lots":[],"manager_level":0}
@@ -628,6 +665,7 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		bar.shift.consumed_stock += consumed
 		customer.budget -= customer.quoted
 		customer.order = false
+		if customer.drinks==0: bar.tip_visits += 1
 		customer.drinks += 1
 		customer.next = repeat_order_seconds(bar)
 		party_add(bar,"sales")
@@ -877,9 +915,11 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			bar.close_reason = ""
 			if is_trading(bar): bar.clean_remaining = 0
 			return status(bar)
-		"recovery":
-			if bar.open: return "Close the venue before taking an owner-run recovery shift."
-			if s.cash>=120: return "You have enough cash to reopen normally; recovery cover is for an empty till."
+		"recovery", "emergency_stock":
+			if id=="emergency_stock" and not emergency_stock_available(bar): return "Recovery delivery needs an empty fridge, insufficient pack cash and a legal opening; existing recovery must finish first."
+			if id=="recovery" and bar.open: return "Close the venue before taking an owner-run recovery shift."
+			if s.cash>=maxi(120,pack_price(bar)): return "You have enough cash to reopen normally; recovery cover is for an empty till."
+			if bar.recovery>0: return "Recovery cover is already running."
 			if bar.closed>0 or bar.raided or not scheduled(bar,int(s.street.minute)): return "Wait until the venue is allowed to open."
 			for member in bar.team: member.on = false
 			bar.recovery = 120

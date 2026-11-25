@@ -23,7 +23,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -142,6 +142,23 @@ func run() -> void:
 	app.model.street.action("skip")
 	app.drawer_open = false
 	await capture(app,"night-prep-noon")
+	app.model = Campaign.new(72)
+	app.model.s.cash = 39
+	app.model.s.street.minute = 1045
+	app.model.street.selected().stock = 0
+	app.drawer_open = true
+	await capture(app,"tips-stockout","Buy 6 drinks")
+	app.model.street.action("emergency_stock")
+	await capture(app,"tips-recovery","Buy 6 drinks")
+	app.model.street.economy.serve(app.model.street.selected(),2)
+	await capture(app,"tips-pending","NIGHTLY TIPS")
+	app.model.s.day = 2
+	app.model.s.street.minute = 59
+	app.model.street.tick(1)
+	app.drawer_open = false
+	await capture(app,"tips-closing")
+	app.drawer_open = true
+	await capture(app,"tips-paid","PREP FOR OPENING")
 	app.model = Campaign.new(72)
 	app.model.s.day = 6
 	app.drawer_open = false

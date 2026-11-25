@@ -563,7 +563,7 @@ func metric(x: int,name_text: String,value: String,tint: Color) -> void:
 	var label := abs_text(root_ui,Rect2(x,13 if name_text=="TILL" and campaign_before_tutorial==null else 20,105,24),value,16 if name_text=="TILL" else 18,tint)
 	if name_text=="TILL" and campaign_before_tutorial==null:
 		var rate := abs_text(root_ui,Rect2(x,33,105,14),"",10,TEAL)
-		rate.tooltip_text = "Net street trading over the last five foreground seconds: income less stock, wages, commission and fines. Excludes upgrade purchases and offline claims."
+		rate.tooltip_text = "Net street trading over the last five foreground seconds: income less stock, wages, commission and fines. Excludes upgrade purchases, nightly tips and offline claims."
 		live_labels.append([rate,func() -> String: return "%s฿%.2f/s" % ["+" if model.s.street.net_per_second>=0 else "−",absf(model.s.street.net_per_second)]])
 		rate.text = live_labels.back()[1].call()
 	if campaign_before_tutorial == null:
@@ -829,6 +829,12 @@ func update_action_controls() -> void:
 
 func stock_button() -> void:
 	stock_controls.append(row_button("Buy drinks",street_action.bind("stock")))
+	var recovery := row_button("Bo's recovery delivery · 6 drinks",street_action.bind("emergency_stock"))
+	recovery.name = "EmergencyStock"
+	live_body(func() -> String:
+		var target: Dictionary = model.street.selected()
+		recovery.visible = model.street.economy.emergency_stock_available(target)
+		return "No upfront cash. ฿14 per drink is paid when sold. Staff go off duty; Anong covers 2 minutes of overhead. Existing orders stay." if recovery.visible else "",GOLD,12)
 	var bar: Dictionary = model.street.selected()
 	live_body(func() -> String: return "%d/%d stocked · cash after pack %s · next operating charge ≤%s" % [bar.stock,model.street.capacity(bar),cash(int(model.s.cash)-model.street.economy.pack_price(bar)),cash(ceili(model.street.economy.operating_rate(bar)/60.0))],MUTED,12)
 
@@ -891,6 +897,7 @@ func street_panel() -> void:
 	update_action_controls()
 	if not eco.is_trading(bar):
 		body("PREP FOR OPENING",GOLD,14)
+		live_body(func() -> String: return eco.tips_text(bar),TEAL,12)
 		live_body(func() -> String: return "Cleanliness %d%% · %.1f%% less attraction\n%s\nStock %d/%d · %d bartenders ready" % [100-int(bar.dirt),float(bar.dirt)/StreetContent.DIRT_LIMIT*StreetContent.DIRT_ATTRACTION_PENALTY*100.0,"Cleaning: %ds remaining" % bar.clean_remaining if bar.clean_remaining>0 else "Clean" if bar.dirt==0 else "Cleaning unfinished",bar.stock,eco.stock_capacity(bar),eco.on_duty(bar,0)],WHITE,13)
 		if bar.dirt>0 and bar.clean_remaining==0: row_button("Clean venue · 15 seconds",street_action.bind("clean"))
 		stock_button()
@@ -1007,6 +1014,8 @@ func street_panel() -> void:
 	if bar.stage<3:
 		row_button("Upgrade · "+cash(model.street.upgrade_cost(bar)),street_action.bind("upgrade"),true)
 		live_body(func() -> String: return eco.upgrade_reason(bar),MUTED,13)
+	body("NIGHTLY TIPS",GOLD,14)
+	live_body(func() -> String: return eco.tips_text(bar),TEAL,13)
 	shift_report(bar)
 	chapter_panel()
 	row_button("Promotions & free pool",change_tab.bind(1))
@@ -1064,6 +1073,10 @@ func street_event_panel() -> void:
 func journal_panel() -> void:
 	character_card("anong","Anong","The street, the stories, and the books.")
 	chapter_panel()
+	body("NIGHTLY TIP JARS",GOLD,14)
+	for venue in model.s.street.bars:
+		body(venue.name,GOLD,13)
+		live_body(func() -> String: return model.street.economy.tips_text(venue),TEAL,13)
 	celebration_panel()
 	body("STREET STORIES",GOLD,12)
 	for line in model.s.street.history: body(str(line),WHITE,13)

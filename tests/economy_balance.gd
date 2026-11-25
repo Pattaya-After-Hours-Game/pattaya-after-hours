@@ -152,7 +152,7 @@ func run() -> void:
 				printerr("ECONOMY FAIL: strategy bypassed cash or customer limits")
 				failures += 1
 			# Opening-arc pass: preserve the first renovation, shorten the mid-game saving wall.
-			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,7500],"stage3":[8100,14400]}
+			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,7500],"stage3":[7800,14400]}
 			if style!="mostly-idle" and (result.manager_saving_gap>1800 or result.longest_investment_gap>2280):
 				printerr("PACING FAIL: excessive saving gap / "+style)
 				failures += 1

@@ -164,7 +164,7 @@ Anong's next-step guidance is a pure read of chapter requirements and business
 state. Navigation may select a venue/tab and scroll, never purchase, pay rewards,
 advance chapters/time, or run RNG. Retain the shared chapter predicates and
 existing gates. Current active pacing bounds keep stage two at 30–45 minutes,
-second property at 90–125 and stage three at 135–240. Measure the saving gaps as
+second property at 90–125 and stage three at 130–240. Measure the saving gaps as
 well: first-manager wait at most 30 minutes and longest between-investment gap
 at most 38 in baseline active policies. These are balance checks, not wait timers.
 
@@ -175,3 +175,12 @@ as a trigger. Stay here cancels for the current night without stopping cleaning;
 manual skip remains available. Schema 10 preserves remaining time/cancellation.
 No countdown on the menu/offline, or while district/arcade hides the cancel
 control. Preserve normal skip contract ageing, owner closures, stock and dates.
+
+Nightly tips are ฿10 per real served visit, once on its first drink. Use saved
+customer.drinks and bar.tip_visits; ordinary close/open, pool, manager and offline
+income never earn/pay tips. Count jars once per night before clean-up (or manual
+night skip), retaining paid reports and the settlement marker in schema 11.
+Keep tip receipts out of commission, drink counters, healthy-service margins and
+the five-second trading sample. Older saves get no retroactive tips. Expose the
+existing six-drink consignment recovery beside unaffordable empty stock; preserve
+orders/cooldowns, staff-off rota and ฿14 per sale, with no cover/stock stacking.

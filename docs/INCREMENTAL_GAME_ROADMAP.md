@@ -22,13 +22,13 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Automatic closing clean-up and cancellable next-day jump |
-| Status | REVIEW; local verification passed; previous feature shipped in v1.0.20 (`e71d156`) |
+| Active feature | Nightly tip jar and visible stockout recovery |
+| Status | REVIEW; implementation verified; previous feature shipped in v1.0.21 (`f345971`) |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Codex verified tests and layout; independent device play pending |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/automatic-night-prep`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Night-prep clock/cancellation, save migration, controls, tests and docs |
+| Working branch / chat / PR | `codex/nightly-tips-recovery`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Tip settlement, stockout recovery control, migration, balance tests and docs |
 | Next handoff / blocker | 42 campaigns, regressions and previews passed; ready for authorized main release; human play pending |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-26 |

@@ -10,6 +10,44 @@ The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
 
+## Nightly tip settlement and recovery — 26 November 2026
+
+Each real visit's first successful drink sale increments `bar.tip_visits`; the
+saved `customer.drinks` counter prevents repeat tips for further rounds. Manual,
+staff and owner automation share settlement. Tips are an additional house bonus
+of ฿10 per served visit, outside the existing drink budget and Nida's commission.
+They are never earned by arrivals alone, pool, managers or offline estimates.
+
+The street counts all jars at final nightly closure, or an explicit legal night
+skip. Daytime close/open toggles and short business reports do not count them.
+`street.tip_night` prevents a second settlement on the same night, and pending
+counts clear atomically into each bar's `last_tips` and `tips_total`. If a player
+reopens a late venue after its jar was counted, newly earned tips remain pending
+until the next nightly count. Waiting for a late venue to finish does not multiply
+the bonus. Cancellation of the clean-up jump does not undo or repay tips.
+
+Cash, weekly revenue and total street earnings receive the payout. Drink/pool
+counters, shift profitability/healthy-service gates, party/promotion reports and
+the five-second trading-rate sample exclude it. The separate tip report explains
+the amount. Offline projections neither earn nor count pending tips. Schema 11
+validates these fields; older saves begin with zero counts, with no reward for
+historical visits or an already-served customer's next drink.
+
+A visible emergency delivery handles zero stock and insufficient cash for the
+current pack. It uses the existing recovery terms: six consignment units, ฿14
+charged on each sale, staff off duty and 120 seconds of covered overhead. No cash
+is granted and existing orders/cooldowns remain. An active recovery period cannot
+be restarted; normal deliveries still use six/twelve units. The eligibility check
+uses the actual pack price, so a ฿130 till unable to buy a ฿144 bulk pack can recover.
+
+The earned bonus intentionally brings active baseline stage three forward to
+130.7–135.9 minutes; its acceptance lower bound is now 130 rather than 135 minutes.
+First renovation remains within 30–45 minutes; second property within 90–125.
+Current baseline measurements: pool 14.4–17.1, stage two 31.6–34.0, manager
+79.2–82.9, second property 93.8–98.0 minutes. First purchase remains 2.5–4.4.
+Earlier measurements below describe the opening-arc pass before nightly tips.
+No prices or customer/regular/healthy-shift thresholds were reduced for this bonus.
+
 ## Weekly calendar celebrations
 
 Day seven is Anong's Birthday at the flagship Blue Hour. Day fourteen/twenty-one/

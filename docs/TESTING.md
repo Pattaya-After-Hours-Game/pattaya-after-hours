@@ -3,7 +3,29 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current automatic night-prep verification — 26 November 2026
+## Current nightly tips and recovery verification — 26 November 2026
+
+Godot 4.7.2 `tools/test.sh` passes all gameplay/save/UI regressions, 42 fresh
+campaigns and sixty paired celebration scenarios. `tips_check.gd` covers real
+first-sale visit counting, repeated drinks, no-order/stockout calls, staff and
+owner automation, separate commission/accounting, late multi-venue closure,
+Stay/reload/skip repeat safety, schema-ten migration, malformed saves and offline
+exclusion. Its UI test clicks the recovery button in the reported ฿39/zero-stock
+state. Two regular beer sales repay Bo and leave ฿121; a normal six-pack then
+costs ฿84. Bulk supplier recovery uses the current pack's affordability.
+
+Baseline active results: stage two 31.6–34.0 minutes, second property 93.8–98.0,
+first stage three 130.7–135.9. The active stage-three lower acceptance bound is
+explicitly relaxed from 135 to 130 minutes for earned tips; all other bounds are
+unchanged. Earlier tables below are historical, before tips.
+
+Five `tips-*` economy previews at 960 × 540 and 1280 × 720 show the stockout,
+consignment delivery, pending jar, closing payout and prep report. The actual
+customer art, stock count, till and cancellation control remain visible. No
+production artwork changed. Device play and human retention feedback remain
+unverified; automated exports do not establish either.
+
+## Previous automatic night-prep verification — 26 November 2026
 
 `tools/test.sh` passes gameplay/save/UI regressions, 42 fresh campaigns and sixty
 paired party scenarios on Godot 4.7.2. Existing pacing bounds are unchanged.

@@ -41,7 +41,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	economy = Economy.new(s,fresh)
-	s.version = 10
+	s.version = 11
 
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()
@@ -126,7 +126,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","rehire","train_staff","train_audience","auto_serve":
+		"serve","stock","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:
@@ -144,6 +144,7 @@ func action(id: String, index: int = 0) -> String:
 			result = "Staying for prep. Cleaning continues; use Skip to 12pm when ready."
 		"skip":
 			if not can_skip(): return "Skip is available after 1am when every venue has stopped trading."
+			count_tips()
 			economy.advance_contracts(C.OPEN_MINUTE-int(s.street.minute))
 			s.street.minute = C.OPEN_MINUTE
 			reopen_noon()
@@ -363,8 +364,15 @@ func night_ready() -> bool:
 		if bar.open and not bar.raided and Economy.scheduled(bar,int(s.street.minute)): return false
 	return true
 
+func count_tips() -> void:
+	var report: Dictionary = economy.settle_tips()
+	if report.amount>0:
+		record("Anong counts the tip jars: %d served visits × ฿%d = ฿%d added to the till. Tomorrow's cold beer fund." % [report.visits,C.TIP_PER_VISIT,report.amount])
+
 func night_prep_tick() -> void:
-	if not night_prep_visible or not night_ready(): return
+	if not night_ready(): return
+	count_tips()
+	if not night_prep_visible: return
 	var prep: Dictionary = s.street.night_prep
 	if int(prep.night)!=int(s.day):
 		prep.night = int(s.day)
@@ -383,7 +391,9 @@ func night_prep_tick() -> void:
 		checkpoint_requested.emit()
 
 func night_prep_text() -> String:
-	return "Closing clean-up · noon in %ds\nStay here · cancel automatic jump" % int(s.street.night_prep.remaining)
+	var tips := 0
+	for bar in s.street.bars: tips += int(bar.last_tips.get("amount",0))
+	return "Tips ฿%d counted · noon in %ds\nStay here · cancel automatic jump" % [tips,int(s.street.night_prep.remaining)]
 
 func raid_chance() -> float:
 	return C.RAID_BASE_CHANCE+C.RAID_HEAT_CHANCE*clampi(int(s.heat),0,100)

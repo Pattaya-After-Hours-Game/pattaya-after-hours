@@ -4,6 +4,15 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Source update — Anong's nightly tips and visible recovery
+
+- Bank ฿10 per actually served customer visit, count each jar once at nightly
+  closing, and show pending/paid amounts in Service, Journal and the countdown.
+- Added Bo's recovery delivery beside unaffordable empty stock, using consignment
+  rather than a cash grant. Keeps orders; staff off duty and two minutes' cover.
+- Schema eleven retains tip reports and settlement identity without retroactive
+  rewards. Tips stay outside drink commission, healthy-service and offline income.
+
 ## Source update — Automatic closing clean-up
 
 - All venues receive a free fifteen-second clean-up after the last nightly closure,

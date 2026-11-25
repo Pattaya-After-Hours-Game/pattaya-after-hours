@@ -380,3 +380,9 @@ The street UI exposes cancellation and signals whether its control can be seen;
 it never decrements a countdown itself. Schema 10 validates `street.night_prep`
 and migrates older saves with no pending jump. `tests/night_prep_check.gd` covers
 completion, cancellation, reload, offline exclusion, late venues and migration.
+
+Schema 11 adds `street.tip_night` and venue tip counters/reports. `economy.gd`
+earns tips only on a first served drink and settles them outside normal sales
+ledgers; `street.gd` triggers counting at nightly closure or legal manual skip.
+The shared recovery action accepts `emergency_stock` for an eligible open venue,
+so UI does not perform an independent cash grant or discard existing orders.

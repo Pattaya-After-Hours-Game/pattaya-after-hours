@@ -150,6 +150,24 @@ contracts and stories should keep reinforcing the same business: attract,
 retain, serve and reinvest. [Economy rules](docs/ECONOMY.md) are authoritative for
 exact settlement and [the player guide](docs/PLAYER_GUIDE.md) explains controls.
 
+## The coins under the till
+
+At closing, Anong finds the jar the previous owner labelled “miscellaneous”.
+It turns out to contain money, not another set of keys that fits nothing.
+
+> **Anong:** “Ten baht from someone you actually served. Count the customers,
+> not how many times you pressed the button. Tomorrow needs cold beer too.”
+
+Each served visit adds ฿10 to the house tip jar, counted once when the street
+finishes its night. Another round from the same guest does not add another tip.
+The closing countdown shows the money counted; Service and Journal keep the
+receipt. These are actual live customers, not an offline attendance bonus.
+
+If the fridge empties first, Bo offers six drinks on consignment: he takes ฿14
+back when each one sells. Anong covers two minutes of overhead while the owner
+serves and the staff take a break. The jar helps tomorrow; Bo's recovery delivery
+gets tonight moving again. Neither prints customers or gives away the stock.
+
 ## Noon, last orders and tomorrow's mop
 
 The playable day now has a clock: noon opening, 1am closing, and an optional
