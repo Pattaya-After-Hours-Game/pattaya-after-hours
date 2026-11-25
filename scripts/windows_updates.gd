@@ -3,8 +3,8 @@ extends Node
 signal update_available
 const EXECUTABLE = "PattayaAfterHours.exe"
 const ARCHIVE = "PattayaAfterHours-windows-x86_64.zip"
-const BASE = "https://github.com/rknell/pattaya-after-hours/releases/download/"
-const LATEST = "https://api.github.com/repos/rknell/pattaya-after-hours/releases/latest"
+const BASE = "https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/download/"
+const LATEST = "https://api.github.com/repos/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest"
 const PREFIX = ".pattaya-update-"
 const WORKER = "UpdateWorker.exe"
 const BACKUP = "PreviousVersion.exe"

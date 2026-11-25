@@ -28,7 +28,7 @@ a 960 × 540 logical canvas, and landscape mobile orientation.
 Clone the repository, then run from its root:
 
 ```sh
-git clone https://github.com/rknell/pattaya-after-hours.git
+git clone https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours.git
 cd pattaya-after-hours
 tools/setup-linux.sh --templates
 export PATH="$HOME/.local/bin:$PATH"
@@ -203,6 +203,20 @@ use the desktop-only command above when those credentials are unavailable.
 References: [Godot Android export guide](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_android.html)
 and [4.7.2 Android exporter source](https://github.com/godotengine/godot/blob/4.7.2-stable/platform/android/export/export_plugin.cpp).
 The pinned source is authoritative for version-specific SDK defaults.
+
+## Automatic releases
+
+Every push to `main` runs the campaign checks and exports the Windows, Linux,
+macOS and signed Android builds. GitHub publishes a release after the files and
+checksums are ready. The workflow run number sets the patch version and Android
+version code without committing version changes. Retry a failed run from the
+Actions tab to reuse its version.
+
+The `game-release` GitHub environment is limited to `main`. Its
+`ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD` secrets provide the
+existing Android signing identity. The workflow checks the APK against the
+published signing certificate before release. Manual exports still work as
+shown above. Avoid hand-numbering public releases in parallel with the workflow.
 
 ## What to include in the repository
 
