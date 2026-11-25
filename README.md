@@ -83,6 +83,7 @@ practice campaign and never overwrites your campaign.
 
 | Read this | For |
 | --- | --- |
+| [Agent guide](AGENTS.md) | Project goal, design commitments and instructions for future coding agents |
 | [Story reference](story.md) | Premise, cast, chapters, venue identities, events and future story hooks |
 | [Player guide](docs/PLAYER_GUIDE.md) | First shift, pool, promotions, expansion and recovery |
 | [Economy specification](docs/ECONOMY.md) | Model rules, costs, local milestones, offline projection and measured pacing |
