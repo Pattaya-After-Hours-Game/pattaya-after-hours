@@ -9,6 +9,12 @@ const PROMOS = ["Regular prices", "Happy hour", "Loyalty night", "Big campaign"]
 const SECURITY = ["House team", "Licensed crew", "Shoreline Desk"]
 const WEEKDAYS = ["Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue"]
 const FIGHT_CARD = 41
+const CANCEL_IF_DISRUPTED = 0.38
+const SCALE_BACK = {"capacity":-8,"rep":-2,"trust":-1}
+const NIGHT_EFFECTS = ["demand","capacity","tour","mine"]
+const TEAM_EFFECTS = ["skill","morale","fatigue"]
+const LOWER_IS_BETTER = ["heat","fatigue","rival"]
+const COMMITMENTS = ["reserve","debt","security","exit"]
 # Temporary test schedule. Move this trigger when making the encounter rare.
 const GODZILLA_TEST_DAY = 3
 var s: Dictionary
@@ -83,6 +89,13 @@ func tour_offer(index: int, route_id: int) -> String:
 	if s.weather == 6 and (route_id == 1 or route_id == 3):
 		return "Declines an exposed route in monsoon rain."
 	return ""
+
+func event_disruption_percent() -> int:
+	return 29 if s.weather >= 5 else 9
+
+func tour_disruption_percent(staff: Dictionary, route_id: int) -> int:
+	var weather_risk := 20 if s.weather == 6 else 5 if s.weather >= 4 else 0
+	return maxi(0,7 + int(C.ROUTES[route_id][3]) + weather_risk - int(staff.guide)*2)
 
 func guide_pay(route_id: int) -> int:
 	var duration: int = C.ROUTES[route_id][2]
@@ -215,8 +228,8 @@ func start() -> String:
 		return "The till can't cover the booking. Try regular service."
 	s.night = {"wave":0,"cash":-event[1],"demand":0,"capacity":0,"tour":0,"mine":100,"guests":0,
 		"event_live":s.event,"gross":0,"sold":0,"turned":0,"tours":0,"wages":0,"fees":0,"fight":0,"notes":[]}
-	if s.event > 0 and rng.randf() < (0.29 if s.weather >= 5 else 0.09):
-		if rng.randf() < 0.38:
+	if s.event > 0 and rng.randf() < event_disruption_percent() / 100.0:
+		if rng.randf() < CANCEL_IF_DISRUPTED:
 			s.night.event_live = 0
 			s.night.notes.append("%s cancelled · booking deposit lost" % event[0])
 		else:
@@ -285,7 +298,7 @@ func pick(index: int) -> String:
 	var offset := 2 + index * 2
 	if offset < 2 or offset + 1 >= card.size(): return ""
 	var effects: Dictionary = card[offset + 1]
-	if not _apply(effects):
+	if s.cash < -int(effects.get("cash",0)):
 		return "The till can't cover that response."
 	s.night.notes.append("%s · %s" % [card[0], card[offset]])
 	if s.card < 100:
@@ -294,35 +307,99 @@ func pick(index: int) -> String:
 	if effects.has("fight"):
 		s.phase = "fight"
 	else:
-		_service()
+		_roll_response(card[offset],effects)
 	return ""
 
-func _apply(effects: Dictionary) -> bool:
-	if s.cash + effects.get("cash",0) < 0 and effects.get("cash",0) < 0: return false
+func response_risk(effects: Dictionary) -> Dictionary:
+	var readiness: int = s.trust
+	if effects.has("supplier") or effects.has("stock"):
+		readiness = s.supplier
+	elif effects.has("partner") or effects.has("visa"):
+		readiness = s.partner
+	elif effects.has("morale") or effects.has("fatigue"):
+		var tired := 0
+		for staff in s.staff: tired += int(staff.fatigue)
+		readiness = 100 - int(tired / float(maxi(1,s.staff.size())))
+	elif effects.has("rig") or effects.has("mine"):
+		readiness = s.rig
+	elif effects.has("demand") or effects.has("capacity") or effects.has("safety"):
+		readiness = s.safety
+	var crowd_swing := maxi(absi(int(effects.get("demand",0))),absi(int(effects.get("capacity",0))))
+	var chance := clampi(68 + roundi((readiness - 50) * 0.35) - int(crowd_swing / 2.0),30,90)
+	var setback := effects.duplicate()
 	for key in effects:
 		var amount: int = effects[key]
+		if key in COMMITMENTS or (key == "cash" and (amount <= 0 or effects.has("debt"))) or (key == "mine" and amount <= -100):
+			continue
+		var direction := -1 if key in LOWER_IS_BETTER else 1
+		if amount * direction > 0:
+			if key in ["cash","stock","capacity","demand","tour","mine","route","food"]:
+				setback[key] = int(amount * 0.35)
+			else:
+				setback[key] = -direction * maxi(1,ceili(absi(amount) * 0.35))
+		else:
+			setback[key] = amount - direction * maxi(1,ceili(absi(amount) * 0.55))
+	var plan_changes := preview_effects(effects)
+	var setback_changes := preview_effects(setback)
+	if setback_changes == plan_changes:
+		# Even when stats hit their limits, the setback incurs a visible cost.
+		setback["debt"] = int(setback.get("debt",0)) + 100
+		setback_changes = preview_effects(setback)
+		if setback_changes == plan_changes:
+			setback["debt"] = 100
+			setback_changes = preview_effects(setback)
+	return {"chance":chance,"setback":setback,"plan_changes":plan_changes,"setback_changes":setback_changes}
+
+func preview_effects(effects: Dictionary) -> Dictionary:
+	return _apply(effects,s.duplicate(true))
+
+func _roll_response(label: String, effects: Dictionary) -> void:
+	var risk := response_risk(effects)
+	var worked := rng.randi_range(1,100) <= int(risk.chance)
+	var changes := _apply(effects if worked else risk.setback,s)
+	_record_result(label,"Goes to plan" if worked else "Setback",int(risk.chance) if worked else 100-int(risk.chance),changes,worked)
+	_service()
+
+func _record_result(label: String, outcome: String, chance: int, changes: Dictionary, worked: bool) -> void:
+	if not s.night.has("results"): s.night.results = []
+	s.night.results.append({"label":label,"outcome":outcome,"chance":chance,"changes":changes,"worked":worked})
+
+func _apply(effects: Dictionary, target: Dictionary) -> Dictionary:
+	var changes := {}
+	for key in effects:
+		var amount: int = effects[key]
+		if key in TEAM_EFFECTS:
+			var team_changes: Array[int] = []
+			for staff in target.staff:
+				var before: int = staff[key]
+				staff[key] = clampi(before + amount, 0, 8 if key == "skill" else 100)
+				team_changes.append(int(staff[key])-before)
+			if team_changes.min() != 0 or team_changes.max() != 0:
+				changes[key] = team_changes
+			continue
+		var values: Dictionary = target.night if key in NIGHT_EFFECTS else target
+		var before: int = values[key]
 		match key:
 			"cash":
-				s.cash += amount
-				s.night.cash += amount
-				if amount < 0: s.weekly.costs -= amount
-				else: s.weekly.revenue += amount
-			"demand","capacity","tour","mine","fight":
-				s.night[key] += amount
-			"skill","morale","fatigue":
-				for staff in s.staff:
-					staff[key] = clampi(int(staff[key]) + amount, 0, 8 if key == "skill" else 100)
+				values.cash += amount
+				target.night.cash += amount
+				if amount < 0: target.weekly.costs -= amount
+				else: target.weekly.revenue += amount
+			"demand","capacity","tour","mine":
+				values[key] += amount
 			"stock":
-				s.stock = clampi(int(s.stock) + amount, 0, 105 + int(s.level) * 20)
+				values.stock = clampi(before+amount, 0, 105 + int(target.level) * 20)
 			"regulars":
-				s.regulars = clampi(int(s.regulars) + amount, 0, 45)
+				values.regulars = clampi(before+amount, 0, 45)
 			"debt","reserve":
-				s[key] = maxi(0, int(s[key]) + amount)
+				values[key] = maxi(0,before+amount)
 			"security","food","exit","route":
-				s[key] = clampi(int(s[key]) + amount, 0, 2)
+				values[key] = clampi(before+amount, 0, 2)
 			_:
-				s[key] = clampi(int(s[key]) + amount, 0, 100)
-	return true
+				values[key] = clampi(before+amount, 0, 100)
+		if int(values[key]) != before:
+			changes[key] = int(values[key]) - before
+	return changes
 
 func fallback() -> void:
 	if s.phase != "incident": return
@@ -330,16 +407,19 @@ func fallback() -> void:
 	if s.card < 100:
 		s.seen.append(s.card)
 		if s.seen.size() > 35: s.seen.pop_front()
-	_apply({"capacity":-8,"rep":-2,"trust":-1})
-	_service()
+	_roll_response("Scale back service",SCALE_BACK)
+
+func fight_effects(won: bool) -> Dictionary:
+	var repair := mini(maxi(0, int(s.cash)), 240 if won else 740)
+	return {"cash":-repair,"debt":(240 if won else 740)-repair,"capacity":-7 if won else -16,
+		"heat":6 if won else 12,"safety":-3 if won else -10,"rep":3 if won else -5,
+		"rival":-16 if won else 8,"condition":-3 if won else -9,"morale":2 if won else -8}
 
 func finish_fight(won: bool) -> void:
 	if s.phase != "fight": return
 	if won: s.wins += 1
-	var repair := mini(maxi(0, int(s.cash)), 240 if won else 740)
-	_apply({"cash":-repair,"debt":(240 if won else 740)-repair,"capacity":-7 if won else -16,
-		"heat":6 if won else 12,"safety":-3 if won else -10,"rep":3 if won else -5,
-		"rival":-16 if won else 8,"condition":-3 if won else -9,"morale":2 if won else -8})
+	var changes := _apply(fight_effects(won),s)
+	_record_result("Back Mali in the arcade showdown","Mali won" if won else "Mali lost",0,changes,won)
 	if not won:
 		s.staff[1].hurt = 3
 		s.staff[1].work = false
@@ -375,7 +455,8 @@ func _service() -> void:
 	if s.license < 30: room -= 10
 	room += int(n.capacity)
 	capacity += int(n.capacity)
-	var served := maxi(0, mini(mini(demand, room), mini(capacity, int(s.stock) * 2)))
+	var stock_capacity := int(s.stock) * 2
+	var served := maxi(0, mini(mini(demand, room), mini(capacity, stock_capacity)))
 	var units := ceili(served / 2.0)
 	var refused := maxi(0, demand - served)
 	var price: int = [57,47,53,58][int(s.promo)] + int(s.food) * 12 + int(s.level) * 4
@@ -390,7 +471,12 @@ func _service() -> void:
 	s.weekly.revenue += revenue
 	var satisfaction := clampi(86 - refused * 2 - maxi(0, int(fatigue / float(maxi(1,on_duty))) - 45) + int(s.safety / 10.0), 0, 100)
 	s.rep = clampi(int(s.rep) + (2 if served > 12 and satisfaction >= 76 else -2 if satisfaction < 56 else 0), 0, 100)
-	n.notes.append("%s · %d served / %d missed · %d%% satisfaction" % [["Early","Peak","Last call"][wave],served,refused,satisfaction])
+	var limit := ""
+	if refused > 0:
+		limit = "low stock" if stock_capacity <= mini(room,capacity) else "room limit" if room <= capacity else "staff capacity"
+	n.last_wave = {"served":served,"missed":refused,"sales":revenue,"limit":limit}
+	n.notes.append("%s · %d served / %d missed · ฿%d sales · %d%% satisfaction%s" % [
+		["Early","Peak","Last call"][wave],served,refused,revenue,satisfaction," · "+limit if not limit.is_empty() else ""])
 	n.demand = 0
 	n.capacity = 0
 	n.wave += 1
@@ -428,8 +514,7 @@ func _close() -> void:
 			wage += pay
 			var groups := clampi(3 + int(staff.guide / 2.0) + rng.randi_range(-2,1) - (2 if s.weather >= 5 else 0) - (1 if s.weather == 4 else 0),1,7)
 			var ticket := int(route[1]) + int(s.route) * 35
-			var chance := 7 + int(route[3]) + (20 if s.weather == 6 else 5 if s.weather >= 4 else 0) - int(staff.guide) * 2
-			if rng.randi_range(0,99) < chance:
+			if rng.randi_range(0,99) < tour_disruption_percent(staff,route_id):
 				groups = maxi(0, groups - 3)
 				n.notes.append("%s · disrupted, guide still paid" % route[0])
 			tour_net += groups * ticket

@@ -23,6 +23,10 @@ func run() -> void:
 			model.s.cash = 20000
 			model.start()
 			model.s.card = card_id
+			var effects: Dictionary = card[option+1]
+			if not effects.has("fight"):
+				var risk: Dictionary = model.response_risk(effects)
+				check(risk.chance > 0 and risk.chance < 100 and risk.plan_changes != risk.setback_changes,"Distinct odds for " + card[option])
 			var response: String = model.pick((option-2)/2)
 			check(response.is_empty() and (model.s.phase == "fight" or model.s.night.wave == 1),"Incident option: " + card[0])
 			if model.s.phase == "fight":
@@ -39,7 +43,8 @@ func run() -> void:
 	check(restored.load_game() and restored.s.card == model.s.card and restored.rng.state == model.rng.state,"Checkpoint round-trip")
 	model.pick(0)
 	restored.pick(0)
-	check(restored.s.night.guests == model.s.night.guests and restored.s.card == model.s.card,"Deterministic reload")
+	check(restored.s.night.guests == model.s.night.guests and restored.s.card == model.s.card
+		and restored.s.night.results == model.s.night.results,"Deterministic reload, including decision results")
 	check(restored.save_game() == OK,"Create backup")
 	var corrupted := FileAccess.open(Campaign.SAVE,FileAccess.WRITE)
 	corrupted.store_string("truncated")
@@ -84,9 +89,10 @@ func run() -> void:
 		model.next_day()
 	check(clean_days == 365 and model.s.phase == "end","Campaign completes the first year")
 	check(saw_week and saw_rush and saw_flood and saw_godzilla and model.s.wins > 0,"Weekly ledger and anchor incidents")
+	test_risk()
 	await test_ui()
 	if failures == 0:
-		print("PASS · all 51 cards and responses, autosave recovery, full year, UI, arcade, tutorial and Godzilla")
+		print("PASS · all 51 cards and responses, autosave recovery, full year, UI, arcade, tutorial, Godzilla and decision odds")
 	quit(1 if failures else 0)
 
 func test_ui() -> void:
@@ -200,3 +206,34 @@ func test_godzilla(app: Control) -> void:
 	check(app.model.s.phase == "report" and app.model.s.night.godzilla == "scared","Timeout goes straight to closeout")
 	check(app.model.s.night.gross == 0 and app.model.s.night.guests == 0 and app.model.s.night.wages > 0,
 		"Frightened patrons buy nothing but staff are paid")
+
+
+func test_risk() -> void:
+	var saw_worked := false
+	var saw_setback := false
+	for seed_value in range(1,61):
+		var model = Campaign.new(seed_value)
+		model.start()
+		var effects: Dictionary = model.current_card()[3]
+		var before: Dictionary = model.s.duplicate(true)
+		var rng_before: int = model.rng.state
+		var risk: Dictionary = model.response_risk(effects)
+		check(model.s == before and model.rng.state == rng_before,"Preview leaves state and RNG untouched")
+		model.pick(0)
+		var result: Dictionary = model.s.night.results.back()
+		saw_worked = saw_worked or result.worked
+		saw_setback = saw_setback or not result.worked
+		check(result.changes == (risk.plan_changes if result.worked else risk.setback_changes),"Rolled changes match advertised effects")
+		check(result.changes.cash == -400 and result.changes.reserve == 400,"Payroll transfer is honored in both outcomes")
+	check(saw_worked and saw_setback,"Both outcomes can actually occur")
+	var model = Campaign.new(61)
+	model.start()
+	var delivery := {"cash":-440,"stock":20}
+	model.s.supplier = 5
+	var low_chance: int = model.response_risk(delivery).chance
+	model.s.supplier = 95
+	check(model.response_risk(delivery).chance > low_chance,"Supplier reliability improves the odds")
+	model.s.cash = 50
+	var start_rng: int = model.rng.state
+	check(not model.pick(0).is_empty() and model.rng.state == start_rng and not model.s.night.has("results"),
+		"Unaffordable choices do not roll or register")

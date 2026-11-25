@@ -17,6 +17,15 @@ const PRACTICE_STOCK = 24
 const SHOT_GOAL = 10
 const SHOT_INTERVAL = 0.60
 const GODZILLA_SECONDS = 10.0
+const EFFECT_LABELS = {
+	"cash":"Till","reserve":"Reserve","debt":"Debt","stock":"Stock","rep":"Reputation",
+	"trust":"Neighborhood trust","partner":"Anong trust","safety":"Safety","heat":"Heat",
+	"supplier":"Supplier reliability","regulars":"Regulars","morale":"Team morale",
+	"fatigue":"Team fatigue","skill":"Team skill","condition":"Building condition",
+	"license":"Permits","visa":"Visa","rival":"Rival pressure","rig":"Rig cooling",
+	"mine":"Rig output factor","tour":"Tour adjustment","route":"Tour route level",
+	"demand":"Demand this wave","capacity":"Capacity this wave",
+}
 
 var model = Campaign.new()
 var campaign_before_tutorial: Campaign
@@ -196,9 +205,24 @@ func render(keep_scroll: bool = false) -> void:
 	abs_text(root_ui,Rect2(24,435,527,19),"BAY DISTRICT   /   "+district_status,10,WHITE)
 	pane(root_ui,Rect2(14,461,550,65),DARK)
 	var first_shift := show_tutorial_hint and not practicing
-	abs_text(root_ui,Rect2(26,467,265,20),"YOUR FIRST SHIFT" if first_shift else "THE SHIFT LOG",13,GOLD)
-	var log_text := "Select Tutorial above to try a practice shift." if first_shift else str(model.s.log.front()).left(61)
-	abs_text(root_ui,Rect2(26,490,410,24),log_text,14,MUTED)
+	var results: Array = model.s.night.get("results",[]) if city.night else []
+	if results.is_empty():
+		abs_text(root_ui,Rect2(26,467,265,20),"YOUR FIRST SHIFT" if first_shift else "THE SHIFT LOG",13,GOLD)
+		var log_text := "Select Tutorial above to try a practice shift." if first_shift else str(model.s.log.front()).left(61)
+		abs_text(root_ui,Rect2(26,490,410,24),log_text,14,MUTED)
+	else:
+		var last: Dictionary = results.back()
+		var heading := abs_text(root_ui,Rect2(26,465,524,17),result_heading(last),13,TEAL if last.worked else PINK)
+		heading.clip_text = true
+		var detail := abs_text(root_ui,Rect2(26,482,524,27),effect_text(last.changes),12,WHITE)
+		detail.clip_text = true
+		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		detail.max_lines_visible = 2
+		var wave: Dictionary = model.s.night.get("last_wave",{})
+		if not wave.is_empty():
+			var limit := " · "+str(wave.limit) if not str(wave.limit).is_empty() else ""
+			abs_text(root_ui,Rect2(26,509,524,15),"Last wave: %d served · %s sales · %d missed%s" % [
+				wave.served,cash(wave.sales),wave.missed,limit],12,MUTED)
 	if not practicing and model.s.phase == "plan":
 		at_button(root_ui,Rect2(435,473,117,41),"Walk district",walk_district)
 	pane(root_ui,Rect2(576,66,370,460),DARK)
@@ -241,7 +265,7 @@ func render(keep_scroll: bool = false) -> void:
 		"incident":
 			if practicing:
 				title("2 / 3    Run the shift")
-				body("Choose a response to serve the next wave. Spending can help service or relationships.")
+				body("Every response has odds. Check both results, then see what happened below the map.")
 			incident_panel()
 			action_label = "Scale back service"
 			action = func():
@@ -274,6 +298,9 @@ func render(keep_scroll: bool = false) -> void:
 	if not message.is_empty():
 		var note := abs_text(root_ui,Rect2(588,454,344,27),message,12,PINK)
 		note.clip_text = true
+	elif model.s.phase == "incident":
+		var chance: int = model.response_risk(Campaign.SCALE_BACK).chance
+		abs_text(root_ui,Rect2(588,454,344,27),"Scale back · %d%% contained / %d%% worse" % [chance,100-chance],12,MUTED)
 	var primary := at_button(root_ui,Rect2(585,480,352,37),action_label,action,true)
 	primary.disabled = practicing and model.s.phase == "plan" and model.s.stock == PRACTICE_STOCK
 	if previous > 0:
@@ -385,7 +412,9 @@ func service_panel() -> void:
 
 func events_panel() -> void:
 	title("What's on tonight?")
-	body("Events increase demand. Secure the door, check capacity, and budget for a thinner crowd.")
+	var disrupted: int = model.event_disruption_percent()
+	var canceled := disrupted * Campaign.CANCEL_IF_DISRUPTED
+	body("Paid events · %d%% on time / %.1f%% delayed / %.1f%% canceled. A cancellation costs the booking fee." % [100-disrupted,disrupted-canceled,canceled])
 	for i in Content.EVENTS.size():
 		var item: Array = Content.EVENTS[i]
 		var value: String = item[0]+(" · "+cash(item[1]) if item[1] else "")
@@ -417,7 +446,9 @@ func tours_panel() -> void:
 		row_button(("%s  ·  %s" % [item[0],"Confirmed" if booked else "Short" if item[2] == 1 else "Long"]),func():
 			message = model.booking(guide,i)
 			commit(true),booked)
-		body("%s ticket · %s pay%s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i))," / "+declined if not declined.is_empty() else ""],MUTED,12)
+		var chance: int = model.tour_disruption_percent(crew[guide],i)
+		var risk_text := declined if not declined.is_empty() else "%d%% disruption" % chance
+		body("%s ticket · %s pay · %s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i)),risk_text],MUTED,12)
 	body("%d guide bookings tonight" % model.s.bookings.size(),GOLD,13)
 
 func empire_panel() -> void:
@@ -458,11 +489,55 @@ func incident_panel() -> void:
 	title(card[0],PINK)
 	body(card[1],WHITE)
 	for i in range(2,card.size(),2):
-		row_button(card[i],choose.bind((i-2)/2))
 		var effects: Dictionary = card[i+1]
-		if effects.has("cash") and effects.cash < 0:
-			body("%s from the till" % cash(-effects.cash),MUTED,12)
+		var option := button(card[i],choose.bind((i-2)/2))
+		option.disabled = model.s.cash < -int(effects.get("cash",0))
+		column.add_child(option)
+		if option.disabled: body("The till can't cover this response.",PINK,12)
+		if effects.has("fight"):
+			body("Win the bout · Reputation rises and rival pressure falls. Repairs cost ฿240.",TEAL,12)
+			body("Lose the bout · Reputation falls, Mali needs paid leave, and repairs cost ฿740.",PINK,12)
+		else:
+			response_odds(effects)
+	body("SCALE BACK SERVICE",GOLD,12)
+	response_odds(Campaign.SCALE_BACK)
 	body("%d served so far   ·   %d turned away" % [model.s.night.guests,model.s.night.turned],GOLD,13)
+
+func response_odds(effects: Dictionary) -> void:
+	var risk: Dictionary = model.response_risk(effects)
+	body("%d%% Goes to plan  ·  %s" % [risk.chance,effect_text(risk.plan_changes)],TEAL,12)
+	body("%d%% Setback  ·  %s" % [100-int(risk.chance),effect_text(risk.setback_changes)],PINK,12)
+
+func effect_text(changes: Dictionary) -> String:
+	var details := PackedStringArray()
+	for key in changes:
+		var delta: Variant = changes[key]
+		match key:
+			"security":
+				details.append("Protection deal ends")
+			"exit":
+				details.append("Explore selling the bar")
+			"food":
+				details.append("Add food service")
+			_:
+				var value := ""
+				if delta is Array:
+					var low: int = delta.min()
+					var high: int = delta.max()
+					value = signed_delta(low) if low == high else "%s to %s" % [signed_delta(low),signed_delta(high)]
+				elif key in ["cash","reserve","debt","tour"]:
+					value = ("+" if int(delta) > 0 else "") + cash(delta)
+				else:
+					value = signed_delta(int(delta))
+				details.append("%s %s" % [EFFECT_LABELS[key],value])
+	return " · ".join(details) if not details.is_empty() else "No direct changes"
+
+func signed_delta(value: int) -> String:
+	return "%+d" % value if value != 0 else "0"
+
+func result_heading(result: Dictionary) -> String:
+	var odds := " (%d%%)" % int(result.chance) if result.chance > 0 else ""
+	return result.outcome + odds + " · " + result.label
 
 func choose(index: int) -> void:
 	message = model.pick(index)
@@ -532,6 +607,12 @@ func report_panel() -> void:
 	if int(model.s.day)%7 == 0: week_lines(model.s.last_week)
 	if campaign_before_tutorial != null:
 		body("Book guides in Tours or find Toybox sparring under Events. Check Journal for Tuesday's rent and permits.",GOLD,13)
+	var results: Array = n.get("results",[])
+	if not results.is_empty():
+		body("DECISIONS THIS SHIFT",GOLD,12)
+		for result in results:
+			body(result_heading(result),TEAL if result.worked else PINK,13)
+			body(effect_text(result.changes),WHITE,12)
 	for line in model.s.report: body(str(line),MUTED,13)
 
 func ending_panel() -> void:

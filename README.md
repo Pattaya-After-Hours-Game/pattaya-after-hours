@@ -8,6 +8,8 @@ Run the Blue Hour in a fictional neon harbor district. Anong wants a payroll res
 
 ## Play
 
+Incident responses show the odds and effects of both outcomes. After choosing, look beneath the map for the result and the last wave’s sales or bottleneck. The closeout keeps the decisions for the whole shift.
+
 Select **Tutorial** at the top of the game to run a short practice shift. Learn to restock, make service decisions, and read the closeout. You can exit or replay it any time without changing your campaign.
 
 - **Service.** Set the schedule, buy stock, pick a promotion, and split the rota. Work through early service, the rush, and last call. Review closing figures and Tuesday's rent, payroll, permits, and outstanding bills.
