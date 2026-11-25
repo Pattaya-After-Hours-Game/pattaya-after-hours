@@ -4,6 +4,14 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Source update — Automatic closing clean-up
+
+- All venues receive a free fifteen-second clean-up after the last nightly closure,
+  followed by an automatic jump to noon. Stay here cancels only the jump.
+- Added a visible cancellation countdown, with late-venue and hidden-view guards.
+- Schema ten preserves remaining time/cancellation; menus and offline estimates
+  cannot consume the choice. Existing skip costs/date/contract rules remain.
+
 ## Source update — A clearer opening arc and shorter saving gaps
 
 - Bartender training costs ฿400 then ฿800; first management costs ฿12,000.

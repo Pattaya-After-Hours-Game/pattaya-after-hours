@@ -22,13 +22,13 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Opening-arc pacing, training value and Anong’s next step |
-| Status | REVIEW; local checks passed; prior feature shipped in v1.0.19 (`e644c55`) |
+| Active feature | Automatic closing clean-up and cancellable next-day jump |
+| Status | REVIEW; local verification passed; previous feature shipped in v1.0.20 (`e71d156`) |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Codex verified tests and layout; independent device play pending |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/opening-arc-balance`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Price balance, read-only story guidance, fresh-campaign measurements, tests and docs |
+| Working branch / chat / PR | `codex/automatic-night-prep`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Night-prep clock/cancellation, save migration, controls, tests and docs |
 | Next handoff / blocker | 42 campaigns, regressions and previews passed; ready for authorized main release; human play pending |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-26 |

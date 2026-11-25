@@ -128,6 +128,7 @@ func cleaning(test: SceneTree) -> void:
 	test.check(bar.clean_remaining==1 and bar.dirt==100,"Cleaning requires fifteen real foreground seconds")
 	m.street.tick(1)
 	test.check(bar.dirt==0 and bar.clean_remaining==0,"Completed cleaning restores cleanliness")
+	m.street.action("stay") # This fixture continues manual prep after the automatic clean.
 	bar.dirt = 80
 	m.street.action("clean")
 	advance(m,5)
@@ -288,7 +289,7 @@ func saves(test: SceneTree) -> void:
 	var migrated = Campaign.new(9)
 	test.check(migrated.load_game(),"Version-three save without new fields loads")
 	var restored: Dictionary = migrated.street.selected()
-	test.check(migrated.s.version==9 and migrated.s.day==47 and migrated.s.cash==9926 and migrated.s.street.minute==720,"Migration preserves day and money and introduces noon")
+	test.check(migrated.s.version==10 and migrated.s.day==47 and migrated.s.cash==9926 and migrated.s.street.minute==720,"Migration preserves day and money and introduces noon")
 	test.check(restored.customers==customers and restored.games==games and restored.closed==9 and not restored.promo.is_empty() and restored.dirt==0,"Migration preserves queues, paid games, promotions and event closures")
 	migrated.save_game()
 	migrated.save_game()

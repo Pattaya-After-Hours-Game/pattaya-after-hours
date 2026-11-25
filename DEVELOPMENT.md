@@ -374,3 +374,9 @@ and scrolls only. The balance runner records manager timing and gaps between
 purchases that improve the business (excluding routine stock and renewals).
 `tests/balance_guidance_check.gd` covers price/reserve boundaries, saved ownership,
 local milestones, guidance purity and UI navigation. No schema change is needed.
+
+`street.gd::night_prep_tick` owns nightly clean-up and the delayed noon skip.
+The street UI exposes cancellation and signals whether its control can be seen;
+it never decrements a countdown itself. Schema 10 validates `street.night_prep`
+and migrates older saves with no pending jump. `tests/night_prep_check.gd` covers
+completion, cancellation, reload, offline exclusion, late venues and migration.

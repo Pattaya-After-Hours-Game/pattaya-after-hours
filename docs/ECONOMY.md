@@ -77,8 +77,8 @@ use the same peak multiplier, after accounting for the venue's opening state.
 Each actual drink sale adds one dirt point, or two during its venue's peak,
 capped at 100. Attraction is multiplied
 by `1 - 0.25 * dirt / 100`, including offline forecasts. A fifteen-foreground-second
-clean, available while closed, clears dirt and costs no cash. Managers start the
-job automatically on closure. Restocking uses the existing paid purchase action.
+clean, available while closed, clears dirt and costs no cash. Nightly clean-up starts the
+job for all venues; managers also start cleaning during other closures. Restocking uses the existing paid purchase action.
 
 Between 1am and noon, an entirely closed street may skip to noon. It cancels
 unfinished cleaning without clearing dirt or buying stock. Natural noon opening
@@ -540,3 +540,23 @@ The frontage section always exposes her renewal control after the first hire,
 with a live shortfall/active-contract explanation. Roster expiry explicitly
 invalidates the UI, independently of history notices. Full floor staffing never
 blocks her separate frontage renewal. No schema change or new rehire reward.
+
+## Closing clean-up and tomorrow's opening
+
+After the last venue closes for the night, a free **15-second clean-up** starts
+for all dirty venues, including those without a manager. A visible street button
+counts down to noon. **Stay here** cancels the automatic jump for that night;
+cleaning continues, and **Skip to 12pm** remains available when you are ready.
+Even an already-clean street gives you the full fifteen-second choice.
+
+The countdown waits for late-trading venues to finish. Daytime closure and a
+temporary event closure cannot end an otherwise scheduled late night. It advances
+only during foreground street play, never on the start menu or through offline
+estimates; its countdown pauses while the street is hidden by district/arcade
+views. Normal clock rules still apply. Schema 10 preserves the remaining time
+and cancellation across reloads; older saves start with no pending countdown.
+
+At zero, completed cleaning is retained and the existing skip moves the clock
+to noon. Stock is not bought, no income is awarded, and contracts age through the
+skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
+The date already advanced at midnight, so the jump does not add another day.

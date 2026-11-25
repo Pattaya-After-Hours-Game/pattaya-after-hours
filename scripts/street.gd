@@ -8,6 +8,7 @@ var s: Dictionary
 var economy: RefCounted
 signal checkpoint_requested
 var raid_checkpoint := false
+var night_prep_visible := true
 
 func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
@@ -38,8 +39,9 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		for bar in s.street.bars:
 			bar.merge(Economy.clock_fields(),true)
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
+	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	economy = Economy.new(s,fresh)
-	s.version = 9
+	s.version = 10
 
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()
@@ -135,13 +137,18 @@ func action(id: String, index: int = 0) -> String:
 					return "Choose late opening before 1am."
 				bar.late_open = true
 				result = "%s can trade until 3am tonight. Heat and raid risk rise after 1am." % bar.name
+		"stay":
+			if int(s.street.night_prep.remaining)<=0: return "No automatic jump is pending."
+			s.street.night_prep.remaining = 0
+			s.street.night_prep.cancelled = true
+			result = "Staying for prep. Cleaning continues; use Skip to 12pm when ready."
 		"skip":
 			if not can_skip(): return "Skip is available after 1am when every venue has stopped trading."
 			economy.advance_contracts(C.OPEN_MINUTE-int(s.street.minute))
 			s.street.minute = C.OPEN_MINUTE
 			reopen_noon()
 			s.street.offline_cursor = C.OPEN_MINUTE
-			result = "12pm. Unfinished cleaning was skipped; check the prep list."
+			result = "12pm. Check cleanliness, stock and the rota."
 		"restock": result = economy.buy_supplier(bar)
 		"manager": result = economy.buy_manager(bar)
 		"upgrade":
@@ -349,10 +356,40 @@ func any_trading() -> bool:
 func can_skip() -> bool:
 	return s.phase=="plan" and s.street.minute>=C.CLOSE_MINUTE and s.street.minute<C.OPEN_MINUTE and not any_trading()
 
+func night_ready() -> bool:
+	if not can_skip(): return false
+	# A temporary event closure must not end a venue's booked late night.
+	for bar in s.street.bars:
+		if bar.open and not bar.raided and Economy.scheduled(bar,int(s.street.minute)): return false
+	return true
+
+func night_prep_tick() -> void:
+	if not night_prep_visible or not night_ready(): return
+	var prep: Dictionary = s.street.night_prep
+	if int(prep.night)!=int(s.day):
+		prep.night = int(s.day)
+		prep.cancelled = false
+		prep.remaining = C.CLEAN_SECONDS
+		for bar in s.street.bars:
+			if bar.dirt>0 and bar.clean_remaining==0:
+				bar.clean_remaining = C.CLEAN_SECONDS
+				bar.clean_auto_started = true
+		return
+	if prep.cancelled or int(prep.remaining)<=0: return
+	prep.remaining -= 1
+	if prep.remaining==0:
+		action("skip")
+		record("Clean-up finished. It's noon: a new opening, with the same stock and team.")
+		checkpoint_requested.emit()
+
+func night_prep_text() -> String:
+	return "Closing clean-up · noon in %ds\nStay here · cancel automatic jump" % int(s.street.night_prep.remaining)
+
 func raid_chance() -> float:
 	return C.RAID_BASE_CHANCE+C.RAID_HEAT_CHANCE*clampi(int(s.heat),0,100)
 
 func reopen_noon() -> void:
+	s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	for bar in s.street.bars:
 		bar.late_open = false
 		bar.raided = false
@@ -460,6 +497,7 @@ func tick(seconds: int) -> void:
 			s.street.guided.wave = int(s.street.seconds)/40
 			s.phase = "guided_choice"
 		settle_overnight()
+		night_prep_tick()
 		check_chapters()
 		if raid_checkpoint:
 			raid_checkpoint = false

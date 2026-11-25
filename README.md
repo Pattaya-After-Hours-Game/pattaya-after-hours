@@ -124,7 +124,7 @@ stage** (up to the cash available), and closure until noon. All venues shut by
 3am; late permission resets each day. The screen shows current raid odds.
 
 Use closed hours to clean, restock and adjust staffing. Cleaning takes fifteen
-real seconds; managers start it automatically. Dirt from drink sales reduces
+real seconds; nightly street clean-up now starts it automatically for everyone. Dirt from drink sales reduces
 attraction by up to 25%. Once every venue stops trading after 1am, **Skip to
 12pm** is available even with unfinished prep. Skipping cancels incomplete
 cleaning and buys no stock. Noon never reverses your own closure or a shutdown
@@ -170,7 +170,7 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 9.
+retain money, staff, venues and owned stages when migrated to save schema 10.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
 Schema 9 preserves staff cooldown deadlines and actual service counters. Older
 partial work is converted once; existing purchases get no refund. Schema 8 retains celebration dates, active/last reports and visitor patience,
@@ -337,3 +337,23 @@ are unchanged. Existing upgrades stay owned, with no retroactive refunds.
 The active baseline's first-manager saving stretch falls from roughly 44–48 to
 25–27 minutes. This is measured simulation pacing, not proof of human retention;
 we still need player feedback on how the revised middle of the game feels.
+
+## Closing clean-up and tomorrow's opening
+
+After the last venue closes for the night, a free **15-second clean-up** starts
+for all dirty venues, including those without a manager. A visible street button
+counts down to noon. **Stay here** cancels the automatic jump for that night;
+cleaning continues, and **Skip to 12pm** remains available when you are ready.
+Even an already-clean street gives you the full fifteen-second choice.
+
+The countdown waits for late-trading venues to finish. Daytime closure and a
+temporary event closure cannot end an otherwise scheduled late night. It advances
+only during foreground street play, never on the start menu or through offline
+estimates; its countdown pauses while the street is hidden by district/arcade
+views. Normal clock rules still apply. Schema 10 preserves the remaining time
+and cancellation across reloads; older saves start with no pending countdown.
+
+At zero, completed cleaning is retained and the existing skip moves the clock
+to noon. Stock is not bought, no income is awarded, and contracts age through the
+skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
+The date already advanced at midnight, so the jump does not add another day.

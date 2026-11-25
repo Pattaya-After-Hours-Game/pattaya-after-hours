@@ -666,7 +666,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -787,6 +787,12 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=10:
+			var prep: Variant = parsed.street.get("night_prep")
+			if not prep is Dictionary: return null
+			if not _finite_number(prep.get("night"),-1,1e12) or float(prep.night)!=floorf(float(prep.night)): return null
+			if not _finite_number(prep.get("remaining"),0,Street.C.CLEAN_SECONDS) or float(prep.remaining)!=floorf(float(prep.remaining)): return null
+			if not prep.get("cancelled") is bool: return null
 		if int(parsed.version)>=9:
 			for bar in parsed.street.bars:
 				for person in bar.team:

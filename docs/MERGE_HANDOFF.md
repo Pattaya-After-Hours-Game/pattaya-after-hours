@@ -1,30 +1,25 @@
 # Current implementation and release handoff
 
-Updated **26 November 2026**. Main `e644c55` shipped as **v1.0.19** with staff-first
-auto-serve and visible Nida renewal. The follow-up **`codex/opening-arc-balance`**
-addresses the player's request to review story, rules, prices and grind together.
-Other worktrees and user attachments are preserved.
+Updated **26 November 2026**. Main `e71d156` shipped as **v1.0.20**. The follow-up
+**`codex/automatic-night-prep`** adds the requested automatic closing routine.
+After the last nightly venue closure, all dirty venues clean for fifteen seconds
+and the street jumps to noon. The prominent Stay here button cancels the jump
+for this night while cleaning continues; manual skip remains available.
 
-Bartender training is ฿400/800, first management ฿12,000, and final beer/Soi/gogo
-renovations ฿40,000/65,000/120,000. Stage three needs 450 happy visits while retaining
-seventy local regulars and forty healthy shifts. Initial progression, contracts,
-customer demand, owner/staff cooldowns, auto-serve price, birthday rules and later
-manager tiers remain unchanged. Existing ownership is retained without refunds.
+Late-trading venues delay the countdown, and temporary event closures cannot
+prematurely end their scheduled night. Menu/offline time does not advance it;
+district/arcade views pause the countdown while its control is hidden. Existing
+noon behaviour retains owner closures, stock, contract ageing and the date.
+Schema 10 preserves remaining time/cancellation; older saves gain no pending jump.
 
-Anong's Next Step reads shared chapter requirements and current business progress.
-Its button navigates to existing controls; it cannot purchase, award money or
-advance time. No save schema change or extra compulsory quest is introduced.
+Full regressions, 42 fresh campaigns and sixty paired party scenarios pass with
+unchanged balance bounds. Four 960 × 540 previews and the 1280 × 720 cancellation
+state are reviewed. See [testing](TESTING.md). No production art changed.
 
-Full regressions, 42 fresh campaigns and sixty paired party scenarios pass.
-Compared with v1.0.19, the first-manager saving gap falls from 44–48 to 25–27
-minutes; active stage three moves from 167–173 to 143–144. Four guidance previews
-are inspected at 960 × 540 and 1280 × 720. See [testing](TESTING.md) and
-[economy](ECONOMY.md) for measurements, revised bounds and limitations.
-
-Ready for the authorized main merge and signed release workflow. Verify its run
-and the [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for the published tag/source. Human retention, full-festival pacing and device
-play remain unverified. This handoff is not a new audit of every conversation.
+Ready for authorized main integration and the signed release workflow. Verify
+its run and the [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+for the published source/tag. Device play remains unverified. Other worktrees and
+user attachments are preserved. The audit below is historical.
 
 ## Historical consolidation audit
 

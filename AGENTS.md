@@ -167,3 +167,11 @@ existing gates. Current active pacing bounds keep stage two at 30–45 minutes,
 second property at 90–125 and stage three at 135–240. Measure the saving gaps as
 well: first-manager wait at most 30 minutes and longest between-investment gap
 at most 38 in baseline active policies. These are balance checks, not wait timers.
+
+Nightly street closure starts a free 15-second clean-up/countdown for all venues.
+The model owns the automatic noon skip and cancellation; UI only presents/input.
+Wait for all scheduled late trading to end, excluding temporary disaster closures
+as a trigger. Stay here cancels for the current night without stopping cleaning;
+manual skip remains available. Schema 10 preserves remaining time/cancellation.
+No countdown on the menu/offline, or while district/arcade hides the cancel
+control. Preserve normal skip contract ageing, owner closures, stock and dates.

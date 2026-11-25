@@ -173,7 +173,7 @@ books. Heat cools by one point per two safe real minutes; skipping does not cool
 it. Reopening buttons cannot override a raid.
 
 When closed, Service shows **Prep for opening**. Start a fifteen-second clean,
-buy stock, and check the rota. Managers start cleaning automatically. Each drink
+buy stock, and check the rota. Nightly clean-up now starts automatically for everyone. Each drink
 sold adds dirt; a completely dirty bar loses 25% of its attraction. Cleaning
 costs no cash. Stock still costs ฿14 per drink, subject to fridge capacity.
 
@@ -411,3 +411,23 @@ Supplier levels 0/1 buy six drinks for ฿84. Levels 2/3/4/5 buy twelve for
 ฿144/120/96/72. The button shows the current quantity and total bill. Eleven empty
 spaces or ฿143 cannot buy a level-two delivery. Auto-stock also keeps cash for
 the next operating charge; managed offline deliveries use their own earned funds.
+
+## Closing clean-up and tomorrow's opening
+
+After the last venue closes for the night, a free **15-second clean-up** starts
+for all dirty venues, including those without a manager. A visible street button
+counts down to noon. **Stay here** cancels the automatic jump for that night;
+cleaning continues, and **Skip to 12pm** remains available when you are ready.
+Even an already-clean street gives you the full fifteen-second choice.
+
+The countdown waits for late-trading venues to finish. Daytime closure and a
+temporary event closure cannot end an otherwise scheduled late night. It advances
+only during foreground street play, never on the start menu or through offline
+estimates; its countdown pauses while the street is hidden by district/arcade
+views. Normal clock rules still apply. Schema 10 preserves the remaining time
+and cancellation across reloads; older saves start with no pending countdown.
+
+At zero, completed cleaning is retained and the existing skip moves the clock
+to noon. Stock is not bought, no income is awarded, and contracts age through the
+skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
+The date already advanced at midnight, so the jump does not add another day.

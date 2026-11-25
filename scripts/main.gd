@@ -412,6 +412,12 @@ func render(keep_scroll: bool = false) -> void:
 		var staff_text := func() -> String: return model.street.economy.staff_indicator(model.street.selected())
 		staff_hud.text = staff_text.call()
 		live_labels.append([staff_hud,staff_text])
+	if not practicing and int(model.s.street.night_prep.remaining)>0:
+		var stay := at_button(root_ui,Rect2(14,330,430,68),"",street_action.bind("stay"),true)
+		stay.name = "NightPrepCancel"
+		stay.add_theme_font_size_override("font_size",15)
+		stay.text = model.street.night_prep_text()
+		live_labels.append([stay,func() -> String: return model.street.night_prep_text()])
 	drawer = Control.new()
 	drawer.position = Vector2(570,54)
 	drawer.size = Vector2(380,422)
@@ -889,6 +895,11 @@ func street_panel() -> void:
 		if bar.dirt>0 and bar.clean_remaining==0: row_button("Clean venue · 15 seconds",street_action.bind("clean"))
 		stock_button()
 		if model.street.can_skip():
+			if int(model.s.street.night_prep.remaining)>0:
+				live_body(func() -> String: return model.street.night_prep_text(),TEAL,13)
+				row_button("Stay here · cancel jump",street_action.bind("stay"))
+			elif model.s.street.night_prep.cancelled:
+				body("Automatic jump cancelled for this night. Cleaning continues.",TEAL,13)
 			body("Skip leaves unfinished cleaning and stock as they are.",MUTED,12)
 			for venue in model.s.street.bars:
 				live_body(func() -> String: return "%s · %s · stock %d/%d" % [venue.name,"clean" if venue.dirt==0 else "needs cleaning",venue.stock,eco.stock_capacity(venue)],MUTED,12)
@@ -1180,6 +1191,7 @@ func serve_godzilla() -> void:
 func street_ui_state() -> Array:
 	var bar: Dictionary = model.street.selected()
 	var state := [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day,model.s.phase,bar.open,bar.promo.is_empty(),model.street.economy.is_trading(bar),bar.late_open,bar.raided,bar.clean_remaining>0,bar.dirt==0,model.street.can_skip(),int(model.s.street.minute)/30,"" if model.s.street.history.is_empty() else model.s.street.history.front()]
+	state.append([int(model.s.street.night_prep.remaining)>0,model.s.street.night_prep.cancelled])
 	for venue in model.s.street.bars:
 		state.append([venue.raided,venue.clean_remaining>0,venue.dirt==0])
 		for person in venue.team: state.append([model.street.economy.contracted(person),person.on,person.role])
@@ -1191,6 +1203,7 @@ func _process(delta: float) -> void:
 	service_animation = maxf(0,service_animation-delta)
 	if campaign_before_tutorial == null:
 		var before := street_ui_state()
+		model.street.night_prep_visible = not is_instance_valid(fight) and not is_instance_valid(district)
 		model.street.advance(minf(delta,1.0))
 		refresh_street = refresh_street or before != street_ui_state()
 		update_action_controls()

@@ -3,7 +3,24 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current opening-arc balance verification — 26 November 2026
+## Current automatic night-prep verification — 26 November 2026
+
+`tools/test.sh` passes gameplay/save/UI regressions, 42 fresh campaigns and sixty
+paired party scenarios on Godot 4.7.2. Existing pacing bounds are unchanged.
+`night_prep_check.gd` verifies fifteen full seconds, cancellation on the final
+second, continued cleaning, no overnight revenue/stock purchase/extra date,
+manual skip, active/cancelled reloads, offline exclusion, hidden-control pause,
+late venue/flood guards, daytime closure, schema-nine migration and malformed
+schema-ten rejection. Existing cleaning fixtures now explicitly cancel automatic
+advancement when testing prolonged manual prep. The UI test clicks the visible
+street cancellation button and checks the saved model outcome.
+
+Four `night-prep-*` economy previews at 960 × 540 cover the countdown, last second
+with Service open, cancelled clean prep and noon. The last-second state is also
+checked at 1280 × 720. No production assets changed. Android device play remains
+unverified; export success is separate from device testing.
+
+## Previous opening-arc balance verification — 26 November 2026
 
 Godot 4.7.2 `tools/test.sh` passes all regressions, 42 fresh campaigns and sixty
 paired celebration scenarios. Before/after baseline runs compare against v1.0.19

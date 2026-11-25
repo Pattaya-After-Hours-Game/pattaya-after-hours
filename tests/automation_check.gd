@@ -58,7 +58,7 @@ func run(test: SceneTree) -> void:
 	test.check(b.serve_ready==deadline,"Rota toggles preserve cooldown after upgrading")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==9 and loaded.street.selected().auto_serve and loaded.street.selected().action_levels.pouring==4,"Schema nine preserves auto-serve and the new pouring tier")
+	test.check(loaded.load_game() and loaded.s.version==10 and loaded.street.selected().auto_serve and loaded.street.selected().action_levels.pouring==4,"Schema ten preserves auto-serve and the new pouring tier")
 	# Supplier buys and stock costs retain their own paid identities.
 	m = fresh()
 	b = m.street.selected()

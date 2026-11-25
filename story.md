@@ -170,8 +170,9 @@ not confiscated staff or an ending screen.
 > **Anong:** “That extra round came with paperwork.”
 
 Closed hours bring ordinary work back into the story: cleaning, buying stock,
-and checking the rota. Fifteen seconds of cleaning clears the dirt left by
-actual drink sales; managers take responsibility for starting it. The owner can
+and checking the rota. Fifteen seconds of nightly clean-up clears the dirt left by
+actual drink sales. Anong calls for the mop, then the next opening; the owner
+can choose to stay and finish preparing. The owner can
 skip to noon without finishing, but an unclean bar attracts fewer customers and
 an empty fridge stays empty. Bo's delivery still costs money.
 
@@ -385,3 +386,23 @@ Future hooks, not implemented quests:
 When a hook becomes playable, update this file and the relevant content/model
 code together. Keep the economic consequences visible, the adult activity
 non-explicit, and the ordinary people more important than the spectacle.
+
+## Closing clean-up and tomorrow's opening
+
+After the last venue closes for the night, a free **15-second clean-up** starts
+for all dirty venues, including those without a manager. A visible street button
+counts down to noon. **Stay here** cancels the automatic jump for that night;
+cleaning continues, and **Skip to 12pm** remains available when you are ready.
+Even an already-clean street gives you the full fifteen-second choice.
+
+The countdown waits for late-trading venues to finish. Daytime closure and a
+temporary event closure cannot end an otherwise scheduled late night. It advances
+only during foreground street play, never on the start menu or through offline
+estimates; its countdown pauses while the street is hidden by district/arcade
+views. Normal clock rules still apply. Schema 10 preserves the remaining time
+and cancellation across reloads; older saves start with no pending countdown.
+
+At zero, completed cleaning is retained and the existing skip moves the clock
+to noon. Stock is not bought, no income is awarded, and contracts age through the
+skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
+The date already advanced at midnight, so the jump does not add another day.
