@@ -65,7 +65,7 @@ Toybox sparring. Tours and legacy mining investments are not progression gates.
 | Street | **Serve a drink**, **Welcome customers**, property cards and the scrollable management tabs |
 | Events | Pink warning banner or **Events**; prepare before the countdown, then **Face Godzilla** for a monster challenge |
 | District | WASD/arrows to walk, E to enter, Esc to return; touch a destination on mobile |
-| Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J/K/L to jab/kick/Burst; mobile touch controls |
+| Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J/K/L to jab/kick/Burst. On mobile, hold or slide on the left D-pad and tap attacks with your right thumb. |
 | Godzilla | **Serve a shot** or Space; ten shots before the timer ends |
 
 The game autosaves after decisions and every fifteen seconds. Older campaigns

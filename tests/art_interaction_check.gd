@@ -17,6 +17,13 @@ func click(tree: SceneTree, control: Control) -> void:
 		tree.root.push_input(event,true)
 	await tree.process_frame
 
+func touch(fight: Control, point: Vector2, index: int, down: bool) -> void:
+	var event := InputEventScreenTouch.new()
+	event.position = point
+	event.index = index
+	event.pressed = down
+	fight._input(event)
+
 func run(test: SceneTree) -> void:
 	var app = load("res://main.tscn").instantiate()
 	test.root.add_child(app)
@@ -102,6 +109,7 @@ func run(test: SceneTree) -> void:
 	var fight := Fight.new()
 	fight.position = Vector2(32,19)
 	fight.size = Vector2(768,432)
+	fight.mobile_controls = false
 	test.root.add_child(fight)
 	fight.set_physics_process(false)
 	for item in Fight.BUTTONS:
@@ -109,6 +117,47 @@ func run(test: SceneTree) -> void:
 		test.check(fight.action_at(point)==item[0],"Scaled combat hit region: "+item[0])
 		fight.activate(point,0)
 		test.check(fight.touches.get(0)==item[0],"Scaled touch dispatch: "+item[0])
+	fight._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	fight.mobile_controls = true
+	var pad_center := Fight.PAD.get_center()
+	var right := fight.global_position+(pad_center+Vector2(Fight.PAD_CELL,0))*.8
+	var up := fight.global_position+(pad_center+Vector2(0,-Fight.PAD_CELL))*.8
+	var down := fight.global_position+(pad_center+Vector2(0,Fight.PAD_CELL))*.8
+	var left := fight.global_position+(pad_center-Vector2(Fight.PAD_CELL,0))*.8
+	var jab := fight.global_position+Vector2(766,482)*.8
+	fight.countdown = 0
+	var player_start: float = fight.fighters[0].x
+	touch(fight,right,0,true)
+	fight._physics_process(.1)
+	fight._physics_process(.1)
+	test.check(fight.fighters[0].x>player_start+15,"Held mobile D-pad moves across frames")
+	touch(fight,jab,1,true)
+	fight._physics_process(.02)
+	test.check(fight.pressed("right") and fight.fighters[0].move=="jab","Second finger attacks while holding movement")
+	touch(fight,jab,1,false)
+	test.check(fight.pressed("right") and not fight.pressed("jab"),"Releasing attack keeps direction held")
+	var drag := InputEventScreenDrag.new()
+	drag.index = 0
+	drag.position = Vector2(left.x,up.y)
+	fight._input(drag)
+	test.check(fight.pressed("left") and fight.pressed("jump") and not fight.pressed("right"),"Sliding to a diagonal combines jump and movement")
+	drag.position = down
+	fight._input(drag)
+	test.check(fight.pressed("guard") and not fight.pressed("left"),"Sliding down guards")
+	drag.position = jab
+	fight._input(drag)
+	test.check(not fight.pressed("guard") and not fight.pressed("jab"),"D-pad finger releases direction outside the pad without attacking")
+	drag.position = right
+	fight._input(drag)
+	touch(fight,right,0,false)
+	test.check(not fight.pressed("right"),"Releasing D-pad finger stops movement")
+	for item in Fight.MOBILE_BUTTONS:
+		var rect: Rect2 = item[2]
+		var point := fight.global_position+rect.get_center()*.8
+		test.check(fight.action_at(point)==item[0],"Scaled mobile attack hit region: "+item[0])
+	touch(fight,jab,1,true)
+	fight._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	test.check(not fight.pressed("jab") and not fight.pressed("jump"),"Focus loss clears held and buffered mobile input")
 	for name in Fight.ATTACKS:
 		fight.reset_round()
 		var f: Dictionary = fight.fighters[0]

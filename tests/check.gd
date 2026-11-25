@@ -142,7 +142,7 @@ func test_ui() -> void:
 	check(f.fighters[1].hp == 97,"Guard reduces damage")
 	check(not f._attack(f.fighters[1],"super"),"Burst requires charge")
 	var exit_touch := InputEventScreenTouch.new()
-	exit_touch.position = Vector2(915,490)
+	exit_touch.position = f.exit_rect().get_center()
 	exit_touch.pressed = true
 	f._input(exit_touch)
 	check(app.fight == null,"Touch exits sparring safely")
