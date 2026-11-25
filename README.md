@@ -24,6 +24,11 @@ Tap **Serve a drink** for a waiting order; use **Welcome customers** when quiet.
 No order means no sale. Open **Service** to see demand, service speed, occupancy,
 stock, payroll and recent actual profit.
 
+Inside the scene, customers stand on the public side of the bar, bartenders
+work behind the counters, and gold dots above customers mark waiting orders.
+The smaller passerby in the left street opening is background traffic, not an
+extra customer. Messages sit above the room so the floor remains visible.
+
 Save for signage, seating, a bartender and a pool table. Pool is available at
 beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
 Night attracts visitors but gives up pool fees; Happy Hour, Pool Tournament and

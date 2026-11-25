@@ -61,7 +61,14 @@ prompt is not deterministic; packing the committed sources is deterministic.
 `scripts/art.gd` owns texture lookup, venue stages, identities, semantic animation
 states, atlas bounds and event identifiers. City staff availability comes from
 the existing campaign state. Gogo stages use one, two or three pole positions;
-remaining hosts work the floor. The foreground counter occludes Anong's legs.
+remaining hosts work the floor. Interior adults share a floor-depth scale, including Anong and the inspector.
+The foreground counter occludes Anong's legs; crops of the original venue plate
+occlude bartenders behind the illustrated counters. Customers and pool tables
+are drawn in floor-depth order, with waiting-order dots above customer heads.
+Both pool tables stay indoors. Street traffic follows the visible outside lane;
+the furnished beer-bar terrace does not receive a passerby sprite. Event effects
+do not add an indoor decorative crowd. The message strip sits above the room,
+leaving customers' feet clear of the property selector.
 
 Fight simulation coordinates and attack durations remain unchanged. Presentation
 maps the simulation into the 960 × 540 scene, selecting anticipation, contact and
