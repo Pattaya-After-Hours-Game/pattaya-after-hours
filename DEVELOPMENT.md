@@ -96,6 +96,7 @@ the affected screens when changing visuals, controls, audio, or mobile layout.
 | `scripts/content.gd` | Six staff profiles, events, tours, weather, 51 incident cards, 15 story beats |
 | `scripts/city.gd` | Layered venue interiors, available workers, event treatments and Godzilla |
 | `scripts/district.gd` | Walkable neighborhood and links back to management tabs |
+| `scripts/windows_updates.gd` | Windows release checks, verified executable staging and update worker |
 | `scripts/fight.gd` | Mali's Toybox fights, three opponents, AI, keyboard/touch controls and timed sprite states |
 | `tests/check.gd` | Campaign and UI regression checks |
 | `tools/audio.py` | Rebuilds the committed music and sound effects |

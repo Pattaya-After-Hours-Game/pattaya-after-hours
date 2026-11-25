@@ -4,6 +4,15 @@ These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).
 
+## Unreleased — Branch consolidation
+
+- Combined the progression and customer-economy histories with current upstream
+  `main` (`87a0107`) on `codex/ready-for-main`; `main` itself is unchanged.
+- Preserved the Windows update feature while fitting its control into the new
+  header. Kept current release metadata with the finished artwork icon paths.
+- Prevented the headless update worker from running or autosaving a fresh street
+  campaign while it replaces the executable; added integration regression checks.
+
 ## Unreleased — Documentation and handover
 
 - Reworked the README into a current overview with play instructions and a

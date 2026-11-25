@@ -3,6 +3,7 @@ extends SceneTree
 const Campaign = preload("res://scripts/campaign.gd")
 const C = preload("res://scripts/content.gd")
 const Fight = preload("res://scripts/fight.gd")
+const Updates = preload("res://scripts/windows_updates.gd")
 var failures := 0
 
 func _initialize() -> void:
@@ -87,11 +88,12 @@ func run() -> void:
 	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
 	load("res://tests/street_check.gd").new().run(self)
 	test_risk()
+	test_windows_updates()
 	await test_ui()
 	load("res://tests/art_check.gd").new().run(self)
 	await load("res://tests/art_interaction_check.gd").new().run(self)
 	if failures == 0:
-		print("PASS · incident deck, endless year, street economy, chapters, migration, offline earnings, events, UI, arcade, tutorial, Godzilla and decision odds")
+		print("PASS · incident deck, endless year, street economy, chapters, migration, offline earnings, events, UI, arcade, tutorial, Godzilla, decision odds and Windows update checks")
 	quit(1 if failures else 0)
 
 func test_ui() -> void:
@@ -272,3 +274,36 @@ func test_risk() -> void:
 	var start_rng: int = model.rng.state
 	check(not model.pick(0).is_empty() and model.rng.state == start_rng and not model.s.night.has("results"),
 		"Unaffordable choices do not roll or register")
+
+
+func test_windows_updates() -> void:
+	var release := {"tag_name":"v1.12.0","draft":false,"prerelease":false,
+		"assets":[{"state":"uploaded","name":Updates.ARCHIVE},{"state":"uploaded","name":"SHA256SUMS.txt"}]}
+	check(Updates.latest_tag(release,"1.9.9") == "v1.12.0","New versions compare numerically")
+	check(Updates.latest_tag(release,"1.12.0").is_empty() and Updates.latest_tag(release,"1.13.0").is_empty(),"No reinstall or downgrade")
+	release.prerelease = true
+	check(Updates.latest_tag(release,"1.9.9").is_empty(),"Ignore prereleases")
+	release.prerelease = false
+	release.tag_name = "v1.12.0/../another"
+	check(Updates.latest_tag(release,"1.9.9").is_empty(),"Reject malformed release tags")
+	release.tag_name = "v1.12.0"
+	release.assets.pop_back()
+	check(Updates.latest_tag(release,"1.9.9").is_empty(),"Require the published checksum")
+	var digest := "ab".repeat(32)
+	check(Updates.expected_hash(digest + "  " + Updates.ARCHIVE + "\n") == digest,"Read the matching checksum")
+	check(Updates.expected_hash("zz".repeat(32) + "  " + Updates.ARCHIVE).is_empty(),"Reject invalid checksums")
+	var archive := "user://update-fixture.zip"
+	var pack := ZIPPacker.new()
+	check(pack.open(archive) == OK,"Create fixture archive")
+	pack.start_file(Updates.EXECUTABLE)
+	var payload := "MZ-test".to_utf8_buffer()
+	pack.write_file(payload)
+	pack.close_file()
+	pack.start_file("other-file.txt")
+	pack.write_file("ignore".to_utf8_buffer())
+	pack.close_file()
+	pack.close()
+	check(Updates.stage_executable(archive,"user://staged.exe") == OK
+		and FileAccess.get_file_as_bytes("user://staged.exe") == payload
+		and not FileAccess.file_exists("user://other-file.txt"),"Stage only the expected executable")
+	check(Updates.valid_folder(".pattaya-update-10-20") and not Updates.valid_folder(".pattaya-update-10-../other"),"Validate restart paths")

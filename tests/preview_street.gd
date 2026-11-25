@@ -92,6 +92,13 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.offline_notice = 0
 	await capture(app,"opening")
+	# Present updater controls without making requests or replacing a binary.
+	app.windows_updates = preload("res://scripts/windows_updates.gd").new()
+	app.add_child(app.windows_updates)
+	app.windows_updates.tag = "v9.0.0"
+	await capture(app,"windows-update")
+	app.windows_updates.queue_free()
+	app.windows_updates = null
 	fresh(app)
 	for kind in 3:
 		if kind > 0: app.model.street.action("buy",kind)

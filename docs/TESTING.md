@@ -103,3 +103,13 @@ Before a release, play a fresh opening, resume an older save, test pause/resume,
 check offline reporting, try touch/back controls and exercise platform-specific
 features on the target OS. Keep release numbers, signing identity and changelog
 in sync. Do not describe an exported package as a published or device-tested one.
+
+## Consolidated branch verification
+
+The follow-up merge with upstream `87a0107` was tested on
+`codex/ready-for-main`. Both feature branches and upstream main passed their own
+suites; the combined suite also passed, including new update-worker isolation
+and header-layout checks. Linux, Windows and macOS packages exported successfully,
+and the Linux startup smoke test passed. The exact inputs and maintainer notes
+are recorded in [MERGE_HANDOFF.md](MERGE_HANDOFF.md). Windows update execution and
+rollback still require Windows testing.

@@ -81,6 +81,21 @@ func run(test: SceneTree) -> void:
 	app.render()
 	app._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	test.check(app.offline_notice==0,"Android Back dismisses offline earnings")
+	# Simulate update availability on Linux without network or executable replacement.
+	app.windows_updates = preload("res://scripts/windows_updates.gd").new()
+	app.add_child(app.windows_updates)
+	app.windows_updates.tag = "v9.0.0"
+	app.render()
+	await test.process_frame
+	test.check(app.update_button.visible and app.update_button.get_global_rect().end.x<268,"Windows Update fits before the till in the new header")
+	test.check(test.find_button(app,"Serve a drink")!=null and test.find_button(app,"Welcome customers")!=null,"Updater integration retains both live economy actions")
+	var saved_before := FileAccess.get_file_as_string(Campaign.SAVE) if FileAccess.file_exists(Campaign.SAVE) else ""
+	var elapsed_before := int(app.model.s.street.elapsed)
+	app.updater_worker = true
+	app._process(20.0)
+	app._notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+	var saved_after := FileAccess.get_file_as_string(Campaign.SAVE) if FileAccess.file_exists(Campaign.SAVE) else ""
+	test.check(saved_after==saved_before and app.model.s.street.elapsed==elapsed_before,"Update worker cannot run or autosave a fresh campaign")
 	app.queue_free()
 	await test.process_frame
 	# Pointer coordinates use each view's displayed transform, not simulation units.

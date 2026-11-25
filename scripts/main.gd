@@ -7,6 +7,7 @@ const City = preload("res://scripts/city.gd")
 const District = preload("res://scripts/district.gd")
 const Art = preload("res://scripts/art.gd")
 const Fight = preload("res://scripts/fight.gd")
+const WindowsUpdates = preload("res://scripts/windows_updates.gd")
 const TEAL = Color("#71f9d2")
 const PINK = Color("#ff80b2")
 const GOLD = Color("#ffd083")
@@ -72,9 +73,21 @@ var shot_delay := 0.0
 var godzilla_meter: ProgressBar
 var godzilla_meter_label: Label
 var godzilla_clock: Label
+var windows_updates: WindowsUpdates
+var update_button: Button
+var updater_worker := false
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	updater_worker = WindowsUpdates.is_worker()
+	if updater_worker:
+		set_process(false)
+		WindowsUpdates.apply_update(get_tree())
+		return
+	if WindowsUpdates.supported():
+		windows_updates = WindowsUpdates.new()
+		add_child(windows_updates)
+		windows_updates.update_available.connect(_update_available)
 	var interface_font := FontVariation.new()
 	interface_font.base_font = ThemeDB.fallback_font
 	interface_font.fallbacks = [preload("res://assets/DejaVuSans.ttf")]
@@ -99,6 +112,14 @@ func _ready() -> void:
 	if not muted and DisplayServer.get_name() != "headless": music.play()
 	render()
 	if model.s.phase == "fight": enter_fight(false)
+	if windows_updates != null:
+		windows_updates.confirm_restart()
+		if DisplayServer.get_name() != "headless": windows_updates.check()
+
+func _update_available() -> void:
+	if is_instance_valid(update_button): update_button.show()
+	if model.s.phase == "plan" and campaign_before_tutorial == null and not is_instance_valid(district) and not is_instance_valid(fight):
+		windows_updates.ask()
 
 func box(fill: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -217,8 +238,13 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui.add_child(city)
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
-	abs_text(root_ui,Rect2(14,4,235,24),"PATTAYA / AFTER HOURS",19,GOLD)
-	abs_text(root_ui,Rect2(14,27,245,16),"PRACTICE SHIFT" if practicing else str(model.street.selected().name)+" · "+model.weekday(),12,TEAL)
+	abs_text(root_ui,Rect2(14,4,170 if windows_updates != null else 235,24),"AFTER HOURS" if windows_updates != null else "PATTAYA / AFTER HOURS",19,GOLD)
+	abs_text(root_ui,Rect2(14,27,170 if windows_updates != null else 245,16),"PRACTICE SHIFT" if practicing else str(model.street.selected().name)+" · "+model.weekday(),12,TEAL)
+	if windows_updates != null:
+		update_button = at_button(root_ui,Rect2(190,5,66,37),"Update",windows_updates.ask,true)
+		update_button.add_theme_font_size_override("font_size",12)
+		update_button.visible = not windows_updates.tag.is_empty()
+		update_button.disabled = model.s.phase == "godzilla"
 	metric(268,"TILL",cash(model.s.cash),TEAL)
 	metric(377,"STOCK",str(int(model.s.stock) if practicing else int(model.street.selected().stock)),GOLD)
 	metric(462,"REPUTATION",str(int(model.s.rep)),TEAL)
@@ -836,6 +862,7 @@ func street_ui_state() -> Array:
 	return [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day,model.s.phase,bar.open,bar.promo.is_empty()]
 
 func _process(delta: float) -> void:
+	if updater_worker: return
 	scene_clock += delta
 	service_animation = maxf(0,service_animation-delta)
 	serve_delay = maxf(0.0,serve_delay-delta)
@@ -965,6 +992,7 @@ func close_district() -> void:
 
 
 func _notification(what: int) -> void:
+	if updater_worker: return
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if campaign_before_tutorial == null: save_state()
 	if what == NOTIFICATION_APPLICATION_RESUMED and campaign_before_tutorial == null:
