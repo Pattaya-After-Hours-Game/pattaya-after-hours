@@ -93,6 +93,7 @@ func run() -> void:
 	load("res://tests/drink_prices_check.gd").new().run(self)
 	load("res://tests/regulars_club_check.gd").new().run(self)
 	load("res://tests/profit_cycle_check.gd").new().run(self)
+	load("res://tests/lease_check.gd").new().run(self)
 	load("res://tests/action_check.gd").new().run(self)
 
 	load("res://tests/staff_check.gd").new().run(self)
@@ -112,6 +113,7 @@ func run() -> void:
 	await load("res://tests/balance_guidance_check.gd").new().run_ui(self)
 	await load("res://tests/regulars_club_check.gd").new().run_ui(self)
 	await load("res://tests/profit_cycle_check.gd").new().run_ui(self)
+	await load("res://tests/lease_check.gd").new().run_ui(self)
 	await test_ui()
 	load("res://tests/art_check.gd").new().run(self)
 	load("res://tests/scene_check.gd").new().run(self)

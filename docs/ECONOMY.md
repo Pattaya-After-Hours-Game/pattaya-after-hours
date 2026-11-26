@@ -85,7 +85,7 @@ passes; their historical timings do not override these targets.
 | Venue | Standard receipt | Starting stock cost | Gross contribution | After Nida's 10%, before other costs |
 | --- | ---: | ---: | ---: | ---: |
 | Beer bar | ฿80 | ฿38 | ฿42 | ฿34 |
-| Soi bar | ฿100 | ฿38 | ฿62 | ฿52 |
+| hostess bar | ฿100 | ฿38 | ฿62 | ฿52 |
 | Gogo | ฿120 | ฿38 | ฿82 | ฿70 |
 
 These are game balance values, not promised real-world supplier terms. The
@@ -552,9 +552,24 @@ The cash report separately records inventory purchases when paid.
 Milestones belong to the venue. Renovation also requires its fee and the next
 shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿40,000. New
 leases additionally require a float for a ฿1,200 bartender contract, stock and existing street payroll.
-The first Soi lease is ฿16,000: a cheaper entry from the retiring owner, balanced
-against its higher overhead. This leaves room for contracts, individual training
-and action upgrades without delaying the second property past the active target.
+First purchased leases cost ฿12,000/24,000/60,000 for beer/hostess/gogo. Each
+prior same-type purchase adds 25% of its base lease, never compounded. The original
+beer bar in slot zero is excluded even if renamed. Existing owned venues count
+for future quotes, but retain their cash, progress and paid inventory without refunds.
+
+Every fourteenth game day offers an advertised 10% lease discount on one type,
+rotating hostess/beer/gogo from day fourteen. It applies after the repeat premium,
+to purchases during that day only. No reward is claimed or replayed; quotes derive
+from the saved date and current ownership. The menu does not advance the offer.
+The reopening, reputation, eight-property cap and full cash reserve gates remain.
+The retirement story no longer silently discounts every first hostess property.
+
+`street.lease_quote()` owns price, base/repeat/offer breakdown, retained reserve,
+total affordability, overhead and one-bartender house-drink break-even. Empire
+presents the same quote that purchase settlement uses. The reserve includes a
+bartender contract, a future stock pack, two minutes of new overhead and two
+minutes of existing open-venue operating costs. It stays in the till. Forecast
+break-even excludes pool and manager receipts and does not promise demand.
 Money earned elsewhere can fund the building but cannot buy its loyal clientele.
 There are no mandatory waiting timers. Renovation adds space, staffing positions
 and operating options; it does not increase ordinary beer prices.

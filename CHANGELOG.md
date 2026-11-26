@@ -1,5 +1,14 @@
 # Changelog
 
+## Hostess bars and clearer expansion pricing
+
+- Renamed the middle venue Hostess bar, preserving saves and artwork.
+- First leases now cost ฿12,000/24,000/60,000; repeat leases add 25% of base,
+  excluding the inherited Blue Hour. Renovations and paid ownership are unchanged.
+- Empire separates payment, retained opening cash, running costs and break-even.
+- Retiring-owner discounts are visible one-day 10% offers every fourteen days,
+  rotating hostess/beer/gogo, with no replayable payout or retroactive refunds.
+
 ## Profit cycle and Gabby — release integration
 
 - Visitors plan variable rounds, finish the final drink and leave or finish pool.

@@ -457,3 +457,15 @@ No grants, forced waiting or changed baseline policy hide pacing misses. Use
 `PATTAYA_PREVIEW_FILTER='cycle-*'` with the economy runner for locked tiers,
 visit/profit views and the 32/34-person production-art capacity cases.
 See [design](docs/design/PROFIT_CYCLE.md) and [verification](docs/TESTING.md).
+
+## Venue lease quotes
+
+`street.lease_quote(kind)` is the shared read-only source for Empire and purchase
+settlement. Repeat counts exclude the slot-zero inherited beer bar; ordinary
+owned venues count even if loaded from older saves. Type 1's display label is
+Hostess bar without changing numeric save IDs or artwork. Prices/offers derive
+from existing ownership/date fields, so this feature needs no schema bump.
+`lease_check.gd` checks reserve boundaries, exact settlement, repeats, live offer
+expiry, save preservation, manager gates and the real UI. `lease_balance.gd`
+compares fresh beer/hostess/gogo expansion routes with bounded street demand.
+Economy previews use `lease-*` at ordinary and wide resolutions.

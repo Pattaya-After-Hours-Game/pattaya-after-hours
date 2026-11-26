@@ -94,11 +94,36 @@ func staff_limit(bar: Dictionary) -> int:
 func upgrade_cost(bar: Dictionary) -> int:
 	return 0 if bar.stage >= 3 else int(C.RENOVATIONS[int(bar.type)][int(bar.stage)-1])
 
+func purchased_count(kind: int) -> int:
+	var count := 0
+	for slot in s.street.bars.size():
+		var bar: Dictionary = s.street.bars[slot]
+		# The inherited flagship is never a repeat purchase, even after renaming.
+		if slot==0 and bar.type==0: continue
+		if bar.type==kind: count += 1
+	return count
+
+func lease_sale(kind: int) -> bool:
+	return int(s.day)>=C.LEASE_SALE_DAYS and int(s.day)%C.LEASE_SALE_DAYS==0 and kind==C.LEASE_SALE_TYPES[(int(s.day)/C.LEASE_SALE_DAYS-1)%C.LEASE_SALE_TYPES.size()]
+
 func purchase_cost(kind: int) -> int:
-	var owned := 0
-	for bar in s.street.bars:
-		if bar.type == kind: owned += 1
-	return int(C.LEASES[kind])*(2+owned)/2
+	var normal := int(C.LEASES[kind])*(100+purchased_count(kind)*C.LEASE_REPEAT_PERCENT)/100
+	return normal*(100-C.LEASE_SALE_PERCENT)/100 if lease_sale(kind) else normal
+
+# A read-only opening quote. The reserve remains in the till; only the lease is paid.
+func lease_quote(kind: int) -> Dictionary:
+	var base := int(C.LEASES[kind])
+	var repeats := purchased_count(kind)
+	var surcharge := base*repeats*C.LEASE_REPEAT_PERCENT/100
+	var price_value := purchase_cost(kind)
+	var reserve := opening_reserve(kind)
+	var running := int(C.OVERHEAD[kind])+int(C.ROLE_WAGES[0])
+	var reason := ""
+	if s.street.bars.size()>=C.NAMES.size(): reason = "You own the whole soi."
+	elif s.street.chapter<1: reason = "Finish the Blue Hour reopening chapter."
+	elif s.rep<C.TYPES[kind].rep: reason = "Needs %d reputation." % C.TYPES[kind].rep
+	elif s.cash<price_value+reserve: reason = "Need ฿%d more, including opening cash." % (price_value+reserve-int(s.cash))
+	return {"base":base,"repeats":repeats,"surcharge":surcharge,"discount":base+surcharge-price_value,"price":price_value,"reserve":reserve,"required":price_value+reserve,"overhead":C.OVERHEAD[kind],"running":running,"break_even":float(running)/(int(C.TYPES[kind].drink)-C.STOCK_COST),"enabled":reason.is_empty(),"reason":reason}
 
 func drink_value(bar: Dictionary, _offline: bool = false) -> int:
 	return economy.price(bar)
@@ -166,11 +191,9 @@ func action(id: String, index: int = 0) -> String:
 			result = C.TYPES[int(bar.type)].stages[int(bar.stage)-1][2]
 		"buy":
 			if index < 0 or index >= C.TYPES.size(): return "Unknown venue type."
-			if s.street.bars.size() >= C.NAMES.size(): return "You own the whole soi. Keep developing your venues."
-			if s.street.chapter < 1: return "Finish the Blue Hour reopening chapter before expanding."
-			if s.rep < C.TYPES[index].rep: return "Needs %d reputation." % C.TYPES[index].rep
-			if s.cash < purchase_cost(index)+opening_reserve(index): return "The lease needs ฿%d plus ฿%d for opening stock, hiring and the street payroll." % [purchase_cost(index),opening_reserve(index)]
-			pay(purchase_cost(index))
+			var quote := lease_quote(index)
+			if not quote.enabled: return quote.reason
+			pay(quote.price)
 			var new_bar := make_bar(index,s.street.bars.size())
 			s.street.bars.append(new_bar)
 			var defaults: Dictionary = economy.new_fields()
@@ -192,7 +215,7 @@ func action(id: String, index: int = 0) -> String:
 			event.prepared = true
 			result = C.EVENTS[int(event.id)][2] + " arranged."
 		"festival":
-			if s.street.chapter < 4 or not festival_ready(): return "Needs a stage-3 beer bar, Soi bar and gogo."
+			if s.street.chapter < 4 or not festival_ready(): return "Needs a stage-3 beer bar, Hostess bar and gogo."
 			if not s.street.event.is_empty(): return "Finish the current street event first."
 			announce(9)
 			result = "After Hours Street Festival announced. Prepare the street!"
@@ -277,7 +300,7 @@ func next_goal() -> Dictionary:
 				focus = "MANAGEMENT"
 	elif chapter==1:
 		title = "A second address on the soi"
-		detail = "Anong: He's retiring again. This time, get the keys. Soi lease: %s Reputation %d/20. Other venue types remain your choice." % [goal_cash(purchase_cost(1),opening_reserve(1)),mini(20,int(s.rep))]
+		detail = "Anong: He's retiring again. This time, get the keys. Hostess lease: %s Reputation %d/20. Other venue types remain your choice." % [goal_cash(purchase_cost(1),opening_reserve(1)),mini(20,int(s.rep))]
 		tab = 3
 	elif chapter==2:
 		var managers := 0

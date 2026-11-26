@@ -13,7 +13,7 @@ Tap a top-bar stat on mobile or hover over it on desktop for a quick explanation
 
 ## Drink prices and restocking money
 
-House beers are ฿80 in beer bars, ฿100 in Soi bars and ฿120 in gogos.
+House beers are ฿80 in beer bars, ฿100 in hostess bars and ฿120 in gogos.
 Service shows the current standard quote and the cost of your next delivery.
 Happy Hour discounts new orders by 20%; already-waiting orders keep their quote.
 The premium-menu upgrade unlocks mango cocktails at ฿30 above house lager; renovation alone adds none.
@@ -381,7 +381,11 @@ buying a second venue. Soi venues require 20 reputation; gogos require 45.
 The combined active-play checks reach pool around 16–19 minutes, stage 2 around
 34–40 minutes and a second property around 117–123 minutes. After stage 2, the
 active policy improves pouring, trains staff and then saves for expansion.
-The first Soi lease is ฿16,000 plus opening reserves. These are
+First purchased leases are ฿12,000/24,000/60,000 for beer/hostess/gogo, plus
+retained opening cash. Each earlier same-type purchase adds 25% of base; the
+inherited Blue Hour does not count. Empire displays payment, retained float and
+ongoing costs separately. Every fourteenth day has a visible 10% retiring-owner
+offer, rotating hostess/beer/gogo. These are
 simulation results for a particular investment strategy, not timers or promises
 for every play style. [Economy details](ECONOMY.md) include the full measurements.
 

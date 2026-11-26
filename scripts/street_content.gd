@@ -6,7 +6,7 @@ const TYPES = [
 		["Plastic Chairs & Big Dreams", "Bottled beers, basic spirits, six stools and a secondhand fridge.", "Anong: The last owner said this place practically runs itself. He's at the airport. You're on ice duty."],
 		["The Local Favourite", "More floor space for pool, cocktails and sports screens. Equipment is purchased separately.", "The new sign works. The reopening party trips the power. Bo offers a generator with only one previous flood."],
 		["Soi Institution", "Live music and a packed terrace. Regulars keep this bar earning in low season.", "Mali's fight night finally pays. A regular asks for his own stool. Anong suggests he start by paying his tab."]]},
-	{"name":"Soi 6-style bar", "rep":20, "drink":100, "stages":[
+	{"name":"Hostess bar", "rep":20, "drink":100, "stages":[
 		["Something Upstairs", "Lady drinks, bar fines and one upstairs room. Adult hosts choose their own bookings.", "The previous owner retires for the fourth time. Dao checks the stairs before anyone checks the till."],
 		["The Busy Staircase", "Two rooms, a larger team and better music. Room for more hosted-drink customers.", "Pim has a music programme. Bo has delivered a karaoke machine. Neither considers this the same thing."],
 		["Soi Royalty", "Three rooms, experienced hosts and a recognisable neon frontage.", "Dao can now run both floors without you. Your new job is to stop offering advice during the rush."]]},
@@ -18,8 +18,8 @@ const TYPES = [
 const NAMES = ["Blue Hour", "High Tide", "Neon Mango", "Lucky Gecko", "Last Baht", "Velvet Tuk Tuk", "Moonlight", "After Eight"]
 const CHAPTERS = [
 	["Rent Is Due on Tuesday", "Establish a loyal customer base, renovate to stage 2, hire a bartender, appoint Dao and survive the reopening."],
-	["Everybody Knows Your Bar", "Buy a second property. Soi bars unlock at 20 reputation. Anong wants a street worth staying for."],
-	["Upstairs, Downstairs, Everywhere", "Own a Soi bar and give two venues managers. Dao runs the floor; Pim builds the music programme."],
+	["Everybody Knows Your Bar", "Buy a second property. Hostess bars unlock at 20 reputation. Anong wants a street worth staying for."],
+	["Upstairs, Downstairs, Everywhere", "Own a Hostess bar and give two venues managers. Dao runs the floor; Pim builds the music programme."],
 	["The Neon Arms Race", "Open a gogo and raise it to stage 2. Anton's LED budget is becoming a public nuisance."],
 	["The Whole Soi Knows Your Name", "Own all three bar types, bring each to stage 3, then host the After Hours Street Festival."],
 	["The Soi Never Sleeps", "The first festival is in the books. Keep growing, weather new seasons and host it again."]
@@ -128,7 +128,11 @@ const ROLE_NAMES = ["Bartender", "Adult host", "Adult dancer", "Adult promoter"]
 const ROLE_WAGES = [24,20,36,0] # per minute, including quiet periods
 const OVERHEAD = [18,45,90]
 const RENOVATIONS = [[4800,40000],[18000,65000],[45000,120000]]
-const LEASES = [21000,16000,85000] # The retired owner's Soi lease leaves room for staff and action investments.
+const LEASES = [12000,24000,60000] # Beer / hostess / gogo; paid leases never revalue.
+const LEASE_REPEAT_PERCENT = 25
+const LEASE_SALE_DAYS = 14
+const LEASE_SALE_PERCENT = 10
+const LEASE_SALE_TYPES = [1,0,2]
 const STAGE_GOALS = [
 	{"happy":70,"regulars":10,"healthy":8},
 	{"happy":450,"regulars":70,"healthy":40}

@@ -1,6 +1,6 @@
 # Pattaya After Hours
 
-Start with six stools and a warm fridge. Build the Blue Hour into a thriving beer bar, then own a mixed street of Soi-style bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
+Start with six stools and a warm fridge. Build the Blue Hour into a thriving beer bar, then own a mixed street of hostess bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
 
 **[Get it on Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522io.github.rknell.pattayaafterhours%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FPattaya-After-Hours-Game%252Fpattaya-after-hours%2522%252C%2522author%2522%253A%2522Pattaya-After-Hours-Game%2522%252C%2522name%2522%253A%2522Pattaya%2520After%2520Hours%2522%257D)** · **[Android APK](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest/download/PattayaAfterHours.apk)** · **[Desktop downloads](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)**
 
@@ -49,7 +49,7 @@ the property thumbnail; renovation alone does not install them.
 Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.
 Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
-House beers cost **฿80 at beer bars, ฿100 at Soi bars and ฿120 at gogos**.
+House beers cost **฿80 at beer bars, ฿100 at hostess bars and ฿120 at gogos**.
 Renovation does not raise these prices. House lager stock starts at ฿38 per drink, leaving
 ฿42/62/82 before wages and overhead. Happy Hour takes 20% off new
 orders; the purchased premium menu unlocks mango cocktails at ฿30 above house lager.
@@ -110,6 +110,22 @@ who is waiting, drinking or finishing pool. A cyan glass means drinking; the
 existing yellow/red dot means a waiting order. See the
 [profit-cycle design](docs/design/PROFIT_CYCLE.md) for tiers, prices and rules.
 
+## Choose your next business
+
+**Beer Bar → Hostess Bar → Gogo Bar** describes three different businesses.
+First purchased leases cost **฿12,000 / ฿24,000 / ฿60,000**. The inherited Blue
+Hour is excluded from the repeat premium. Each earlier purchase of the same type
+adds **25% of that type's base price**, without compounding: beer bars cost
+฿12,000, ฿15,000, ฿18,000, then ฿21,000. Renovation prices stay unchanged.
+
+Empire separates **pay now**, **keep in till**, **total opening cash**, running
+costs and estimated house-drink break-even. The reserve is not a second fee.
+Shared street traffic and local renovation milestones still apply.
+
+Retiring-owner offers are explicit: every fourteenth game day, one venue type
+gets 10% off leases for that day, rotating Hostess → Beer → Gogo. Empire shows
+the saving. Existing buildings, cash and stock receive no refunds or revaluation.
+
 ## Music, automation and management income
 
 | Purchase | Price and effect |
@@ -162,7 +178,7 @@ from insufficient cash.
 | Venue | Identity | Three stages |
 | --- | --- | --- |
 | Beer bar | Affordable drinks, pool and regulars | Plastic Chairs & Big Dreams → The Local Favourite → Soi Institution |
-| Soi 6-style bar | Hosted nightlife and repeat visitors | Something Upstairs → The Busy Staircase → Soi Royalty |
+| Hostess bar | Hosted nightlife and repeat visitors | Something Upstairs → The Busy Staircase → Soi Royalty |
 | Gogo | Performances, tourist demand and premium orders | First Spotlight → Neon Showroom → Walking Street Headliner |
 
 Own up to eight properties. Beer bars remain useful after new types unlock;
@@ -282,7 +298,7 @@ serves adds ฿5 to the nightly tip jar, alongside existing visit and drink bonu
 
 This update adds ten-day staff contracts, individual training that survives
 rehiring, measured 25/20/15-second service, and a waiting-order bell. Hiring and
-rehiring now cost ฿1,200 for bartenders (hosts/dancers remain ฿4,500); the first Soi lease is ฿16,000 to accommodate
+rehiring now cost ฿1,200 for bartenders (hosts/dancers remain ฿4,500); leases now follow the Beer/Hostess/Gogo ladder documented above, with room reserved for
 the new hiring reserve and training costs. Existing hires and training migrate,
 and offline projections stop crediting staff service at contract expiry. See the
 [player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).

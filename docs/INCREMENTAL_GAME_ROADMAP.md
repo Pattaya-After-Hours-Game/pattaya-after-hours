@@ -36,6 +36,15 @@ must not independently start two roadmap items.
 An empty or stale table is **not evidence that the other contributor is idle**.
 Never overwrite an existing claim or abandon another contributor's unfinished work.
 
+### Explicit expansion-pricing follow-up
+
+The user approved the Hostess Bar name and new lease ladder. Work is isolated in
+`codex/venue-pricing` at `/home/zak/projects/pattaya-venue-pricing`, based on main
+`654a60b`. The other shared checkout's host controls and bartender HUD are
+preserved, not replaced by this claim. Scope: type label, lease quote/settlement,
+visible rotating offers, expansion UI, tests and docs. Reconcile any newly
+committed upstream work and run combined tests before release.
+
 ### Claim, build, review, finish
 
 1. Read this table, the working tree diff, and the current handoff. Reconcile work

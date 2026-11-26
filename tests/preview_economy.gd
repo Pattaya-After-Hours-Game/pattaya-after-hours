@@ -36,7 +36,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	elif not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("lease-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 			if name_text=="gabby-hire": app.scroll.scroll_vertical = maxi(0,app.scroll.scroll_vertical-100)
 		await process_frame
@@ -61,6 +61,25 @@ func run() -> void:
 	app.start_new_game()
 	app.model = Campaign.new(72)
 	await capture(app,"opening")
+	app.show_tutorial_hint = false
+	app.model.s.street.chapter = 1
+	app.model.s.rep = 100
+	app.model.s.cash = 100000
+	app.change_tab(3)
+	await capture(app,"lease-first","Lease Beer bar")
+	await capture(app,"lease-hostess","Lease Hostess bar")
+	await capture(app,"lease-gogo","Lease Gogo bar")
+	app.model.street.action("buy",1)
+	app.change_tab(0)
+	await capture(app,"lease-hostess-owned")
+	app.change_tab(3)
+	app.model.street.action("buy",0)
+	app.model.s.cash = 1000
+	await capture(app,"lease-repeat-shortfall","Lease Beer bar")
+	app.model.s.day = 14
+	await capture(app,"lease-retirement-offer","Lease Hostess bar")
+	app.change_tab(0)
+	app.model = Campaign.new(72)
 	var wrong_stock: Dictionary = app.model.street.selected()
 	wrong_stock.stock = 30
 	for guest in wrong_stock.customers:

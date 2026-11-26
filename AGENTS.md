@@ -5,7 +5,7 @@
 Build a cheeky, adult nightlife idle/incremental business game set on a fictional
 Pattaya street. The player and co-owner Anong rescue the Blue Hour, earn a loyal
 customer base, automate a viable bar, and eventually operate a mixed street of
-beer bars, Soi-style venues and gogos. Everyday business comedy grows into
+beer bars, hostess bars and gogos. Everyday business comedy grows into
 cartoon chaos, including Godzilla. The street continues after its first festival.
 
 The central loop is:
@@ -53,6 +53,13 @@ claiming behaviour exists; update the relevant documentation when it changes.
   Advice and visit details are read-only. Customer contribution uses consumed paid
   stock and excludes manager income, tips and investments; keep the till cashflow
   sample unchanged. See [profit-cycle rules](docs/design/PROFIT_CYCLE.md).
+- Venue type 1 is labelled Hostess bar; numeric identity and production art stay
+  unchanged. Lease bases are ฿12,000/24,000/60,000. Each earlier same-type purchase
+  adds 25% of base, excluding the inherited slot-zero beer bar. Never refund old
+  purchases. Every fourteenth day has a visible 10% offer, rotating hostess/beer/
+  gogo. `street.lease_quote()` owns price, retained opening cash, affordability and
+  cost estimates. Only the lease is spent; the reserve stays in the till. Keep
+  local renovation/manager gates and all renovation prices unchanged.
 - Pool costs **฿50 per game per table**, charged once at game start; new games last 30 seconds.
   Preserve saved remaining time for games already underway, including older 45-second games. Free Pool
   Night trades fees for attraction. Timers, capacity, customer budgets and

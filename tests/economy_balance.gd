@@ -5,7 +5,7 @@ const C = preload("res://scripts/street_content.gd")
 func _initialize() -> void:
 	call_deferred("run")
 
-func simulate(seed_value: int, style: String, minutes: int = 600, opening: String = "manual", use_chat: bool = true, feature: String = "") -> Dictionary:
+func simulate(seed_value: int, style: String, minutes: int = 600, opening: String = "manual", use_chat: bool = true, feature: String = "", expansion: int = 1) -> Dictionary:
 	var model = Campaign.new(seed_value)
 	var st = model.street
 	var eco = st.economy
@@ -101,8 +101,8 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if bar.stage>=2 and not bar.manager and model.s.cash>2000: st.action("manager")
 		if bar.manager and opening=="manual" and style!="mostly-idle" and bar.action_levels.welcoming==0:
 			st.action("action_upgrade",1)
-		if model.s.street.bars.size()==1 and model.s.street.chapter>=1 and model.s.cash>=st.purchase_cost(1)+st.opening_reserve(1):
-			st.action("buy",1)
+		if model.s.street.bars.size()==1 and model.s.street.chapter>=1 and model.s.cash>=st.purchase_cost(expansion)+st.opening_reserve(expansion):
+			st.action("buy",expansion)
 			if model.s.street.bars.size()>1: times.second = second
 		if model.s.street.bars.size()>1:
 			model.s.street.selected = 1

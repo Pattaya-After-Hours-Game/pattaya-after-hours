@@ -1,5 +1,28 @@
 # Testing and release checks
 
+## Lease ladder and Hostess Bar verification — 26 November 2026
+
+Godot 4.7.2 `tools/test.sh` passes with zero failures on the isolated pricing
+branch: gameplay/save/UI checks, 66 fresh campaigns and the existing 60 party,
+80 club and 120 profit-cycle scenarios. New lease tests verify the inherited-bar
+exemption, non-compounding repeat prices, exact reserve boundaries, actual
+payment, rotating offers, reload preservation and stage-one manager gating.
+
+Across three matched balanced seeds, second-property opening takes 84.2–92.2
+minutes for beer bars, 92.5–103.5 for hostess bars and 129.8–139.3 for gogos.
+Their first stage-three flagship takes 123.6–134.3, 129.9–142.8 and 165.4–175.6
+minutes respectively. All remain solvent and demand-limited. The cheaper beer
+route is intentionally useful; stage-two managers still need earned venue
+progress, and later story chapters still require a mixed street. No manager
+income, renovation price or existing pacing criterion changed.
+
+The baseline active hostess route reaches property two in 92.5–103.5 minutes
+and stage three in 129.9–142.8, with longest investment gaps 33.9–36.2 minutes.
+Empire previews at 960×540 and 1280×720 cover the three leases, repeat surcharge,
+shortfall and an explicit retiring-owner offer. No production assets were replaced.
+Device play and full-festival balancing remain unverified. Upstream integration
+is checked separately before the release is called ready.
+
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 

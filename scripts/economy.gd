@@ -1316,7 +1316,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			commit_orders(bar)
 			return "Rota updated. Nida earns no commission or hourly wages." if bar.team[index].role==3 else "Rota updated. Off-duty staff do not incur wages."
 		"role":
-			if bar.type==0 or index<0 or index>=bar.team.size(): return "Choose a team member at a Soi bar or gogo."
+			if bar.type==0 or index<0 or index>=bar.team.size(): return "Choose a team member at a Hostess bar or gogo."
 			if index in bar.away: return "Wait until this team member returns."
 			var person: Dictionary = bar.team[index]
 			if person.get("identity","")=="gabby": return "Gabby works as a bartender."

@@ -446,7 +446,7 @@ func render(keep_scroll: bool = false) -> void:
 				thumb.size = Vector2(56,32)
 				thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 				card.add_child(thumb)
-				abs_text(card,Rect2(2,34,58,18),"%d · %s %d" % [i+1,["BEER","SOI","GOGO"][int(b.type)],b.stage],10,Color("#241820") if i == model.s.street.selected else GOLD)
+				abs_text(card,Rect2(2,34,58,18),"%d · %s %d" % [i+1,["BEER","HOST","GOGO"][int(b.type)],b.stage],10,Color("#241820") if i == model.s.street.selected else GOLD)
 			else:
 				card.text = "+\nLEASE"
 				card.add_theme_font_size_override("font_size",11)
@@ -882,8 +882,16 @@ func empire_panel() -> void:
 	body("AVAILABLE LEASES",GOLD,12)
 	for kind in StreetContent.TYPES.size():
 		var info: Dictionary = StreetContent.TYPES[kind]
-		row_button("Buy %s · %s" % [info.name,cash(model.street.purchase_cost(kind))],street_action.bind("buy",kind))
-		body("Needs chapter 2 · %d reputation\nBare premises: ฿%d/real min plus staff; opening reserve ฿%d.\nOne bartender: break-even %.1f drinks/real min before pool." % [info.rep,StreetContent.OVERHEAD[kind],model.street.opening_reserve(kind),float(StreetContent.OVERHEAD[kind]+StreetContent.ROLE_WAGES[0])/(int(info.drink)-StreetContent.STOCK_COST)],MUTED,12)
+		var quote: Dictionary = model.street.lease_quote(kind)
+		var buy := row_button("Lease %s · %s" % [info.name,cash(quote.price)],street_action.bind("buy",kind))
+		buy.name = "Lease_"+str(kind)
+		buy.disabled = not quote.enabled
+		body("Base %s + %s repeat premium (%d earlier purchases). Blue Hour excluded." % [cash(quote.base),cash(quote.surcharge),quote.repeats],MUTED,12)
+		if quote.discount>0: body("Retiring-owner offer · today only: %d%% off (save %s)" % [StreetContent.LEASE_SALE_PERCENT,cash(quote.discount)],TEAL,12)
+		body("Pay now: %s\nKeep in till: %s for hiring, next stock pack and opening payroll\nCash needed to open: %s" % [cash(quote.price),cash(quote.reserve),cash(quote.required)],WHITE,13)
+		body("Bare premises %s/min · with one bartender %s/min\nEstimated break-even %.1f house drinks/min before pool or manager income. Running costs exclude stock; break-even includes it. Shared traffic does not guarantee buyers.\nNeeds chapter 2 · %d reputation" % [cash(quote.overhead),cash(quote.running),quote.break_even,info.rep],MUTED,12)
+		if not quote.enabled: body(quote.reason,PINK,12)
+
 	row_button("Host After Hours Street Festival",street_action.bind("festival"))
 	body("Needs stage 3 in all three bar types. A warned district boss event completes the first story arc.")
 	body("Anong · %d trust / Neighbours · %d trust\nSafety %d / Permits %d" % [model.s.partner,model.s.trust,model.s.safety,model.s.license],WHITE,14)

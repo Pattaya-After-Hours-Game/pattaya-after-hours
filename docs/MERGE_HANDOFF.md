@@ -1,5 +1,15 @@
 # Current implementation and release handoff
 
+## Hostess naming and expansion prices — 26 November 2026
+
+User-approved follow-up in `codex/venue-pricing`, isolated at
+`/home/zak/projects/pattaya-venue-pricing` from main `654a60b`. The separate shared
+checkout has ongoing host controls and bartender HUD work; it is preserved.
+This follow-up changes the lease ladder, repeat premiums, visible retirement
+offers, model-owned opening quotes and type-1 display name. Renovation prices,
+paid ownership and save identities stay unchanged. Combined checks and upstream
+reconciliation are required before release.
+
 ## Profit-cycle implementation — 26 November 2026
 
 Branch `codex/profit-cycle` preserves completed Gabby work in its own checkpoint

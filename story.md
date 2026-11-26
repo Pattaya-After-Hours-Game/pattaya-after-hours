@@ -13,7 +13,7 @@ a warm fridge and a battered neon sign.
 The previous owner said it was a goldmine. He also said the roof didn't leak.
 
 Your first ambition is modest: keep the drinks cold and put more money in the
-till than you take out. Eventually, you will own a street of beer bars, Soi-style
+till than you take out. Eventually, you will own a street of beer bars, hostess
 venues and gogos, each with its own customers, staff and problems.
 
 > **Anong:** “The last owner said this place practically runs itself. He's at the
@@ -339,9 +339,11 @@ into a business that can operate without your hand on every bottle.
 
 The regulars recognise you. So do the suppliers and rivals. Anong begins looking
 past the Blue Hour's doorway. Another owner announces his retirement for the
-fourth time, creating the opportunity to buy a Soi-style property. His discounted
-lease leaves room in the budget for a team; the higher running costs and a new
-customer base still need work.
+fourth time, creating the opportunity to buy a hostess bar. Its ฿24,000 base
+lease sits between a ฿12,000 beer bar and a ฿60,000 gogo. The owner's retirement
+is a story opportunity, not a hidden permanent discount. Every fortnight the
+property board advertises a one-day 10% retirement offer, rotating venue types.
+Higher running costs and a new customer base still need work.
 
 The second lease is not a second guaranteed crowd. It needs its own reputation
 with customers. The player learns that financing a building and establishing a
