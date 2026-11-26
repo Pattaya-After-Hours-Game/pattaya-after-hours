@@ -143,9 +143,10 @@ player selects an option; no contract ageing, offline claim or autosave on the m
 
 Inspect `git status`, the current branch and relevant worktrees first. Preserve
 other work. The merge handover records a historical integration state; do not
-assume its branch names or paths describe every future checkout. Unless the user
-asks otherwise, work on a feature branch and leave merging to `main` and release
-publication to the maintainer. Follow the user's explicit task and scope.
+assume its branch names or paths describe every future checkout. For requests
+from Ryan (`rknell`), sync `main`, verify the change, then commit and push
+directly to `main` unless he asks for a branch or pull request. For other
+maintainers, follow their instructions. The release workflow runs on `main`.
 
 For gameplay, save, integration or asset changes, run `tools/test.sh`. It isolates
 saves and editor settings and includes the pacing suite. Never run destructive
