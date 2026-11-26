@@ -72,10 +72,12 @@ all owned progress, cash, paid stock, quotes, budgets and timers, with no club
 entitlement, free training or retroactive manager refund. Ordinary receipts and
 offline estimates remain limited by demand, service, supply and operating costs.
 
-Current active pacing acceptance: stage two **30–45 min**, second property
+Current active pacing acceptance: stage two **28–45 min**, second property
 **75–115**, stage three **110–210**; manager saving gap **≤21 min**, longest
 investment gap **≤38 min**. Milestones use nearest-minute comparisons; gaps use
-exact seconds. The following dated pricing/bonus/balance sections document prior
+exact seconds. Active profit-cycle routes target a **2.5–5-minute median** between
+flagship investments at stage two. The user confirmed the faster lower bounds
+without changing prices. The following dated pricing/bonus/balance sections document prior
 passes; their historical timings do not override these targets.
 
 ## Earlier venue pricing pass — 26 November 2026

@@ -1,6 +1,6 @@
 # Changelog
 
-## Profit cycle — source implementation
+## Profit cycle and Gabby — release integration
 
 - Visitors plan variable rounds, finish the final drink and leave or finish pool.
   Satisfied one-round visits count; club/birthday adds one non-stacking round.
@@ -11,6 +11,8 @@
 - Schema 13 preserves paid progress and legacy visitors; offline estimates use
   variable rounds. Existing prices and manager exception remain.
 - Includes the separately preserved Gabby integration below.
+- User confirmed unchanged prices with stage two from 28 minutes and a
+  2.5–5-minute median investment cadence; other pacing bounds are unchanged.
 
 ## Gabby bartender — local source
 

@@ -194,10 +194,13 @@ claim unpublished work is already in release downloads.
 Anong's next-step guidance is a pure read of chapter requirements and business
 state. Navigation may select a venue/tab and scroll, never purchase, pay rewards,
 advance chapters/time, or run RNG. Retain the shared chapter predicates and
-existing gates. Current active pacing bounds keep stage two at 30–45 minutes,
+existing gates. Current active pacing bounds keep stage two at 28–45 minutes,
 second property at 75–115 and stage three at 110–210. Measure the saving gaps as
 well: first-manager wait at most 21 minutes and longest between-investment gap
-at most 38 in baseline active policies. These are balance checks, not wait timers.
+at most 38 in baseline active policies. Stage-two flagship investment cadence
+targets a 2.5–5-minute median in active
+profit-cycle policies. The user confirmed these faster lower bounds while keeping
+prices unchanged. These are balance checks, not wait timers.
 
 Nightly street closure starts a free 15-second clean-up/countdown for all venues.
 The model owns the automatic noon skip and cancellation; UI only presents/input.

@@ -9,15 +9,16 @@ profit and schema-13 saves. No other worktrees or attachments were changed.
 See the [design](design/PROFIT_CYCLE.md), [economy](ECONOMY.md) and measured
 [verification](TESTING.md#profit-cycle-verification--26-november-2026).
 
-Gameplay/save/UI checks and matched bottleneck scenarios pass. Baseline stage
-two is slightly faster than the existing lower target in two runs; five new
-purchase-cadence medians are slightly below the requested three minutes. These
-failures remain visible in tests. The user decision on keeping prices and
-accepting faster lower bounds versus retuning is pending. Do not merge/publish
-this branch as verified until that decision and the complete wrapper pass.
+The user confirmed keeping prices and accepting stage two from 28 minutes and
+2.5–5-minute median flagship purchase cadence. Other bounds remain unchanged.
+Gabby is already committed as `1a23e49` and included in the feature branch; no
+second copy or re-hire migration is necessary. The complete Godot 4.7.2 `tools/test.sh` wrapper passed with zero failures,
+including Gabby and all 57 fresh campaigns. Both features are included in the
+main integration. Main's workflow retests, exports and publishes signed downloads;
+verify its completion before claiming the release is available.
 The local desktop export is not a signed Android release or device playtest.
 
-## Gabby addition — local source, 26 November 2026
+## Gabby addition — included in main integration, 26 November 2026
 
 Adds a named adult bartender with pale skin, a very short red dress and her own
 four-pose atlas/portrait. Service offers her normal ฿1,200 ten-day contract when
@@ -28,7 +29,7 @@ no migration rewards or offline tips are added. Schema remains 12.
 
 The pre-existing Nida/pool work was preserved and reached `cc30403` while this
 addition was underway. Combined tests and Gabby UI/art checks pass; see
-[testing](TESTING.md). Gabby was preserved in local commit `1a23e49`, not yet a published build.
+[testing](TESTING.md). Gabby was preserved in commit `1a23e49` and included with the profit-cycle integration.
 
 ## Nida and pool update — 26 November 2026
 

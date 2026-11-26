@@ -5,8 +5,8 @@ It is a handover checklist, not a claim that every platform has been played.
 
 ## Profit-cycle verification — 26 November 2026
 
-Working branch: `codex/profit-cycle`, based on `cc30403` and the separate Gabby
-checkpoint `1a23e49`. Source and release status are distinct.
+Main integration includes `codex/profit-cycle` (`b48b427`) and the separate Gabby
+checkpoint `1a23e49`, based on `cc30403`. Source and release status are distinct.
 
 Gameplay/save/UI regressions pass, including variable visit plans, final-drink
 occupancy, happy one-drink departures, budget/stock limits, pool completion and
@@ -48,20 +48,21 @@ is **160–189 seconds** (2m40s–3m09s). All gaps are printed, including occasi
 5–11-minute gaps and much longer late idle-route gaps. Mostly-idle routes remain
 slower and solvent; their cadence is not held to the active-player target.
 
-**Unresolved acceptance:** `tools/test.sh` currently fails the unchanged baseline
-stage-two lower bound in two click-heavy seeds: 1676s and 1769s against the
-30-minute target. The new cycle suite also reports five active cadence medians
-below 180s. No target was silently weakened and no unrelated price changed.
-The user has been asked whether to keep prices and accept 28-minute stage two /
-2.5–5-minute median purchase cadence, or retune to the original lower bounds.
-Until resolved, the branch is not release-ready and is not deployed to main.
+**Confirmed acceptance:** the user confirmed keeping prices and accepting stage
+two from 28 minutes and an active flagship purchase median of 150–300 seconds.
+This explicitly resolves the two earlier stage-two lower-bound failures (1676s
+and 1769s, compared at nearest-minute precision) and five cadence medians below
+180s. Other targets remain unchanged. The complete Godot 4.7.2 `tools/test.sh` wrapper passes with zero failures:
+gameplay/save/UI regressions, 57 fresh campaigns, 60 celebration scenarios, 80
+club scenarios and 120 profit-cycle scenarios. Prior failures are retained here
+as the reason for this agreed change.
 
 Production-art previews at 960×540 and 1280×720 cover locked/unlocked tiers,
 waiting/drinking/finishing-pool details, customer profit and 32/34-person capacity.
 Linux, Windows and macOS exports and isolated Linux startup were checked locally.
 Android device play, Windows/macOS execution, human retention and a published
 release of this feature remain unverified. Previous dated records below are
-historical and do not certify this feature's pending pacing targets.
+historical and do not replace this feature's combined verification.
 
 ## Gabby verification — 26 November 2026
 

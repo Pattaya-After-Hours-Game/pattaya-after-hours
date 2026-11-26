@@ -6,7 +6,8 @@ Start with six stools and a warm fridge. Build the Blue Hour into a thriving bee
 
 ![The Blue Hour and its neighborhood at dusk](docs/blue-hour.png)
 
-This source includes the full customer cast, New Game / Resume, the day/night
+The current source integrates Gabby and the expanded customer profit cycle, with
+existing saves preserved. It includes the full customer cast, New Game / Resume, the day/night
 clock, owner cooldowns/Chat and retained staff training. Day seven now brings a
 free Anong’s Birthday celebration, followed by weekly neighbourhood parties. Recent updates add music, auto-serve, two-second pouring, supplier discounts,
 manager income and a five-second ฿/s display, alongside

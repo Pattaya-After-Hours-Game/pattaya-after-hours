@@ -62,7 +62,7 @@ func run() -> void:
 			result.cycle_gaps = gaps
 			print(JSON.stringify(result))
 			if result.stage3<0 or result.cash<0 or result.sales>result.orders or result.arrivals>result.offered+3: failures += 1
-			if style!="mostly-idle" and (result.cycle_median<180 or result.cycle_median>300):
+			if style!="mostly-idle" and (result.cycle_median<150 or result.cycle_median>300):
 				printerr("CYCLE CADENCE FAIL: %s seed %d median %ds" % [style,seed_value,result.cycle_median])
 				failures += 1
 	print("PROFIT CYCLE · %d failures across 120 paired scenarios and nine fresh campaigns" % failures)

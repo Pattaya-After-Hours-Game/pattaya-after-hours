@@ -96,4 +96,6 @@ Cadence counts actual flagship investments while at stage two, excluding ordinar
 stock deliveries, renewals and purchases for another property. Report the median
 and every gap, including long manager-saving gaps; do not hide those in an
 average. Milestone and cadence bounds require explicit user approval to change.
-See the current verification record for measured results and unresolved targets.
+The user confirmed keeping prices and accepting stage two from 28 minutes and
+a 2.5–5-minute median cadence. Other milestone and saving-gap bounds remain
+unchanged. See the current verification record for measured results.
