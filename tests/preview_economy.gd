@@ -17,10 +17,23 @@ func find_text(node: Node, text: String) -> Control:
 
 func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not filter.is_empty() and not name_text.match(filter): return
+	var targets := {"YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
+	var upgrade_target: String = targets.get(scroll_to,"")
+	var was_open: bool = app.upgrades_open
+	var ready_only: bool = app.upgrades_ready_only
+	var forecast_open: bool = app.nida_forecast_open
+	if name_text=="promoter-hire-forecast": app.nida_forecast_open = true
+	if not upgrade_target.is_empty():
+		app.upgrades_open = true
+		app.upgrades_ready_only = false
 	app.render()
 	await process_frame
 	await process_frame
-	if not scroll_to.is_empty():
+	if not upgrade_target.is_empty():
+		var card := app.column.find_child(upgrade_target,true,false) as Control
+		if card: app.scroll.ensure_control_visible(card)
+		await process_frame
+	elif not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
 			if name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
@@ -28,6 +41,9 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 		await process_frame
 	await RenderingServer.frame_post_draw
 	get_root().get_texture().get_image().save_png(output.path_join(name_text+".png"))
+	app.upgrades_open = was_open
+	app.upgrades_ready_only = ready_only
+	app.nida_forecast_open = forecast_open
 
 func run() -> void:
 	if output.is_empty() or DisplayServer.get_name() == "headless":
@@ -47,6 +63,17 @@ func run() -> void:
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	await capture(app,"economy-opening")
+	var start_cash: int = app.model.s.cash
+	app.model.s.cash = 1800
+	await capture(app,"upgrades-badge")
+	app.upgrades_open = true
+	await capture(app,"upgrades-ready")
+	app.upgrades_ready_only = false
+	await capture(app,"upgrades-all")
+	app.model.s.cash = start_cash
+	await capture(app,"upgrades-locked")
+	app.upgrades_open = false
+	app.upgrades_ready_only = true
 	app.model.street.action("mixed_drinks")
 	app.drink_list_open = true
 	await capture(app,"economy-drinks")

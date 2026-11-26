@@ -132,6 +132,10 @@ Return slow stock at half its purchase cost to free fridge space.
 
 ## Give yourself a faster shift
 
+Open **Service → Upgrades** to see what you can buy. The number badge on Service
+jumps to ready upgrades for the selected venue. **Show all** lists locked options,
+and **?** explains what an upgrade does and what it needs.
+
 The Serve and Welcome buttons fill back up as foreground time passes. The label
 shows seconds remaining, Ready, or why the action is unavailable. Each venue has
 its own timers. Bartenders keep serving while your own Serve button refills.

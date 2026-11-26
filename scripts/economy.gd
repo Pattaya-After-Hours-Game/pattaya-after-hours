@@ -973,21 +973,47 @@ func start_promotion(bar: Dictionary, kind: int) -> String:
 		"pool_revenue":0,"free_games":0,"regulars":0,"lost":0,"fee":int(item.fee),"operating":0,"operating_credit":0,"baseline":forecast(bar).arrivals*2.0}
 	return "%s started. Compare the report after two minutes." % item.name
 
-func buy_equipment(bar: Dictionary, index: int) -> String:
-	if index<0 or index>=C.EQUIPMENT.size(): return "Unknown equipment."
+func equipment_offer(bar: Dictionary,index: int) -> Dictionary:
 	var item: Dictionary = C.EQUIPMENT[index]
 	var id: String = item.id
-	if id=="training": return "Choose an individual team member to train in Service."
-	if bar.equipment[id]>=equipment_limit(bar,id,int(item.max)): return "Already fully equipped."
-	if id=="pool" and bar.type!=0: return "Pool tables belong in beer bars."
-	if id=="pool" and bar.equipment.pool>=bar.stage: return "Upgrade the venue before adding another table."
-	if id=="menu" and bar.stage<2: return "Premium menus unlock at stage 2."
 	var amount := int(item.cost)*(int(bar.equipment[id])+1)
-	if s.cash<amount+operating_rate(bar)*2: return "Keep the next shift's operating reserve after this purchase."
-	s.cash -= amount
-	s.weekly.costs += amount
-	bar.equipment[id] += 1
+	var maxed: bool = int(bar.equipment[id])>=equipment_limit(bar,id,int(item.max))
+	var reason := ""
+	if id=="training": reason = "Choose an individual team member to train in Service."
+	elif maxed: reason = "Already fully equipped."
+	elif id=="pool" and bar.type!=0: reason = "Pool tables belong in beer bars."
+	elif id=="pool" and bar.equipment.pool>=bar.stage: reason = "Upgrade the venue before adding another table."
+	elif id=="menu" and bar.stage<2: reason = "Premium menus unlock at stage 2."
+	elif s.cash<amount+operating_rate(bar)*2: reason = "Keep the next shift's operating reserve after this purchase."
+	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"maxed":maxed}
+
+func buy_equipment(bar: Dictionary, index: int) -> String:
+	if index<0 or index>=C.EQUIPMENT.size(): return "Unknown equipment."
+	var offer := equipment_offer(bar,index)
+	if not offer.enabled: return offer.reason
+	var item: Dictionary = C.EQUIPMENT[index]
+	s.cash -= offer.price
+	s.weekly.costs += offer.price
+	bar.equipment[item.id] += 1
 	return "%s installed. %s" % [item.name,item.help]
+
+func auto_serve_offer(bar: Dictionary) -> Dictionary:
+	var enabled: bool = s.cash>=C.AUTO_SERVE_COST+operating_rate(bar)*2
+	return {"enabled":enabled,"price":C.AUTO_SERVE_COST,"reason":"" if enabled else "Keep the next shift's reserve after the ฿3,000 auto-serve purchase."}
+
+func training_offer(bar: Dictionary,index: int,audience: bool) -> Dictionary:
+	var person: Dictionary = bar.team[index]
+	var level := int(person.get("audience_training" if audience else "training",0))
+	var amount := (C.AUDIENCE_TRAINING_COST if audience else C.STAFF_TRAINING_COST)*(level+1)
+	var maxed := level>=(2 if audience else C.STAFF_SERVICE_SECONDS.size()-1)
+	var reason := ""
+	if not contracted(person): reason = "Rehire this team member before training."
+	elif audience and not int(person.role) in [2,3]: reason = "Audience training is for promoters and dancers."
+	elif not audience and person.role!=0: reason = "Service training is for bartenders. Reassign their role first."
+	elif maxed: reason = "Already fully trained."
+	elif audience and bar.stage<level+2: reason = "Needs venue stage %d." % (level+2)
+	elif s.cash<amount+operating_rate(bar)*2: reason = "Keep a shift's operating reserve after training."
+	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"maxed":maxed,"level":level}
 
 func upgrade_reason(bar: Dictionary) -> String:
 	if bar.stage>=3: return "Final stage reached."
@@ -1003,7 +1029,8 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if bar.auto_serve:
 				bar.auto_serve_on = not bar.auto_serve_on
 				return "Auto-serve %s. The existing Serve cooldown is unchanged." % ("on" if bar.auto_serve_on else "off")
-			if s.cash<C.AUTO_SERVE_COST+operating_rate(bar)*2: return "Keep the next shift's reserve after the ฿3,000 auto-serve purchase."
+			var offer := auto_serve_offer(bar)
+			if not offer.enabled: return offer.reason
 			s.cash -= C.AUTO_SERVE_COST
 			s.weekly.costs += C.AUTO_SERVE_COST
 			bar.auto_serve = true
@@ -1141,32 +1168,18 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			person.service_clock = 0
 			commit_orders(bar)
 			return "Rehired for ten game days. Their training is unchanged."
-		"train_audience":
-			if index<0 or index>=bar.team.size(): return "Choose a promoter or dancer."
-			var person: Dictionary = bar.team[index]
-			if not int(person.role) in [2,3]: return "Audience training is for promoters and dancers."
-			if not contracted(person): return "Rehire before training."
-			var level := int(person.get("audience_training",0))
-			if level>=2: return "Already fully trained."
-			if bar.stage<level+2: return "Needs venue stage %d." % (level+2)
-			var amount := C.AUDIENCE_TRAINING_COST*(level+1)
-			if s.cash<amount+operating_rate(bar)*2: return "Keep the next shift's operating reserve."
-			s.cash -= amount
-			s.weekly.costs += amount
-			person.audience_training = level+1
-			return "Audience training improved. Skills stay with the person after rehiring."
-		"train_staff":
+		"train_audience","train_staff":
 			if index<0 or index>=bar.team.size(): return "Choose a team member."
+			var audience := id=="train_audience"
+			var offer := training_offer(bar,index,audience)
+			if not offer.enabled: return offer.reason
 			var person: Dictionary = bar.team[index]
-			if not contracted(person): return "Rehire this team member before training."
-			if person.role!=0: return "Service training is for bartenders. Reassign their role first."
-			var level := int(person.get("training",0))
-			if level>=C.STAFF_SERVICE_SECONDS.size()-1: return "Already fully trained."
-			var amount := C.STAFF_TRAINING_COST*(level+1)
-			if s.cash<amount+operating_rate(bar)*2: return "Keep a shift's operating reserve after training."
-			s.cash -= amount
-			s.weekly.costs += amount
-			person.training = level+1
+			s.cash -= offer.price
+			s.weekly.costs += offer.price
+			if audience:
+				person.audience_training = int(offer.level)+1
+				return "Audience training improved. Skills stay with the person after rehiring."
+			person.training = int(offer.level)+1
 			return "Training retained for future contracts. Now serves one drink every %ds." % service_seconds(person)
 		"bar_fine":
 			if index<0 or index>=bar.team.size() or bar.team[index].role!=1: return "Choose an adult host."

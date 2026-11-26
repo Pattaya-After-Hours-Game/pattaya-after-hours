@@ -53,6 +53,14 @@ func run(test: SceneTree) -> void:
 	var before := int(app.model.s.street.served)
 	await click(test,test.find_button(app,"Serve a drink"))
 	test.check(app.model.s.street.served==before+1,"Serve remains accessible with drawer closed")
+	app.model.s.cash = 1000
+	app.sync_upgrade_badge(true)
+	await click(test,app.upgrade_badge)
+	test.check(app.upgrades_open and app.upgrades_ready_only,"The Service notification opens the ready list with a pointer tap")
+	var pouring := app.column.find_child("Upgrade_pouring",true,false) as Button
+	await click(test,pouring)
+	test.check(app.model.s.cash==100 and app.model.street.selected().action_levels.pouring==1 and not app.upgrade_badge.visible,"Buying from the upgrade card updates cash, speed and the badge")
+	app.close_drawer()
 	app.model.s.cash = 999999
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 4

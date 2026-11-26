@@ -237,8 +237,18 @@ func run_ui(test: SceneTree) -> void:
 	app.street_action("chat")
 	test.check(test.find_button(app,"Have a chat").disabled and test.find_button(app,"Welcome customers").disabled,"Chat visibly locks both social controls")
 	app.model.s.cash = 10000
-	app.update_action_controls()
-	test.check(not app.upgrade_controls[0][0].disabled and app.upgrade_controls[0][0].text.contains("10s → 8s"),"Upgrade affordability updates live and shows exact improvement")
+	app.sync_upgrade_badge(true)
+	test.check(app.upgrade_badge.visible and int(app.upgrade_badge.text)>0,"The upgrade badge appears when cash makes an upgrade affordable")
+	app.upgrade_badge.pressed.emit()
+	var pouring := app.column.find_child("Upgrade_pouring",true,false) as Button
+	test.check(app.upgrades_open and not pouring.disabled and pouring.icon!=null and pouring.text.contains("10s → 8s"),"The badge opens ready upgrades with icons and clear effects")
+	app.model.s.cash = 0
+	app.sync_upgrade_badge(true)
+	test.check(not app.upgrade_badge.visible and app.column.find_child("Upgrade_pouring",true,false)==null,"An unaffordable upgrade disappears from the ready list")
+	app.open_upgrades(false)
+	pouring = app.column.find_child("Upgrade_pouring",true,false) as Button
+	test.check(pouring.disabled and pouring.icon!=null,"Show all reveals locked upgrades and keeps their icons")
+	app.model.s.cash = 10000
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	for guest in bar.customers: guest.order = false
