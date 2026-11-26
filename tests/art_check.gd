@@ -10,6 +10,10 @@ func run(test: SceneTree) -> void:
 		if variant[0]=="patrons-men": male_variants[variant[1]] = true
 	test.check(male_variants.size()==9,"All nine male customer sprites, including the supplied-reference guest, are reachable")
 	test.check(Art.customer_sprite(2)==["patrons-capybara",0] and Art.customer_sprite(26)==Art.customer_sprite(2),"The capybara regular appears at the opening and on later visits")
+	var capybara_poses := []
+	for time in [0.0,1.6,3.1,3.5,4.9,6.6,7.0,8.0]:
+		capybara_poses.append(Art.capybara_frame(time))
+	test.check(capybara_poses==[0,1,2,3,4,2,0,0],"Capybara blinks, lowers, sits, blinks again, stands and repeats")
 	test.check(Art.customer_sprite(3)==["patrons-rainbow-duo",0] and Art.customer_sprite(35)==Art.customer_sprite(3),"The rainbow duo appears on opening day and returns on later visits")
 	for kind in 3:
 		for stage in range(1,4):

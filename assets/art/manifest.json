@@ -418,10 +418,10 @@
   "patrons-capybara": {
     "file": "res://assets/art/patrons-capybara.png",
     "size": [
-      224,
+      1120,
       192
     ],
-    "sha256": "1b8bfccd551315446b89c362afd1516a433bc45732d5bffbeb101bf1fab57914"
+    "sha256": "23ff44796328303bfc3a898381a2769cc7efd39dc88dbc4a9cd550cfaae02b46"
   },
   "patrons-men": {
     "file": "res://assets/art/patrons-men.png",
@@ -434,10 +434,10 @@
   "patrons-rainbow-duo": {
     "file": "res://assets/art/patrons-rainbow-duo.png",
     "size": [
-      160,
+      320,
       192
     ],
-    "sha256": "395cf8cfdbf7cc584f11968c3f068bc06842464d2edb652422e951225e33edd1"
+    "sha256": "96c95cf5b311d07fd12f33c6e203c46e00df567310fe3bcd00f4ebb461c145d9"
   },
   "patrons": {
     "file": "res://assets/art/patrons.png",

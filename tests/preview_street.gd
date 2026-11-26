@@ -105,6 +105,17 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.offline_notice = 0
 	await capture(app,"opening")
+	if filter.contains("companion"):
+		for sample in [["stand",0.0],["blink",1.60],["lower",3.1],["sit",3.5],["sit-blink",4.90],["rise",6.6],["stand-again",7.0]]:
+			app.scene_clock = sample[1]
+			await capture(app,"companion-capybara-"+sample[0])
+		app.duo_reaction.assign({"id":3,"until":app.scene_clock+1.2})
+		await capture(app,"companion-duo-kiss")
+		app.scene_clock += .47
+		await capture(app,"companion-duo-heart")
+		app.scene_clock += .8
+		await capture(app,"companion-duo-idle")
+		app.duo_reaction.clear()
 	# Present updater controls without making requests or replacing a binary.
 	app.windows_updates = preload("res://scripts/windows_updates.gd").new()
 	app.add_child(app.windows_updates)

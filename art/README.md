@@ -144,14 +144,16 @@ or `customer-beard-glasses-*` for a small group led by the reference guest.
 The runtime catalog includes the fan ownership overlays and nine additional
 male customers.
 
-The capybara regular uses one wide sprite anchored under the customer's shoes.
-It appears in the opening crowd and on later visits through the same customer
-appearance lookup. The leash and pet are part of the sprite. The
-[generation recipe](recipes/customer-capybara.json) records the prompt.
+The capybara regular uses a wide atlas anchored under the customer's shoes.
+The pet blinks, lowers onto its haunches, and stands again on an eight-second
+loop. The existing customer pose and leash anchor are aligned across all five
+cells. See the [original generation recipe](recipes/customer-capybara.json).
 
-The rainbow duo and their orange dog use a single sprite for a shared order on
-opening day and recurring visits. The [customer jobs](recipes/customer-jobs.json)
-include the cutout recipe.
+The rainbow duo and their orange dog share one sprite and one order on opening
+day and recurring visits. Double-click or tap them to swap to their kiss frame
+for 1.2 seconds, with a heart rising from their lips. The [customer jobs](recipes/customer-jobs.json)
+include the original cutout recipe. Both new pose sheets use built-in ImageGen
+references and are packed as aligned cells for the [companion animations](recipes/companion-poses.md).
 See [the cast lineup](../docs/customer-cast.png) and
 [testing notes](../docs/TESTING.md) for review coverage.
 

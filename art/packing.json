@@ -426,7 +426,8 @@
       160,
       192
     ],
-    "height": 180
+    "height": 180,
+    "pose_sheet": "customer-rainbow-duo-kiss.png"
   },
   "nida": {
     "frames": [
@@ -450,7 +451,8 @@
       192
     ],
     "height": 180,
-    "foot_x_fraction": 0.26
+    "foot_x_fraction": 0.26,
+    "pose_sheet": "customer-capybara-poses.png"
   },
   "gabby": {
     "frames": [

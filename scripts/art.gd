@@ -86,10 +86,10 @@ static func frame(canvas: CanvasItem, id: String, index: int, foot: Vector2, sca
 
 static func atlas_specs() -> Dictionary:
 	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),9],"nida":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
-	specs["patrons-capybara"] = [Vector2(224,192),1]
+	specs["patrons-capybara"] = [Vector2(224,192),5]
 	specs["gabby"] = [Vector2(160,192),4]
 	specs["daisy"] = [Vector2(160,256),6]
-	specs["patrons-rainbow-duo"] = [Vector2(160,192),1]
+	specs["patrons-rainbow-duo"] = [Vector2(160,192),2]
 	for id in STAFF: specs[id] = [Vector2(160,192),4]
 	for id in HOSTS: specs[id] = [Vector2(160,256),6]
 	for id in ["mali","juno","vega","orchid"]: specs["fight-"+id] = [Vector2(320,256),12]
@@ -101,6 +101,14 @@ static func customer_sprite(customer_id: int) -> Array:
 	if customer_id%32==3: return ["patrons-rainbow-duo",0]
 	# Existing saved IDs keep a guest's look stable as other guests leave.
 	return CUSTOMER_VARIANTS[(maxi(1,customer_id)-1)%CUSTOMER_VARIANTS.size()]
+
+static func capybara_frame(time: float) -> int:
+	var phase := fposmod(time,8.0)
+	if phase>=1.50 and phase<1.68: return 1
+	if phase>=3.0 and phase<3.22 or phase>=6.5 and phase<6.72: return 2
+	if phase>=3.22 and phase<6.5:
+		return 4 if phase>=4.8 and phase<4.98 else 3
+	return 0
 
 # Semantic animation catalog. Contact frames are selected by the combat simulator.
 static func animation_frames(id: String, state: String) -> Array:

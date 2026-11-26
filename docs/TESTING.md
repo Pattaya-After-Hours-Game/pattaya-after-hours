@@ -1,5 +1,13 @@
 # Testing and release checks
 
+## Companion animations — 27 November 2026
+
+The isolated `tools/test.sh` suite passes on Godot 4.7.2, including the
+capybara frame sequence, mouse double-click, simulated touch tap, return to
+idle, and unchanged order and campaign state. The `companion-*` art previews
+were checked at 960×540 and 1280×720. The Linux export starts headless and
+opens a desktop window. Physical touch-device play remains unverified.
+
 ## Upgrade blocker visibility — 27 November 2026
 
 Synced through `860b56c`, retaining price ordering and live cash shortfalls.

@@ -8,9 +8,14 @@ const TEAL = Color("#73f5dc")
 const PINK = Color("#f37ab0")
 const GOLD = Color("#e8ba7b")
 const ORDER_URGENT = Color("#ff514d")
+const KISS_SECONDS = 1.2
+const HEART_OUTLINE = [Vector2(-6,-4),Vector2(-2,-4),Vector2(0,-2),
+	Vector2(2,-4),Vector2(6,-4),Vector2(7,-1),Vector2(5,2),Vector2(0,7),
+	Vector2(-5,2),Vector2(-7,-1)]
 var clock := 0.0
 var street_state: Dictionary = {}
 var arrival_time := 0.0
+var duo_reaction := {}
 var night := false
 var celebrating := false
 var godzilla := ""
@@ -31,13 +36,42 @@ signal select_bar(index: int)
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_PASS
 
 func _process(delta: float) -> void:
 	clock += delta
 	arrival_time += delta
 	service_flash = maxf(0,service_flash-delta)
 	queue_redraw()
+
+func _gui_input(event: InputEvent) -> void:
+	if bars.is_empty(): return
+	if event is InputEventMouseButton:
+		if event.device==InputEvent.DEVICE_ID_EMULATION or event.button_index!=MOUSE_BUTTON_LEFT or not event.pressed or not event.double_click: return
+	elif event is InputEventScreenTouch:
+		if event.device==InputEvent.DEVICE_ID_EMULATION or not event.pressed: return
+	else:
+		return
+	var point: Vector2 = event.position * Vector2(960,540) / size
+	var people := scene_people(bars[selected_bar])
+	people.reverse()
+	for person in people:
+		if person.behind_bar or not _person_contains(person,point): continue
+		if person.who=="patrons-rainbow-duo":
+			duo_reaction.assign({"id":person.customer_id,"until":clock+KISS_SECONDS})
+			accept_event()
+		return
+
+func _person_contains(person: Dictionary, point: Vector2) -> bool:
+	var cell: Vector2 = Art.atlas_specs()[person.who][0]
+	var scale_value := person_scale(person.foot.y)
+	var pixel := (point-Vector2(person.foot))/scale_value + Vector2(cell.x*.5,cell.y-4)
+	if not Rect2(Vector2.ZERO,cell).has_point(pixel): return false
+	var x := int(cell.x)-1-int(pixel.x) if person.flip else int(pixel.x)
+	var texture := Art.texture(person.who)
+	var columns := int(texture.get_width()/cell.x)
+	return texture.get_image().get_pixel(x+person.pose%columns*int(cell.x),
+		int(pixel.y)+person.pose/columns*int(cell.y)).a>.5
 
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
@@ -76,6 +110,7 @@ func _draw() -> void:
 			_draw_person(item)
 	# Markers are drawn after the people so a nearer guest cannot hide an order.
 	for person in people:
+		if person.who=="patrons-rainbow-duo" and person.pose==1: _draw_kiss_heart(person)
 		if person.get("chat_until",0.0)>float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0)):
 			var feedback := order_position(person)+Vector2(-31,-14)
 			draw_style_box(_sign_box(),Rect2(feedback-Vector2(4,15),Vector2(78,21)))
@@ -192,6 +227,15 @@ func _draw_person(person: Dictionary) -> void:
 	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
 	Art.frame(self,person.who,person.pose,foot,scale_value,person.flip)
 
+func _draw_kiss_heart(person: Dictionary) -> void:
+	var progress := 1.0-(float(duo_reaction.until)-clock)/KISS_SECONDS
+	# Mouth contact in the kiss sprite is at (57,44), relative to its (80,188) pivot.
+	var scale_value := person_scale(person.foot.y)
+	var origin: Vector2 = person.foot+Vector2(23 if person.flip else -23,-144-progress*38)*scale_value
+	var points := PackedVector2Array()
+	for point in HEART_OUTLINE: points.append(origin+point*scale_value)
+	draw_colored_polygon(points,Color(1.0,.32,.55,1.0-smoothstep(.35,1.0,progress)))
+
 static func counter_regions(kind: int, stage: int) -> Array[Rect2]:
 	if kind==0:
 		if stage==1: return [Rect2(250,270,300,85),Rect2(665,290,180,110)]
@@ -287,7 +331,12 @@ func scene_people(bar: Dictionary) -> Array:
 				if player>=0: foot = Vector2(250+int(game.get("table",0))*200+player*205,355+int(game.get("table",0))*12)
 		var customer_id: int = int(bar.customers[i].id) if bar.has("customers") else i+1
 		var appearance := Art.customer_sprite(customer_id)
-		people.append({"who":appearance[0],"pose":appearance[1],"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})
+		var pose: int = appearance[1]
+		if appearance[0]=="patrons-capybara":
+			pose = Art.capybara_frame(clock+float(customer_id/24)*1.31)
+		elif appearance[0]=="patrons-rainbow-duo" and duo_reaction.get("id",-1)==customer_id and clock<float(duo_reaction.get("until",0.0)):
+			pose = 1
+		people.append({"who":appearance[0],"pose":pose,"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})
 		people.back().visit_phase = bar.customers[i].get("visit_phase","legacy") if bar.has("customers") else "legacy"
 		people.back().costume = bar.has("customers") and bar.customers[i].get("costume",false)
 		people.back().order_seconds_left = Economy.order_seconds_left(bar,bar.customers[i]) if bar.has("customers") else Content.PATIENCE_SECONDS

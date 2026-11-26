@@ -96,7 +96,10 @@ for name,frames in groups.items():
     if name.startswith('fight-'):
         spec.update(cell=[320,256],height=200,frame_heights=[200,200,200,160,185,185,200,190,185,195,52,235])
     if name=='monster': spec.update(cell=[320,320],height=290,frame_heights=[290,290,290,210])
-    if name=='patrons-capybara': spec.update(cell=[224,192],foot_x_fraction=0.26)
+    if name=='patrons-capybara':
+        spec.update(cell=[224,192],foot_x_fraction=0.26,pose_sheet='customer-capybara-poses.png')
+    if name=='patrons-rainbow-duo':
+        spec.update(pose_sheet='customer-rainbow-duo-kiss.png')
     packing[name]=spec
 normalize(Image.open(SRC/'compact-bench.png'),(240,128),120,False).save(OUT/'compact-bench.png')
 Image.open(SRC/'portrait-nida.png').convert('RGBA').resize((96,96),NEAREST).save(OUT/'portrait-nida.png')
@@ -128,8 +131,13 @@ if recipe.exists():
             for index,path in enumerate(spec['frames']):
                 height=spec.get('frame_heights',[spec.get('height',180)]*len(spec['frames']))[index]
                 frames.append(normalize(Image.open(SRC/path),cell,height,not (name.startswith('fight-') and index==10),spec.get('foot_x_fraction')))
-            atlas=Image.new('RGBA',(cell[0]*len(frames),cell[1]))
+            poses = Image.open(SRC/spec['pose_sheet']).convert('RGBA') if 'pose_sheet' in spec else None
+            if poses and (poses.height != cell[1] or poses.width % cell[0]):
+                raise ValueError(f'Unaligned pose sheet: {name}')
+            width = cell[0]*len(frames)
+            atlas=Image.new('RGBA',(width + (poses.width if poses else 0),cell[1]))
             for i,frame in enumerate(frames): atlas.alpha_composite(frame,(i*cell[0],0))
+            if poses: atlas.alpha_composite(poses,(width,0))
             atlas.save(OUT/(name+'.png'))
         if name in ['bee','may','june','lek','fah','nan','daisy','fight-juno','fight-vega','fight-orchid']:
             original=Image.open(SRC/spec['frames'][0]).convert('RGBA')

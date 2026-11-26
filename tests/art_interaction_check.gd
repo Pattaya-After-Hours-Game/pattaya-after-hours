@@ -42,6 +42,39 @@ func run(test: SceneTree) -> void:
 	app.render()
 	await test.process_frame
 	test.check(not app.drawer.visible,"Management starts dismissed")
+	var duo_point := Vector2(592,300)
+	var before_reaction := JSON.stringify(app.model.s)
+	var mouse := InputEventMouseButton.new()
+	mouse.position = duo_point
+	mouse.button_index = MOUSE_BUTTON_LEFT
+	mouse.pressed = true
+	test.root.push_input(mouse,true)
+	test.check(app.duo_reaction.is_empty(),"A single mouse click leaves the duo idle")
+	mouse.pressed = false
+	test.root.push_input(mouse,true)
+	mouse.pressed = true
+	mouse.double_click = true
+	test.root.push_input(mouse,true)
+	test.check(app.duo_reaction.get("id")==3,"Double-clicking the duo starts its kiss")
+	mouse.pressed = false
+	test.root.push_input(mouse,true)
+	app.render()
+	var opening_bar: Dictionary = app.model.street.selected()
+	var duo: Dictionary = app.city.scene_people(opening_bar).filter(func(person: Dictionary) -> bool: return person.get("customer_id")==3)[0]
+	test.check(duo.pose==1,"The kiss pose survives a scene refresh")
+	app.city.clock += 1.3
+	duo = app.city.scene_people(opening_bar).filter(func(person: Dictionary) -> bool: return person.get("customer_id")==3)[0]
+	test.check(duo.pose==0,"The duo returns to idle after the kiss")
+	app.duo_reaction.clear()
+	var finger := InputEventScreenTouch.new()
+	finger.position = duo_point
+	finger.pressed = true
+	test.root.push_input(finger,true)
+	test.check(app.duo_reaction.get("id")==3,"Tapping the duo starts its kiss")
+	finger.pressed = false
+	test.root.push_input(finger,true)
+	app.duo_reaction.clear()
+	test.check(JSON.stringify(app.model.s)==before_reaction,"The reaction leaves the campaign and waiting orders alone")
 	await click(test,test.find_button(app,"Service"))
 	test.check(app.drawer_open and app.drawer.visible,"Pointer opens Service drawer")
 	test.check(app.scroll.get_v_scroll_bar().max_value<=app.scroll.get_v_scroll_bar().page,"The opening Service dashboard fits without scrolling")

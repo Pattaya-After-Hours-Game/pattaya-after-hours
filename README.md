@@ -44,6 +44,8 @@ extra customer. Messages sit above the room so the floor remains visible.
 The customer cast includes older regulars and Indian, Korean, Black and Thai
 visitors, with outfits ranging from scruffy holiday wear to tailored clubwear.
 Looks stay consistent during each visit and do not determine spending behaviour.
+The capybara blinks and settles onto its haunches before standing again.
+Double-click the rainbow duo or tap them on a touchscreen to see them kiss.
 Wall fans appear only after buying **Fans & comfortable seats**, including in
 the property thumbnail; renovation alone does not install them.
 Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.

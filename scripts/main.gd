@@ -94,6 +94,7 @@ var race_meter: ProgressBar
 var race_clock: Label
 var race_course: Control
 var scene_clock := 0.0
+var duo_reaction := {}
 var service_animation := 0.0
 var tab := 0
 var guide := 2
@@ -390,6 +391,7 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
 	if boot_menu:
+		duo_reaction.clear()
 		render_boot_menu()
 		return
 	var practicing := campaign_before_tutorial != null
@@ -399,6 +401,7 @@ func render(keep_scroll: bool = false) -> void:
 	city.size = Vector2(960,540)
 	city.clip_contents = true
 	city.clock = scene_clock
+	city.duo_reaction = duo_reaction
 	city.service_flash = service_animation
 	city.night = model.s.phase in ["incident","fight","report","godzilla"]
 	city.godzilla = model.s.night.get("godzilla","")

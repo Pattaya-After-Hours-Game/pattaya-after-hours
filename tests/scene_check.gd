@@ -92,7 +92,7 @@ func run(test: SceneTree) -> void:
 			test.check(staff.size()==1 and staff[0].behind_bar,"Only available bartender appears behind the counter")
 			test.check(people.filter(func(p: Dictionary) -> bool: return p.order).size()==model.street.economy.pending(bar),"Visible markers match actual waiting orders")
 			for guest in guests:
-				appearances["%s/%d" % [guest.who,guest.pose]] = true
+				appearances["%s/%d" % Art.customer_sprite(guest.customer_id)] = true
 				test.check(guest.foot.x>=240 and guest.foot.x<840,"Indoor guest stays out of street and fridge")
 				test.check(guest.foot.y+4*City.person_scale(guest.foot.y)<373,"Guest feet clear the property dock")
 				test.check(City.order_position(guest).y<guest.foot.y-180*City.person_scale(guest.foot.y),"Waiting-order marker is above the silhouette")
