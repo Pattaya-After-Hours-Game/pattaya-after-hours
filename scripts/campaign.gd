@@ -698,6 +698,13 @@ func _read(path: String) -> Variant:
 				for key in ["id","phase","remaining","prepared"]:
 					if not data.event.has(key): return null
 				if int(data.event.id) < 0 or int(data.event.id) >= Street.C.EVENTS.size(): return null
+				if int(data.event.id)>=Street.C.Local.ENCORE:
+					if not _finite_number(data.event.get("venue"),0,data.bars.size()-1): return null
+					if float(data.event.venue)!=floorf(float(data.event.venue)): return null
+					if not _finite_number(data.event.get("serial"),0,1e15): return null
+					for flag in ["attempted","game_won","encore","lucky","early","solo"]:
+						if data.event.has(flag) and not data.event[flag] is bool: return null
+					if data.event.has("runner") and not _finite_number(data.event.runner,0,6): return null
 		if int(parsed.version) >= 3:
 			for key in ["elapsed","economy_seed","next_customer","pass_credit","offered","arrivals","orders","guided","offline_report"]:
 				if not parsed.street.has(key): return null

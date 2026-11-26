@@ -178,10 +178,16 @@ func action(id: String, index: int = 0) -> String:
 			economy.ensure_stock_lots(new_bar)
 			s.street.selected = s.street.bars.size()-1
 			result = "%s opens. %s" % [new_bar.name,C.TYPES[index].stages[0][2]]
+		"encore_solo":
+			var event: Dictionary = s.street.event
+			if event.get("id",-1)!=C.Local.ENCORE or event.phase!="warning" or event.prepared: return "The setup window has closed."
+			event.solo = true
+			result = "Anong puts out the sign. Work the crowd yourself."
 		"prepare":
 			var event: Dictionary = s.street.event
 			if event.is_empty() or event.phase != "warning": return "Preparation closes when the event starts."
 			if event.prepared: return "Already prepared."
+			if event.id==C.Local.BED and race_staff(s.street.bars[int(event.venue)])<0: return "Enter with an available bartender."
 			if not pay(C.EVENTS[int(event.id)][3]): return "The preparation needs more cash."
 			event.prepared = true
 			result = C.EVENTS[int(event.id)][2] + " arranged."
@@ -295,13 +301,14 @@ func next_goal() -> Dictionary:
 	return {"title":title,"detail":detail,"focus":focus,"tab":tab,"venue":0}
 
 func announce(id: int) -> void:
-	s.street.event = {"id":id,"phase":"warning","remaining":C.RAT_WARNING_SECONDS if id==C.RAT_PLAGUE else 60,"prepared":false}
+	s.street.event = {"id":id,"phase":"warning","remaining":C.RAT_WARNING_SECONDS if id==C.RAT_PLAGUE else 30 if id>=C.Local.ENCORE else 60,"prepared":false,"serial":s.street.get("elapsed",0)}
+	if id>=C.Local.ENCORE: s.street.event.venue = s.street.selected
 	record("COMING UP · " + C.EVENTS[id][0] + ": " + C.EVENTS[id][1])
 
 func start_event() -> void:
 	var event: Dictionary = s.street.event
 	event.phase = "active"
-	event.remaining = C.RAT_PLAGUE_SECONDS if event.id==C.RAT_PLAGUE else 90
+	event.remaining = C.RAT_PLAGUE_SECONDS if event.id==C.RAT_PLAGUE else 45 if event.id>=C.Local.ENCORE else 90
 	record("TONIGHT · " + C.EVENTS[int(event.id)][0])
 	if event.id==C.RAT_PLAGUE:
 		if event.prepared:
@@ -312,6 +319,28 @@ func start_event() -> void:
 				fled += bar.customers.size()
 				economy.clear_visits(bar)
 			record("RAT PLAGUE · %d guests bolt for the door. New walk-ins are scarce." % fled)
+	if int(event.id)>=C.Local.ENCORE:
+		var target: Dictionary = s.street.bars[int(event.venue)]
+		match int(event.id):
+			C.Local.ENCORE:
+				event.encore = posmod(hash(Vector2i(int(s.street.economy_seed),int(event.serial))),2)==0
+				if not event.get("early",false) or event.prepared or event.get("solo",false):
+					record("The band plays an encore. Expect two waves." if event.encore else "The final song ends. Here comes the crowd.")
+			C.Local.CART:
+				if event.prepared:
+					var units := mini(4,economy.stock_capacity(target)-int(target.stock))
+					if units>0: economy.add_stock(target,0,units,economy.drink_cost(target,0))
+					record("Bo gets through on foot with %d cold lagers." % units)
+			C.Local.BED:
+				var runner := race_staff(target) if event.prepared else -1
+				event.prepared = runner>=0
+				if runner>=0:
+					event.runner = runner
+					target.away.append(runner)
+			C.Local.LIZARD:
+				if event.prepared:
+					event.lucky = posmod(hash(Vector2i(int(s.street.economy_seed),int(event.serial))),4)!=0
+					record("Locals are already talking about a lucky round." if event.lucky else "The locals leave the rescuers some space.")
 	if event.id in [0,2,3,4] and not event.prepared:
 		var protected: bool = (event.id == 2 and s.license >= 75 and s.safety >= 65) or (event.id == 3 and s.trust >= 60)
 		if not protected:
@@ -321,6 +350,32 @@ func start_event() -> void:
 				var fine := mini(900,int(s.cash) / 5)
 				pay(fine)
 				record("Inspection: paperwork gaps. ฿%d fine; a short closure for corrections." % fine)
+
+func race_staff(bar: Dictionary) -> int:
+	for i in bar.team.size():
+		var worker: Dictionary = bar.team[i]
+		if worker.role==0 and worker.on and economy.contracted(worker) and i not in bar.away: return i
+	return -1
+
+func begin_event_game() -> int:
+	var event: Dictionary = s.street.event
+	var id := int(event.get("id",-1))
+	if s.phase!="plan" or event.get("phase","")!="active" or event.get("attempted",false): return -1
+	if not ((id==C.Local.CART and not event.prepared) or (id==C.Local.BED and event.prepared)): return -1
+	event.attempted = true
+	return id
+
+func settle_event_game(id: int, won: bool) -> String:
+	var event: Dictionary = s.street.event
+	if id!=int(event.get("id",-1)) or not event.get("attempted",false) or event.has("game_won"): return ""
+	event.game_won = won
+	if id==C.Local.CART:
+		return "Traffic cleared. Bo can deliver again." if won else "Bo will wait out the jam."
+	if won:
+		s.street.bars[int(event.venue)].bed_trophy = true
+		s.rep = mini(100,int(s.rep)+3)
+		return "You won the bed race! The trophy is on the wall."
+	return "Bo’s bed finished. Eventually."
 
 func finish_event(won: bool = true) -> void:
 	if s.street.event.is_empty(): return
@@ -337,6 +392,8 @@ func finish_event(won: bool = true) -> void:
 		if id == 9:
 			s.street.festival = true
 			s.street.festivals += 1
+	if id==C.Local.BED and event.has("runner"):
+		s.street.bars[int(event.venue)].away.erase(int(event.runner))
 	if id == 3 and event.prepared: s.trust = mini(100,int(s.trust)+8)
 	if id == 5: s.rep = clampi(int(s.rep)+(4 if event.prepared else -2),0,100)
 	if id == 6 and event.prepared: record("The locals appreciate the invitation. Good visits can earn their loyalty.")
@@ -350,6 +407,9 @@ func end_shift() -> void:
 	s.street.seconds = 0
 	for bar in s.street.bars:
 		bar.away.clear()
+		var event: Dictionary = s.street.event
+		if event.get("id",-1)==C.Local.BED and event.has("runner") and s.street.bars[int(event.venue)]==bar:
+			bar.away.append(event.runner)
 		economy.settle_shift(bar)
 	s.bookings.clear()
 	s.night.erase("godzilla")
@@ -497,6 +557,10 @@ func tick(seconds: int) -> void:
 				if event.remaining<=0:
 					if event.phase=="warning": start_event()
 					else: finish_event(not int(event.id) in [8,9])
+			elif s.street.chapter==0 and s.day==1 and int(s.street.elapsed)>=180 and not s.street.get("early_encore",false):
+				s.street.early_encore = true
+				announce(C.Local.ENCORE)
+				s.street.event.early = true
 			elif s.street.chapter>=1 and not economy.celebration_window():
 				s.street.event_wait -= 1
 				if s.street.event_wait<=0:
@@ -505,7 +569,7 @@ func tick(seconds: int) -> void:
 					if posmod(hash(Vector3i(int(s.street.economy_seed),int(s.street.elapsed),slot)),C.RAT_EVENT_ODDS)==0:
 						announce(C.RAT_PLAGUE)
 					else:
-						announce(1+slot%8)
+						announce(C.Local.ROTATION[slot%C.Local.ROTATION.size()])
 						s.street.event_index += 1
 		economy.advance_contracts(1)
 		s.street.minute = (int(s.street.minute)+1)%C.DAY_MINUTES

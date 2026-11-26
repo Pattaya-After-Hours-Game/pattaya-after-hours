@@ -80,6 +80,10 @@ func _draw() -> void:
 			var feedback := order_position(person)+Vector2(-31,-14)
 			draw_style_box(_sign_box(),Rect2(feedback-Vector2(4,15),Vector2(78,21)))
 			draw_string(font,feedback,"+10s · chat",HORIZONTAL_ALIGNMENT_LEFT,-1,12,TEAL)
+		if person.get("costume",false):
+			var mask := order_position(person)+Vector2(0,19)
+			draw_rect(Rect2(mask-Vector2(7,2),Vector2(14,5)),Color("#71975b"))
+			for x in [-4,3]: draw_rect(Rect2(mask+Vector2(x,0),Vector2(2,2)),INK)
 		if person.order:
 			var marker := order_position(person)
 			draw_circle(marker,6,INK)
@@ -109,6 +113,11 @@ func _draw() -> void:
 	Art.frame(self,"anong-service",idle,Vector2(817,418),person_scale(418),false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
 	# Foreground bar layer occludes the bartender's legs, never the interface.
 	Art.image(self,"counter",Rect2(650,344,310,92))
+	if bar.get("bed_trophy",false):
+		draw_rect(Rect2(697,104,35,25),Color("#2b242d"))
+		draw_rect(Rect2(706,107,17,8),GOLD)
+		draw_rect(Rect2(712,114,5,8),GOLD)
+		draw_rect(Rect2(706,121,17,4),GOLD.darkened(.2))
 	# Owned fans stay installed when closed, but only spin during trading.
 	if fan_owned(bar) and not closed:
 		var fan := Vector2(502,122) if kind==0 else Vector2(266,92)
@@ -270,6 +279,7 @@ func scene_people(bar: Dictionary) -> Array:
 		var appearance := Art.customer_sprite(customer_id)
 		people.append({"who":appearance[0],"pose":appearance[1],"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})
 		people.back().visit_phase = bar.customers[i].get("visit_phase","legacy") if bar.has("customers") else "legacy"
+		people.back().costume = bar.has("customers") and bar.customers[i].get("costume",false)
 		people.back().order_seconds_left = Economy.order_seconds_left(bar,bar.customers[i]) if bar.has("customers") else Content.PATIENCE_SECONDS
 	people.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.foot.y<b.foot.y)
 	return people
@@ -326,3 +336,39 @@ func _draw_event(closed: bool) -> void:
 			for i in 32:
 				var p := Vector2(fposmod(i*59+sin(clock+i)*13,960),fposmod(i*83+clock*38,540))
 				draw_rect(Rect2(p,Vector2(3,7)),[TEAL,PINK,GOLD][i%3])
+
+		Content.Local.ENCORE:
+			for i in 4:
+				var beam := Vector2(10+i*18,120)
+				var end := Vector2(210+sin(clock*2+i)*145,348)
+				draw_colored_polygon(PackedVector2Array([beam,end,end+Vector2(15,8)]),Color(.8,.34,.6,.19))
+		Content.Local.CART:
+			for i in 4:
+				var p := Vector2(13+i*37,352+i*11)
+				draw_rect(Rect2(p,Vector2(27,16)),Color("#85545e"))
+				draw_rect(Rect2(p-Vector2(2,10),Vector2(31,8)),[GOLD,TEAL,PINK,GOLD][i])
+				draw_circle(p+Vector2(6,16),4,INK)
+				draw_circle(p+Vector2(21,16),4,INK)
+		Content.Local.ZOMBIES:
+			for i in 5:
+				var p := Vector2(28+i*30,178+sin(clock*3+i)*4)
+				draw_circle(p,5,Color("#a4bc68"))
+				draw_rect(Rect2(p+Vector2(-5,2),Vector2(10,13)),Color("#646e49"))
+		Content.Local.BED:
+			for i in 3:
+				var p := Vector2(fposmod(clock*89+i*59,205)-13,398+i*8)
+				draw_rect(Rect2(p,Vector2(39,9)),[GOLD,TEAL,PINK][i])
+				draw_rect(Rect2(p-Vector2(0,9),Vector2(4,16)),INK)
+				draw_circle(p+Vector2(5,9),3,INK)
+				draw_circle(p+Vector2(34,9),3,INK)
+		Content.Local.LIZARD:
+			var p := Vector2(66+sin(clock*1.3)*27,344)
+			draw_line(p,p-Vector2(23,7+sin(clock*6)*3),Color("#799365"),4)
+			draw_rect(Rect2(p-Vector2(7,6),Vector2(25,9)),Color("#789958"))
+			draw_rect(Rect2(p+Vector2(14,-8),Vector2(10,6)),Color("#9da266"))
+			draw_rect(Rect2(p+Vector2(21,-7),Vector2(2,2)),GOLD)
+		Content.Local.DINO:
+			var p := Vector2(15+sin(clock*.9)*14,175)
+			draw_colored_polygon(PackedVector2Array([p,p+Vector2(123,19),p+Vector2(158,-85),p+Vector2(182,-96),p+Vector2(196,-86),p+Vector2(178,-75),p+Vector2(148,64),p+Vector2(55,62)]),Color("#3c354c"))
+			draw_rect(Rect2(p+Vector2(25,64),Vector2(150,12)),Color("#7f524e"))
+			draw_circle(p+Vector2(180,-86),3,GOLD)

@@ -24,6 +24,7 @@ const CHAPTERS = [
 	["The Whole Soi Knows Your Name", "Own all three bar types, bring each to stage 3, then host the After Hours Street Festival."],
 	["The Soi Never Sleeps", "The first festival is in the books. Keep growing, weather new seasons and host it again."]
 ]
+const Local = preload("res://scripts/local_events.gd")
 const RAT_PLAGUE = 10
 const RAT_WARNING_SECONDS = 20
 const RAT_PLAGUE_SECONDS = 45
@@ -39,7 +40,13 @@ const EVENTS = [
 	["Anton's Grand Re-Reopening", "Lantern House has a new sign, a new promotion and exactly the same chairs.", "Promote your own lineup", 350, "Anton's screen blows a fuse. His overflow crowd discovers your street."],
 	["Godzilla Wants a Cold One", "Something enormous is coming in from the bay. Find the largest glasses you own.", "Stage giant ice buckets", 450, "The harbour is quiet again. Nobody can agree whose tab the monster belongs on."],
 	["After Hours Street Festival", "Your whole street is on the programme. The headline guest has dorsal plates.", "Coordinate all venues", 1200, "Anong: You came here to relax. Now look at this place. Same time next year?"],
-	["Rat Plague", "Anong heard scratching. The beer crates are moving.", "Call Bo's rat patrol", 120, "Bo saw the last rat leave with a cocktail umbrella. Word gets out that the coast is clear."]
+	["Rat Plague", "Anong heard scratching. The beer crates are moving.", "Call Bo's rat patrol", 120, "Bo saw the last rat leave with a cocktail umbrella. Word gets out that the coast is clear."],
+	["Encore Rush", "The band at the end of the soi is about to finish. Keep an ear out for an encore.", "Book a relief bartender", 100, "The last concertgoers drift down to the beach."],
+	["Cart Jam", "Bo’s delivery van is boxed in by a convoy of snack carts.", "Book a hand delivery", 90, "The last cart rolls away. Bo can finally get through."],
+	["Last Call of the Dead", "A Halloween parade is shuffling towards Soi 6.", "Host the costume contest", 90, "The zombies go home. The glitter stays."],
+	["Bo’s Bed Race", "A charity bed race needs one more crew. Bo has already borrowed wheels.", "Enter the bed race", 0, "The beds have crossed the finish line. Bo wants his wheels back."],
+	["Lucky Lizard", "A monitor lizard has settled in by the planters.", "Clear a path for rescuers", 0, "The lizard is safely on its way. The neighbours are talking about lucky numbers."],
+	["Definitely Not Godzilla", "Something enormous is rolling down the soi on a flatbed.", "Set up a photo stop", 80, "The robot dinosaur rolls off. It hasn’t touched a single shot."]
 ]
 const HOSTS = [
 	["Bee", "Likes early shifts; accepts bar-fine requests", true],

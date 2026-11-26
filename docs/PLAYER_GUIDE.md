@@ -54,6 +54,26 @@ speed in a disposable copy of your campaign. Toggle back to 1×, adjust passing
 crowds or owner cooldowns, or trigger Rat Plague during quiet trading. Return to
 **Journal → End playtest** to pick up your original campaign where you left it.
 
+## Read The Soi Dispatch
+
+New street events, celebrations and late-night raids open a short newspaper
+notice. Open **Events** from the paper to act, or **Back to the bar** to dismiss
+it. When a story draws on real reporting, the paper includes a short note and
+a button that opens the original article in your browser.
+
+- **Encore Rush** offers a solo rush or paid relief during the warning.
+- **Cart Jam** stops deliveries at the affected bar. Book a hand delivery in
+  advance, wait for the jam to end, or play the puzzle. Select a vehicle and
+  use the arrows to clear a path for Bo’s van to the right-hand exit.
+- **Last Call of the Dead** offers a costume contest that fills seats with
+  guests who can order up to three rounds.
+- **Bo’s Bed Race** takes one bartender off the floor. Tap **Push** or press
+  Space to reach the finish line before time runs out and earn a trophy.
+- **Lucky Lizard** lets you clear a path for rescuers and can bring in locals
+  for a lucky round afterward.
+- **Definitely Not Godzilla** offers a photo stop for the robot dinosaur with
+  a short slowdown while you set up, followed by a visitor rush.
+
 ## When the rats come out
 
 A rare **Rat Plague** can hit during live trading. The swarm drives seated

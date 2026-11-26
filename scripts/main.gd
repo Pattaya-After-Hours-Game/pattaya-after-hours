@@ -3,6 +3,7 @@ extends Control
 const Campaign = preload("res://scripts/campaign.gd")
 const Content = preload("res://scripts/content.gd")
 const StreetContent = preload("res://scripts/street_content.gd")
+const Local = preload("res://scripts/local_events.gd")
 const City = preload("res://scripts/city.gd")
 const District = preload("res://scripts/district.gd")
 const Art = preload("res://scripts/art.gd")
@@ -66,6 +67,19 @@ var drink_list_open := false
 var nida_forecast_open := false
 var drawer: Control
 var event_banner: Button
+var news_issue := {}
+var seen_news := {}
+var event_overlay: Control
+var event_game := -1
+var cart_board := []
+var cart_selected := 0
+var cart_moves := 0
+var race_left := 0.0
+var race_taps := 0
+var race_meter: ProgressBar
+var race_clock: Label
+var race_bed: Label
+var race_rival: Label
 var scene_clock := 0.0
 var service_animation := 0.0
 var tab := 0
@@ -581,6 +595,7 @@ func render(keep_scroll: bool = false) -> void:
 		abs_text(welcome,Rect2(24,96,500,26),"Demand and costs included · estimates in Journal",14,MUTED)
 		at_button(welcome,Rect2(24,142,512,40),"Back to the street",dismiss_offline,true)
 	if previous > 0: scroll.set_deferred("scroll_vertical",previous)
+	draw_event_overlay()
 
 func toggle_drawer(index: int) -> void:
 	if drawer_open and tab == index:
@@ -642,6 +657,20 @@ func close_stat_tip() -> void:
 	stat_tip_key = ""
 
 func _input(event: InputEvent) -> void:
+	if (event_game>=0 or not news_issue.is_empty()) and event is InputEventKey:
+		var playing := event_game>=0
+		if event.is_action_pressed("ui_cancel"):
+			if event_game>=0: end_event_game(false)
+			else: close_news(false)
+		elif event is InputEventKey and event.pressed and not event.echo:
+			if event_game==Local.BED and event.physical_keycode==KEY_SPACE: tap_race()
+			elif event_game==Local.CART:
+				var horizontal: bool = cart_board[cart_selected][3]
+				if (horizontal and event.physical_keycode==KEY_LEFT) or (not horizontal and event.physical_keycode==KEY_UP): slide_cart(-1)
+				if (horizontal and event.physical_keycode==KEY_RIGHT) or (not horizontal and event.physical_keycode==KEY_DOWN): slide_cart(1)
+		if playing or event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+		return
 	if not is_instance_valid(stat_tip): return
 	if (event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT or event is InputEventScreenTouch) and event.pressed:
 		if not Rect2(264,0,479,48).has_point(event.position): close_stat_tip()
@@ -1372,7 +1401,7 @@ func street_event_panel() -> void:
 	var info: Array = StreetContent.EVENTS[int(event.id)]
 	title(info[0],PINK)
 	body(info[1],WHITE,14)
-	body([
+	var rules := [
 		"Without a generator: a 20-second closure.",
 		"More shore-leave customers; stock, seats and service still limit sales.",
 		"Prepare or maintain permits (75) and safety (65). Gaps can mean a fine and 40-second closure.",
@@ -1384,14 +1413,199 @@ func street_event_panel() -> void:
 		"Preparation adds four seconds to the challenge. A loss closes venues for 30 seconds.",
 		"Double street traffic during the festival. Preparation adds four seconds against Godzilla.",
 		"Guests bolt and walk-ins dry up for 45 seconds. Bo keeps seated guests inside and helps save some trade."
-	][int(event.id)],MUTED,12)
+	]
+	body(Local.RULES[int(event.id)] if Local.RULES.has(int(event.id)) else rules[int(event.id)],MUTED,12)
+	if event.has("venue"): body(model.s.street.bars[int(event.venue)].name,GOLD,12)
+	row_button("Read the Dispatch",func() -> void: show_news(street_issue()))
 	live_body(func() -> String: return "%s · %ds · %s" % ["Starts in" if event.phase == "warning" else "Time remaining",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,14)
 	if event.phase == "warning" and not event.prepared:
-		row_button("%s · %s" % [info[2],cash(info[3])],street_action.bind("prepare"))
+		if event.id==Local.ENCORE and not event.get("solo",false): row_button("Work the rush solo",street_action.bind("encore_solo"))
+		row_button("%s · %s" % [info[2],cash(info[3])] if info[3]>0 else info[2],street_action.bind("prepare"))
+	if event.phase=="active" and not event.get("attempted",false):
+		if event.id==Local.CART and not event.prepared: row_button("Clear traffic · Play",start_event_game,true)
+		if event.id==Local.BED and event.prepared: row_button("Race the bed · Play",start_event_game,true)
 	if event.phase == "active" and int(event.id) in [8,9]:
 		row_button("Face Godzilla",func():
 			message = model.start_street_boss()
 			commit(),true)
+
+func street_issue() -> Dictionary:
+	var event: Dictionary = model.s.street.event
+	var id := int(event.id)
+	var info: Array = StreetContent.EVENTS[id]
+	return {"id":id,"headline":info[0],"lead":info[1],"source":Local.SOURCES.get(id,[])}
+
+func poll_news() -> void:
+	if model.s.phase!="plan" or offline_notice>0 or is_instance_valid(district) or is_instance_valid(fight): return
+	var prefix := "%d/" % model.get_instance_id()
+	var event: Dictionary = model.s.street.event
+	if not event.is_empty():
+		var key := prefix+"event/%s/%s" % [event.id,event.get("serial",model.s.day)]
+		if not seen_news.has(key):
+			seen_news[key] = true
+			show_news(street_issue())
+			return
+	var party: Dictionary = model.street.celebration_info()
+	if party.active and not seen_news.has(prefix+"party/%d" % party.day):
+		seen_news[prefix+"party/%d" % party.day] = true
+		show_news({"headline":party.name,"lead":"The Blue Hour is hosting a neighbourhood celebration. Expect more traffic and more rounds.","source":[]})
+		return
+	for bar in model.s.street.bars:
+		if not bar.raided: continue
+		var key := prefix+"raid/%d/%s" % [model.s.day,bar.name]
+		if seen_news.has(key): continue
+		seen_news[key] = true
+		show_news({"headline":"Late-night raid","lead":"%s was fined and closed until noon." % bar.name,"source":[]})
+		return
+
+func show_news(issue: Dictionary) -> void:
+	news_issue = issue
+	draw_event_overlay()
+
+func close_news(details: bool) -> void:
+	var id := int(news_issue.get("id",-1))
+	news_issue = {}
+	if details:
+		if id>=Local.ENCORE and model.s.street.event.get("id",-1)==id:
+			model.s.street.selected = int(model.s.street.event.venue)
+		change_tab(1)
+	else:
+		draw_event_overlay()
+
+func overlay_panel(rect: Rect2, fill: Color, border: Color) -> Panel:
+	event_overlay = pane(root_ui,Rect2(0,0,960,540),Color(0.03,0.02,0.04,.68),Color.TRANSPARENT)
+	event_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	return pane(event_overlay,rect,fill,border)
+
+func draw_event_overlay() -> void:
+	if is_instance_valid(event_overlay):
+		event_overlay.hide()
+		event_overlay.queue_free()
+		event_overlay = null
+	if event_game>=0:
+		draw_event_game()
+	elif not news_issue.is_empty():
+		draw_newspaper()
+
+func draw_newspaper() -> void:
+	var ink := Color("#392526")
+	var paper := overlay_panel(Rect2(171,65,618,414),Color("#f4e2be"),Color("#aa7053"))
+	var masthead := abs_text(paper,Rect2(25,15,455,44),"The Soi Dispatch",30,ink)
+	var serif := SystemFont.new()
+	serif.font_names = PackedStringArray(["Georgia","Noto Serif","DejaVu Serif"])
+	masthead.add_theme_font_override("font",serif)
+	abs_text(paper,Rect2(498,20,95,30),"DAY %03d" % model.s.day,15,ink)
+	pane(paper,Rect2(25,63,568,2),ink,ink)
+	var headline := abs_text(paper,Rect2(25,79,568,68),news_issue.headline,29,ink)
+	headline.add_theme_font_override("font",serif)
+	headline.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var photo := TextureRect.new()
+	photo.position = Vector2(25,147)
+	photo.size = Vector2(136,69)
+	photo.texture = Art.texture("beer-1")
+	photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	photo.modulate = Color("#b9a490")
+	photo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	paper.add_child(photo)
+	var lead := abs_text(paper,Rect2(177,146,416,70),news_issue.lead,17,ink)
+	lead.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var source: Array = news_issue.source
+	if not source.is_empty():
+		pane(paper,Rect2(25,226,568,1),ink,ink)
+		abs_text(paper,Rect2(25,235,568,22),"IN THE REAL PATTAYA",13,ink)
+		var context := abs_text(paper,Rect2(25,260,568,49),source[0],15,ink)
+		context.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		at_button(paper,Rect2(25,314,568,38),"Read the original · "+str(source[1]),func() -> void: OS.shell_open(source[2]))
+	var dismiss := at_button(paper,Rect2(25,364,270,38),"Back to the bar",close_news.bind(false))
+	at_button(paper,Rect2(305,364,288,38),"Open Events",close_news.bind(true),true)
+	dismiss.grab_focus()
+
+func start_event_game() -> void:
+	event_game = model.street.begin_event_game()
+	if event_game<0: return
+	save_state()
+	cart_board = Local.BOARD.duplicate(true)
+	cart_selected = 0
+	cart_moves = 0
+	race_left = Local.BED_SECONDS
+	race_taps = 0
+	draw_event_overlay()
+
+func end_event_game(won: bool) -> void:
+	message = model.street.settle_event_game(event_game,won)
+	event_game = -1
+	commit(true)
+
+func slide_cart(direction: int) -> void:
+	if event_game!=Local.CART: return
+	if Local.slide(cart_board,cart_selected,direction): cart_moves += 1
+	if Local.delivery_free(cart_board): end_event_game(true)
+	else: draw_event_overlay()
+
+func choose_cart(index: int) -> void:
+	cart_selected = index
+	draw_event_overlay()
+
+func tap_race() -> void:
+	if event_game!=Local.BED or race_left<=0: return
+	race_taps += 1
+	if race_taps>=Local.BED_TAPS: end_event_game(true)
+	else: update_race()
+
+func update_race() -> void:
+	race_meter.value = race_taps
+	race_clock.text = "%.1fs left · %d / %d pushes" % [race_left,race_taps,Local.BED_TAPS]
+	race_bed.position.x = 30+486.0*float(race_taps)/Local.BED_TAPS
+	race_rival.position.x = 30+442.0*(1.0-race_left/Local.BED_SECONDS)
+
+func draw_event_game() -> void:
+	var panel := overlay_panel(Rect2(167,28,626,484),DARK,GOLD)
+	if event_game==Local.CART:
+		abs_text(panel,Rect2(21,9,575,39),"Cart Jam",25,GOLD)
+		abs_text(panel,Rect2(21,50,584,43),"Pick a vehicle, then slide along its lane. Get Bo’s van to the exit →",16)
+		var cell := 52
+		for y in 6:
+			for x in 6:
+				pane(panel,Rect2(23+x*cell,108+y*cell,cell,cell),Color("#38343e"),Color("#4c4551"))
+		abs_text(panel,Rect2(344,213,90,42),"EXIT →",15,TEAL)
+		for i in cart_board.size():
+			var car: Array = cart_board[i]
+			var rect := Rect2(25+int(car[0])*cell,110+int(car[1])*cell,(int(car[2]) if car[3] else 1)*cell-4,(1 if car[3] else int(car[2]))*cell-4)
+			var vehicle := at_button(panel,rect,"BO" if i==0 else "↔" if car[3] else "↕",choose_cart.bind(i),i==cart_selected)
+			vehicle.focus_mode = Control.FOCUS_NONE
+			if i!=cart_selected:
+				var paint: Color = [Color("#615065"),Color("#864b47"),Color("#4b6262"),Color("#726343")][i%4]
+				vehicle.add_theme_stylebox_override("normal",box(paint,GOLD if i==0 else EDGE,2))
+		var horizontal: bool = cart_board[cart_selected][3]
+		abs_text(panel,Rect2(366,120,228,38),"%d moves" % cart_moves,17,TEAL)
+		var first := at_button(panel,Rect2(366,266,232,48),"← Left" if horizontal else "↑ Up",slide_cart.bind(-1))
+		var second := at_button(panel,Rect2(366,324,232,48),"Right →" if horizontal else "Down ↓",slide_cart.bind(1))
+		first.focus_mode = Control.FOCUS_NONE
+		second.focus_mode = Control.FOCUS_NONE
+		at_button(panel,Rect2(366,380,232,44),"Reset board",func() -> void:
+			cart_board = Local.BOARD.duplicate(true)
+			cart_selected = 0
+			cart_moves = 0
+			draw_event_overlay()).focus_mode = Control.FOCUS_NONE
+		at_button(panel,Rect2(366,434,232,40),"Wait out the jam",end_event_game.bind(false)).focus_mode = Control.FOCUS_NONE
+	else:
+		abs_text(panel,Rect2(25,18,576,55),"Bo’s Bed Race",29,GOLD)
+		abs_text(panel,Rect2(25,85,576,48),"Tap rapidly or press Space. Push the bed across the finish line!",17)
+		race_clock = abs_text(panel,Rect2(25,131,576,44),"",24,TEAL)
+		pane(panel,Rect2(25,179,576,72),Color("#38303b"),EDGE)
+		pane(panel,Rect2(581,180,12,70),GOLD,GOLD)
+		race_bed = abs_text(panel,Rect2(30,180,80,32),"▰ BO",22,TEAL)
+		race_rival = abs_text(panel,Rect2(30,214,80,32),"▰ RIVAL",18,PINK)
+		race_meter = ProgressBar.new()
+		race_meter.position = Vector2(25,259)
+		race_meter.size = Vector2(576,12)
+		race_meter.max_value = Local.BED_TAPS
+		race_meter.show_percentage = false
+		panel.add_child(race_meter)
+		at_button(panel,Rect2(25,284,576,112),"PUSH!",tap_race,true).focus_mode = Control.FOCUS_NONE
+		at_button(panel,Rect2(25,421,576,43),"Drop out",end_event_game.bind(false)).focus_mode = Control.FOCUS_NONE
+		update_race()
 
 func start_tuning() -> void:
 	if campaign_before_tuning != null or campaign_before_tutorial != null or model.s.phase!="plan": return
@@ -1585,7 +1799,16 @@ func _process(delta: float) -> void:
 	if updater_worker or boot_menu: return
 	scene_clock += delta
 	service_animation = maxf(0,service_animation-delta)
+	if event_game>=0:
+		if event_game==Local.BED:
+			race_left = maxf(0,race_left-delta)
+			if race_left<=0: end_event_game(false)
+			else: update_race()
+		return
+	if not news_issue.is_empty(): return
 	if campaign_before_tutorial == null:
+		poll_news()
+		if not news_issue.is_empty(): return
 		var before := street_ui_state()
 		model.street.night_prep_visible = not is_instance_valid(fight) and not is_instance_valid(district)
 		model.street.advance(minf(delta,1.0)*tuning_speed)
@@ -1724,7 +1947,9 @@ func _notification(what: int) -> void:
 		save_state()
 		refresh_street = true
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if is_instance_valid(district): close_district()
+		if event_game>=0: end_event_game(false)
+		elif not news_issue.is_empty(): close_news(false)
+		elif is_instance_valid(district): close_district()
 		elif is_instance_valid(fight): leave_fight(fight.result if fight.over else false)
 		elif campaign_before_tutorial != null: finish_tutorial()
 		elif offline_notice > 0 and model.s.phase == "plan": dismiss_offline()

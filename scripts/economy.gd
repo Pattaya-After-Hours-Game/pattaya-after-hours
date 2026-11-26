@@ -362,7 +362,8 @@ func stock_offer(bar: Dictionary, automatic: bool = false, drink: int = 0) -> Di
 	var room := stock_capacity(bar)-int(bar.stock)
 	var reserve := ceili(operating_rate(bar)/60.0) if automatic else 0
 	var reason := ""
-	if room<pack_quantity(bar): reason = "Need %d free spaces; you have %d." % [pack_quantity(bar),room]
+	if cart_delivery_blocked(bar): reason = "Cart Jam: clear Bo’s route in Events."
+	elif room<pack_quantity(bar): reason = "Need %d free spaces; you have %d." % [pack_quantity(bar),room]
 	elif s.cash<amount+reserve: reason = "Need ฿%d%s; you have ฿%d." % [amount+reserve," including next operating charge" if automatic else "",s.cash]
 	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"quantity":pack_quantity(bar),"room":room,"remaining_cash":int(s.cash)-amount}
 
@@ -603,6 +604,12 @@ func base_traffic(replacement: Dictionary = {}) -> float:
 		if bar.type==0: frontage = maxi(frontage,int(bar.equipment.sign))
 	return C.TRAFFIC_PER_MINUTE+C.FRONTAGE_TRAFFIC*maxi(0,frontage-1)
 
+func local_event(bar: Dictionary, id: int) -> bool:
+	return event_id()==id and bar.name==s.street.bars[int(s.street.event.venue)].name
+
+func cart_delivery_blocked(bar: Dictionary) -> bool:
+	return local_event(bar,C.Local.CART) and not s.street.event.prepared and not s.street.event.get("game_won",false)
+
 func traffic_rate(offline: bool = false, replacement: Dictionary = {}) -> float:
 	var kinds := {}
 	for bar in s.street.bars:
@@ -616,6 +623,12 @@ func traffic_rate(offline: bool = false, replacement: Dictionary = {}) -> float:
 		5,9: rate *= 2.0
 		6: rate *= .7
 		C.RAT_PLAGUE: rate *= .55 if s.street.event.prepared else .15
+		C.Local.ENCORE:
+			var wave := int(s.street.event.remaining)
+			if not s.street.event.get("early",false) or s.street.event.prepared or s.street.event.get("solo",false):
+				rate *= (2.4 if wave>35 or wave<16 else .75) if s.street.event.encore else 2.0
+		C.Local.ZOMBIES, C.Local.BED: rate *= 1.45
+		C.Local.DINO: rate *= 1.25
 	if celebrating(s.street.bars[0]): rate = minf(rate*C.CELEBRATION_TRAFFIC,(base_traffic(replacement)+maxi(0,kinds.size()-1)*C.AUDIENCE_TRAFFIC_BONUS)*C.CELEBRATION_TRAFFIC_CAP)
 	if s.weather >= 5: rate *= .8
 	return rate*walk_in_scale
@@ -638,6 +651,13 @@ func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minu
 		if event_id() == 6: value *= .95 if bar.type == 0 else .55
 		if event_id() == 7: value *= 1.2 if s.street.event.prepared else .65
 		if event_id() == 4 and bar.type == 0: value *= 1.3
+		var event: Dictionary = s.street.event
+		if local_event(bar,C.Local.ZOMBIES) and event.prepared: value *= 1.55
+		if local_event(bar,C.Local.BED) and event.get("game_won",false): value *= 1.5
+		if local_event(bar,C.Local.CART) and (event.prepared or event.get("game_won",false)): value *= 1.15
+		if local_event(bar,C.Local.LIZARD) and event.prepared:
+			value *= .25 if event.remaining>30 else 1.55 if event.get("lucky",false) else 1.0
+		if local_event(bar,C.Local.DINO) and event.prepared: value *= .75 if event.remaining>33 else 1.65 if audience!=0 else 1.0
 	if audience>=0: value *= C.AUDIENCE_AFFINITY[int(bar.type)][audience]
 	if peak(int(bar.type),int(s.street.minute) if minute<0 else minute): value *= C.PEAK_ATTRACTION
 	return value * (1.0 - float(bar.dirt)/C.DIRT_LIMIT*C.DIRT_ATTRACTION_PENALTY)
@@ -780,6 +800,7 @@ func restock(bar: Dictionary, automatic: bool = false, drink: int = 0) -> bool:
 	return true
 
 func mixed_delivery(bar: Dictionary) -> int:
+	if cart_delivery_blocked(bar): return 0
 	var mix := drink_popularity(bar)
 	var target := mini(stock_capacity(bar),int(bar.stock)+pack_quantity(bar))
 	var delivered := 0
@@ -867,6 +888,10 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 	# Stable per-visitor choice leaves shared arrival RNG alone. Opening rush stays forgiving.
 	var rounds := 2 if opening or posmod(hash(Vector2i(int(customer.id),-53)),100)>=C.ONE_ROUND_CHANCE[audience] else 1
 	if customer.club or celebrating(bar): rounds += 1
+	var in_costume: bool = local_event(bar,C.Local.ZOMBIES) and s.street.event.prepared
+	if in_costume:
+		rounds = 3
+		customer.costume = true
 	customer.planned_rounds = mini(3,rounds)
 	customer.budget = int(C.TYPES[int(bar.type)].drink)*int(customer.planned_rounds)+100
 	customer.visit_phase = "waiting"
@@ -1233,6 +1258,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			var offer := stock_offer(bar,false,index)
 			return "%d %s delivered for ฿%d." % [offer.quantity,C.DRINKS[index].name,offer.price] if restock(bar,false,index) else offer.reason
 		"mixed_drinks":
+			if cart_delivery_blocked(bar): return "Cart Jam: clear Bo’s route in Events."
 			var units := mixed_delivery(bar)
 			return "%d drinks stocked for this crowd." % units if units>0 else "Fridge full, or insufficient cash for a delivery."
 		"return_drink":
@@ -1507,6 +1533,8 @@ func tick() -> void:
 			if not customer.playing and (((legacy or customer.missed) and customer.life<=0) or (not legacy and customer.visit_phase=="finished" and not pool_waiting)): depart(bar,customer)
 		if bar.restock and bar.drink_stock.is_empty() and bar.stock<pack_quantity(bar) and pending(bar)>0: restock(bar,true)
 		staff_service(bar)
+		if local_event(bar,C.Local.ENCORE) and s.street.event.prepared and int(s.street.event.remaining)%8==0:
+			serve(bar)
 		if automatic_service(bar) and owner_relief_needed(bar): serve(bar,1,true)
 		pool_tick(bar)
 
