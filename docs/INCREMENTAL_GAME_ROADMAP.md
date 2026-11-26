@@ -23,14 +23,14 @@ must not independently start two roadmap items.
 | Field | Current value |
 | --- | --- |
 | Active feature | Hostess naming and expansion prices, integrating completed host controls/HUD |
-| Status | REVIEW; pricing `f85afc0` merged with host/HUD checkpoint `ef17ddc` |
+| Status | DONE; pricing `f85afc0` and host/HUD `ef17ddc` pass combined verification |
 | Implementer | Codex in the shared checkout |
 | Reviewer / playtester | Codex automated and visual checks; device play pending |
 | Shared claim location | This table in `/home/zak/projects/pattaya-after-hours` |
 | Working branch / chat / PR | `codex/venue-pricing` isolated integration |
 | Scope and owned files | Economy, street/content, saves, main UI, barfine tests/previews and docs |
 | Acceptance | Real willing-host requests; ฿500 base fee; 30-second absence and appeal loss; paid auto-accept; retained host training; repeat-safe saves |
-| Next handoff / blocker | Rerunning combined tests and previews before main; see [handover](MERGE_HANDOFF.md); device play remains pending |
+| Next handoff / blocker | Combined tests and previews pass; main release workflow publishes; see [handover](MERGE_HANDOFF.md); device play remains pending |
 | Recommended next, when free | Await user direction; do not start another roadmap feature |
 | Last updated | 2026-11-26 |
 

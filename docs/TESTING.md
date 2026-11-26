@@ -3,7 +3,8 @@
 ## Lease ladder and Hostess Bar verification — 26 November 2026
 
 Godot 4.7.2 `tools/test.sh` passes with zero failures on the isolated pricing
-branch: gameplay/save/UI checks, 66 fresh campaigns and the existing 60 party,
+branch and again after merging host/HUD checkpoint `ef17ddc`: gameplay/save/UI
+checks, 66 fresh campaigns and the existing 60 party,
 80 club and 120 profit-cycle scenarios. New lease tests verify the inherited-bar
 exemption, non-compounding repeat prices, exact reserve boundaries, actual
 payment, rotating offers, reload preservation and stage-one manager gating.
@@ -20,8 +21,10 @@ The baseline active hostess route reaches property two in 92.5–103.5 minutes
 and stage three in 129.9–142.8, with longest investment gaps 33.9–36.2 minutes.
 Empire previews at 960×540 and 1280×720 cover the three leases, repeat surcharge,
 shortfall and an explicit retiring-owner offer. No production assets were replaced.
-Device play and full-festival balancing remain unverified. Upstream integration
-is checked separately before the release is called ready.
+The final UI regression rerun also verifies live affordability and offer expiry
+without reopening Empire. Combined previews include the Hostess room/badge and
+the preserved portrait HUD. Device play and full-festival balancing remain
+unverified; source verification is separate from publication.
 
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.

@@ -7,8 +7,11 @@ User-approved follow-up in `codex/venue-pricing`, isolated at
 commit `ef17ddc` and merged into this branch.
 This follow-up changes the lease ladder, repeat premiums, visible retirement
 offers, model-owned opening quotes and type-1 display name. Renovation prices,
-paid ownership and save identities stay unchanged. Combined checks and upstream
-reconciliation are required before release.
+paid ownership and save identities stay unchanged. The complete combined
+`tools/test.sh` run passed with zero failures, including 66 fresh campaigns.
+Lease/UI previews and final live-control regressions pass. Both feature commits
+are included in the main integration; its workflow retests and publishes signed
+downloads. Check workflow completion before claiming a published release.
 
 ## Bar-fine controls — local working tree, 26 November 2026
 

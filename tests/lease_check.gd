@@ -35,7 +35,6 @@ func run(test: SceneTree) -> void:
 	test.check(st.purchase_cost(1)==30000,"Offer ends at the day boundary without changing paid ownership")
 	m.s.day = 28
 	test.check(st.lease_sale(0) and not st.lease_sale(1),"Fortnightly offers rotate through venue types")
-	var saved := JSON.stringify(m.s)
 	m.save_game()
 	var loaded = Campaign.new(4)
 	test.check(loaded.load_game() and loaded.s.cash==m.s.cash and loaded.s.street.bars==m.s.street.bars,"Existing cash, venues and stock survive the label/quote change with no refund")
@@ -55,6 +54,15 @@ func run_ui(test: SceneTree) -> void:
 	app.change_tab(3)
 	var button = app.column.find_child("Lease_1",true,false)
 	test.check(button!=null and not button.disabled and button.text.contains("Hostess bar") and button.text.contains("24,000"),"Empire presents the named hostess lease and real current price")
+	app.model.s.cash = 1
+	app.update_lease_controls()
+	test.check(button.disabled,"Open Empire disables a lease when cash drops")
+	app.model.s.day = 14
+	app.model.s.cash = 100000
+	app.update_lease_controls()
+	test.check(not button.disabled and button.text.contains("21,600"),"Open Empire refreshes affordability and the current sale quote without reopening")
+	app.model.s.day = 15
+	app.update_lease_controls()
 	if button: button.pressed.emit()
 	test.check(app.model.street.selected().type==1 and app.model.s.cash==76000,"Lease button purchases through the authoritative quote")
 	app.queue_free()

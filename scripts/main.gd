@@ -116,6 +116,7 @@ var live_labels: Array = []
 var action_controls: Array = []
 var bartender_controls: Array = []
 var bar_fine_controls: Array = []
+var lease_controls: Array = []
 var upgrades_open := false
 var fridge_open := false
 var upgrades_ready_only := true
@@ -365,6 +366,7 @@ func render(keep_scroll: bool = false) -> void:
 	action_controls.clear()
 	bartender_controls.clear()
 	bar_fine_controls.clear()
+	lease_controls.clear()
 	upgrade_badge = null
 	upgrades_entry = null
 	stock_controls.clear()
@@ -1059,6 +1061,20 @@ func tours_panel() -> void:
 		body("%s route listing · %s guide pay%s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i))," / "+declined if not declined.is_empty() else ""],MUTED,12)
 	body("%d guide bookings tonight" % model.s.bookings.size(),GOLD,13)
 
+func update_lease_controls() -> void:
+	for entry in lease_controls:
+		var info: Dictionary = StreetContent.TYPES[entry.kind]
+		var quote: Dictionary = model.street.lease_quote(entry.kind)
+		entry.button.text = "Lease %s · %s" % [info.name,cash(quote.price)]
+		entry.button.disabled = not quote.enabled
+		entry.base.text = "Base %s + %s repeat premium (%d earlier purchases). Blue Hour excluded." % [cash(quote.base),cash(quote.surcharge),quote.repeats]
+		entry.sale.visible = quote.discount>0
+		entry.sale.text = "Retiring-owner offer · today only: %d%% off (save %s)" % [StreetContent.LEASE_SALE_PERCENT,cash(quote.discount)]
+		entry.cash.text = "Pay now: %s\nKeep in till: %s for hiring, next stock pack and opening payroll\nCash needed to open: %s" % [cash(quote.price),cash(quote.reserve),cash(quote.required)]
+		entry.running.text = "Bare premises %s/min · with one bartender %s/min\nEstimated break-even %.1f house drinks/min before pool or manager income. Running costs exclude stock; break-even includes it. Shared traffic does not guarantee buyers.\nNeeds chapter 2 · %d reputation" % [cash(quote.overhead),cash(quote.running),quote.break_even,info.rep]
+		entry.reason.text = quote.reason
+		entry.reason.visible = not quote.enabled
+
 func empire_panel() -> void:
 	title("One bar to the whole soi")
 	chapter_panel()
@@ -1067,16 +1083,10 @@ func empire_panel() -> void:
 		property_card(bar,i)
 	body("AVAILABLE LEASES",GOLD,12)
 	for kind in StreetContent.TYPES.size():
-		var info: Dictionary = StreetContent.TYPES[kind]
-		var quote: Dictionary = model.street.lease_quote(kind)
-		var buy := row_button("Lease %s · %s" % [info.name,cash(quote.price)],street_action.bind("buy",kind))
+		var buy := row_button("",street_action.bind("buy",kind))
 		buy.name = "Lease_"+str(kind)
-		buy.disabled = not quote.enabled
-		body("Base %s + %s repeat premium (%d earlier purchases). Blue Hour excluded." % [cash(quote.base),cash(quote.surcharge),quote.repeats],MUTED,12)
-		if quote.discount>0: body("Retiring-owner offer · today only: %d%% off (save %s)" % [StreetContent.LEASE_SALE_PERCENT,cash(quote.discount)],TEAL,12)
-		body("Pay now: %s\nKeep in till: %s for hiring, next stock pack and opening payroll\nCash needed to open: %s" % [cash(quote.price),cash(quote.reserve),cash(quote.required)],WHITE,13)
-		body("Bare premises %s/min · with one bartender %s/min\nEstimated break-even %.1f house drinks/min before pool or manager income. Running costs exclude stock; break-even includes it. Shared traffic does not guarantee buyers.\nNeeds chapter 2 · %d reputation" % [cash(quote.overhead),cash(quote.running),quote.break_even,info.rep],MUTED,12)
-		if not quote.enabled: body(quote.reason,PINK,12)
+		lease_controls.append({"kind":kind,"button":buy,"base":body("",MUTED,12),"sale":body("",TEAL,12),"cash":body("",WHITE,13),"running":body("",MUTED,12),"reason":body("",PINK,12)})
+	update_lease_controls()
 
 	row_button("Host After Hours Street Festival",street_action.bind("festival"))
 	body("Needs stage 3 in all three bar types. A warned district boss event completes the first story arc.")
@@ -2150,6 +2160,7 @@ func _process(delta: float) -> void:
 		save_seconds += minf(delta,1.0)
 		if live_seconds >= 1.0:
 			live_seconds -= 1.0
+			update_lease_controls()
 			if not is_instance_valid(fight) and not is_instance_valid(district): sync_upgrade_badge(true)
 			if refresh_street and model.s.phase in ["plan","guided","guided_choice","guided_report"] and not is_instance_valid(fight) and not is_instance_valid(district): render(true)
 			for entry in live_labels:
