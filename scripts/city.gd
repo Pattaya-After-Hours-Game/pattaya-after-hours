@@ -9,6 +9,12 @@ const PINK = Color("#f37ab0")
 const GOLD = Color("#e8ba7b")
 const ORDER_URGENT = Color("#ff514d")
 const KISS_SECONDS = 1.2
+const FRIDGE_BOTTLE_BAYS = [
+	[Vector2i(71,7)],
+	[Vector2i(54,6),Vector2i(125,1)],
+	[Vector2i(88,5),Vector2i(23,5)],
+	[Vector2i(89,5),Vector2i(25,5)]
+]
 const HEART_OUTLINE = [Vector2(-6,-4),Vector2(-2,-4),Vector2(0,-2),
 	Vector2(2,-4),Vector2(6,-4),Vector2(7,-1),Vector2(5,2),Vector2(0,7),
 	Vector2(-5,2),Vector2(-7,-1)]
@@ -29,6 +35,8 @@ var bars: Array = []
 var selected_bar := 0
 var street_event: Dictionary = {}
 var service_flash := 0.0
+var fridge_install_flash := 0.0
+var fridge_capacity := 1
 var legacy_staff: Array = []
 var font = ThemeDB.fallback_font
 signal site(tab: int)
@@ -42,6 +50,7 @@ func _process(delta: float) -> void:
 	clock += delta
 	arrival_time += delta
 	service_flash = maxf(0,service_flash-delta)
+	fridge_install_flash = maxf(0,fridge_install_flash-delta)
 	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
@@ -78,8 +87,10 @@ func _draw() -> void:
 	var bar: Dictionary = bars[selected_bar] if not bars.is_empty() else {"type":0,"stage":clampi(level,1,3),"crew":legacy_staff.size(),"away":[],"closed":0,"name":"Blue Hour"}
 	var kind := int(bar.type)
 	var stage := int(bar.stage)
-	var backdrop := Art.venue(kind,stage,fan_owned(bar),screen_owned(bar))
+	var tier := fridge_tier(bar,selected_bar) if not bars.is_empty() else -1
+	var backdrop := Art.venue(kind,stage,fan_owned(bar),screen_owned(bar),tier)
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
+	if tier>0: _draw_fridge_stock(tier,int(bar.stock))
 	if celebrating: _draw_celebration()
 	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
 	# Only the street opening contains ambient traffic. Interior sprites come
@@ -150,8 +161,9 @@ func _draw() -> void:
 	# Anong remains available at the service position even before the first hire.
 	var idle := 0 if service_flash <= 0 or closed else 3
 	Art.frame(self,"anong-service",idle,Vector2(817,418),person_scale(418),false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
-	# Foreground bar layer occludes the bartender's legs, never the interface.
-	Art.image(self,"counter",Rect2(650,344,310,92))
+	# Leave the upgraded cabinet and its lower drawer visible beside Anong.
+	Art.image(self,"counter",Rect2(650,344,198 if tier>0 else 310,92))
+	if tier==4 and fridge_install_flash>0: _draw_fridge_frost()
 	if bar.get("bed_trophy",false):
 		draw_rect(Rect2(697,104,35,25),Color("#2b242d"))
 		draw_rect(Rect2(706,107,17,8),GOLD)
@@ -194,6 +206,31 @@ func _draw_celebration() -> void:
 func _draw_compact_layout() -> void:
 	# Fitted wall benches leave the pool aisle clear; actual guests draw above.
 	for x in [257,465]: Art.image(self,"compact-bench",Rect2(x,294,150,80))
+
+func _draw_fridge_stock(tier: int, stock: int) -> void:
+	var bays: Array = FRIDGE_BOTTLE_BAYS[tier-1]
+	var slots := 0
+	for bay in bays: slots += 4*bay.y
+	var fill := ceili(slots*clampf(float(stock)/fridge_capacity,0,1))
+	for shelf in [190,154,118,83]:
+		for bay in bays:
+			for i in bay.y:
+				if fill==0: return
+				fill -= 1
+				var p := Vector2(Art.FRIDGE_ORIGIN)+Vector2(bay.x+i*8,shelf)
+				draw_rect(Rect2(p+Vector2(2,-13),Vector2(2,4)),Color("#e6c779"))
+				draw_rect(Rect2(p+Vector2(0,-9),Vector2(6,9)),Color("#74924b"))
+				draw_rect(Rect2(p+Vector2(1,-6),Vector2(4,4)),Color("#eee0a2"))
+
+func _draw_fridge_frost() -> void:
+	var progress := 1.0-fridge_install_flash
+	for i in 8:
+		var p := Vector2(890+i*6,396-i%3*4)-Vector2(progress*(12+i*2),progress*16)
+		draw_rect(Rect2(p,Vector2(8+i%3*2,3)),Color(.70,.94,1.0,.8*fridge_install_flash))
+
+static func fridge_tier(bar: Dictionary, slot: int) -> int:
+	if slot!=0 or int(bar.type)!=0: return -1
+	return clampi(int(bar.get("equipment",{}).get("fridge",0)),0,4)
 
 static func fan_owned(bar: Dictionary) -> bool:
 	return int(bar.get("equipment",{}).get("comfort",0))>0
@@ -334,6 +371,8 @@ func scene_people(bar: Dictionary) -> Array:
 		var pose: int = appearance[1]
 		if appearance[0]=="patrons-capybara":
 			pose = Art.capybara_frame(clock+float(customer_id/24)*1.31)
+		elif appearance[0]=="patrons-men" and pose==Art.COBALT_IDLE:
+			pose = Art.cobalt_frame(clock+float(customer_id/Art.CUSTOMER_VARIANTS.size())*1.31)
 		elif appearance[0]=="patrons-rainbow-duo" and duo_reaction.get("id",-1)==customer_id and clock<float(duo_reaction.get("until",0.0)):
 			pose = 1
 		people.append({"who":appearance[0],"pose":pose,"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})

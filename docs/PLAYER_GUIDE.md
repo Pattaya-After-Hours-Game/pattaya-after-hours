@@ -238,10 +238,11 @@ reopen the deal from **Fridge** until 3:15pm.
 
 ## Give yourself a faster shift
 
-Open **Service → Upgrades** to see what you can buy. The number badge on Service
-jumps to ready upgrades for the selected venue. Upgrades are listed cheapest
-first. **Show all** includes locked options, and **?** explains each purchase.
-Locked requirements appear directly below the card and update while you play.
+Open **Service → Upgrades** or tap the number badge on Service to see the
+selected venue’s upgrades, cheapest first. Locked cards are greyed out, with
+requirements that update while you play. Choose **Ready only** to see what
+you can buy now, or **Show all** to restore the full list. **?** explains each
+purchase.
 
 The progress block at the top belongs to the **selected venue**, including in
 **Ready only**. Stage 2 needs **70 happy visits, 10 regulars and 8 healthy shifts**;
@@ -256,9 +257,11 @@ closing. Manager income, nightly tips and another bar’s customers cannot quali
 this venue. Use **Reports** to find a supply, service or demand problem; quiet
 venues can put surplus staff off duty.
 
-The Serve and Welcome buttons fill back up as foreground time passes. The label
-shows seconds remaining, Ready, or why the action is unavailable. Each venue has
-its own timers. Bartenders keep serving while your own Serve button refills.
+The action buttons fill back up as foreground time passes. Welcome is green
+when there’s a free seat, Chat is green when a guest needs reassurance, and
+Serve is green when an order is waiting. Each refill greys out when its
+condition ends. The labels show readiness or what’s blocking the action.
+Bartenders keep serving while your own Serve button refills.
 
 Near the top of **Service**, **Faster pouring** and **Better welcoming** each have
 three purchases: **10 → 8 → 6 → 4 seconds**, costing **฿900 / ฿1,400 / ฿2,800**.
@@ -526,6 +529,29 @@ The decision screens pause the model; continuing does not skip the clock or
 create another stream of money. Exploring the district and Toybox sparring are
 optional. The street continues after the festival.
 
+## Toybox arcade controls
+
+Open **Events** and select **Quick spar** or **Run the circuit**. The desktop
+fight screen keeps each binding visible. Use A/D or Left/Right to move, W/Up to
+jump, J to punch, K to kick and L for Burst when the meter is full.
+
+- Hold **S** or **Down** to crouch and guard. A crouching fighter can duck a
+  roundhouse.
+- Hold crouch and press **J** for an uppercut, which can catch a jumping rival.
+- Hold crouch and press **K** for a slower, longer-reaching roundhouse kick.
+- On touchscreens, hold **Down** on the D-pad and tap **Punch** or **Kick**
+  with your other thumb for the same moves.
+
+<details>
+<summary>Toybox secret move</summary>
+
+During an active round, tap **↑ ↑ ↓ ↓ ← → ← → B A**, allowing at most two
+seconds between presses. On touch, tap the same D-pad directions and finish
+with **Kick, Punch**. Ultimate Takedown knocks out the current rival and wins
+that round. You get one use per spar or circuit.
+
+</details>
+
 ## Twelve places and Nida outside
 
 Stage-one beer bars offer three seating purchases: ฿400, ฿800 and **Compact layout · ฿1,200**.
@@ -666,6 +692,10 @@ Each better fridge tier adds forty stock spaces and one extra reputation point
 per ten satisfied visits at that bar. With no upgrade that milestone earns +1;
 with fridge levels one/two it earns +2/+3, up to 100 reputation. Buying the fridge
 alone grants no reputation. Existing fridges benefit from future happy visits.
+
+Buying a fridge upgrade at the Blue Hour reveals it in the room. The four tiers
+add a shelf, a side compartment, twin doors and a cold drawer, with more frost
+at each step. The bottles in the upgraded cabinet show roughly how full it is.
 
 Supplier levels 0/1 buy six drinks for ฿228. Levels 2/3/4/5 buy twelve for
 ฿432/408/384/360. The button shows the current quantity and total bill. Eleven empty

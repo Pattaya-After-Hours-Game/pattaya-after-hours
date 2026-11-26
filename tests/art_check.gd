@@ -9,6 +9,11 @@ func run(test: SceneTree) -> void:
 		test.check(Art.atlas_specs().has(variant[0]) and variant[1]>=0 and variant[1]<Art.atlas_specs()[variant[0]][1],"Customer appearance resolves to a valid atlas cell")
 		if variant[0]=="patrons-men": male_variants[variant[1]] = true
 	test.check(male_variants.size()==9,"All nine male customer sprites, including the supplied-reference guest, are reachable")
+	test.check(Art.customer_sprite(9)==["patrons-men",Art.COBALT_IDLE],"The cobalt-shirt customer retains his existing appearance")
+	var sunglasses_poses := []
+	for time in [0.0,5.1,5.3,7.0,10.1,10.3,11.0,21.1]:
+		sunglasses_poses.append(Art.cobalt_frame(time))
+	test.check(sunglasses_poses==[6,9,10,11,10,9,6,9],"The cobalt-shirt guest puts his sunglasses on, takes them off and repeats")
 	test.check(Art.customer_sprite(2)==["patrons-capybara",0] and Art.customer_sprite(26)==Art.customer_sprite(2),"The capybara regular appears at the opening and on later visits")
 	var capybara_poses := []
 	for time in [0.0,1.6,3.1,3.5,4.9,6.6,7.0,8.0]:
@@ -53,6 +58,13 @@ func run(test: SceneTree) -> void:
 				for strip in [Rect2i(0,0,960,rect.position.y),Rect2i(0,rect.end.y,960,540-rect.end.y),Rect2i(0,rect.position.y,rect.position.x,rect.size.y),Rect2i(rect.end.x,rect.position.y,960-rect.end.x,rect.size.y)]:
 					test.check(plain.get_region(strip).get_data()==equipped.get_region(strip).get_data(),"Sports screen preserves the surrounding production artwork")
 				test.check(Art.venue(kind,stage,has_fan,false).get_image().get_data()==plain.get_data(),"Switching properties cannot leak purchased TV artwork to another room")
+	var fridge_region := Rect2i(Art.FRIDGE_ORIGIN,Art.FRIDGE_CELL)
+	for stage in range(1,4):
+		var before := Art.venue(0,stage,false,false,0).get_image().get_region(fridge_region).get_data()
+		for tier in range(1,stage+2):
+			var after := Art.venue(0,stage,false,false,tier).get_image().get_region(fridge_region).get_data()
+			test.check(after!=before,"Each Blue Hour fridge purchase changes the cabinet at the same renovation stage")
+			before = after
 	for id in ["district","toybox","counter","event-inspection","compact-bench"]:
 		test.check(Art.texture(id) != null,"Scene/prop artwork exists: "+id)
 	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid","nida","gabby","daisy"]:

@@ -4,6 +4,8 @@ const ROOT = "res://assets/art/"
 const TYPES = ["beer", "soi", "gogo"]
 const STAFF = ["dao", "mali", "fern", "nok", "jin", "pim"]
 const HOSTS = ["bee", "may", "june", "lek", "fah", "nan"]
+const FRIDGE_ORIGIN = Vector2i(800,160)
+const FRIDGE_CELL = Vector2i(160,256)
 # Appearance is independent of audience, spending budget and gameplay RNG.
 const CUSTOMER_VARIANTS = [
 	["patrons-men",0], ["patrons",1], ["patrons-men",2],
@@ -11,6 +13,7 @@ const CUSTOMER_VARIANTS = [
 	["patrons",0], ["patrons-men",4], ["patrons-men",6],
 	["patrons",3], ["patrons-men",7], ["patrons-men",8]
 ]
+const COBALT_IDLE = 6
 static var textures: Dictionary = {}
 
 static func texture(id: String) -> Texture2D:
@@ -32,13 +35,14 @@ static func screen_region(kind: int, stage: int) -> Rect2i:
 		return Rect2i(421,193,96,61) if stage==1 else Rect2i(397,193,114,64)
 	return Rect2i(300,147,96,61)
 
-static func venue(kind: int, stage: int, has_fan: bool = true, has_screen: bool = false) -> Texture2D:
+static func venue(kind: int, stage: int, has_fan: bool = true, has_screen: bool = false, fridge_tier: int = -1) -> Texture2D:
 	kind = clampi(kind,0,2)
 	stage = clampi(stage,1,3)
 	var id := "%s-%d" % [TYPES[kind],stage]
 	var original := texture(id)
 	if original==null: return null
-	var key := "%s#fan-%s#screen-%s" % [id,has_fan,has_screen]
+	var fitted_fridge := kind==0 and fridge_tier>=0 and (stage>1 or fridge_tier>0)
+	var key := "%s#fan-%s#screen-%s#fridge-%d" % [id,has_fan,has_screen,fridge_tier if fitted_fridge else -1]
 	if not textures.has(key):
 		var plate: Image = original.get_image().duplicate()
 		plate.convert(Image.FORMAT_RGBA8)
@@ -61,6 +65,12 @@ static func venue(kind: int, stage: int, has_fan: bool = true, has_screen: bool 
 		elif kind==0 and stage>1:
 			# The fitted bezel remains, but its display is off until purchased.
 			plate.fill_rect(screen.grow(-4),Color("#171824"))
+		if fitted_fridge:
+			var wall := texture("blue-hour-fridge-walls").get_image()
+			var cabinet := texture("blue-hour-fridges").get_image()
+			var wall_x := FRIDGE_CELL.x if stage>1 else 0
+			plate.blend_rect(wall,Rect2i(Vector2i(wall_x,0),FRIDGE_CELL),FRIDGE_ORIGIN)
+			plate.blend_rect(cabinet,Rect2i(Vector2i(fridge_tier*FRIDGE_CELL.x,0),FRIDGE_CELL),FRIDGE_ORIGIN)
 		textures[key] = ImageTexture.create_from_image(plate)
 	return textures[key]
 
@@ -85,7 +95,7 @@ static func frame(canvas: CanvasItem, id: String, index: int, foot: Vector2, sca
 	canvas.draw_texture_rect_region(tex,dest,region,tint)
 
 static func atlas_specs() -> Dictionary:
-	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),9],"nida":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
+	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),12],"nida":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
 	specs["patrons-capybara"] = [Vector2(224,192),5]
 	specs["gabby"] = [Vector2(160,192),4]
 	specs["daisy"] = [Vector2(160,256),6]
@@ -110,9 +120,16 @@ static func capybara_frame(time: float) -> int:
 		return 4 if phase>=4.8 and phase<4.98 else 3
 	return 0
 
+static func cobalt_frame(time: float) -> int:
+	var phase := fposmod(time,16.0)
+	if (phase>=5.0 and phase<5.22) or (phase>=10.22 and phase<10.44): return 9
+	if (phase>=5.22 and phase<5.44) or (phase>=10.0 and phase<10.22): return 10
+	if phase>=5.44 and phase<10.0: return 11
+	return COBALT_IDLE
+
 # Semantic animation catalog. Contact frames are selected by the combat simulator.
 static func animation_frames(id: String, state: String) -> Array:
-	# Patron cells are separate appearances, not an animation sequence.
+	# Customer-specific poses are selected by the street scene.
 	if id.begins_with("patrons"): return [0]
 	if id.begins_with("fight-"):
 		return {"idle":[0],"walk":[1,2],"jump":[3],"guard":[4],"anticipation":[5],"jab":[6],"kick":[7],"burst":[8],"hit":[9],"ko":[10],"victory":[11]}.get(state,[0])

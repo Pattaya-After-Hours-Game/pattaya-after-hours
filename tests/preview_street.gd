@@ -116,6 +116,14 @@ func run() -> void:
 		app.scene_clock += .8
 		await capture(app,"companion-duo-idle")
 		app.duo_reaction.clear()
+	if filter.contains("sunglasses"):
+		var opening_bar: Dictionary = app.model.street.selected()
+		opening_bar.customers.clear()
+		app.model.s.street.next_customer = 9
+		for i in 3: app.model.street.economy.admit(opening_bar)
+		for sample in [["off",0.0],["raise",5.1],["fit",5.3],["on",7.0],["remove",10.1],["lower",10.3],["off-again",11.0]]:
+			app.scene_clock = sample[1]
+			await capture(app,"sunglasses-"+sample[0])
 	# Present updater controls without making requests or replacing a binary.
 	app.windows_updates = preload("res://scripts/windows_updates.gd").new()
 	app.add_child(app.windows_updates)
@@ -334,6 +342,25 @@ func run() -> void:
 	app.fight.mobile_controls = true
 	pose(app.fight,0)
 	await capture(app,"fight-mobile-controls",false)
+	app.fight.mobile_controls = false
+	app.fight.fighters[0].guard = true
+	app.fight.fighters[0].crouch = true
+	app.fight.queue_redraw()
+	await capture(app,"fight-crouch",false)
+	for move in ["uppercut","roundhouse","ultimate"]:
+		pose(app.fight,0)
+		var mali: Dictionary = app.fight.fighters[0]
+		mali.x = 128.0
+		app.fight.fighters[1].x = {"uppercut":151.0,"roundhouse":164.0,"ultimate":232.0}[move]
+		if move == "ultimate":
+			for key in Fight.KONAMI:
+				app.fight.register_code(key)
+			app.fight._physics_process(Fight.ATTACKS[move][0]+.02)
+		else:
+			app.fight._attack(mali,move)
+			app.fight._resolve(mali,app.fight.fighters[1],Fight.ATTACKS[move][0]+.02)
+		app.fight.queue_redraw()
+		await capture(app,"fight-"+move,false)
 	app.leave_fight(false)
 	fresh(app)
 	populate(app,app.model.street.selected(),3)

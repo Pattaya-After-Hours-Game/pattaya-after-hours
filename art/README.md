@@ -82,11 +82,12 @@ the furnished beer-bar terrace does not receive a passerby sprite. Event effects
 do not add an indoor decorative crowd. The message strip sits above the room,
 leaving customers' feet clear of the property selector.
 
-Fight simulation coordinates and attack durations remain unchanged. Presentation
-maps the simulation into the 960 × 540 scene, selecting anticipation, contact and
-recovery poses from the existing timers. UI hit regions use the same displayed
-rectangles and transforms. Idle breathing and light animation are independent of
-simulation ticks.
+Fight presentation maps the simulation into the 960 × 540 scene. Attack timers
+select anticipation, contact and recovery poses. The existing fighter atlas
+supplies the crouch, uppercut and roundhouse poses with sprite transforms, and
+contact effects distinguish each special move. UI hit regions use the same
+displayed rectangles and transforms. Idle breathing and light animation are
+independent of simulation ticks.
 
 ## Review
 
@@ -128,9 +129,12 @@ that image for identity/clothing and the sun-faded regular for rendering style.
 The blue shirt graphic is simplified for sprite readability. Its exact prompt,
 reference roles and output provenance are in `recipes/customer-beard-glasses.json`.
 
-`assets/art/patrons-men.png` has nine 160 × 192 cells. The existing packer
-normalizes alpha, height, padding and foot pivots. These are standing appearances
-with the scene's existing idle breathing, not a walking-animation sequence.
+`assets/art/patrons-men.png` begins with nine 160 × 192 standing appearances,
+followed by three poses for the cobalt-shirt guest. The packer normalizes the
+standing cells and appends the aligned sunglasses sheet. The guest raises his
+black sunglasses, fits them, wears them briefly, then reverses the gesture on a
+16-second loop. The [pose recipe](recipes/customer-cobalt-evening.json) records
+the reference and prompt.
 `tools/review_art.py` produces a labelled lineup and light/dark edge sheets.
 
 The catalog mixes these men with the existing patrons. Appearance and facing
@@ -203,6 +207,14 @@ suite passes. The integration review captured 51 general graphics views and 23
 economy views, plus wider-window pool/layout checks. Linux export and its isolated
 headless smoke test pass; the integrated Android debug APK exports and verifies.
 Android device, Windows and macOS execution were not tested in this integration.
+
+## Equipment ownership: Blue Hour fridge
+
+The Blue Hour room and property thumbnail use the saved fridge tier. The
+four fitted cabinets add a shelf, a side bay, twin doors and a cold drawer.
+The live room fills the upgraded shelves from actual inventory and gives the
+final purchase a brief burst of frost. The generated cabinets and wall patch
+are packed by `tools/prepare_art.py` using the [fridge recipe](recipes/blue-hour-fridges.json).
 
 ## Equipment ownership: wall fans
 

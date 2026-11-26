@@ -416,7 +416,8 @@
       160,
       192
     ],
-    "height": 180
+    "height": 180,
+    "pose_sheet": "customer-cobalt-sunglasses-poses.png"
   },
   "patrons-rainbow-duo": {
     "frames": [

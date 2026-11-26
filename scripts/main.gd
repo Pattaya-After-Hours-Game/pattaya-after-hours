@@ -127,7 +127,7 @@ var bar_fine_controls: Array = []
 var lease_controls: Array = []
 var upgrades_open := false
 var fridge_open := false
-var upgrades_ready_only := true
+var upgrades_ready_only := false
 var upgrade_badge: Button
 var upgrades_entry: Button
 var upgrade_ready: Array[String] = []
@@ -420,6 +420,7 @@ func render(keep_scroll: bool = false) -> void:
 	city.bars = model.s.street.bars
 	city.street_state = model.s.street
 	city.selected_bar = int(model.s.street.selected)
+	city.fridge_capacity = model.street.economy.stock_capacity(model.street.selected())
 	city.street_event = model.s.street.event
 	city.celebrating = model.street.economy.celebrating(model.street.selected())
 	root_ui.add_child(city)
@@ -470,7 +471,7 @@ func render(keep_scroll: bool = false) -> void:
 				var b: Dictionary = model.s.street.bars[i]
 				var thumb := TextureRect.new()
 				thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-				thumb.texture = Art.venue(int(b.type),int(b.stage),City.fan_owned(b),City.screen_owned(b))
+				thumb.texture = Art.venue(int(b.type),int(b.stage),City.fan_owned(b),City.screen_owned(b),City.fridge_tier(b,i))
 				thumb.position = Vector2(3,3)
 				thumb.size = Vector2(56,32)
 				thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -507,7 +508,7 @@ func render(keep_scroll: bool = false) -> void:
 		var tour_style := box(TEAL if tours>0 else Color("#b8293d"),DARK,2)
 		tour_style.set_corner_radius_all(10)
 		for state in ["normal","hover","pressed"]: tour_badge.add_theme_stylebox_override(state,tour_style)
-		upgrade_badge = at_button(root_ui,Rect2(56,478,21,21),"",open_upgrades.bind(true),true)
+		upgrade_badge = at_button(root_ui,Rect2(56,478,21,21),"",open_upgrades,true)
 		upgrade_badge.name = "UpgradeBadge"
 		upgrade_badge.custom_minimum_size = Vector2.ZERO
 		upgrade_badge.size = Vector2(21,21)
@@ -1354,8 +1355,19 @@ func street_action(id: String,index: int = 0) -> void:
 		open_fridge()
 		return
 	var sold_before := int(model.s.street.served)
+	var selected: Dictionary = model.street.selected()
+	var slot := int(model.s.street.selected)
+	var fridge_before := City.fridge_tier(selected,slot)
 	message = model.street.action(id,index)
 	if id=="serve" and model.s.street.served>sold_before: service_animation = 0.7
+	var fridge_after := City.fridge_tier(selected,slot)
+	if fridge_after>fridge_before:
+		message = "Blue Hour fridge · Level %d installed · +40 drink slots" % fridge_after
+		show_details = false
+		save_state()
+		close_drawer()
+		if fridge_after==4: city.fridge_install_flash = 1.0
+		return
 	commit(true)
 
 func cooldown_button(rect: Rect2, label: String, id: String) -> void:
@@ -1380,6 +1392,7 @@ func cooldown_button(rect: Rect2, label: String, id: String) -> void:
 func update_action_controls() -> void:
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
+	var trading: bool = eco.is_trading(bar)
 	var skipping: bool = is_instance_valid(skip_to_open) and model.street.can_skip()
 	if is_instance_valid(skip_to_open): skip_to_open.visible = skipping
 	for entry in action_controls:
@@ -1391,31 +1404,37 @@ func update_action_controls() -> void:
 		var stock_shortcut: bool = state.needs_stock and campaign_before_tutorial==null
 		var needed := "Need "+str(StreetContent.DRINKS[state.short_drink].name) if stock_shortcut else ""
 		var caption: String = entry[3]
-		var bar_full: bool = entry[4]=="welcome" and eco.is_trading(bar) and bar.customers.size()>=eco.seats(bar) and campaign_before_tutorial==null
+		var no_seats: bool = entry[4]=="welcome" and bar.customers.size()>=eco.seats(bar)
+		var bar_full: bool = no_seats and trading and campaign_before_tutorial==null
+		var promoter_welcoming: bool = entry[4]=="welcome" and trading and eco.promoter_bonus(bar)>0
 		if bar_full: caption = "Bar full"
 		elif stock_shortcut: caption = "Restock fridge" if bar.stock==0 else needed
 		elif entry[4]=="serve" and eco.automatic_service(bar): caption = "Auto-serve"
 		entry[0].disabled = bar_full or not (state.enabled or stock_shortcut) or not practice_action
 		entry[0].tooltip_text = "All seats are taken." if bar_full else state.reason+" Open the stock menu." if stock_shortcut else "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
+		if trading and practice_action and state.no_chat_target:
+			entry[0].tooltip_text = "Chat helps a guest with 10s or less left to wait, once per visit."
 		# Keep native button text for keyboard/accessibility; a child draws the caption over the fill.
 		entry[0].text = caption if bar_full or stock_shortcut else entry[3]
 		for color_name in ["font_color","font_disabled_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
 			entry[0].add_theme_color_override(color_name,Color.TRANSPARENT)
-		entry[1].size.x = 0 if state.no_orders or stock_shortcut else (entry[0].size.x-4)*state.fill
-		var refilling: bool = state.remaining>0.000001 and not state.no_orders and not stock_shortcut
-		entry[1].color.a = 0.24 if refilling or not entry[0].disabled else 0.07
+		entry[1].size.x = (entry[0].size.x-4)*state.fill
+		var has_demand: bool = not (no_seats or state.no_orders or state.no_chat_target)
+		entry[1].color = Color(0.30,0.95,0.58,0.36) if has_demand else Color(0.65,0.65,0.65,0.15)
+		var refilling: bool = state.remaining>0.000001 and trading and practice_action and not (
+			state.no_orders or state.no_chat_target or state.needs_stock or bar_full or promoter_welcoming)
 		var detail := "Ready" if state.enabled else "Unavailable"
-		if not eco.is_trading(bar): detail = "Venue closed"
+		if not trading: detail = "Venue closed"
 		elif bar_full: detail = "All seats taken"
 		elif state.no_orders: detail = "Waiting for orders"
+		elif state.no_chat_target: detail = "No guest needs chat"
+		elif promoter_welcoming: detail = "Nida is welcoming"
 		elif stock_shortcut: detail = "%d waiting · Open fridge" % state.waiting
 		elif entry[4]=="serve" and state.waiting>0:
 			detail = "%d order%s waiting" % [state.waiting,"" if state.waiting==1 else "s"]
 			if refilling: detail = "%d waiting · %ds" % [state.waiting,ceili(state.remaining)]
 		elif refilling: detail = "Refilling · %ds" % ceili(state.remaining)
 		elif not state.enabled and entry[4]=="serve": detail = "Restock fridge"
-		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
-		elif not state.enabled and entry[4]=="welcome" and eco.promoter_bonus(bar)>0: detail = "Nida is welcoming"
 		elif not practice_action: detail = "Practice step"
 		entry[2].text = caption+"\n"+detail
 		entry[2].modulate = DARK if not entry[0].disabled and entry[4]=="serve" else WHITE if not entry[0].disabled or refilling else MUTED
@@ -1741,7 +1760,7 @@ func sync_upgrade_badge(rebuild: bool = false) -> void:
 		upgrades_entry.text = "Upgrades" if ready.is_empty() else "Upgrades   ·   %d ready" % ready.size()
 	if changed and rebuild and drawer_open and upgrades_open: render(true)
 
-func open_upgrades(ready_only: bool, focus: String = "") -> void:
+func open_upgrades(ready_only: bool = false, focus: String = "") -> void:
 	service_section = ""
 	fridge_open = false
 	tab = 0
@@ -1838,8 +1857,7 @@ func street_panel() -> void:
 		watch_purchase(enable,"Enable opening",func() -> Dictionary: return cash_offer(ceili(eco.operating_rate(bar)/60.0)))
 	service_tiles("Fridge","fridge",open_fridge,"Team","manager",open_service_section.bind("team"))
 	if model.s.phase=="plan":
-		var growth := func() -> void: open_upgrades(not upgrade_ready.is_empty())
-		var row := service_tiles("Upgrades","upgrades",growth,"Reports","menu",open_service_section.bind("reports"))
+		var row := service_tiles("Upgrades","upgrades",open_upgrades,"Reports","menu",open_service_section.bind("reports"))
 		upgrades_entry = row[0]
 		upgrades_entry.name = "OpenUpgrades"
 		sync_upgrade_badge()

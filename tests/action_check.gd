@@ -227,6 +227,8 @@ func run_ui(test: SceneTree) -> void:
 	var before: Dictionary = app.model.s.duplicate(true)
 	app.update_action_controls()
 	test.check(app.model.s==before and is_equal_approx(app.action_controls[0][1].size.x/(serve.size.x-4),0.45),"UI reads the fractional fill without advancing or rewarding the model")
+	var demand_green := Color(0.30,0.95,0.58,0.36)
+	test.check(app.action_controls[0][1].color==demand_green,"Waiting orders keep the active Serve refill green")
 	app.render()
 	test.check(test.find_button(app,"Serve a drink").disabled,"Rebuilding the drawer does not reset cooldown")
 	app.model.street.advance(5.5)
@@ -237,28 +239,44 @@ func run_ui(test: SceneTree) -> void:
 	test.check(not test.find_button(app,"Have a chat").disabled,"Chat button follows real customer urgency")
 	app.street_action("chat")
 	test.check(test.find_button(app,"Have a chat").disabled and test.find_button(app,"Welcome customers").disabled,"Chat visibly locks both social controls")
+	var social_bar: Dictionary = app.model.street.selected()
+	var original_wait: int = social_bar.customers[2].wait
+	app.model.street.advance(1.0)
+	app.update_action_controls()
+	var chat_fill: ColorRect = app.action_controls[2][1]
+	var welcome_fill: ColorRect = app.action_controls[1][1]
+	var chat_caption: Label = app.action_controls[2][2]
+	test.check(chat_fill.color.s==0 and chat_fill.size.x>0 and chat_caption.text.contains("No guest needs chat") and welcome_fill.color==demand_green,"A shared refill stays grey for Chat and green for Welcome when there is a free seat")
+	var same_width := chat_fill.size.x
+	social_bar.customers[2].wait = 40
+	app.update_action_controls()
+	test.check(chat_fill.color==demand_green and chat_fill.size.x==same_width and chat_caption.text.contains("19s"),"An urgent guest turns the existing Chat refill green without resetting it")
+	social_bar.customers[2].wait = original_wait
 	app.model.s.cash = 10000
 	app.sync_upgrade_badge(true)
 	test.check(app.upgrade_badge.visible and int(app.upgrade_badge.text)>0,"The upgrade badge appears when cash makes an upgrade affordable")
 	app.upgrade_badge.pressed.emit()
 	var pouring := app.column.find_child("Upgrade_pouring",true,false) as Button
-	test.check(app.upgrades_open and not pouring.disabled and pouring.icon!=null and pouring.text.contains("10s → 8s"),"The badge opens ready upgrades with icons and clear effects")
+	var locked_club := app.column.find_child("Upgrade_club",true,false) as Button
+	test.check(app.upgrades_open and not app.upgrades_ready_only and locked_club!=null and locked_club.disabled and not pouring.disabled and pouring.icon!=null and pouring.text.contains("10s → 8s"),"The badge opens the full list with both locked and ready upgrades")
 	app.model.s.cash = 0
 	app.sync_upgrade_badge(true)
-	test.check(not app.upgrade_badge.visible and app.column.find_child("Upgrade_pouring",true,false)==null,"An unaffordable upgrade disappears from the ready list")
-	app.open_upgrades(false)
 	pouring = app.column.find_child("Upgrade_pouring",true,false) as Button
-	test.check(pouring.disabled and pouring.icon!=null,"Show all reveals locked upgrades and keeps their icons")
+	test.check(not app.upgrade_badge.visible and pouring!=null and pouring.disabled and pouring.icon!=null and pouring.text.contains("Need"),"An upgrade that becomes unaffordable stays visible with its cash shortfall")
 	app.model.s.cash = 10000
-	app.open_upgrades(false)
+	app.change_tab(0)
+	app.upgrades_entry.pressed.emit()
 	var ready_seating: Button = app.column.find_child("Upgrade_seating",true,false)
-	var locked_club: Button = app.column.find_child("Upgrade_club",true,false)
+	locked_club = app.column.find_child("Upgrade_club",true,false)
 	pouring = app.column.find_child("Upgrade_pouring",true,false)
-	test.check(not ready_seating.disabled and locked_club.disabled and not pouring.disabled and ready_seating.get_parent().get_index()<locked_club.get_parent().get_index() and locked_club.get_parent().get_index()<pouring.get_parent().get_index(),"Show all sorts ฿400 seating, ฿600 locked club, and ฿900 pouring by price")
-	app.open_upgrades(true)
+	test.check(not app.upgrades_ready_only and not ready_seating.disabled and locked_club!=null and locked_club.disabled and not pouring.disabled and ready_seating.get_parent().get_index()<locked_club.get_parent().get_index() and locked_club.get_parent().get_index()<pouring.get_parent().get_index(),"The Service tile defaults to the full price-sorted list")
+	test.use_button(app,"Ready only")
 	ready_seating = app.column.find_child("Upgrade_seating",true,false)
 	pouring = app.column.find_child("Upgrade_pouring",true,false)
 	test.check(app.column.find_child("Upgrade_club",true,false)==null and ready_seating.get_parent().get_index()<pouring.get_parent().get_index(),"Ready only still filters locked cards and sorts the rest by price")
+	test.use_button(app,"Show all")
+	locked_club = app.column.find_child("Upgrade_club",true,false)
+	test.check(locked_club!=null and locked_club.disabled,"Show all restores the disabled club card")
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	for guest in bar.customers: guest.order = false
@@ -266,7 +284,8 @@ func run_ui(test: SceneTree) -> void:
 	app.update_action_controls()
 	var serve_caption: Label = app.action_controls[0][2]
 	serve = test.find_button(app,"Serve a drink")
-	test.check(serve.disabled and serve_caption.text.contains("Waiting for orders") and app.action_controls[0][1].size.x==0,"Without orders Serve shows a disabled waiting state even during cooldown")
+	var serve_fill: ColorRect = app.action_controls[0][1]
+	test.check(serve.disabled and serve_caption.text.contains("Waiting for orders") and serve_fill.size.x>0 and serve_fill.color.s==0,"Without orders Serve shows its continuing refill in grey")
 	var before_sale := [bar.stock,bar.serve_ready,app.model.s.cash]
 	app.model.street.action("serve")
 	test.check(before_sale==[bar.stock,bar.serve_ready,app.model.s.cash],"Serving without an order cannot affect the till or stock")
@@ -285,15 +304,16 @@ func run_ui(test: SceneTree) -> void:
 	app.render()
 	var capacity: Label = app.root_ui.get_node("CustomerCapacity")
 	test.check(capacity.position.y<48 and capacity.text=="1 SEAT LEFT · 5/6","The header flags the last empty seat")
+	test.check(app.action_controls[1][1].color==demand_green,"Welcome is green with one free seat")
 	eco.admit(bar)
 	app.update_action_controls()
 	welcome = test.find_button(app,"Bar full")
-	test.check(welcome.disabled,"A full bar visibly disables Welcome")
+	test.check(welcome.disabled and app.action_controls[1][1].color.s==0,"A full bar disables Welcome and greys its refill")
 	app.render()
 	test.check(app.root_ui.get_node("CustomerCapacity").text=="FULL · 6/6","The header reports exact occupancy at capacity")
 	bar.customers.pop_back()
 	app.update_action_controls()
-	test.check(not test.find_button(app,"Welcome customers").disabled,"Welcome returns when a seat opens")
+	test.check(not test.find_button(app,"Welcome customers").disabled and app.action_controls[1][1].color==demand_green,"Welcome returns to green when a seat opens")
 
 	app.queue_free()
 	await test.process_frame

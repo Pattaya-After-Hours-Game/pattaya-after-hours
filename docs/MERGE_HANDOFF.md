@@ -1,5 +1,20 @@
 # Current implementation and release handoff
 
+## Combined graphics and controls update — 27 November 2026
+
+The main checkout held the remaining changes. All other local and fetched
+branch tips were already reachable from main, and Git listed no additional
+worktrees. This update includes the four Blue Hour fridge cabinet tiers,
+cobalt-shirt sunglasses animation, refreshed rainbow duo lighting,
+demand-aware action refills, the full upgrade list by default, and the
+expanded Toybox moves and controls.
+
+The full isolated Godot 4.7.2 suite passed, and the affected states were
+reviewed at 960 × 540 and 1280 × 720. See [testing](TESTING.md) for the
+individual regression checks. The
+[release workflow](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/actions/workflows/release.yml)
+publishes signed downloads from main. Device play remains unverified.
+
 ## Upgrade blocker visibility — 27 November 2026
 
 User's wealthy Neon Mango screenshot exposed stage-locked training with no

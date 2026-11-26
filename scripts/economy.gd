@@ -1087,6 +1087,7 @@ func action_status(bar: Dictionary, id: String) -> Dictionary:
 	var duration := maxf(0.001,float(bar[timer+"_duration"]))
 	var waiting := pending(bar) if id=="serve" else 0
 	var no_orders := id=="serve" and waiting==0
+	var no_chat_target := id=="chat" and chat_target(bar).is_empty()
 	var trading := is_trading(bar)
 	var short_drink := blocking_drink(bar) if id=="serve" and trading and waiting>0 else -1
 	var needs_stock := short_drink>=0
@@ -1096,8 +1097,8 @@ func action_status(bar: Dictionary, id: String) -> Dictionary:
 	elif no_orders: reason = "No orders waiting. Welcome customers or plan a promotion."
 	elif remaining>0.000001: reason = "%s ready in %.1fs." % ["Serve" if id=="serve" else "Welcome / Chat",remaining]
 	elif id=="welcome" and promoter_bonus(bar)>0: reason = "Nida is welcoming customers."
-	elif id=="chat" and chat_target(bar).is_empty(): reason = "Chat helps an unchatted guest with 10s or less left to wait."
-	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"waiting":waiting,"needs_stock":needs_stock,"short_drink":short_drink,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
+	elif no_chat_target: reason = "Chat helps an unchatted guest with 10s or less left to wait."
+	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"no_chat_target":no_chat_target,"waiting":waiting,"needs_stock":needs_stock,"short_drink":short_drink,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
 
 func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var item: Dictionary = C.ACTION_UPGRADES[index]

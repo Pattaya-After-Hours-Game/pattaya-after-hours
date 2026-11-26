@@ -98,6 +98,8 @@ for name,frames in groups.items():
     if name=='monster': spec.update(cell=[320,320],height=290,frame_heights=[290,290,290,210])
     if name=='patrons-capybara':
         spec.update(cell=[224,192],foot_x_fraction=0.26,pose_sheet='customer-capybara-poses.png')
+    if name=='patrons-men':
+        spec.update(pose_sheet='customer-cobalt-sunglasses-poses.png')
     if name=='patrons-rainbow-duo':
         spec.update(pose_sheet='customer-rainbow-duo-kiss.png')
     packing[name]=spec
@@ -184,6 +186,35 @@ for item in fan_recipe['assets']:
         canvas.alpha_composite(im,((canvas.width-im.width)//2,0))
         im=canvas
     im.save(OUT/(item['id']+'.png'))
+# The Blue Hour cabinet keeps its footprint through room renovations.
+fridge_recipe=json.loads((ROOT/'art/recipes/blue-hour-fridges.json').read_text())
+fridges=Image.open(SRC/'blue-hour-fridge-upgrades.png').convert('RGBA')
+fridges.putalpha(fridges.getchannel('A').point(lambda a: 0 if a<190 else 255))
+cell=tuple(fridge_recipe['cell'])
+origin=tuple(fridge_recipe['origin'])
+cabinet_atlas=Image.new('RGBA',(cell[0]*5,cell[1]))
+starter=Image.open(OUT/'beer-1.png').convert('RGBA').crop((*origin,origin[0]+cell[0],origin[1]+cell[1]))
+mask=Image.new('L',cell)
+ImageDraw.Draw(mask).polygon([tuple(point) for point in fridge_recipe['starter_mask']],fill=255)
+starter.putalpha(mask)
+cabinet_atlas.alpha_composite(starter)
+for i, width in enumerate(fridge_recipe['upgrade_widths']):
+    x, y = i%2, i//2
+    sprite=fridges.crop((x*fridges.width//2,y*fridges.height//2,(x+1)*fridges.width//2,(y+1)*fridges.height//2))
+    sprite=sprite.crop(sprite.getbbox()).resize((width,250),NEAREST)
+    cabinet_atlas.alpha_composite(sprite,((i+2)*cell[0]-3-width,4))
+cabinet_atlas.save(OUT/'blue-hour-fridges.png')
+wall=Image.open(SRC/'blue-hour-fridge-wall.png').convert('RGBA')
+wall=wall.crop(tuple(fridge_recipe['wall_crop'])).resize((119,340),NEAREST).crop((0,50,119,306))
+wall_atlas=Image.new('RGBA',(cell[0]*2,cell[1]))
+for i, outline in enumerate(fridge_recipe['wall_masks']):
+    patch=Image.new('RGBA',cell)
+    patch.alpha_composite(wall,(41,0))
+    mask=Image.new('L',cell)
+    ImageDraw.Draw(mask).polygon([tuple(point) for point in outline],fill=255)
+    patch.putalpha(mask.filter(ImageFilter.GaussianBlur(.6)))
+    wall_atlas.alpha_composite(patch,(i*cell[0],0))
+wall_atlas.save(OUT/'blue-hour-fridge-walls.png')
 # Mini-game sprites use cell-centred footprints and wheel baselines.
 for sheet, cols, rows, cell in [
     ('cart-jam-overhead', 2, 2, (144, 72)),

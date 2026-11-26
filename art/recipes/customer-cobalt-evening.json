@@ -12,5 +12,18 @@
     "/home/zak/projects/pattaya-after-hours/art/sources/patrons-0.png"
   ],
   "destination": "art/sources/customer-cobalt-evening.png",
-  "transparent_background": true
+  "transparent_background": true,
+  "sunglasses_animation": {
+    "generator": "built-in ImageGen",
+    "date": "2026-11-27",
+    "prompt": "Use case: identity-preserve. Edit target: attached enlarged pixel sprite of bald, salt-and-pepper-bearded adult Black clubgoer in shiny cobalt collared shirt, cream trousers, brown shoes, facing screen right in three-quarter view. Create a production pixel art sprite sheet of exactly THREE evenly spaced full-body cels in a single horizontal row on true transparent alpha. Frame 1: he has raised his screen-left hand partway to lift folded black sunglasses, hand holding them just below his chin near his chest, bent elbow. Frame 2: same arm higher, fingertips visibly pinching outer temple of the black sunglasses as he slides them on over his eyes. Frame 3: wearing the same opaque black sunglasses, left arm down exactly like the input pose, right hand in pocket. Duplicate the input at each position and edit only the one forearm and sunglasses. Freeze head angle, lower body, feet, other hand, clothing, proportions, amber rim light and cobalt shading across cels. Clean nearest-neighbor looking square pixel clusters matching the reference. Place each cel centered in its third, with an identical common horizontal shoe baseline and ample transparent space between. No labels, divisions, shadows, floor, or background.",
+    "reference": "Existing patrons-men atlas cell 6, enlarged with nearest-neighbor sampling",
+    "destination": "art/sources/customer-cobalt-sunglasses-poses.png",
+    "frames": [
+      "raise sunglasses",
+      "fit sunglasses",
+      "wear sunglasses"
+    ],
+    "alignment": "Resampled and composited the generated arm and eyewear onto the original runtime cell. The original stance and foot pivot are shared by all poses."
+  }
 }

@@ -1,5 +1,29 @@
 # Testing and release checks
 
+## Cobalt-shirt sunglasses — 27 November 2026
+
+The art check covers raising the sunglasses, fitting them, wearing them, removing
+them and repeating the loop. The `sunglasses-*` previews show each pose in the
+Blue Hour at 960 × 540 and 1280 × 720. The nine original atlas cells and the
+animated guest's lower body were checked for pixel-for-pixel alignment.
+
+## Blue Hour fridge art
+
+The art checks compare consecutive fridge variants at each renovation stage.
+The UI check uses the four paid upgrade buttons, verifies the room reveal and
+thumbnail, then reloads the saved cabinet without replaying the cold puff.
+The `blue-hour-fridge-*` economy previews cover all tiers, a renovated room
+with the starter cabinet, and stocked and empty versions of the final tier.
+The previews were inspected at 960×540 and 1280×720.
+
+## Demand-aware action refills — 27 November 2026
+
+The isolated Godot 4.7.2 `tools/test.sh` suite passes. Action checks cover
+grey refill progress without orders, an eligible Chat guest or a free seat,
+and a live switch to green at the same refill progress when demand changes.
+The `actions-*` economy previews were inspected at 960×540 and 1280×720.
+The Linux export passed isolated startup and opened on the local desktop.
+
 ## Companion animations — 27 November 2026
 
 The isolated `tools/test.sh` suite passes on Godot 4.7.2, including the
@@ -684,6 +708,8 @@ Review these behaviours, not just whether a PNG exists:
   labels, touch targets and scrollable controls fit at ordinary and wide sizes.
 - Fighters face the opponent, contact effects fit attacks, and corner KO/victory
   poses stay visible. Monster arrival, drinking, sleep and closure remain readable.
+- Use `fight-crouch`, `fight-uppercut`, `fight-roundhouse`, `fight-ultimate`
+  and `fight-mobile-controls` to review contact effects and persistent controls.
 - Tutorial and guided-shift screens display their correct model and controls.
 
 ## Build checks

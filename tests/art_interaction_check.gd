@@ -2,6 +2,7 @@ extends RefCounted
 const Campaign = preload("res://scripts/campaign.gd")
 const Fight = preload("res://scripts/fight.gd")
 const District = preload("res://scripts/district.gd")
+const Art = preload("res://scripts/art.gd")
 
 func click(tree: SceneTree, control: Control) -> void:
 	await tree.process_frame
@@ -24,6 +25,42 @@ func touch(fight: Control, point: Vector2, index: int, down: bool) -> void:
 	event.pressed = down
 	fight._input(event)
 
+func fight_key(test: SceneTree, key: Key, down: bool, echo: bool = false) -> void:
+	var event := InputEventKey.new()
+	event.physical_keycode = key
+	event.keycode = key
+	event.pressed = down
+	event.echo = echo
+	test.root.push_input(event,true)
+
+func check_blue_hour_fridges(test: SceneTree, app: Control) -> void:
+	app.model = Campaign.new(555)
+	app.model.s.cash = 20000
+	var bar: Dictionary = app.model.street.selected()
+	var before: Texture2D = Art.venue(0,1,false,false,0)
+	for tier in range(1,5):
+		bar.stage = [1,1,2,3][tier-1]
+		var capacity: int = app.model.street.economy.stock_capacity(bar)
+		app.open_upgrades()
+		var purchase := app.column.find_child("Upgrade_fridge",true,false) as Button
+		test.check(purchase!=null and not purchase.disabled,"Blue Hour offers fridge tier %d" % tier)
+		if purchase==null or purchase.disabled: return
+		purchase.pressed.emit()
+		var thumbnail := app.find_child("Property0",true,false).get_child(0) as TextureRect
+		test.check(bar.equipment.fridge==tier and thumbnail.texture!=before and not app.drawer_open,
+			"Buying Blue Hour fridge tier %d updates its artwork and reveals the room" % tier)
+		test.check(app.city.fridge_capacity==capacity+40 and (app.city.fridge_install_flash>0)==(tier==4),
+			"Fridge art uses the purchased capacity and only the final tier emits frost")
+		before = thumbnail.texture
+	var loaded := Campaign.new(555)
+	test.check(loaded.load_game(),"Fridge purchase is saved")
+	app.model = loaded
+	app.render()
+	var restored := app.find_child("Property0",true,false).get_child(0) as TextureRect
+	test.check(restored.texture==before and app.city.fridge_install_flash==0,
+		"Reload restores Blue Hour fridge art without replaying the installation")
+	test.check(app.city.fridge_tier(bar,1)==-1,"Other beer bars keep their regular art")
+
 func run(test: SceneTree) -> void:
 	var app = load("res://main.tscn").instantiate()
 	test.root.add_child(app)
@@ -36,6 +73,7 @@ func run(test: SceneTree) -> void:
 	test.check(app.boot_menu and not app.new_game_confirmation,"Pointer cancels without leaving the menu")
 	await click(test,test.find_button(app,"Resume"))
 	test.check(not app.boot_menu,"Pointer resumes the saved campaign")
+	check_blue_hour_fridges(test,app)
 	app.model = Campaign.new(555)
 	app.offline_notice = 0
 	app.show_tutorial_hint = false
@@ -152,7 +190,7 @@ func run(test: SceneTree) -> void:
 	app.model.s.cash = 1000
 	app.sync_upgrade_badge(true)
 	await click(test,app.upgrade_badge)
-	test.check(app.upgrades_open and app.upgrades_ready_only,"The Service notification opens the ready list with a pointer tap")
+	test.check(app.upgrades_open and not app.upgrades_ready_only,"The Service notification opens the full list with a pointer tap")
 	var pouring := app.column.find_child("Upgrade_pouring",true,false) as Button
 	await test.process_frame
 	app.scroll.ensure_control_visible(pouring)
@@ -238,6 +276,27 @@ func run(test: SceneTree) -> void:
 		fight.activate(point,0)
 		test.check(fight.touches.get(0)==item[0],"Scaled touch dispatch: "+item[0])
 	fight._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	for key in [KEY_J,KEY_K]:
+		fight.reset_round()
+		fight.countdown = 0
+		fight_key(test,key,true)
+		fight_key(test,key,false)
+		fight._physics_process(.016)
+		test.check(fight.fighters[0].move == ("jab" if key == KEY_J else "kick"),"Desktop punch and kick use the displayed keys")
+		fight.reset_round()
+		fight.countdown = 0
+		var start_x: float = fight.fighters[0].x
+		fight_key(test,KEY_DOWN,true)
+		fight_key(test,KEY_RIGHT,true)
+		fight._physics_process(.016)
+		test.check(fight.fighters[0].crouch and fight.fighters[0].guard and fight.fighters[0].x == start_x,"Down crouches in place and guards")
+		fight_key(test,key,true)
+		fight_key(test,key,false)
+		fight._physics_process(.016)
+		test.check(fight.fighters[0].move == ("uppercut" if key == KEY_J else "roundhouse"),"The crouching modifier selects a distinct attack")
+		fight_key(test,KEY_DOWN,false)
+		fight_key(test,KEY_RIGHT,false)
+	fight.reset_round()
 	fight.mobile_controls = true
 	var pad_center := Fight.PAD.get_center()
 	var right := fight.global_position+(pad_center+Vector2(Fight.PAD_CELL,0))*.8
@@ -263,7 +322,7 @@ func run(test: SceneTree) -> void:
 	test.check(fight.pressed("left") and fight.pressed("jump") and not fight.pressed("right"),"Sliding to a diagonal combines jump and movement")
 	drag.position = down
 	fight._input(drag)
-	test.check(fight.pressed("guard") and not fight.pressed("left"),"Sliding down guards")
+	test.check(fight.pressed("guard") and not fight.pressed("left"),"Sliding down crouches and guards")
 	drag.position = jab
 	fight._input(drag)
 	test.check(not fight.pressed("guard") and not fight.pressed("jab"),"D-pad finger releases direction outside the pad without attacking")
@@ -278,6 +337,71 @@ func run(test: SceneTree) -> void:
 	touch(fight,jab,1,true)
 	fight._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
 	test.check(not fight.pressed("jab") and not fight.pressed("jump"),"Focus loss clears held and buffered mobile input")
+	fight.reset_round()
+	fight.countdown = 0
+	touch(fight,down,0,true)
+	touch(fight,jab,1,true)
+	fight._physics_process(.016)
+	test.check(fight.fighters[0].move == "uppercut","A second finger can launch the crouching combo")
+	touch(fight,down,0,false)
+	touch(fight,jab,1,false)
+	fight.reset_round()
+	fight.countdown = 0
+	var kick := fight.global_position+Vector2(841,440)*.8
+	for point in [up,up,down,down,left,right,left,right,kick,jab]:
+		touch(fight,point,0,true)
+		touch(fight,point,0,false)
+	test.check(fight.fighters[0].move == "ultimate","Touch D-pad and Kick/Punch enter the secret code")
+	fight.ultimate_used = false
+	fight.mobile_controls = false
+	fight.reset_round()
+	fight.countdown = 0
+	var code := [KEY_UP,KEY_UP,KEY_DOWN,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_LEFT,KEY_RIGHT,KEY_B,KEY_A]
+	fight_key(test,KEY_UP,true)
+	fight_key(test,KEY_UP,true,true)
+	fight_key(test,KEY_UP,false)
+	test.check(fight.code_step == 1,"A held arrow does not count as repeated code presses")
+	fight.elapsed += 2.1
+	for key in code.slice(1):
+		fight_key(test,key,true)
+		fight_key(test,key,false)
+	test.check(not fight.ultimate_used,"An expired code prefix cannot trigger the finisher")
+	for key in code:
+		fight_key(test,key,true)
+		fight_key(test,key,false)
+	test.check(fight.ultimate_used and fight.fighters[0].move == "ultimate","The full keyboard code starts the finisher")
+	fight.ai_timer = 99.0
+	fight.ai_guard = 10.0
+	for i in 36:
+		fight._physics_process(.016)
+	test.check(fight.fighters[1].hp == 0 and fight.wins[0] == 1 and fight.announced == "ULTIMATE TAKEDOWN!","The finisher beats distant guard and awards one normal round")
+	test.check(fight.frame_index(fight.fighters[0]) == 8,"The finisher keeps its contact pose at knock-out")
+	for i in 110:
+		fight._physics_process(.016)
+	test.check(not fight.over and fight.fighters[1].hp == 100,"The next round starts normally after the finisher")
+	fight.countdown = 0
+	for key in code:
+		fight_key(test,key,true)
+		fight_key(test,key,false)
+	test.check(fight.fighters[0].move.is_empty(),"The code cannot trigger again in the same session")
+	fight.reset_round()
+	var player: Dictionary = fight.fighters[0]
+	var rival: Dictionary = fight.fighters[1]
+	rival.x = player.x + 20
+	rival.y = Fight.FLOOR - 31
+	fight._attack(player,"uppercut")
+	fight._resolve(player,rival,.18)
+	test.check(rival.hp == 82,"Uppercut hits an airborne rival above jab range")
+	player.move = ""
+	rival.x = player.x + 28
+	rival.y = Fight.FLOOR
+	rival.crouch = true
+	fight._attack(player,"roundhouse")
+	fight._resolve(player,rival,.30)
+	test.check(rival.hp == 82,"Crouching ducks a high roundhouse")
+	rival.crouch = false
+	fight._resolve(player,rival,.02)
+	test.check(rival.hp == 60,"Roundhouse reaches farther than a jab")
 	for name in Fight.ATTACKS:
 		fight.reset_round()
 		var f: Dictionary = fight.fighters[0]
@@ -285,7 +409,7 @@ func run(test: SceneTree) -> void:
 		f.timer = Fight.ATTACKS[name][0]-.001
 		test.check(fight.frame_index(f)==5,"Attack anticipation: "+name)
 		f.timer += .002
-		test.check(fight.frame_index(f)=={"jab":6,"kick":7,"super":8}[name],"Attack contact synchronized: "+name)
+		test.check(fight.frame_index(f)==Fight.CONTACT_POSES[name],"Attack contact synchronized: "+name)
 		f.timer = Fight.ATTACKS[name][0]+Fight.ATTACKS[name][1]+.001
 		test.check(fight.frame_index(f)==5,"Attack recovery: "+name)
 	fight.queue_free()

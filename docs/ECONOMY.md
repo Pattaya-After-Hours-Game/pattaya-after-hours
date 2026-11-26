@@ -651,10 +651,9 @@ The cash report separately records inventory purchases when paid. Manager
 income and nightly tips do not qualify a healthy shift.
 
 Upgrades presents live local milestone counts and renovation cash/reserve status
-above the price-sorted list, including in Ready only. Locked cards expose the
-model’s current reason without requiring a help tap. View renovation only
-changes navigation. This visibility change alters no prices, thresholds,
-accounting, save fields or offline progress.
+above the price-sorted list, including in Ready only. The default list includes
+greyed-out locked cards with the model’s current reasons. View renovation
+navigates to the renovation card.
 
 Milestones belong to the venue. Renovation also requires its fee and the next
 shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿40,000. New

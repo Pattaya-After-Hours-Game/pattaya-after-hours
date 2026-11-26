@@ -79,6 +79,22 @@
     ],
     "sha256": "7586e298f452d5bcc06d080ccc563b9dc928cc4c820515118c749f56f6cc1196"
   },
+  "blue-hour-fridge-walls": {
+    "file": "res://assets/art/blue-hour-fridge-walls.png",
+    "size": [
+      320,
+      256
+    ],
+    "sha256": "ab0fd16110a5850a79a0b833a3e16425e35ef5341c6dc3a4be752ec45ace3928"
+  },
+  "blue-hour-fridges": {
+    "file": "res://assets/art/blue-hour-fridges.png",
+    "size": [
+      800,
+      256
+    ],
+    "sha256": "b050bd5e24519134114226f9481f0708e6f0b9d427e2f7738b334ae49095b618"
+  },
   "cart-jam-overhead": {
     "file": "res://assets/art/cart-jam-overhead.png",
     "size": [
@@ -426,10 +442,10 @@
   "patrons-men": {
     "file": "res://assets/art/patrons-men.png",
     "size": [
-      1440,
+      1920,
       192
     ],
-    "sha256": "60fac81da6798881d2f30d66ef2f889ca4a5b32e8c59192435160d0f18e63b95"
+    "sha256": "d157d61c4e4d7f087272f701be922ca8b822aef1140c0fbe2620f0a3e648f18d"
   },
   "patrons-rainbow-duo": {
     "file": "res://assets/art/patrons-rainbow-duo.png",
@@ -437,7 +453,7 @@
       320,
       192
     ],
-    "sha256": "96c95cf5b311d07fd12f33c6e203c46e00df567310fe3bcd00f4ebb461c145d9"
+    "sha256": "6ac7b04948e0f3d00ff0e5556089620afc0045c76d81a96a0d3073c5503d8f6d"
   },
   "patrons": {
     "file": "res://assets/art/patrons.png",

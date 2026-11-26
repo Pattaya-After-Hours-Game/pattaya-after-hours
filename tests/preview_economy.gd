@@ -15,7 +15,7 @@ func find_text(node: Node, text: String) -> Control:
 		if found: return found
 	return null
 
-func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
+func capture(app: Control, name_text: String, scroll_to: String = "", refresh: bool = true) -> void:
 	if not filter.is_empty() and not name_text.match(filter): return
 	var targets := {"Train Bee":"Upgrade_audience_0","Cycle seating":"Upgrade_seating","Cycle music":"Upgrade_music","Regulars Club":"Upgrade_club","Better sound system":"Upgrade_music","Train Bartender":"Upgrade_training_0","YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
 	var upgrade_target: String = targets.get(scroll_to,"")
@@ -31,7 +31,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not upgrade_target.is_empty():
 		app.upgrades_open = true
 		app.upgrades_ready_only = false
-	app.render()
+	if refresh: app.render()
 	await process_frame
 	await process_frame
 	if not upgrade_target.is_empty():
@@ -98,6 +98,25 @@ func run() -> void:
 		app.model.s.street.event = {"id":5,"prepared":false}
 		app.model.street.finish_event()
 		await capture(app,"reputation-loss")
+		quit()
+		return
+	if filter.begins_with("blue-hour-fridge-"):
+		app.show_tutorial_hint = false
+		app.model.s.cash = 20000
+		var bar: Dictionary = app.model.street.selected()
+		await capture(app,"blue-hour-fridge-0")
+		bar.stage = 3
+		await capture(app,"blue-hour-fridge-renovated-unowned")
+		for tier in range(1,5):
+			bar.stage = [1,1,2,3][tier-1]
+			app.street_action("equipment",2)
+			await capture(app,"blue-hour-fridge-%d" % tier,"",false)
+		while app.model.street.economy.stock_offer(bar,false,0).enabled:
+			app.model.street.action("buy_drink",0)
+		await capture(app,"blue-hour-fridge-4-stocked")
+		bar.stock = 0
+		bar.stock_lots.clear()
+		await capture(app,"blue-hour-fridge-4-empty")
 		quit()
 		return
 	await capture(app,"opening")
@@ -371,14 +390,16 @@ func run() -> void:
 	var start_cash: int = app.model.s.cash
 	app.model.s.cash = 1800
 	await capture(app,"upgrades-badge")
-	app.upgrades_open = true
-	await capture(app,"upgrades-ready")
-	app.upgrades_ready_only = false
+	app.open_upgrades()
 	await capture(app,"upgrades-all")
 	app.model.s.cash = start_cash
 	await capture(app,"upgrades-locked")
+	app.model.s.cash = 1800
+	app.open_upgrades(true)
+	await capture(app,"upgrades-ready")
+	app.model.s.cash = start_cash
 	app.upgrades_open = false
-	app.upgrades_ready_only = true
+	app.upgrades_ready_only = false
 	app.model.street.action("buy_drink",2)
 	await capture(app,"economy-drinks")
 	await capture(app,"actions-ready")
@@ -386,6 +407,15 @@ func run() -> void:
 	app.model.street.action("welcome")
 	app.model.street.advance(5.25)
 	await capture(app,"actions-refilling")
+	var refill_guests: Array = app.model.street.selected().customers
+	var current_wait: int = refill_guests[1].wait
+	refill_guests[1].wait = 40
+	await capture(app,"actions-chat-needed")
+	refill_guests[1].wait = current_wait
+	var order_flags: Array = refill_guests.map(func(guest: Dictionary) -> bool: return guest.order)
+	for guest in refill_guests: guest.order = false
+	await capture(app,"actions-no-demand")
+	for i in refill_guests.size(): refill_guests[i].order = order_flags[i]
 	app.model.street.advance(5)
 	app.model.street.selected().customers[1].wait = 40
 	await capture(app,"actions-chat-ready")

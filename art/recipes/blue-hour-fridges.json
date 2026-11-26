@@ -1,0 +1,23 @@
+{
+  "cell": [160, 256],
+  "origin": [800, 160],
+  "upgrade_widths": [105, 120, 148, 148],
+  "starter_mask": [[46, 15], [56, 8], [92, 2], [117, 3], [148, 6], [156, 11], [157, 249], [115, 255], [47, 241]],
+  "wall_crop": [620, 0, 1053, 1493],
+  "wall_masks": [
+    [[43, 16], [51, 8], [94, 0], [145, 2], [159, 9], [159, 255], [41, 255], [43, 243]],
+    [[41, 24], [62, 18], [104, 15], [149, 10], [159, 14], [159, 255], [43, 255]]
+  ],
+  "generation": {
+    "tool": "Built-in ImageGen",
+    "blue-hour-fridge-upgrades.png": {
+      "references": ["assets/art/beer-1.png", "exec-020461ea-3c14-4848-89b0-3af208032178.png"],
+      "transparent": true,
+      "prompt": "Create ONE production sprite sheet on genuine transparent alpha for the illustrated 2D pixel-art Godot game Pattaya After Hours. First reference is the actual room and fridge perspective. Second reference is the approved fridge upgrade design lineup; reproduce ONLY the four upgraded units (the last four in the reference lineup). Four separate FLOATING fridge sprites arranged two by two with large clear gutters and no overlap, similar height, whole appliances in frame. Each sprite has no floor, no cast shadow, no surroundings, no white/black/chessboard background, no text, no effects outside appliance. Match the actual room's hard pixel edge high-contrast shading, rusty cream and plum metal, electric cyan interiors. Perspective from slightly above, looking at almost straight front with VERY shallow right side visible, front faces nearly rectangle. Top left: tall slim single door and four visible empty shelves, small blue-white frost patches in bottom corners. Top right: slim main door and separate tall narrow secondary glass compartment with own vertical frame, visible ice along lower seam. Bottom left: wider twin equal glass doors, prominent central mullion and twin handles, distinctive frost around both windows. Bottom right: wide twin doors and a wide visibly separate horizontal cold drawer under both doors, visibly larger icy corner crystals and side glazing. Keep all enclosure and glass opaque alpha, the panes are transparent in-world with a very dark teal back and crisp thin horizontal shelves. IMPORTANT all shelves are EMPTY, no bottles or products whatsoever, for game-driven inventory overlays. No diagonal glass reflections across the center of shelves. Plenty of structure and clear stacking even at a 200px tall sprite size. The first unit's total width about 46% of height, close to the fridge at the right of first reference; last two about 64%. Preserve the retro modest repaired Thai bar feel."
+    },
+    "blue-hour-fridge-wall.png": {
+      "reference": "assets/art/beer-1.png crop [720, 110, 960, 450] at 2x",
+      "prompt": "Precise object removal in this game's pixel art BACKGROUND CROP. Reproduce the reference crop in the exact same upright 12:17 shape, same framing and identical placements. Remove ONLY the large blue glowing refrigerator occupying the rightmost 48% of the picture. Behind its silhouette reveal plain warm dark magenta vertical wood wall boards matching those already visible directly above it. Continue the same perspective floor tiles at the very bottom below the wall, keeping their original warm colors and crisp grout alignments; remove the turquoise refrigerator floor glow. Keep the hanging ivy above the refrigerator, entire backbar shelves and bottles, glasses, stacked towels, lower bar cabinets, existing sign corner and everything left of fridge silhouette as close to pixel identical as possible. Do not move the bar cabinet right edge or introduce any objects, lettering, or design. The result must look like a believable gap where the fridge was removed. Match the exact crunchy high contrast detailed pixel art style, no blur or smooth painterly gradient."
+    }
+  }
+}

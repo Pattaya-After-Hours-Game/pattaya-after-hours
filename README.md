@@ -32,7 +32,9 @@ Both actions refill over ten seconds. In **Service**, buy **Faster pouring** and
 **Better welcoming** to reduce each venue’s cooldowns to eight, six, then four
 seconds. Pouring has an additional **two-second tier for ฿5,600**, available from
 stage 2. **Have a chat** buys an urgent waiting guest ten more seconds; it shares
-Welcome’s timer and takes twenty seconds to recover. No order means no sale. Open **Service** to see demand, service speed, occupancy,
+Welcome’s timer and takes twenty seconds to recover. Refill bars are green
+when there’s room to welcome, a guest needs Chat, or an order needs serving.
+No order means no sale. Open **Service** to see demand, service speed, occupancy,
 stock, payroll and recent actual profit. Waiting-order bells respect Sound / Muted.
 
 Inside the scene, customers stand on the public side of the bar, bartenders
@@ -60,7 +62,9 @@ Stock starts in **six-drink packs for ฿228**. Supplier level 2 switches both m
 and automatic deliveries to **twelve drinks for ฿432** (฿36 each). Levels 3–5
 keep twelve-drink deliveries and lower the bill to ฿408/384/360. Every purchase
 needs room and cash for the whole delivery; the button explains any shortfall.
-Each fridge tier adds +1 reputation per ten satisfied visits, on top of the base +1. Stage-1 beer bars can buy a third seating level, **Compact layout
+At the Blue Hour, each fridge upgrade visibly adds storage and frost. Each fridge
+tier adds +1 reputation per ten satisfied visits, on top of the base +1.
+Stage-1 beer bars can buy a third seating level, **Compact layout
 for ฿1,200**, reaching twelve customers even with pool and fans installed.
 
 Save for signage, seating and a pool table, then invest in staff contracts. Pool is available at
@@ -89,9 +93,9 @@ most once every ten seconds. **Sound / Muted** controls it along with game audio
 Staff cost money while on duty, even when the bar is quiet. Use the rota or temporarily close if
 costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
-cash for the next shift—not just a large bank balance. **Upgrades** now shows the selected
-venue’s stage progress at the top, even in **Ready only**. **View renovation**
-jumps to its purchase, and locked cards show their requirements directly.
+cash for the next shift. **Upgrades** shows the selected venue’s stage progress
+and includes greyed-out cards with their requirements by default. Choose
+**Ready only** to filter the list. **View renovation** jumps to its purchase.
 
 Tap **Stock** or **Restock fridge** to buy packs of individual drinks. Tap **?**
 to compare demand and margin. The Supplier upgrade unlocks automatic restocking,
@@ -238,7 +242,7 @@ Toybox sparring. Tours and legacy mining investments are not progression gates.
 | Street | **Serve a drink**, **Welcome customers**, **Have a chat**, property cards and the scrollable management tabs |
 | Events | Pink warning banner or **Events**; prepare before the countdown, then **Face Godzilla** for a monster challenge |
 | District | WASD/arrows to walk, E to enter, Esc to return; touch a destination on mobile |
-| Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J/K/L to jab/kick/Burst. On mobile, hold or slide on the left D-pad and tap attacks with your right thumb. |
+| Toybox | A/D or Left/Right to move, W/Up to jump, S/Down to crouch and guard. J punches, K kicks, L uses Burst at full meter. Hold crouch with J for an uppercut or K for a roundhouse. On mobile, hold Down on the D-pad and tap Punch or Kick for the same moves. |
 | Godzilla | **Serve a shot** or Space; ten shots before the timer ends |
 
 Each launch opens a **New Game / Resume** menu. **Resume** continues your saved
