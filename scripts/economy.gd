@@ -1,6 +1,8 @@
 extends RefCounted
 
 const C = preload("res://scripts/street_content.gd")
+signal tour_arrived(guide_index: int, venue_name: String, guests: int)
+
 var s: Dictionary
 var last_sale := ""
 var walk_in_scale := 1.0
@@ -658,11 +660,11 @@ func traffic_rate(offline: bool = false, replacement: Dictionary = {}) -> float:
 	if s.weather >= 5: rate *= .8
 	return rate*walk_in_scale
 
-func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minute: int = -1, offset: int = 0) -> float:
+func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minute: int = -1, offset: int = 0, include_guides: bool = true) -> float:
 	if not is_trading(bar,offline): return 0.0
 	var value := 4.0 + (int(bar.stage)-1)*1.0 + int(bar.equipment.sign)*2 + int(bar.equipment.pool)*1.5
 	value += minf(3.0,int(bar.regulars)/15.0) + minf(1.5,int(s.rep)/80.0)
-	if not offline: value += s.bookings.size()*.5
+	if not offline and include_guides: value += s.bookings.size()*.5
 	for i in bar.team.size():
 		var host: Dictionary = bar.team[i]
 		if host.role==1 and host.on and contracted(host,offset) and not i in bar.away: value += host_appeal(host)
@@ -1663,7 +1665,17 @@ func tick() -> void:
 			if choice<weight:
 				var bonus := 0 if bar.promo.is_empty() else roundi(weight*(float(C.PROMOTIONS[int(bar.promo.kind)].boost)/int(bar.promo.repetition))/maxf(.01,attraction(bar)))
 				var promoted: bool = not bar.promo.is_empty() and choice<bonus
-				for _guest in group: admit(bar,promoted,false,audience)
+				var admitted := 0
+				for _guest in group:
+					if admit(bar,promoted,false,audience): admitted += 1
+				if admitted>0 and not s.bookings.is_empty():
+					# Attribute only the part of the existing draw supplied by guide appeal.
+					var without_guides := roundi(attraction(bar,false,audience,-1,0,false)*1000)
+					if choice>=without_guides:
+						var guides: Array = s.bookings.keys()
+						guides.sort()
+						var guide_slot := (choice-without_guides)*guides.size()/(weight-without_guides)
+						tour_arrived.emit(int(guides[guide_slot]),str(bar.name),admitted)
 				break
 			choice -= weight
 	for bar in s.street.bars:

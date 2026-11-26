@@ -302,9 +302,36 @@ func test_ui() -> void:
 	check(app.model == live_campaign,"Esc exits a replay")
 	test_godzilla(app)
 	test_clock_ui(app)
+	test_tour_update(app)
 	test_purchase_ui(app)
 	app.queue_free()
 	await process_frame
+
+
+func test_tour_update(app: Control) -> void:
+	app.model = Campaign.new(48)
+	app.model.booking(2,0)
+	app.change_tab(2)
+	app.message = "Booking confirmed."
+	app.model.s.street.pass_credit = 60000
+	app.model.s.street.next_group = 1
+	app.live_seconds = 1.0
+	app._process(1.0)
+	var expected := "Tour guide Fern brought a new customer to Blue Hour."
+	var note: Label = app.root_ui.get_node("StreetUpdate")
+	check(app.model.street.selected().customers.size()==4 and note.text==expected and app.model.s.street.history.front()==expected,"A seated tour referral appears in the live street update over the booking confirmation")
+
+	for fixture in [[5,false],[48,true]]:
+		var m = Campaign.new(fixture[0])
+		m.booking(2,0)
+		var bar: Dictionary = m.street.selected()
+		if fixture[1]:
+			while bar.customers.size()<m.street.economy.seats(bar): m.street.economy.admit(bar)
+			m.s.street.economy_seed = fixture[0]
+		m.s.street.pass_credit = 60000
+		m.s.street.next_group = 1
+		m.street.tick(1)
+		check(m.street.tour_update.is_empty(),"An ordinary walk-in or a full venue does not report an admitted tour referral")
 
 
 func test_purchase_ui(app: Control) -> void:

@@ -92,6 +92,11 @@ Bed Race take over the game screen until you finish or leave.
 - **Definitely Not Godzilla** offers a photo stop for the robot dinosaur with
   a short slowdown while you set up, followed by a visitor rush.
 
+## See when tours bring in customers
+
+Book a guide in **Tours** to recommend your street for the current shift.
+When a referral gets a seat, the top-left update names the guide and venue.
+
 ## When the rats come out
 
 A rare **Rat Plague** can hit during live trading. The swarm drives seated

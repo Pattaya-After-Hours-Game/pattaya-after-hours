@@ -1,6 +1,7 @@
 extends RefCounted
 
 const C = preload("res://scripts/street_content.gd")
+const Crew = preload("res://scripts/content.gd")
 const Economy = preload("res://scripts/economy.gd")
 const OFFLINE_CAP = 8 * 60 * 60
 const SHIFT_SECONDS = 120
@@ -9,6 +10,8 @@ var economy: RefCounted
 signal checkpoint_requested
 var raid_checkpoint := false
 var night_prep_visible := true
+var tour_update := ""
+var tour_update_until := 0
 
 func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
@@ -42,6 +45,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("supplier_deal"): s.street.supplier_deal = {}
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	economy = Economy.new(s,fresh)
+	economy.tour_arrived.connect(record_tour_arrival)
 	s.version = 15
 
 func celebration_info() -> Dictionary:
@@ -73,6 +77,13 @@ func record(line: String) -> void:
 	if s.log.size() > 30: s.log.pop_back()
 	s.street.history.push_front(line)
 	if s.street.history.size() > 60: s.street.history.pop_back()
+
+func record_tour_arrival(guide_index: int, venue_name: String, guests: int) -> void:
+	var guide_name: String = Crew.STAFF[int(s.staff[guide_index].id)][0]
+	var customers := "a new customer" if guests==1 else "%d new customers" % guests
+	tour_update = "Tour guide %s brought %s to %s." % [guide_name,customers,venue_name]
+	tour_update_until = int(s.street.elapsed)+8
+	record(tour_update)
 
 func pay(cost: int) -> bool:
 	if cost < 0 or int(s.cash) < cost: return false

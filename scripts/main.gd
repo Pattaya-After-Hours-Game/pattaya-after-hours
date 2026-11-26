@@ -479,11 +479,16 @@ func render(keep_scroll: bool = false) -> void:
 				card.text = "+\nLEASE"
 				card.add_theme_font_size_override("font_size",11)
 	var first_shift := show_tutorial_hint and not practicing
-	var log_text := "Serve → upgrade → hire → grow" if first_shift else str(model.s.log.front())
+	var update_text := func() -> String:
+		if int(model.s.street.elapsed)<model.street.tour_update_until: return model.street.tour_update
+		if not message.is_empty(): return message
+		return "Serve → upgrade → hire → grow" if first_shift else str(model.s.log.front())
 	var note_y := 148 if event_banner != null else 56
 	pane(root_ui,Rect2(14,note_y,540,27),Color("#21161fdd"))
-	var note := abs_text(root_ui,Rect2(20,note_y+3,530,22),message if not message.is_empty() else log_text,13,GOLD)
+	var note := abs_text(root_ui,Rect2(20,note_y+3,530,22),update_text.call(),13,GOLD)
+	note.name = "StreetUpdate"
 	note.clip_text = true
+	live_labels.append([note,update_text])
 	pane(root_ui,Rect2(0,482,960,58),Color("#21161ff8"))
 	for index in TAB_NAMES.size():
 		var b := at_button(root_ui,Rect2(14+index*62,490,56,40),TAB_NAMES[index],toggle_drawer.bind(index),drawer_open and tab == index)

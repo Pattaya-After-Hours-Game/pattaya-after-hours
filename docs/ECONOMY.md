@@ -296,6 +296,9 @@ Welcoming has a ten-second cooldown, a short expiry and a capped attraction
 bonus. The street supplies 7.3 potential visitors per real minute before events;
 opening a different venue type adds an audience, while similar venues compete.
 Local, tourist and nightlife groups choose among the venues and outside options.
+Each booked tour guide adds 0.5 to live venue appeal before modifiers. When the
+guide's share of the same arrival draw brings customers who get seats, the
+street update names the guide and venue.
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.
