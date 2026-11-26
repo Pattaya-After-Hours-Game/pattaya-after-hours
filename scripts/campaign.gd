@@ -676,7 +676,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -710,6 +710,8 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)<14:
+					for key in Street.Economy.bar_fine_fields(): defaults.erase(key)
 				if int(parsed.version)<13: defaults.erase("completed")
 				if int(parsed.version)<12: defaults.erase("club_level")
 				if int(parsed.version)<11:
@@ -820,6 +822,23 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=14:
+			for bar in parsed.street.bars:
+				for flag in ["auto_bar_fine","auto_bar_fine_on"]:
+					if not bar.get(flag) is bool: return null
+				var absent: Array[int] = []
+				for index in bar.away:
+					if not _finite_number(index,0,bar.team.size()-1) or float(index)!=floorf(index): return null
+					if int(index) in absent: return null
+					absent.append(int(index))
+				for person in bar.team:
+					if not _finite_number(person.get("host_training"),0,2) or float(person.host_training)!=floorf(person.host_training): return null
+					if not _finite_number(person.get("host_return"),0,1e15): return null
+					if person.host_return>0 and (int(person.role)!=1 or not bar.team.find(person) in absent): return null
+				for report in [bar.shift,bar.last_shift]+bar.recent:
+					if report.is_empty(): continue
+					for key in ["bar_fine_income","bar_fines"]:
+						if not _finite_number(report.get(key),0,1e15) or float(report[key])!=floorf(report[key]): return null
 		if int(parsed.version)>=13:
 			for bar in parsed.street.bars:
 				if not _finite_number(bar.completed,0,1e15) or float(bar.completed)!=floorf(bar.completed): return null
@@ -881,7 +900,7 @@ func _restore_numbers(value: Variant, field: String = "") -> Variant:
 	# Preserve explicit fractional action clocks; legacy numeric fields stay integers.
 	match typeof(value):
 		TYPE_FLOAT:
-			if field in ["tick_fraction","service_ready","last_served","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
+			if field in ["host_return","tick_fraction","service_ready","last_served","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
 			return int(value)
 		TYPE_ARRAY:
 			for i in value.size(): value[i] = _restore_numbers(value[i])

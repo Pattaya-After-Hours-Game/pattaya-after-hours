@@ -22,15 +22,16 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Profit cycle: seats → service → appeal → seats |
-| Status | DONE; combined verification passed, including Gabby `1a23e49` |
-| Implementer | Codex in Build out Pattaya bar game |
-| Reviewer / playtester | Codex verified tests and layout; independent device play pending |
-| Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `main` integration from `codex/profit-cycle`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Visit lifecycle, beer upgrade tracks, bounded traffic, model feedback, save migration, tests and docs |
-| Next handoff / blocker | Complete suite passed; main workflow publishes signed downloads; device play remains pending |
-| Recommended next, when free | **IF-01 — Guided next goal** |
+| Active feature | Hostess naming and expansion prices, integrating completed host controls/HUD |
+| Status | REVIEW; pricing `f85afc0` merged with host/HUD checkpoint `ef17ddc` |
+| Implementer | Codex in the shared checkout |
+| Reviewer / playtester | Codex automated and visual checks; device play pending |
+| Shared claim location | This table in `/home/zak/projects/pattaya-after-hours` |
+| Working branch / chat / PR | `codex/venue-pricing` isolated integration |
+| Scope and owned files | Economy, street/content, saves, main UI, barfine tests/previews and docs |
+| Acceptance | Real willing-host requests; ฿500 base fee; 30-second absence and appeal loss; paid auto-accept; retained host training; repeat-safe saves |
+| Next handoff / blocker | Rerunning combined tests and previews before main; see [handover](MERGE_HANDOFF.md); device play remains pending |
+| Recommended next, when free | Await user direction; do not start another roadmap feature |
 | Last updated | 2026-11-26 |
 
 An empty or stale table is **not evidence that the other contributor is idle**.

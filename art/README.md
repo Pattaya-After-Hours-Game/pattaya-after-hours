@@ -244,8 +244,9 @@ The countdown and actual contribution report are model-driven UI.
 
 ## Actual bartender service feedback
 
-The bottom-right BAR STAFF indicator uses the model's actual staff sales and
-cooldown/readiness. Bartender atlases enter their existing serve animation only
+The top-right BARTENDERS list reuses existing portraits and reads the model's
+cooldown/readiness, training levels and shared tip jar. Actual staff sales remain
+in row tooltips and Service. Bartender atlases enter their existing serve animation only
 for two seconds after a real staff sale; the old decorative six-second loop is
 removed. No textures or atlas frames are replaced. Use `staff-ready-*` economy
 previews for ready, served, cooldown, quiet, stockout, rota and expiry states.
@@ -273,3 +274,11 @@ Cart Jam uses a directly overhead atlas of a delivery van and three decorated
 food carts. The bed race uses an illustrated Beach Road panorama and two
 separate side-on racing teams. The packer trims and aligns the sprites. Godot
 rotates the cart tiles and animates the racing beds, wheels and finish effects.
+
+## Bar-fine presentation
+
+The `barfine-*` economy previews show existing host portraits in a compact
+room card with model-owned acceptance and return countdowns, plus Service and
+training offers. The existing `away` state removes only the booked host from
+the production scene. Returning, expiry and closure use the same availability
+rules as attraction. No portraits, room plates or character atlases are replaced.

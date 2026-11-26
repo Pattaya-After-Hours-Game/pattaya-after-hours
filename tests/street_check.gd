@@ -383,7 +383,7 @@ func test_migration(test: SceneTree) -> void:
 	var model = Campaign.new(9)
 	test.check(model.load_game(),"Version-two save loads")
 	var bar: Dictionary = model.street.selected()
-	test.check(model.s.version==13 and model.s.cash==9876 and bar.stage==2 and bar.team.size()==2,"Migration preserves money, stage and staff")
+	test.check(model.s.version==14 and model.s.cash==9876 and bar.stage==2 and bar.team.size()==2,"Migration preserves money, stage and staff")
 	test.check(bar.equipment.pool==1 and bar.customers.is_empty(),"Existing illustrated pool table is granted; migration creates no buyers")
 	model.save_game()
 	model.save_game()

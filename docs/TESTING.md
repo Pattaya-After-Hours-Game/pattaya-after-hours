@@ -26,6 +26,42 @@ is checked separately before the release is called ready.
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
+## Bar-fine controls verification — 26 November 2026
+
+Synced main to `654a60b` before implementation and restored the local bartender
+HUD without conflicts. Godot 4.7.2 `tools/test.sh` passes with zero failures:
+gameplay/save/UI/art regressions, 57 fresh campaigns, 60 celebration scenarios,
+80 club scenarios and 120 paired profit-cycle scenarios. This includes the
+pulled Soi Dispatch events and both full-screen event minigames.
+
+`bar_fine_check.gd` verifies real affordable requests, consent, a once-only ฿500
+base receipt, appeal loss, no fabricated drink/tip receipts, exact fractional
+thirty-second returns, report boundaries, save/reload and schema-13 migration.
+It also checks stage/reserve limits, ฿750/1,000 trained fees, increased expected
+customer share without increased street traffic, retained skills, rota/expiry/
+rehire, offline exclusion, auto-accept/toggle behavior, malformed save rejection,
+visible UI acceptance and independent returns for the bed-race runner.
+
+Nine `barfine-*` economy previews at 960×540 and 1280×720 cover acceptance,
+absence, return, Service, upgrades, automation, a full host roster and closure.
+Existing production portraits and room art are retained. Documentation links and
+`git diff --check` pass. Changes are local and unpublished; Android/touch-device
+playtesting and long-run player balance feedback remain unverified.
+
+## Bartender HUD verification — 26 November 2026
+
+The top-right portrait list replaces the old aggregate indicator. UI regressions
+cover six bartenders with Nida excluded, Gabby's portrait, fractional recovery,
+training during an existing cooldown, off-duty/expired states, the shared bonus
+jar, pure rendering and navigation to Service without campaign changes.
+
+The isolated Godot 4.7.2 `tools/test.sh` suite passes, including gameplay, saves,
+UI/art and all pacing scenarios. Economy previews were inspected at 960×540 for
+recovery, readiness, six-person scrolling and closure, and at 1280×720 for the
+full roster. Existing production portraits are retained. Documentation links and
+`git diff --check` pass. Android/touch-device playtesting and publication of this
+working-tree update remain unverified.
+
 ## Profit-cycle verification — 26 November 2026
 
 Main integration includes `codex/profit-cycle` (`b48b427`) and the separate Gabby

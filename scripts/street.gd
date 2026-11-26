@@ -41,7 +41,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	economy = Economy.new(s,fresh)
-	s.version = 13
+	s.version = 14
 
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()
@@ -151,7 +151,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","regulars_club","stock","buy_drink","mixed_drinks","return_drink","hire","hire_gabby","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
+		"serve","regulars_club","stock","buy_drink","mixed_drinks","return_drink","hire","hire_gabby","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","train_host","auto_bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:
@@ -309,7 +309,7 @@ func next_goal() -> Dictionary:
 			managers += int(bar.manager)
 			soi = soi or bar.type==1
 		title = "Trust the team with two venues"
-		detail = "Soi venue: %s · managers %d/2. Each new bar must earn its own customers and healthy shifts. Dao: Two sets of keys. One owner who finally sits down." % ["owned" if soi else "still needed",mini(2,managers)]
+		detail = "Hostess bar: %s · managers %d/2. Each new bar must earn its own customers and healthy shifts. Dao: Two sets of keys. One owner who finally sits down." % ["owned" if soi else "still needed",mini(2,managers)]
 		tab = 3
 	elif chapter==3:
 		title = "Give Anton something to worry about"
@@ -429,10 +429,12 @@ func finish_event(won: bool = true) -> void:
 func end_shift() -> void:
 	s.street.seconds = 0
 	for bar in s.street.bars:
-		bar.away.clear()
+		# Legacy absences keep their shift boundary; timed bookings keep their deadline.
+		for i in bar.away.duplicate():
+			if float(bar.team[int(i)].get("host_return",0))<=economy.action_time(): bar.away.erase(i)
 		var event: Dictionary = s.street.event
 		if event.get("id",-1)==C.Local.BED and event.has("runner") and s.street.bars[int(event.venue)]==bar:
-			bar.away.append(event.runner)
+			if not int(event.runner) in bar.away: bar.away.append(event.runner)
 		economy.settle_shift(bar)
 	s.bookings.clear()
 	s.night.erase("godzilla")
@@ -558,6 +560,9 @@ func advance(delta: float) -> void:
 		if s.street.tick_fraction>=0.9999999:
 			s.street.tick_fraction = 0.0
 			tick(1)
+
+	if s.phase in ["plan","guided"]:
+		for bar in s.street.bars: economy.return_hosts(bar)
 
 func tick(seconds: int) -> void:
 	if not s.phase in ["plan","guided"]: return

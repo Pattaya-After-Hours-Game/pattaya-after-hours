@@ -161,7 +161,7 @@ per-customer chat state. Action deadlines are fractional foreground seconds;
 Do not run both `advance` and `tick` for the same elapsed interval.
 
 Changes to the save dictionary need compatibility handling; the current schema
-version is 12. Promoter roster/commission fields and fractional offline accounting
+version is 14. Promoter roster/commission fields and fractional offline accounting
 are migrated without granting purchases. Keep whole-pack delivery and commission
 settlement inside `economy.gd`; UI/animation code must not mint receipts.
 Manager income is a separate model-owned receipt, not a drink. Stock lots retain
@@ -361,7 +361,10 @@ before owner auto-serve in the live tick, without changing manual action timers.
 Schema 9 preserves fractional deadlines and converts old partial work once.
 `tests/staff_ready_check.gd` covers ready service, toggle/reload protection, stock,
 queue sharing, owner separation and migration. The `staff-ready-*` economy preview
-group checks the bottom-right indicator, real serving poses and purchase price.
+group checks the top-right portrait roster, real serving poses and purchase price.
+`main.gd::update_bartender_hud` only reads staff deadlines and availability; it
+never serves or settles tips. Levels display training plus one. Full rosters
+scroll after four visible rows, and the shared pending tip jar includes bonuses.
 
 Owner relief dispatch belongs to `economy.gd::owner_relief_needed`, called after
 staff service. UI status reads this predicate without settling sales. Renewal
@@ -469,3 +472,23 @@ from existing ownership/date fields, so this feature needs no schema bump.
 expiry, save preservation, manager gates and the real UI. `lease_balance.gd`
 compares fresh beer/hostess/gogo expansion routes with bounded street demand.
 Economy previews use `lease-*` at ordinary and wide resolutions.
+
+## Host booking controls and schema fourteen
+
+`economy.gd::bar_fine_offer` is the pure shared gate for the HUD, Service and
+`accept_bar_fine`. `return_hosts` clears only completed timed bookings;
+`auto_bar_fines` invokes the same settlement on live ticks. `street.advance`
+checks fractional returns as well as fixed economy ticks. `end_shift` preserves
+new timed absences and the bed-race runner while finishing old untimed absences.
+
+Content defines host appeal, fees, training costs and automation cost. Schema 14
+validates saved host levels, deadlines, absence indices, automation flags and
+booking reports, and preserves fractional `host_return` in number restoration.
+JSON absence indices are normalized before matching against roster indices.
+Older saves receive zero levels/ownership and retain legacy absence timing.
+
+`tests/bar_fine_check.gd` covers pure offers, fees, demand/budgets, consent,
+availability, thirty-second return/reload, stage/reserve gates, upgrades,
+automation, expiry/rehire, offline exclusion, old-save migration, validation,
+UI acceptance and compatibility with the bed-race runner. Use `barfine-*` with
+the economy preview runner for the room card, Service and upgrade controls.

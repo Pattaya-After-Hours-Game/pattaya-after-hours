@@ -42,7 +42,7 @@ sales and regulars; later ones explain renovation, reopening preparations,
 deliveries and the first manager. The guide follows the Blue Hour and then the
 street-wide story even when you have another property selected.
 
-Final renovations now cost ฿40,000 for a beer bar, ฿65,000 for a Soi venue and
+Final renovations now cost ฿40,000 for a beer bar, ฿65,000 for a Hostess bar and
 ฿120,000 for a gogo. Each still needs its own 450 happy visits, 70 regulars and
 40 healthy shifts, plus operating cash. You can work on another bar while that
 customer base grows. The first renovation and ordinary drink prices are unchanged.
@@ -113,12 +113,15 @@ and parties shorten repeat timing. Fridges earn reputation through happy visits.
 
 ## Is my bartender working?
 
-Look at **BAR STAFF** in the bottom right. It shows drinks staff have actually
-served, flashes **Served a drink!**, and counts down to the next serve. It also
-shows **waiting for orders**, **out of stock**, **off duty / contract finished**
-or **venue closed**. Tap it for Service and each person's detailed status.
-Counts start when hired or when this update is installed, excluding your taps
-and offline estimates.
+Look at **BARTENDERS** in the top right. Each row shows a portrait, level and
+red cooldown bar that fills until ready. Level 1 means no training; each training
+purchase adds one level. The label explains no orders, no stock, off duty,
+finished contracts or venue closure. Scroll for larger teams. Tap a row or the
+arrow for Service and detailed actual-sale counts.
+
+The **Tip jar** beneath the list is this venue's shared unpaid total, including
+first-visit tips, matched-drink bonuses and Gabby's bonus. It pays at closing;
+it is not an individual bartender's lifetime earnings.
 
 She starts ready and automatically serves a waiting customer on the next live
 tick if stock is available. Then she recovers for 25 seconds, improving to 20/15
@@ -253,7 +256,7 @@ Check the peak indicator in Service when planning staffing and stock:
 | Venue | Peak hours |
 | --- | --- |
 | Beer bar | 5–9pm |
-| Soi venue | 7–11pm |
+| Hostess bar | 7–11pm |
 | Gogo | 10pm–2am |
 
 Peaks add 50% attraction, increasing your share of the existing street traffic.
@@ -360,12 +363,36 @@ The manager appointment and supplier agreement remain permanent purchases.
 
 Adult hosts and dancers attract their audience and use the same contracts; they
 do not serve drinks. Use each person's rota to pause wages, not their contract.
-At Soi venues and gogos, role reassignment changes service and payroll. Switching
+At Hostess bars and gogos, role reassignment changes service and payroll. Switching
 a bartender to a host/dancer charges the contract-price difference for the
 remaining term, keeping training and requiring the next shift’s reserve. Switching
 back does not refund it.
-Hosts' preferences still apply, and only an actual customer request can produce
-a bar fine. An accepting host is unavailable for the remainder of the shift.
+At a Hostess bar, the **BAR FINES** card in the room shows each host's availability.
+Tap **Accept · ฿500** for an affordable request from a real customer. The fee goes
+to the till once; the host leaves for **30 foreground seconds**, and her appeal
+is removed until she returns. The card shows the countdown. Up to one/two/three
+hosts can be away at once at venue stages one/two/three. Scroll for larger teams.
+May and Fah prefer hosted drinks and never accept bookings.
+
+**Service → Bar fines** has the same controls, training and **Auto-accept for
+฿3,000**. Once bought, toggle it on or off. It accepts eligible requests on live
+ticks using the same consent, contract, rota, customer-budget and capacity rules.
+It earns nothing on the startup menu or in offline estimates.
+
+| Host level | Base appeal while present | Bar-fine fee | Training purchase |
+| --- | ---: | ---: | --- |
+| 1 | +0.6 | ฿500 | Starting level |
+| 2 | +1.2 | ฿750 | ฿1,500; venue stage 2 |
+| 3 | +1.8 | ฿1,000 | ฿3,000; venue stage 3 |
+
+More appeal improves the venue's share of finite street customers, rather than
+guaranteeing arrivals. Training stays with the person after expiry or rehire;
+it does not change a fee already paid or shorten an active booking. Colleagues
+who decline bookings can train their appeal without changing that preference.
+Purchases retain a shift's operating reserve. Private activity stays off-screen.
+
+New bookings retain their exact return time across reports and reloads. Older
+saved bookings retain their original end-of-shift return, with no extra payment.
 
 Automatic deliveries are a paid supplier agreement. They buy one complete delivery at your supplier price
 when stock is below the delivery quantity and orders are waiting, retaining the next operating
@@ -376,7 +403,7 @@ estimate. Check the current prices and requirements in **Service**.
 Renovations require a local customer base and healthy shifts as well as cash.
 The wealth of another property cannot satisfy those milestones. **Empire** shows
 leases and their opening reserves. Finish the Blue Hour opening chapter before
-buying a second venue. Soi venues require 20 reputation; gogos require 45.
+buying a second venue. Hostess bars require 20 reputation; gogos require 45.
 
 The combined active-play checks reach pool around 16–19 minutes, stage 2 around
 34–40 minutes and a second property around 117–123 minutes. After stage 2, the
@@ -530,8 +557,9 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Current schema 13 retains visit plans/phases, all beer-bar tiers and personal
-training. Existing visitors finish their old saved visit rules; new arrivals use
+Current schema 14 also retains host training, auto-accept and fractional booking
+return deadlines. Schema 13 visit plans/phases, beer-bar tiers and personal
+training are preserved. Existing visitors finish their old saved visit rules; new arrivals use
 the new plans. Older campaigns receive no free upgrades or refunds; existing
 guests keep their budgets and visit limits. Save schema 9 retains staff cooldowns and actual service counters; older partial
 work keeps its remaining wait. Schema 8 also retains celebration dates, reports and visitor patience.

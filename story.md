@@ -46,7 +46,7 @@ real-time deadline or a separate Tuesday rent mechanic in the live economy.
 
 ## Same beer, different night
 
-The Blue Hour charges ฿80 for a standard drink. A Soi venue charges ฿100;
+The Blue Hour charges ฿80 for a standard drink. A Hostess bar charges ฿100;
 a gogo charges ฿120. The extra twenty baht belongs to the kind of night on offer,
 not an automatic price rise every time the owner buys new chairs.
 
@@ -150,7 +150,8 @@ off duty or out of contract, and keeps her training if she returns.
 The colleague behind the counter is now visibly doing real work. Ready staff
 serve an actual waiting order, then take their 25/20/15-second recovery (12/10 after stage-two training). The owner
 clearing a queue no longer sends them back to the beginning of a warmup. Their
-serving pose and the bottom-right staff tally confirm what they sold. When the
+serving pose and the Service tally confirm what they sold. The top-right
+portrait list shows who is ready and who is recovering. When the
 fridge is empty, the indicator says so instead of pretending someone is pouring.
 At ฿3,000, owner auto-serve is a separate convenience for the owner's tapping;
 it does not replace the colleague's own clock or create buyers. Quiet orders
@@ -161,6 +162,20 @@ door: her skills stay, and Anong insists on keeping payroll and a delivery in
 reserve after paying her fee.
 
 > **Anong:** “She's ready. Give her an order, not another stopwatch.”
+
+## A booking is a trade-off
+
+At a Hostess bar, a customer can ask and a willing adult host can accept. The
+owner sees the decision plainly: ฿500 for the bar, thirty seconds away, and less
+appeal while the colleague is absent. A visible countdown brings her back;
+there is no private scene. May and Fah still prefer hosted drinks.
+
+> **Anong:** “Count the fee. Then count who is still here to welcome the next guest.”
+
+Host development earns stronger appeal and higher future fees: ฿750, then
+฿1,000. Training belongs to the colleague, not the contract. Paid auto-accept
+handles the same eligible requests while the street is live; it cannot change
+anyone's preferences or invent a customer who can afford the booking.
 
 ## Something to look forward to: Anong's birthday
 
@@ -239,7 +254,7 @@ extension to 3am chosen separately for each venue each night. One real second
 is one game minute. The visible DAY counter follows the campaign from Day 1,
 advancing at midnight. Anong's short business reports are not whole calendar days.
 
-The street gets busy in waves: beer-bar peaks run from 5–9pm, Soi venues from
+The street gets busy in waves: beer-bar peaks run from 5–9pm, Hostess bars from
 7–11pm, and gogos from 10pm–2am. The extra attraction still competes for real
 passersby. More trade also leaves more work: each drink sold during peak time
 makes twice the mess. A gogo's final peak hour tempts the owner into late opening.
@@ -355,7 +370,7 @@ The story shifts from serving everyone personally to trusting other people.
 Dao takes responsibility, Pim thinks about the music, and Mali wants promotions
 that do more than leave someone else with the cleaning.
 
-A Soi venue adds hosted nightlife, actual customer requests and staff availability
+A Hostess bar adds hosted nightlife, actual customer requests and staff availability
 to the decisions. Private activity stays behind the door. Two managed venues are
 the milestone: the street is becoming an organisation rather than one frantic
 owner running between fridges.
@@ -373,7 +388,7 @@ rivalry as a recurring part of life on the street.
 ### Chapter 5 — The Whole Soi Knows Your Name
 
 The player has built a mixed street rather than discarded every small business
-on the way to the largest one. Beer bars, Soi venues and gogos each have a role.
+on the way to the largest one. Beer bars, Hostess bars and gogos each have a role.
 Neighbours, managers and regulars give the district its character.
 
 The **After Hours Street Festival** brings the first arc together: a crowd,
@@ -398,7 +413,7 @@ These describe the implementation, rather than adding new quest requirements.
 | --- | --- |
 | Chapter 1 | Blue Hour at stage 2+, with a manager; at least ten street drink sales and one resolved street event |
 | Chapter 2 | Own at least two properties |
-| Chapter 3 | Own a Soi venue and have at least two managed venues |
+| Chapter 3 | Own a Hostess bar and have at least two managed venues |
 | Chapter 4 | Own a gogo at stage 2+ |
 | Chapter 5 | Resolve the festival; success and recoverable failure both continue the story |
 
