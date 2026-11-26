@@ -41,7 +41,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			customer.commission_order = false
 			customer.merge(visit_fields(),int(s.get("version",1))<13)
 		for report in [bar.shift,bar.last_shift]+bar.recent:
-			if not report.is_empty(): report.merge({"completed":0,"waiting_seconds":0,"drinking_seconds":0,"drink_requests":{},"drink_misses":{},"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.LEGACY_STOCK_COST,"manager_income":0})
+			if not report.is_empty(): report.merge({"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"drink_requests":{},"drink_misses":{},"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.LEGACY_STOCK_COST,"manager_income":0})
 		for table in bar.games.size():
 			if not bar.games[table].has("table"): bar.games[table].table = table
 		if migrated:
@@ -53,6 +53,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			if not person.has("training"): person.training = int(bar.equipment.training)
 			if not person.has("service_clock"): person.service_clock = 0
 			if not person.has("audience_training"): person.audience_training = 0
+			person.merge({"host_training":0,"host_return":0.0})
 			ensure_staff_service(person)
 			if person.contract_left<=0: person.on = false
 	if fresh:
@@ -143,12 +144,16 @@ static func new_fields() -> Dictionary:
 		"welcome":0,"welcome_until":0.0,"welcome_ready":0.0,"serve_ready":0.0,"service_clock":0,"cost_credit":0,
 		"completed":0,"club_level":0,"regulars":0,"happy":0,"healthy":0,"shift":ledger(),"last_shift":{},"recent":[],"recent_sales":[],"recent_orders":[],
 		"pool_games":0,"pool_income":0,"free_games":0,"arrivals":0,"orders":0,"sold":0,"lost_full":0,"lost_service":0,"lost_stock":0,"host_requests":[],"drink_stock":{}}
+	fields.merge(bar_fine_fields())
 	fields.merge(tip_fields())
 	fields.merge(automation_fields())
 	fields.merge(promoter_fields())
 	fields.merge(clock_fields())
 	fields.merge(action_fields())
 	return fields
+
+static func bar_fine_fields() -> Dictionary:
+	return {"auto_bar_fine":false,"auto_bar_fine_on":true}
 
 static func tip_fields() -> Dictionary:
 	return {"tip_visits":0,"bonus_tips":0,"tips_total":0,"last_tips":{}}
@@ -368,7 +373,7 @@ func stock_offer(bar: Dictionary, automatic: bool = false, drink: int = 0) -> Di
 	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"quantity":pack_quantity(bar),"room":room,"remaining_cash":int(s.cash)-amount}
 
 static func ledger() -> Dictionary:
-	return {"completed":0,"waiting_seconds":0,"drinking_seconds":0,"revenue":0,"stock_cost":0,"drink_requests":{},"drink_misses":{},"operating":0,"promo_cost":0,"fines":0,"commission":0,"consumed_stock":0,"manager_income":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}
+	return {"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"revenue":0,"stock_cost":0,"drink_requests":{},"drink_misses":{},"operating":0,"promo_cost":0,"fines":0,"commission":0,"consumed_stock":0,"manager_income":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}
 
 func roll(limit: int) -> int:
 	s.street.economy_seed = (int(s.street.economy_seed)*48271) % 2147483647
@@ -398,7 +403,7 @@ func advance_contracts(minutes: int) -> void:
 			if person.contract_left==0:
 				person.on = false
 				person.service_clock = 0
-				bar.away.erase(i)
+				if float(person.get("host_return",0))<=action_time(): bar.away.erase(i)
 				var notice := "%s · %s %d finished their ten-day contract. Rehire in Service; training is retained." % [bar.name,C.ROLE_NAMES[int(person.role)],i+1]
 				s.log.push_front(notice)
 				s.street.history.push_front(notice)
@@ -423,7 +428,7 @@ func ensure_staff_service(person: Dictionary) -> void:
 	if not person.has("service_ready"):
 		var old_progress := int(person.get("service_clock",0))
 		person.service_ready = action_time()+maxi(0,service_seconds(person)-old_progress) if old_progress>0 else 0.0
-	person.merge({"last_served":-1.0,"drinks_served":0})
+	person.merge({"last_served":-1.0,"drinks_served":0,"host_training":0,"host_return":0.0})
 	person.service_ready = float(person.service_ready)
 	person.last_served = float(person.last_served)
 
@@ -638,7 +643,9 @@ func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minu
 	var value := 4.0 + (int(bar.stage)-1)*1.0 + int(bar.equipment.sign)*2 + int(bar.equipment.pool)*1.5
 	value += minf(3.0,int(bar.regulars)/15.0) + minf(1.5,int(s.rep)/80.0)
 	if not offline: value += s.bookings.size()*.5
-	value += on_duty(bar,1,offset)*.6
+	for i in bar.team.size():
+		var host: Dictionary = bar.team[i]
+		if host.role==1 and host.on and contracted(host,offset) and not i in bar.away: value += host_appeal(host)
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
 		if person.role==2 and person.on and contracted(person,offset) and not i in bar.away:
@@ -991,7 +998,7 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 			report.drink_revenue += quote
 			report.drink_cost += consumed
 			report["commission"] = int(report.get("commission",0))+commission
-		if bar.type == 1 and customer.drinks == 2 and on_duty(bar,1)>0 and customer.fine_budget>=300*int(bar.stage) and roll(100)<40:
+		if bar.type == 1 and customer.drinks == 2 and on_duty(bar,1)>0 and customer.fine_budget>=C.BAR_FINE_FEES[0] and roll(100)<40:
 			bar.host_requests.append(int(customer.id))
 		sold += 1
 		if manual:
@@ -1351,7 +1358,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			s.cash -= amount
 			s.weekly.costs += amount
 			var host := free_host(bar) if index==1 else -1
-			bar.team.append({"role":index,"on":true,"host":host,"training":0,"audience_training":0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES})
+			bar.team.append({"role":index,"on":true,"host":host,"training":0,"audience_training":0,"host_training":0,"host_return":0.0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES})
 			ensure_staff_service(bar.team.back())
 			bar.crew = bar.team.size()
 			commit_orders(bar)
@@ -1383,22 +1390,112 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 				return "Audience training improved. Skills stay with the person after rehiring."
 			person.training = int(offer.level)+1
 			return "Training retained for future contracts. Now serves one drink every %ds." % service_seconds(person)
+		"train_host":
+			var offer := host_training_offer(bar,index)
+			if not offer.enabled: return offer.reason
+			s.cash -= offer.price
+			s.weekly.costs += offer.price
+			bar.team[index].host_training = int(offer.level)+1
+			return "Host training improved appeal and future bar-fine fees. Skills stay after rehire."
+		"auto_bar_fine":
+			if bar.get("auto_bar_fine",false):
+				bar.auto_bar_fine_on = not bar.auto_bar_fine_on
+				return "Automatic bar fines " + ("on." if bar.auto_bar_fine_on else "off.")
+			var offer := auto_bar_fine_offer(bar)
+			if not offer.enabled: return offer.reason
+			s.cash -= offer.price
+			s.weekly.costs += offer.price
+			bar.auto_bar_fine = true
+			bar.auto_bar_fine_on = true
+			return "Auto-accept installed. Willing, available hosts accept affordable requests on live ticks."
 		"bar_fine":
-			if index<0 or index>=bar.team.size() or bar.team[index].role!=1: return "Choose an adult host."
-			if not is_trading(bar) or not contracted(bar.team[index]) or not bar.team[index].on or index in bar.away: return "This host is unavailable."
-			if not C.HOSTS[int(bar.team[index].host)][2]: return "The host declines; hosted drinks are their preference."
-			if bar.host_requests.is_empty(): return "No customer has requested a bar fine."
-			if bar.away.size()>=bar.stage: return "Upstairs bookings are full this shift."
-			var request := int(bar.host_requests.pop_front())
-			var requester: Dictionary = {}
-			for customer in bar.customers:
-				if customer.id==request: requester = customer
-			if requester.is_empty() or requester.fine_budget<300*int(bar.stage): return "The customer has left or cannot cover the request."
-			requester.fine_budget -= 300*int(bar.stage)
-			bar.away.append(index)
-			income(bar,200*int(bar.stage))
-			return "Accepted. The host is unavailable until the next shift; private activity stays off-screen."
+			return accept_bar_fine(bar,index)
 	return ""
+
+static func host_appeal(person: Dictionary) -> float:
+	return C.HOST_APPEAL[int(person.get("host_training",0))]
+
+static func host_fee(person: Dictionary) -> int:
+	return C.BAR_FINE_FEES[int(person.get("host_training",0))]
+
+func host_training_offer(bar: Dictionary, index: int) -> Dictionary:
+	var person: Dictionary = bar.team[index] if index>=0 and index<bar.team.size() else {}
+	var level := int(person.get("host_training",0))
+	var maxed := level>=C.HOST_TRAINING_PRICES.size()
+	var amount := 0 if maxed else int(C.HOST_TRAINING_PRICES[level])
+	var reason := ""
+	if person.get("role",-1)!=1 or bar.type!=1: reason = "Choose an adult Soi host."
+	elif not contracted(person): reason = "Rehire this host before training."
+	elif maxed: reason = "Already fully trained."
+	elif bar.stage<level+2: reason = "Needs venue stage %d." % (level+2)
+	elif s.cash<amount+operating_rate(bar)*2: reason = "Keep the next shift's operating reserve after training."
+	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"level":level,"maxed":maxed,"required_stage":level+2}
+
+func auto_bar_fine_offer(bar: Dictionary) -> Dictionary:
+	var reason := ""
+	var willing := false
+	for person in bar.team:
+		if person.role==1 and C.HOSTS[int(person.host)][2] and contracted(person): willing = true
+	if bar.type!=1: reason = "Bar fines belong to Soi venues."
+	elif bar.get("auto_bar_fine",false): reason = "Already installed."
+	elif not willing: reason = "Hire a host who accepts bar-fine requests first."
+	elif s.cash<C.AUTO_BAR_FINE_COST+operating_rate(bar)*2: reason = "Keep the next shift's operating reserve after auto-accept."
+	return {"enabled":reason.is_empty(),"reason":reason,"price":C.AUTO_BAR_FINE_COST}
+
+func bar_fine_offer(bar: Dictionary, index: int) -> Dictionary:
+	var person: Dictionary = bar.team[index] if index>=0 and index<bar.team.size() else {}
+	var fee := host_fee(person)
+	var remaining := maxf(0.0,float(person.get("host_return",0))-action_time())
+	var request := -1
+	# Inspect real, still-present customers without consuming requests or RNG.
+	for id in bar.host_requests:
+		for customer in bar.customers:
+			if int(customer.id)==int(id) and customer.fine_budget>=fee:
+				request = int(id)
+				break
+		if request>=0: break
+	var occupied := 0
+	for i in bar.away:
+		if int(i)>=0 and int(i)<bar.team.size() and bar.team[int(i)].role==1: occupied += 1
+	var reason := ""
+	if bar.type!=1 or person.get("role",-1)!=1: reason = "Choose an adult Soi host."
+	elif not C.HOSTS[int(person.host)][2]: reason = "Declines bookings · hosted drinks only"
+	elif remaining>0: reason = "Away · back in %ds" % ceili(remaining)
+	elif not contracted(person): reason = "Contract finished"
+	elif not person.on: reason = "Off duty"
+	elif index in bar.away: reason = "Returning" if float(person.get("host_return",0))>0 else "Away · back next shift"
+	elif not is_trading(bar): reason = "Venue closed"
+	elif occupied>=int(bar.stage): reason = "Booking spaces full"
+	elif request<0: reason = "No affordable customer request"
+	return {"enabled":reason.is_empty(),"reason":reason,"fee":fee,"appeal":host_appeal(person),"remaining":remaining,"request":request}
+
+func accept_bar_fine(bar: Dictionary, index: int) -> String:
+	var offer := bar_fine_offer(bar,index)
+	if not offer.enabled: return "This host is unavailable. " + str(offer.reason)
+	for customer in bar.customers:
+		if int(customer.id)!=int(offer.request): continue
+		customer.fine_budget -= int(offer.fee)
+		while int(offer.request) in bar.host_requests: bar.host_requests.erase(int(offer.request))
+		bar.away.append(index)
+		bar.team[index].host_return = action_time()+C.BAR_FINE_SECONDS
+		income(bar,int(offer.fee))
+		bar.shift.bar_fine_income += int(offer.fee)
+		bar.shift.bar_fines += 1
+		return "%s accepted · ฿%d received · back in %ds. Appeal is lower while away." % [C.HOSTS[int(bar.team[index].host)][0],offer.fee,C.BAR_FINE_SECONDS]
+	return "The customer has left."
+
+func return_hosts(bar: Dictionary) -> void:
+	for i in bar.team.size():
+		var person: Dictionary = bar.team[i]
+		var deadline := float(person.get("host_return",0))
+		if deadline>0 and action_time()>=deadline:
+			person.host_return = 0.0
+			bar.away.erase(i)
+
+func auto_bar_fines(bar: Dictionary) -> void:
+	if not bar.get("auto_bar_fine",false) or not bar.get("auto_bar_fine_on",true) or not is_trading(bar): return
+	for i in bar.team.size():
+		if bar.team[i].role==1 and bar_fine_offer(bar,i).enabled: accept_bar_fine(bar,i)
 
 static func customer_profit(report: Dictionary) -> int:
 	return int(report.get("revenue",0))-int(report.get("manager_income",0))-int(report.get("consumed_stock",0))-int(report.get("operating",0))-int(report.get("promo_cost",0))-int(report.get("fines",0))-int(report.get("commission",0))
@@ -1451,6 +1548,7 @@ func settle_shift(bar: Dictionary) -> void:
 
 func tick() -> void:
 	s.street.elapsed += 1
+	for bar in s.street.bars: return_hosts(bar)
 	# Create a bounded supply of potential visitors shared by every property.
 	s.street.pass_credit += roundi(traffic_rate()*1000)
 	while s.street.pass_credit>=int(s.street.next_group)*60000:
@@ -1536,6 +1634,7 @@ func tick() -> void:
 		if local_event(bar,C.Local.ENCORE) and s.street.event.prepared and int(s.street.event.remaining)%8==0:
 			serve(bar)
 		if automatic_service(bar) and owner_relief_needed(bar): serve(bar,1,true)
+		auto_bar_fines(bar)
 		pool_tick(bar)
 
 func offline_drink(bar: Dictionary, mix: Array, sample: int) -> int:

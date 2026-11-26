@@ -92,6 +92,19 @@ cash for the next shift—not just a large bank balance.
 Tap **Stock** or **Restock fridge** to compare popularity with profit per sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
 Mango cocktails.
 
+## Host bookings without the hunt through menus
+
+Soi venues show a **BAR FINES** card in the room. Accept a real customer's
+request for **฿500**: the willing host leaves for **30 seconds**, losing her
+appeal until she returns. A countdown shows when she is back. Service offers
+**Auto-accept for ฿3,000**, with an on/off toggle and the same availability,
+consent, customer-budget and booking-space limits.
+
+Personal host training costs **฿1,500 at venue stage 2**, then **฿3,000 at stage 3**.
+Base appeal rises **0.6 → 1.2 → 1.8**, competing for more shared street customers;
+fees rise **฿500 → ฿750 → ฿1,000**. Training survives rehire. Hosts who decline
+bookings keep that preference. Nothing pays automatically offline.
+
 ## Chase the next bottleneck
 
 New customers plan one or two rounds; club members and birthday guests can plan
@@ -197,7 +210,9 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 13.
+retain money, staff, venues and owned stages when migrated to save schema 14.
+Schema 14 saves host training, auto-accept and thirty-second booking deadlines.
+Existing paid bookings retain their old shift return without another fee.
 Schema 13 retains individual visit plans and expanded beer-bar tiers. Existing
 visitors finish under their saved legacy stay, quotes and timers. Older
 saves get no free purchases, extra rounds for existing guests or manager refunds.
@@ -328,10 +343,14 @@ or order frequency. Music and celebrations affect repeat-order timing.
 
 ## See your bartender working
 
-The bottom-right **BAR STAFF** indicator shows actual staff drinks served,
-a short confirmation after each sale, readiness, cooldown and stock/rota problems.
-Tap it to open Service. Staff sprites use their serving pose after actual sales.
-Counters begin at hiring or this update and exclude owner taps and offline estimates.
+The top-right **BARTENDERS** list shows the selected venue's portraits, levels
+and red bars filling toward each person's next serve. Level 1 is untrained;
+each purchased training tier adds a level. Ready, stock, rota, contract and
+closure labels reflect the live model. Larger teams scroll within the compact list.
+Tap a row or the arrow for Service; actual staff sale counts remain in the
+row tooltip and Service roster. Serving poses still follow actual sales.
+The shared venue **Tip jar** shows unpaid first-visit and drink bonuses, including
+Gabby's tips, and resets when paid at closing.
 
 A bartender starts ready. If an order and stock are available, she serves on the
 next simulation tick, then recovers for 25 seconds (20/15 with basic training, 12/10 with stage-two training). Empty

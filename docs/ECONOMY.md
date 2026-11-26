@@ -421,13 +421,60 @@ advance the live deadline. Overnight skips retain it, like owner action timers.
 Offline projections retain demand-limited sustained service estimates and do not
 add to live staff counters or fake a recent serving animation.
 
-The bottom-right indicator and Service roster read the authoritative state.
+The top-right bartender list and Service roster read the authoritative state.
+The HUD level is personal training plus one; red bars fill against saved service
+deadlines. Its tip jar reads the venue’s unpaid visit and bonus tips, without
+attributing shared tips to individuals or settling them.
 Counts are actual staff sales since hiring or this update, not reconstructed
 historical totals. Serving poses follow actual settlement for two seconds.
 The HUD cannot award money or run service. Save schema nine preserves fractional
 deadlines and counters; old nonzero `service_clock` progress becomes its remaining
 cooldown once. An idle old bartender becomes ready. Old training, contracts,
 stock, cash and purchased auto-serve remain; the lower price grants no refund.
+
+## Bar-fine requests, host appeal and automation
+
+Soi hosts use the existing request source: a real nightlife guest with a separate
+booking budget may request a booking after their second actual served drink
+(40% chance while a host is on duty). New requests need at least the ฿500 base
+budget. Existing guest budgets are unchanged; new nightlife guests retain
+`600 × venue stage` in their separate `fine_budget`. Drink money is never used
+for bookings. Requests disappear when that customer leaves or the venue closes.
+
+Acceptance checks a live affordable request, a willing adult host, an active
+contract, on-duty rota, trading venue and available booking space. May and Fah
+continue to decline. There are at most `venue stage` simultaneous host bookings.
+The model consumes one request, deducts the **entire fee** from its customer's
+booking budget and credits that fee once to normal actual revenue. Ledger fields
+`bar_fines` and `bar_fine_income` report it separately; it is not a drink sale,
+tip, commission, manager receipt or offline estimate. Duplicate clicks cannot
+pay again. The normal five-second cashflow sample includes the actual receipt.
+
+The host joins `away` until `host_return = action_time + 30`. Her entire base
+appeal contribution is absent during that period. Foreground time can complete
+the absence while closed or off duty; expiry/rehire, role controls and report
+boundaries cannot reset it. Menu, paused and offline time do not advance it.
+A return restores eligibility, not an expired contract or an off-duty rota.
+The newly integrated bed-race runner keeps its separate event return rule.
+
+Host training is personal, independent of bartender/audience training, and
+survives expiry, renewal and reassignment. Levels 0/1/2 supply base appeal
+**0.6/1.2/1.8** and future fees **฿500/750/1,000**. Training costs **฿1,500/3,000**
+and needs venue stage **2/3** respectively, an active contract and the next
+shift's operating reserve. Non-booking hosts may train appeal without changing
+consent. Appeal competes for the same shared traffic; it creates no extra buyers.
+Training never changes an already-paid fee or its return deadline.
+
+**฿3,000 auto-accept** is a permanent per-Soi-venue purchase requiring a contracted
+willing host and the operating reserve. Its saved toggle defaults on when bought.
+Live ticks use the same acceptance action after service; purchasing or toggling
+it does not itself accept anything. It adds no offline booking income.
+
+Schema **14** preserves automation, personal host training, fractional return
+deadlines and booking report fields. Previous saves receive no purchases,
+training or repayments. Old `away` entries without a deadline still return at
+their original shift boundary; historical fees remain in their original revenue
+rather than being reconstructed. All UI offers and countdowns are pure reads.
 
 ## Staff contracts and alerts
 

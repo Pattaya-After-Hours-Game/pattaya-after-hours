@@ -150,7 +150,8 @@ off duty or out of contract, and keeps her training if she returns.
 The colleague behind the counter is now visibly doing real work. Ready staff
 serve an actual waiting order, then take their 25/20/15-second recovery (12/10 after stage-two training). The owner
 clearing a queue no longer sends them back to the beginning of a warmup. Their
-serving pose and the bottom-right staff tally confirm what they sold. When the
+serving pose and the Service tally confirm what they sold. The top-right
+portrait list shows who is ready and who is recovering. When the
 fridge is empty, the indicator says so instead of pretending someone is pouring.
 At ฿3,000, owner auto-serve is a separate convenience for the owner's tapping;
 it does not replace the colleague's own clock or create buyers. Quiet orders
@@ -161,6 +162,20 @@ door: her skills stay, and Anong insists on keeping payroll and a delivery in
 reserve after paying her fee.
 
 > **Anong:** “She's ready. Give her an order, not another stopwatch.”
+
+## A booking is a trade-off
+
+At a Soi venue, a customer can ask and a willing adult host can accept. The
+owner sees the decision plainly: ฿500 for the bar, thirty seconds away, and less
+appeal while the colleague is absent. A visible countdown brings her back;
+there is no private scene. May and Fah still prefer hosted drinks.
+
+> **Anong:** “Count the fee. Then count who is still here to welcome the next guest.”
+
+Host development earns stronger appeal and higher future fees: ฿750, then
+฿1,000. Training belongs to the colleague, not the contract. Paid auto-accept
+handles the same eligible requests while the street is live; it cannot change
+anyone's preferences or invent a customer who can afford the booking.
 
 ## Something to look forward to: Anong's birthday
 

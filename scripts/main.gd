@@ -114,6 +114,8 @@ var arcade_circuit := false
 
 var live_labels: Array = []
 var action_controls: Array = []
+var bartender_controls: Array = []
+var bar_fine_controls: Array = []
 var upgrades_open := false
 var fridge_open := false
 var upgrades_ready_only := true
@@ -361,6 +363,8 @@ func render(keep_scroll: bool = false) -> void:
 	stat_tip = null
 	stat_tip_key = ""
 	action_controls.clear()
+	bartender_controls.clear()
+	bar_fine_controls.clear()
 	upgrade_badge = null
 	upgrades_entry = null
 	stock_controls.clear()
@@ -476,14 +480,8 @@ func render(keep_scroll: bool = false) -> void:
 	walk.add_theme_font_size_override("font_size",12)
 	walk.disabled = practicing or model.s.phase != "plan"
 	if not practicing:
-		var staff_hud := at_button(root_ui,Rect2(666,408,278,68),"",change_tab.bind(0))
-		staff_hud.name = "StaffIndicator"
-		staff_hud.add_theme_font_size_override("font_size",13)
-		staff_hud.add_theme_color_override("font_color",TEAL)
-		staff_hud.tooltip_text = "Actual staff sales since hiring or this update. Bartenders serve whenever ready; owner auto-serve is a separate purchase. Tap for Service."
-		var staff_text := func() -> String: return model.street.economy.staff_indicator(model.street.selected())
-		staff_hud.text = staff_text.call()
-		live_labels.append([staff_hud,staff_text])
+		bartender_hud()
+		bar_fine_hud()
 	if not practicing and int(model.s.street.night_prep.remaining)>0:
 		var stay := at_button(root_ui,Rect2(14,330,430,68),"",street_action.bind("stay"),true)
 		stay.name = "NightPrepCancel"
@@ -647,6 +645,194 @@ func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> vo
 				"SHIFT": return "D%03d" % model.s.day
 				"TIME": return model.street.clock_text()
 			return str(model.s.heat)])
+
+# Presentation only: deadlines, training and tips remain owned by the economy.
+func bartender_hud() -> void:
+	var bar: Dictionary = model.street.selected()
+	var roster: Array[int] = []
+	for i in bar.team.size():
+		if bar.team[i].role==0: roster.append(i)
+	var list_height := 40 if roster.is_empty() else mini(roster.size(),4)*62
+	var panel := pane(root_ui,Rect2(682,56,264,32+list_height+42),Color("#21161ff2"))
+	panel.name = "StaffIndicator"
+	var frame := box(Color("#21161ff2"),EDGE)
+	frame.set_corner_radius_all(8)
+	panel.add_theme_stylebox_override("panel",frame)
+	abs_text(panel,Rect2(12,5,178,22),"BARTENDERS",13,GOLD)
+	var manage := at_button(panel,Rect2(210,2,44,28),"›",change_tab.bind(0))
+	manage.custom_minimum_size = Vector2.ZERO
+	manage.size = Vector2(44,28)
+	manage.tooltip_text = "Manage this venue's team in Service"
+	if roster.is_empty():
+		abs_text(panel,Rect2(12,34,240,30),"Hire your first in Service  ›",13,MUTED)
+	else:
+		var list := ScrollContainer.new()
+		list.name = "BartenderList"
+		list.position = Vector2(8,32)
+		list.size = Vector2(248,list_height)
+		list.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		list.follow_focus = true
+		panel.add_child(list)
+		var rows := VBoxContainer.new()
+		rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		rows.add_theme_constant_override("separation",2)
+		list.add_child(rows)
+		for i in roster:
+			var person: Dictionary = bar.team[i]
+			var row := button("",change_tab.bind(0))
+			row.name = "Bartender%d" % i
+			row.custom_minimum_size = Vector2(0,60)
+			rows.add_child(row)
+			var portrait := TextureRect.new()
+			portrait.texture = Art.texture("portrait-"+Art.worker_id(bar,i))
+			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			portrait.position = Vector2(5,6)
+			portrait.size = Vector2(44,44)
+			portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			row.add_child(portrait)
+			var name_label := abs_text(row,Rect2(56,3,174,21),"%s · Lv %d" % [Art.worker_id(bar,i).capitalize(),int(person.get("training",0))+1],14,WHITE)
+			name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			var status := abs_text(row,Rect2(56,24,174,19),"",12,MUTED)
+			status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			var meter := ProgressBar.new()
+			meter.name = "Cooldown"
+			meter.position = Vector2(56,47)
+			meter.size = Vector2(174,7)
+			meter.max_value = 1.0
+			meter.show_percentage = false
+			meter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var background := box(Color("#170f18"),Color("#170f18"),0)
+			background.set_corner_radius_all(3)
+			var fill := box(Color("#dc5963"),Color("#dc5963"),0)
+			fill.set_corner_radius_all(3)
+			meter.add_theme_stylebox_override("background",background)
+			meter.add_theme_stylebox_override("fill",fill)
+			row.add_child(meter)
+			bartender_controls.append({"person":person,"row":row,"status":status,"meter":meter,"portrait":portrait})
+	var tips := abs_text(panel,Rect2(12,34+list_height,240,20),"",14,GOLD)
+	tips.name = "BartenderTips"
+	var tip_text := func() -> String: return "Tip jar · %s" % cash(int(bar.tip_visits)*StreetContent.TIP_PER_VISIT+int(bar.bonus_tips))
+	tips.text = tip_text.call()
+	live_labels.append([tips,tip_text])
+	abs_text(panel,Rect2(12,54+list_height,240,16),"Shared venue tips · paid at closing",11,MUTED)
+	update_bartender_hud()
+
+func update_bartender_hud() -> void:
+	var bar: Dictionary = model.street.selected()
+	var eco = model.street.economy
+	for entry in bartender_controls:
+		var person: Dictionary = entry.person
+		var state: Dictionary = eco.staff_status(bar,person)
+		var available: bool = eco.contracted(person) and person.on and not bar.team.find(person) in bar.away and eco.is_trading(bar)
+		var duration: float = eco.service_seconds(person)
+		if float(person.get("last_served",-1))>=0:
+			duration = maxf(1.0,float(person.get("service_ready",0))-float(person.last_served))
+		entry.meter.value = clampf(1.0-float(state.remaining)/duration,0.0,1.0)
+		entry.meter.modulate.a = 1.0 if available else 0.3
+		entry.portrait.modulate = Color.WHITE if available else Color("#8b7c85")
+		var text: String = state.text
+		if available:
+			if state.remaining>0: text = "Ready in %ds" % ceili(state.remaining)
+			elif bar.stock==0: text = "Ready · no stock"
+			elif eco.pending(bar)==0: text = "Ready · no orders"
+			else: text = "Ready to serve"
+		entry.status.text = text
+		entry.row.tooltip_text = "%s · Training %d · %ds service\n%s · %d drinks served\nRed bar fills until ready. Tap for Service." % [Art.worker_id(bar,bar.team.find(person)).capitalize(),int(person.get("training",0)),eco.service_seconds(person),state.text,state.served]
+
+func bar_fine_hud() -> void:
+	var bar: Dictionary = model.street.selected()
+	if bar.type!=1: return
+	var hosts: Array[int] = []
+	for i in bar.team.size():
+		if bar.team[i].role==1: hosts.append(i)
+	if hosts.is_empty(): return
+	var height := mini(hosts.size(),2)*64
+	var panel := pane(root_ui,Rect2(14,182,320,height+62),Color("#21161ff2"))
+	panel.name = "BarFineHUD"
+	abs_text(panel,Rect2(10,3,210,24),"BAR FINES · 30s away",14,GOLD)
+	var manage := at_button(panel,Rect2(270,2,40,28),"›",change_tab.bind(0))
+	manage.custom_minimum_size = Vector2.ZERO
+	manage.size = Vector2(40,28)
+	manage.tooltip_text = "Host training and auto-accept in Service"
+	var list := ScrollContainer.new()
+	list.name = "HostList"
+	list.position = Vector2(8,30)
+	list.size = Vector2(304,height)
+	list.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	list.follow_focus = true
+	panel.add_child(list)
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation",2)
+	list.add_child(rows)
+	for i in hosts:
+		var person: Dictionary = bar.team[i]
+		var row := Control.new()
+		row.custom_minimum_size = Vector2(0,62)
+		rows.add_child(row)
+		var portrait := TextureRect.new()
+		portrait.texture = Art.texture("portrait-"+Art.worker_id(bar,i))
+		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		portrait.position = Vector2(0,5)
+		portrait.size = Vector2(40,42)
+		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(portrait)
+		abs_text(row,Rect2(45,0,130,22),"%s · Lv %d" % [StreetContent.HOSTS[int(person.host)][0],int(person.get("host_training",0))+1],14)
+		var state := abs_text(row,Rect2(45,23,132,34),"",11,MUTED)
+		state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var accept := at_button(row,Rect2(181,5,105,48),"",street_action.bind("bar_fine",i),true)
+		accept.name = "AcceptBarFine%d" % i
+		accept.add_theme_font_size_override("font_size",13)
+		bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":true})
+	var auto := abs_text(panel,Rect2(10,32+height,300,24),"",12,TEAL)
+	var summary := func() -> String: return "%d requests · Auto-accept %s" % [bar.host_requests.size(),"ON" if bar.get("auto_bar_fine",false) and bar.get("auto_bar_fine_on",true) else "OFF" if bar.get("auto_bar_fine",false) else "available in Service"]
+	auto.text = summary.call()
+	live_labels.append([auto,summary])
+	update_bar_fine_controls()
+
+func update_bar_fine_controls() -> void:
+	var bar: Dictionary = model.street.selected()
+	for entry in bar_fine_controls:
+		var offer: Dictionary = model.street.economy.bar_fine_offer(bar,entry.index)
+		entry.button.disabled = not offer.enabled
+		entry.button.text = "Accept\n%s" % cash(offer.fee) if entry.compact else "Accept bar fine · %s" % cash(offer.fee)
+		entry.status.text = "−%.1f appeal\nfor %ds" % [offer.appeal,StreetContent.BAR_FINE_SECONDS] if offer.enabled else offer.reason
+		entry.button.tooltip_text = "%s received once; away for %ds; loses %.1f base appeal while away." % [cash(offer.fee),StreetContent.BAR_FINE_SECONDS,offer.appeal] if offer.enabled else offer.reason
+
+func bar_fine_panel(bar: Dictionary) -> void:
+	if bar.type!=1: return
+	var eco = model.street.economy
+	body("BAR FINES",GOLD,14)
+	body("Accept a real customer's request: the host leaves for 30 seconds, removing her appeal until she returns. Adult hosts choose whether to accept; private activity stays off-screen.",MUTED,12)
+	if bar.get("auto_bar_fine",false):
+		row_button("Auto-accept bar fines · "+("On" if bar.auto_bar_fine_on else "Off"),street_action.bind("auto_bar_fine"))
+	else:
+		var buy := row_button("Auto-accept bar fines · ฿3,000",street_action.bind("auto_bar_fine"))
+		live_body(func() -> String:
+			var offer: Dictionary = eco.auto_bar_fine_offer(bar)
+			buy.disabled = not offer.enabled
+			return offer.reason if not offer.enabled else "Accepts eligible requests on live ticks. Same fees, consent, budgets and 30-second absence.",MUTED,12)
+	for i in bar.team.size():
+		var person: Dictionary = bar.team[i]
+		if person.role!=1: continue
+		var name_text: String = StreetContent.HOSTS[int(person.host)][0]
+		character_card(Art.worker_id(bar,i),"%s · Host level %d" % [name_text,int(person.get("host_training",0))+1],"+%.1f appeal · %s bar fine" % [eco.host_appeal(person),cash(eco.host_fee(person))] if StreetContent.HOSTS[int(person.host)][2] else "+%.1f appeal · hosted drinks only" % eco.host_appeal(person))
+		var state := body("",TEAL,13)
+		var accept := row_button("",street_action.bind("bar_fine",i),true)
+		accept.name = "ServiceBarFine%d" % i
+		bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":false})
+		var training: Dictionary = eco.host_training_offer(bar,i)
+		if not training.maxed:
+			var level: int = training.level
+			var upgrade := row_button("Train %s · %s" % [name_text,cash(training.price)],street_action.bind("train_host",i))
+			live_body(func() -> String:
+				var offer: Dictionary = eco.host_training_offer(bar,i)
+				upgrade.disabled = not offer.enabled
+				return "+%.1f → +%.1f appeal%s. %s" % [StreetContent.HOST_APPEAL[level],StreetContent.HOST_APPEAL[level+1]," · %s → %s fee" % [cash(StreetContent.BAR_FINE_FEES[level]),cash(StreetContent.BAR_FINE_FEES[level+1])] if StreetContent.HOSTS[int(person.host)][2] else "",offer.reason],MUTED,12)
+	live_body(func() -> String: return "%d requests · %d accepted this shift · %s bar-fine receipts" % [bar.host_requests.size(),bar.shift.get("bar_fines",0),cash(bar.shift.get("bar_fine_income",0))],TEAL,12)
+	update_bar_fine_controls()
 
 func toggle_stat_tip(key: String,x: int) -> void:
 	var was_open := stat_tip_key == key
@@ -1120,6 +1306,17 @@ func upgrade_offers() -> Array[Dictionary]:
 		offers.append(upgrade_offer(item.id,item.name,"%ds → %ds" % [status.current,status.next],help,"action_upgrade",i,status))
 	if not bar.auto_serve:
 		offers.append(upgrade_offer("auto","Auto-serve","Owner helps automatically","Staff serve first. Auto-serve helps the rush or fills in when no bartender is on duty.","auto_serve",0,eco.auto_serve_offer(bar)))
+	if bar.type==1:
+		if not bar.get("auto_bar_fine",false):
+			offers.append(upgrade_offer("auto","Auto-accept bar fines","Automatic eligible bookings","Willing hosts only; real requests, budgets and booking space still apply. Hosts return after 30 seconds.","auto_bar_fine",0,eco.auto_bar_fine_offer(bar)))
+		for i in bar.team.size():
+			if bar.team[i].role!=1: continue
+			var status: Dictionary = eco.host_training_offer(bar,i)
+			if status.maxed: continue
+			var level: int = status.level
+			var caption := "+%.1f → +%.1f appeal" % [StreetContent.HOST_APPEAL[level],StreetContent.HOST_APPEAL[level+1]]
+			if StreetContent.HOSTS[int(bar.team[i].host)][2]: caption += " · %s fee" % cash(StreetContent.BAR_FINE_FEES[level+1])
+			offers.append(upgrade_offer("audience","Train "+str(StreetContent.HOSTS[int(bar.team[i].host)][0]),caption,"More appeal competes for shared street customers; no guaranteed arrivals. Training stays after rehire.","train_host",i,status))
 	for i in StreetContent.EQUIPMENT.size():
 		var item: Dictionary = StreetContent.EQUIPMENT[i]
 		if item.id=="training" or (item.id=="pool" and bar.type!=0): continue
@@ -1220,6 +1417,7 @@ func upgrade_card(offer: Dictionary) -> void:
 		caption += "\nNeeds venue stage %d" % status.required_stage
 	var purchase := button("%s\n%s" % [offer.name,caption],street_action.bind(offer.action,offer.index))
 	purchase.name = "Upgrade_"+offer.icon if not offer.action.begins_with("train_") else "Upgrade_%s_%d" % [offer.icon,offer.index]
+	if offer.action=="auto_bar_fine": purchase.name = "Upgrade_auto_bar_fine"
 	purchase.icon = UpgradeIcons.get_icon(offer.icon)
 	purchase.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	purchase.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1256,6 +1454,7 @@ func street_panel() -> void:
 		var party: Dictionary = model.street.celebration_info()
 		return "%s · %s at the Blue Hour · details in Events" % ["Party tonight" if party.active else "Next: day %d" % party.day,party.name],PINK,12)
 	next_goal_panel()
+	bar_fine_panel(bar)
 	if bar.auto_serve:
 		var auto_button := row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off"),street_action.bind("auto_serve"))
 		auto_button.icon = UpgradeIcons.get_icon("auto")
@@ -1377,8 +1576,8 @@ func street_panel() -> void:
 		if bar.type>0 and person.role!=3 and person.get("identity","")!="gabby": row_button("Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))],street_action.bind("role",i))
 		if person.role==1:
 			body(StreetContent.HOSTS[int(person.host)][1],MUTED,12)
-			row_button("Bar-fine request · "+name_text,street_action.bind("bar_fine",i))
-	if bar.type==1: live_body(func() -> String: return "%d actual customer requests · %d hosts away" % [bar.host_requests.size(),bar.away.size()],MUTED,12)
+
+
 	body("NIGHTLY TIPS",GOLD,14)
 	live_body(func() -> String: return eco.tips_text(bar),TEAL,13)
 	shift_report(bar)
@@ -1390,6 +1589,7 @@ func shift_report(bar: Dictionary) -> void:
 	if bar.last_shift.is_empty(): return
 	var report: Dictionary = bar.last_shift
 	body("LAST SHIFT",GOLD,14)
+	if int(report.get("bar_fines",0))>0: body("Bar fines: %d accepted · %s (included in revenue)" % [report.bar_fines,cash(report.bar_fine_income)],TEAL,13)
 	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s · fines %s · commission %s\nManager income %s (included in revenue)\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.get("fines",0)),cash(report.get("commission",0)),cash(report.get("manager_income",0)),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
 
 func celebration_panel() -> void:
@@ -1936,6 +2136,8 @@ func _process(delta: float) -> void:
 		model.street.advance(minf(delta,1.0)*tuning_speed)
 		refresh_street = refresh_street or before != street_ui_state()
 		update_action_controls()
+		update_bartender_hud()
+		update_bar_fine_controls()
 		live_seconds += minf(delta,1.0)
 		save_seconds += minf(delta,1.0)
 		if live_seconds >= 1.0:

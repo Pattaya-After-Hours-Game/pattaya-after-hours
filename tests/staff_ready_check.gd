@@ -68,7 +68,7 @@ func run(test: SceneTree) -> void:
 	p.service_clock = 9
 	m.save_game()
 	loaded = Campaign.new(11)
-	test.check(loaded.load_game() and loaded.s.version==13,"V8 staff records migrate without changing owned progress")
+	test.check(loaded.load_game() and loaded.s.version==14,"V8 staff records migrate without changing owned progress")
 	lb = loaded.street.selected()
 	test.check(lb.team[0].service_ready==loaded.s.street.elapsed+16 and lb.team[0].drinks_served==0,"Legacy partial work retains its remaining sixteen seconds; historical sales are not invented")
 
@@ -122,3 +122,46 @@ func run(test: SceneTree) -> void:
 	test.check(e.owner_relief_needed(b),"Expired staff do not block owner coverage")
 	b.customers.clear()
 	test.check(not e.owner_relief_needed(b),"Relief never creates demand")
+
+func run_ui(test: SceneTree) -> void:
+	var app = load("res://main.tscn").instantiate()
+	test.root.add_child(app)
+	await test.process_frame
+	app.set_process(false)
+	app.start_new_game()
+	app.model.s.cash = 100000
+	var bar: Dictionary = app.model.street.selected()
+	var eco = app.model.street.economy
+	bar.stage = 3
+	app.model.street.action("hire_gabby")
+	for i in 5: app.model.street.action("hire",0)
+	app.model.street.action("hire",3)
+	eco.staff_service(bar)
+	app.model.s.street.tick_fraction = 0.5
+	var before := JSON.stringify(app.model.s)
+	app.render()
+	app.update_bartender_hud()
+	test.check(JSON.stringify(app.model.s)==before,"Rendering bartender portraits, cooldowns and tips is a pure model read")
+	test.check(app.bartender_controls.size()==6,"HUD lists all six bartenders without adding Nida to service")
+	var first: Dictionary = app.bartender_controls[0]
+	test.check(first.portrait.texture==app.Art.texture("portrait-gabby") and is_equal_approx(first.meter.value,0.02),"Gabby's portrait and fractional cooldown come from her actual sale")
+	# Training midway through recovery must not resize the saved recovery period.
+	app.model.street.action("train_staff",0)
+	app.update_bartender_hud()
+	test.check(is_equal_approx(first.meter.value,0.02),"Training does not jump the visible current cooldown")
+	bar.team[0].on = false
+	app.update_bartender_hud()
+	test.check(first.status.text=="Off duty" and first.meter.modulate.a<1.0,"Off-duty bartender is labelled and her bar is subdued")
+	bar.team[0].contract_left = 0
+	app.update_bartender_hud()
+	test.check(first.status.text=="Contract finished","Expired bartender remains visible for renewal")
+	var tips = app.root_ui.find_child("BartenderTips",true,false)
+	test.check(tips.text=="Tip jar · ฿35","HUD reads the shared first-visit jar plus Gabby's actual bonus")
+	app.drawer_open = false
+	var frozen := JSON.stringify(app.model.s)
+	first.row.pressed.emit()
+	test.check(app.drawer_open and app.tab==0 and JSON.stringify(app.model.s)==frozen,"Bartender row opens Service without advancing time or granting receipts")
+	app.queue_free()
+	await test.process_frame
+	for path in [Campaign.SAVE,Campaign.BACKUP]:
+		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)

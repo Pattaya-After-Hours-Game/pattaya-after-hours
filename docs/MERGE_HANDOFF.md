@@ -1,5 +1,35 @@
 # Current implementation and release handoff
 
+## Bar-fine controls — local working tree, 26 November 2026
+
+Pulled main from `dadd995` to `654a60b` before editing, retaining the prior local
+bartender HUD. This includes upstream Soi Dispatch events and the Cart Jam /
+bed-race graphics and controls. The combined isolated suite passes; see
+[verification](TESTING.md#bar-fine-controls-verification--26-november-2026).
+
+Soi venues now expose an in-room Accept button and matching Service controls.
+Willing hosts earn ฿500 per actual affordable request, leave for thirty foreground
+seconds and lose their appeal until returning. Auto-accept costs ฿3,000 and has
+an on/off toggle. Personal host training costs ฿1,500/3,000 at stages 2/3, raising
+appeal 0.6→1.2→1.8 and future fees ฿500→750→1,000. Consent, contracts, budgets,
+booking capacity and operating reserves still apply; no offline booking fees.
+
+Schema 14 retains automation, host training, fractional return deadlines and
+booking reports. Old paid absences retain their original shift return with no
+repayment. Timed bookings and the bed-race runner return independently. Existing
+art and personal attachments are untouched. These changes and the bartender HUD
+remain in the local working tree; neither is committed or published by this chat.
+
+## Bartender HUD — local working tree, 26 November 2026
+
+Based on synced main `dadd995`. Replaces the bottom-right aggregate with a compact
+selected-venue portrait roster at the top right: training-based levels, red
+cooldown fills, availability labels and the existing shared unpaid tip jar.
+Four rows fit before scrolling; row/arrow taps open Service. Uses existing
+production portraits and saved staff deadlines, with no economy or save changes.
+This working-tree update is not yet committed or published. See the current
+[verification record](TESTING.md#bartender-hud-verification--26-november-2026).
+
 ## Profit-cycle implementation — 26 November 2026
 
 Branch `codex/profit-cycle` preserves completed Gabby work in its own checkpoint

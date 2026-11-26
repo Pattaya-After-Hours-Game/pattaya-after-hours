@@ -57,6 +57,13 @@ const HOSTS = [
 	["Nan", "Wants predictable hours; accepts bar-fine requests", true]
 ]
 
+# Host development changes future booking quotes, never an already-paid booking.
+const BAR_FINE_SECONDS = 30
+const BAR_FINE_FEES = [500,750,1000]
+const HOST_APPEAL = [0.6,1.2,1.8]
+const HOST_TRAINING_PRICES = [1500,3000]
+const AUTO_BAR_FINE_COST = 3000
+
 # Game minutes advance once per foreground second. Economy timers use real seconds.
 const OPEN_MINUTE = 12 * 60
 const CLOSE_MINUTE = 60

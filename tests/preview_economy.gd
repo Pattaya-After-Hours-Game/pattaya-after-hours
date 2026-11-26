@@ -17,7 +17,7 @@ func find_text(node: Node, text: String) -> Control:
 
 func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not filter.is_empty() and not name_text.match(filter): return
-	var targets := {"Cycle seating":"Upgrade_seating","Cycle music":"Upgrade_music","Regulars Club":"Upgrade_club","Better sound system":"Upgrade_music","Train Bartender":"Upgrade_training_0","YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
+	var targets := {"Train Bee":"Upgrade_audience_0","Cycle seating":"Upgrade_seating","Cycle music":"Upgrade_music","Regulars Club":"Upgrade_club","Better sound system":"Upgrade_music","Train Bartender":"Upgrade_training_0","YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
 	var upgrade_target: String = targets.get(scroll_to,"")
 	var was_open: bool = app.upgrades_open
 	var ready_only: bool = app.upgrades_ready_only
@@ -36,7 +36,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	elif not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("barfine-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 			if name_text=="gabby-hire": app.scroll.scroll_vertical = maxi(0,app.scroll.scroll_vertical-100)
 		await process_frame
@@ -61,6 +61,34 @@ func run() -> void:
 	app.start_new_game()
 	app.model = Campaign.new(72)
 	await capture(app,"opening")
+	var barfine_fixtures = load("res://tests/bar_fine_check.gd").new()
+	app.model = barfine_fixtures.fixture()
+	app.show_tutorial_hint = false
+	app.drawer_open = false
+	barfine_fixtures.request(app.model)
+	await capture(app,"barfine-ready")
+	app.model.street.action("bar_fine",0)
+	await capture(app,"barfine-accepted")
+	app.model.street.advance(15)
+	await capture(app,"barfine-away")
+	app.model.street.advance(15)
+	await capture(app,"barfine-returned")
+	app.drawer_open = true
+	await capture(app,"barfine-service","BAR FINES")
+	await capture(app,"barfine-upgrades","Train Bee")
+	app.model.street.action("train_host",0)
+	app.model.street.action("auto_bar_fine")
+	app.drawer_open = false
+	barfine_fixtures.request(app.model)
+	app.model.street.tick(1)
+	await capture(app,"barfine-auto")
+	app.model = barfine_fixtures.fixture(3)
+	for i in 3: app.model.street.action("hire",1)
+	barfine_fixtures.request(app.model)
+	await capture(app,"barfine-full-roster")
+	app.model.street.selected().open = false
+	await capture(app,"barfine-closed")
+	app.model = Campaign.new(72)
 	var wrong_stock: Dictionary = app.model.street.selected()
 	wrong_stock.stock = 30
 	for guest in wrong_stock.customers:
@@ -216,6 +244,30 @@ func run() -> void:
 
 	app.drawer_open = false
 	await capture(app,"staff-ready-unhired")
+	# Full roster, mixed availability and the shared bonus jar, without new art.
+	var empty_model = app.model
+	app.model = Campaign.new(72)
+	app.model.s.cash = 100000
+	var hud_bar: Dictionary = app.model.street.selected()
+	hud_bar.stage = 3
+	app.model.street.action("hire_gabby")
+	for i in 5: app.model.street.action("hire",0)
+	hud_bar.team[0].training = 6
+	app.model.street.economy.staff_service(hud_bar)
+	app.model.s.street.tick_fraction = 0.5
+	hud_bar.team[2].on = false
+	hud_bar.team[3].contract_left = 0
+	await capture(app,"staff-ready-full-roster")
+	var hud_list = app.root_ui.find_child("BartenderList",true,false)
+	if hud_list:
+		hud_list.scroll_vertical = 200
+		await process_frame
+		await RenderingServer.frame_post_draw
+		if filter.is_empty() or "staff-ready-full-roster".match(filter):
+			get_root().get_texture().get_image().save_png(output.path_join("staff-ready-roster-scrolled.png"))
+	hud_bar.open = false
+	await capture(app,"staff-ready-venue-closed")
+	app.model = empty_model
 	app.model.s.cash = 10000
 	app.model.street.action("hire",0)
 	await capture(app,"staff-ready-waiting-order")
