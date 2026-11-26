@@ -227,8 +227,21 @@ reopen the deal from **Fridge** until 3:15pm.
 
 Open **Service → Upgrades** to see what you can buy. The number badge on Service
 jumps to ready upgrades for the selected venue. Upgrades are listed cheapest
-first. **Show all** includes locked options, and **?** explains what an upgrade
-does and what it needs.
+first. **Show all** includes locked options, and **?** explains each purchase.
+Locked requirements appear directly below the card and update while you play.
+
+The progress block at the top belongs to the **selected venue**, including in
+**Ready only**. Stage 2 needs **70 happy visits, 10 regulars and 8 healthy shifts**;
+stage 3 needs **450, 70 and 40**. **Cash ready** means you can cover the renovation
+plus its operating reserve, not that local milestones are met. **View renovation**
+jumps to the purchase without spending anything.
+
+**What counts?** explains the local gates. A healthy report needs at least four
+sales, 80% of orders fulfilled and positive customer profit after consumed stock
+and operating costs. Reports settle every two minutes of street trading and at
+closing. Manager income, nightly tips and another bar’s customers cannot qualify
+this venue. Use **Reports** to find a supply, service or demand problem; quiet
+venues can put surplus staff off duty.
 
 The Serve and Welcome buttons fill back up as foreground time passes. The label
 shows seconds remaining, Ready, or why the action is unavailable. Each venue has

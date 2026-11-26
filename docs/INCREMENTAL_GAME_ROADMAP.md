@@ -22,17 +22,17 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Hosted drinks: guest-topic matching, real service and Room Buzz |
-| Status | DONE; `20e032b` integrated into main with the current Service UI |
-| Implementer | Codex in the shared checkout |
-| Reviewer / playtester | Codex automated and visual checks; device play pending |
+| Active feature | Visible venue renovation progress and upgrade blockers |
+| Status | DONE; verified in shared main, commit/release follows |
+| Implementer | Codex in shared main |
+| Reviewer / playtester | Codex regression and layout checks; device play pending |
 | Shared claim location | This table in `/home/zak/projects/pattaya-after-hours` |
-| Working branch / chat / PR | `main`; combined hosted-drinks / Daisy release integration |
-| Scope and owned files | Economy, street/content, saves, main UI, barfine tests/previews and docs |
-| Acceptance | One sponsored round per real guest; stock/budget/service gates; topic matching; bounded Buzz; distinct barfine choice; repeat-safe saves |
-| Next handoff / blocker | Combined tests and previews recorded; release workflow publishes the verified source; see [handover](MERGE_HANDOFF.md); device play pending |
-| Recommended next, when free | Await user direction; do not start another roadmap feature |
-| Last updated | 2026-11-26 |
+| Working branch / chat / PR | `main`, synced through `860b56c` |
+| Scope and owned files | Upgrade UI, focused tests/previews and related docs; no balance or save changes |
+| Acceptance | Show selected venue's local milestones and cash gate live; expose locked reasons; preserve price sorting, gates, saves and read-only navigation |
+| Next handoff / blocker | Full tests and two-resolution previews pass; see current handover for release verification |
+| Recommended next, when free | Await user direction |
+| Last updated | 2026-11-27 |
 
 An empty or stale table is **not evidence that the other contributor is idle**.
 Never overwrite an existing claim or abandon another contributor's unfinished work.

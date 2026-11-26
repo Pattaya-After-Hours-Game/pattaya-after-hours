@@ -108,6 +108,16 @@ completed visits, with guaranteed manager income shown separately. Her advice
 points to the constraint the last shift exposed. These are working business
 systems, not new personal quests or promises of an endless customer stream.
 
+## A rich street still needs a local following
+
+> **Anong:** “The Blue Hour can buy the paint. It cannot buy Neon Mango's regulars.”
+
+The shared till can fund a renovation, but each venue earns its own happy
+visits, regulars and healthy shifts. Manager takings make expansion affordable;
+they do not prove that the new room serves its customers well. Upgrades shows
+that venue's progress and explains what still needs work. This is clearer
+bookkeeping for the existing milestones, not another fee or story quest.
+
 ## A shift has a rhythm
 
 The owner can pour a drink, step outside to welcome passersby, or reassure a guest
@@ -127,8 +137,8 @@ Better refrigeration earns its reputation through satisfied visits: colder beer
 gives the regulars something good to tell their friends.
 
 Nida, 28, is the adult promoter at the entrance: friendly, practical and fond of
-music nights. She welcomes passersby while the owner pours. Her ten-day contract
-and share of drink takings make the partnership a business choice. She can bring
+music nights. She welcomes passersby while the owner pours. Her flat-fee ten-day contract
+with no drink commission makes the partnership a business choice. She can bring
 people through the door; she cannot rescue a queue that nobody serves. Training
 lets her take on a busier frontage as the venue grows.
 

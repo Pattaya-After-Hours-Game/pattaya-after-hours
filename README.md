@@ -87,7 +87,9 @@ most once every ten seconds. **Sound / Muted** controls it along with game audio
 Staff cost money while on duty, even when the bar is quiet. Use the rota or temporarily close if
 costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
-cash for the next shift—not just a large bank balance.
+cash for the next shift—not just a large bank balance. **Upgrades** now shows the selected
+venue’s stage progress at the top, even in **Ready only**. **View renovation**
+jumps to its purchase, and locked cards show their requirements directly.
 
 Tap **Stock** or **Restock fridge** to buy packs of individual drinks. Tap **?**
 to compare demand and margin. The Supplier upgrade unlocks automatic restocking,

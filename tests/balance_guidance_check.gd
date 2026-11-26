@@ -94,6 +94,58 @@ func run_ui(test: SceneTree) -> void:
 	app.change_tab(0)
 	test.use_button(app,"Open Events  ›")
 	test.check(app.tab==1 and app.drawer_open,"Reopening next-step button opens Events")
+	# A rich street still has local gates; make them readable without opening help.
+	app.model.s.cash = 659000
+	app.model.s.rep = 100
+	app.model.s.street.chapter = 2
+	app.model.street.action("buy",1)
+	var bar: Dictionary = app.model.street.selected()
+	var eco = app.model.street.economy
+	bar.happy = 21
+	bar.regulars = 4
+	bar.healthy = 3
+	app.model.s.street.bars[0].happy = 1000
+	app.model.s.street.bars[0].regulars = 100
+	app.model.s.street.bars[0].healthy = 100
+	before = JSON.stringify(app.model.s)
+	var rng_before: int = app.model.rng.state
+	app.open_upgrades(true)
+	var progress: Label = app.column.find_child("RenovationProgress",true,false)
+	test.check(progress!=null and progress.text.contains("21/70") and progress.text.contains("4/10") and progress.text.contains("3/8") and progress.text.contains("Cash ready"),"Ready filter still shows the selected venue's unmet milestones despite a rich successful flagship")
+	test.check(app.column.find_child("Upgrade_renovate",true,false)==null,"Ready-only cards still exclude unearned renovations")
+	test.use_button(app,"View renovation  ›")
+	await test.process_frame
+	await test.process_frame
+	var renovate: Button = app.column.find_child("Upgrade_renovate",true,false)
+	var reason: Label = app.column.find_child("Upgrade_club_reason",true,false)
+	test.check(renovate!=null and renovate.disabled and not app.upgrades_ready_only and reason!=null and reason.visible and reason.text.contains("stage 2"),"Renovation link reveals the disabled card; stage-locked club explains itself without a question-mark tap")
+	test.check(JSON.stringify(app.model.s)==before and app.model.rng.state==rng_before,"Progress and renovation navigation cannot buy, simulate, reward or roll RNG")
+	bar.happy = 69
+	app.sync_upgrade_badge(true)
+	for entry in app.live_labels:
+		if is_instance_valid(entry[0]): entry[0].text = entry[1].call()
+	progress = app.column.find_child("RenovationProgress",true,false)
+	test.check(progress.text.contains("69/70"),"Milestones refresh even while the purchase remains locked")
+	bar.happy = 70
+	bar.regulars = 10
+	bar.healthy = 8
+	app.model.s.cash = eco.upgrade_required_cash(bar)-1
+	app.sync_upgrade_badge(true)
+	for entry in app.live_labels:
+		if is_instance_valid(entry[0]): entry[0].text = entry[1].call()
+	progress = app.column.find_child("RenovationProgress",true,false)
+	renovate = app.column.find_child("Upgrade_renovate",true,false)
+	test.check(progress.text.contains("Need ฿1 more") and renovate.disabled,"Cash progress includes the operating reserve, even when local milestones are complete")
+	app.model.s.cash += 1
+	app.sync_upgrade_badge(true)
+	renovate = app.column.find_child("Upgrade_renovate",true,false)
+	test.check(not renovate.disabled,"The renovation becomes purchasable at the exact unchanged gate")
+	renovate.pressed.emit()
+	test.check(bar.stage==2 and app.column.find_child("RenovationProgress",true,false).text.contains("70/450"),"Buying once advances to the stage-three local targets without granting visits")
+	bar.stage = 3
+	app.open_upgrades(false)
+	test.check(app.column.find_child("RenovationProgress",true,false)==null,"Final-stage venues show no impossible fourth renovation")
+
 	app.queue_free()
 	await test.process_frame
 	# This runner is invoked only inside tools/test.sh's isolated save directory.

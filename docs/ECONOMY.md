@@ -644,7 +644,14 @@ Stage 2 requires 70 satisfied visits, 10 local regulars and eight healthy shifts
 Stage 3 requires 450 satisfied visits, 70 local regulars and forty healthy shifts.
 A healthy shift serves at least four orders, fulfils at least 80% of orders and
 has positive operating margin after stock consumed, payroll, promotion costs, fines and drink commission.
-The cash report separately records inventory purchases when paid.
+The cash report separately records inventory purchases when paid. Manager
+income and nightly tips do not qualify a healthy shift.
+
+Upgrades presents live local milestone counts and renovation cash/reserve status
+above the price-sorted list, including in Ready only. Locked cards expose the
+model’s current reason without requiring a help tap. View renovation only
+changes navigation. This visibility change alters no prices, thresholds,
+accounting, save fields or offline progress.
 
 Milestones belong to the venue. Renovation also requires its fee and the next
 shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿40,000. New

@@ -67,6 +67,8 @@ claiming behaviour exists; update the relevant documentation when it changes.
 - Keep all three venue types useful, with three stages each. Renovation earns
   space and options; it does not automatically raise every drink's price.
   Local satisfaction, regulars and healthy operation matter alongside cash.
+  Keep selected-venue renovation progress visible above Upgrades, including Ready
+  only; show live locked reasons and keep navigation/readouts free of mutations.
   Stage three requires 450 happy visits, 70 regulars and 40 healthy shifts;
   final renovations cost ฿40,000/65,000/120,000 by venue type.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.

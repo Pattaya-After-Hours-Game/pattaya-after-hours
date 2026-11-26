@@ -1674,10 +1674,13 @@ func open_upgrades(ready_only: bool, focus: String = "") -> void:
 	await get_tree().process_frame
 	if not upgrades_open: return
 	var card := column.find_child(focus,true,false) as Control
-	if card != null: scroll.ensure_control_visible(card)
+	if card != null:
+		var reason := column.find_child(focus+"_reason",true,false) as Control
+		scroll.ensure_control_visible(reason if reason!=null and reason.visible else card)
 
 func upgrades_panel() -> void:
 	var offers := upgrade_offers()
+	renovation_progress_panel()
 	row_button("Show all" if upgrades_ready_only else "Ready only",open_upgrades.bind(not upgrades_ready_only))
 	var bar: Dictionary = model.street.selected()
 	body("Stage %d/3 · Supplier %d/5 · Manager %d/3" % [bar.stage,bar.supplier_level,bar.manager_level],MUTED,12)
@@ -1690,6 +1693,22 @@ func upgrades_panel() -> void:
 		return a.status.price<b.status.price)
 	for offer in visible_offers: upgrade_card(offer)
 
+func renovation_progress_panel() -> void:
+	var bar: Dictionary = model.street.selected()
+	if bar.stage>=3: return
+	var eco = model.street.economy
+	var goal: Dictionary = StreetContent.STAGE_GOALS[int(bar.stage)-1]
+	body("STAGE %d PROGRESS · %s" % [bar.stage+1,bar.name],GOLD,12)
+	var progress := body("",WHITE,13)
+	progress.name = "RenovationProgress"
+	var summary := func() -> String:
+		var missing := maxi(0,eco.upgrade_required_cash(bar)-int(model.s.cash))
+		return "Happy visits %d/%d · Regulars %d/%d\nHealthy shifts %d/%d · %s" % [mini(bar.happy,goal.happy),goal.happy,mini(bar.regulars,goal.regulars),goal.regulars,mini(bar.healthy,goal.healthy),goal.healthy,"Cash ready" if missing==0 else "Need %s more" % cash(missing)]
+	progress.text = summary.call()
+	live_labels.append([progress,summary])
+	row_pair("View renovation  ›",open_upgrades.bind(false,"Upgrade_renovate"),"What counts?",func() -> void:
+		show_service_help("Earn the next stage here","Earn progress here, not at other bars.\nHappy guests can become regulars.\n\nHealthy: 4+ sales, 80%+ orders served, profit after stock and costs. Checked every 2 minutes and at closing.\n\nManager income and tips do not count."))
+
 func upgrade_card(offer: Dictionary) -> void:
 	var status: Dictionary = offer.status
 	upgrade_quotes["%s/%d" % [offer.action,offer.index]] = status
@@ -1697,8 +1716,6 @@ func upgrade_card(offer: Dictionary) -> void:
 	row.add_theme_constant_override("separation",6)
 	column.add_child(row)
 	var caption := "%s · %s" % [offer.caption,cash(status.price)]
-	if status.get("required_stage",1)>model.street.selected().stage:
-		caption += "\nNeeds venue stage %d" % status.required_stage
 	var purchase := button("%s\n%s" % [offer.name,caption],street_action.bind(offer.action,offer.index))
 	purchase.name = "Upgrade_"+offer.icon if not offer.action.begins_with("train_") else "Upgrade_%s_%d" % [offer.icon,offer.index]
 	if offer.action in ["auto_bar_fine","auto_host_drinks"]: purchase.name = "Upgrade_"+offer.action
@@ -1713,7 +1730,14 @@ func upgrade_card(offer: Dictionary) -> void:
 	purchase.add_theme_color_override("font_disabled_color",MUTED)
 	row.add_child(purchase)
 	watch_purchase(purchase,purchase.text,func() -> Dictionary: return status)
-	var details := body(offer.help if status.enabled else offer.help+"\n"+status.reason,MUTED,12)
+	var blocker := body("",GOLD,12)
+	blocker.name = purchase.name+"_reason"
+	var explain := func() -> String:
+		blocker.visible = not status.enabled and not str(status.reason).is_empty()
+		return status.reason
+	blocker.text = explain.call()
+	live_labels.append([blocker,explain])
+	var details := body(offer.help,MUTED,12)
 	details.hide()
 	var info := button("?",func() -> void: details.visible = not details.visible)
 	info.custom_minimum_size.x = 38

@@ -57,6 +57,12 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 			else: app.scroll.ensure_control_visible(target)
 			if name_text=="gabby-hire": app.scroll.scroll_vertical = maxi(0,app.scroll.scroll_vertical-100)
 		await process_frame
+	if name_text=="renovation-blocked":
+		await app.open_upgrades(false,"Upgrade_renovate")
+		await process_frame
+	if name_text=="renovation-help":
+		find_text(app.column,"What counts?").pressed.emit()
+		await create_timer(.22).timeout
 	await RenderingServer.frame_post_draw
 	get_root().get_texture().get_image().save_png(output.path_join(name_text+".png"))
 	app.upgrades_open = was_open
@@ -98,6 +104,35 @@ func run() -> void:
 	app.open_supplier_special()
 	await capture(app,"supplier-special")
 	app.close_supplier_special()
+	if filter.begins_with("renovation-"):
+		app.model = Campaign.new(72)
+		app.show_tutorial_hint = false
+		app.model.s.cash = 659000
+		app.model.s.rep = 100
+		app.model.s.street.chapter = 2
+		app.model.street.action("buy",1)
+		var venue: Dictionary = app.model.street.selected()
+		venue.name = "Neon Mango"
+		venue.happy = 21
+		venue.regulars = 4
+		venue.healthy = 3
+		app.open_upgrades(false)
+		await capture(app,"renovation-local-progress")
+		app.open_upgrades(true)
+		await capture(app,"renovation-ready-filter")
+		await capture(app,"renovation-help")
+		app.open_upgrades(false,"Upgrade_renovate")
+		await process_frame
+		await capture(app,"renovation-blocked","Renovate to stage 2")
+		venue.happy = 70
+		venue.regulars = 10
+		venue.healthy = 8
+		app.model.s.cash = app.model.street.economy.upgrade_required_cash(venue)-1
+		app.open_upgrades(false)
+		await capture(app,"renovation-cash-reserve")
+		quit()
+		return
+
 	app.model = Campaign.new(72)
 	app.change_tab(0)
 	await capture(app,"service-overview")

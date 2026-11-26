@@ -190,7 +190,7 @@ func run_ui(test: SceneTree) -> void:
 	app.upgrades_ready_only = false
 	app.render()
 	var card = app.column.find_child("Upgrade_seating",true,false)
-	test.check(card!=null and card.disabled and card.text.contains("Needs venue stage 2"),"Next seating tier stays visible and locked at stage one")
+	test.check(card!=null and card.disabled and app.column.find_child("Upgrade_seating_reason",true,false).text.contains("Needs venue stage 2"),"Next seating tier stays visible and locked at stage one")
 	b.stage = 2
 	app.render()
 	card = app.column.find_child("Upgrade_seating",true,false)

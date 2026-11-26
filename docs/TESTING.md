@@ -1,5 +1,25 @@
 # Testing and release checks
 
+## Upgrade blocker visibility — 27 November 2026
+
+Synced through `860b56c`, retaining price ordering and live cash shortfalls.
+`tools/test.sh` passes with zero failures across the gameplay/save/UI suite,
+66 fresh campaigns, 60 celebration scenarios, 80 club scenarios and 120 paired
+profit-cycle scenarios. Final isolated `tests/check.gd` passes after navigation
+polish. No economy values or save fields changed.
+
+Guidance checks cover a rich street with an unqualified new hostess venue,
+selected-venue counts, Ready-only visibility, live progress while still locked,
+exact renovation reserve, purchase-to-stage-three progress and final-stage
+suppression. Navigation and display preserve the model and RNG. Existing price
+sorting, locked training, pointer navigation and supplier-shortcut checks pass.
+
+Five `renovation-*` economy previews were inspected at 960×540 and 1280×720:
+local progress, Ready-only, help, renovation blockers and a one-baht reserve
+shortfall. The renovation shortcut brings its explanation into view. Production
+art is unchanged. Local doc links and `git diff --check` pass. Android/device
+play remains unverified; the main release workflow builds and publishes packages.
+
 ## Combined release verification — 26 November 2026
 
 The combined hosted-drinks / Daisy source was reconciled with simplified Service,

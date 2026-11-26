@@ -1,5 +1,21 @@
 # Current implementation and release handoff
 
+## Upgrade blocker visibility — 27 November 2026
+
+User's wealthy Neon Mango screenshot exposed stage-locked training with no
+obvious local renovation progress. Synced main through `860b56c`. Upgrades now
+shows the selected venue's milestone counts and cash/reserve status above its
+price-sorted list, including Ready only. View renovation navigates to its card
+and reason; What counts explains healthy shifts. Locked cards display live
+model reasons without a help tap. Prices, gates, saves and production art stay
+unchanged; the screenshot alone cannot identify the player's unmet counter.
+
+Full isolated suite and final regression checks pass; five preview states were
+reviewed at two resolutions. README, story, economy and player guidance are
+aligned. See [verification](TESTING.md#upgrade-blocker-visibility--27-november-2026).
+Main's workflow retests and builds the release; verify publication in GitHub
+before reporting a downloadable version. Device play remains pending.
+
 ## Combined release wrap-up — 26 November 2026
 
 User requested all finished local and deployment work be committed, pushed and
