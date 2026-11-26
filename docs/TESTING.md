@@ -1,5 +1,23 @@
 # Testing and release checks
 
+## Combined release verification — 26 November 2026
+
+The combined hosted-drinks / Daisy source was reconciled with simplified Service,
+supplier specials and pinned Back navigation through `d2d40e8`. The full isolated
+`tools/test.sh` run passed: gameplay/save/UI checks, 66 fresh campaigns, 60 paired
+celebration scenarios, 80 club scenarios and 120 paired profit-cycle scenarios.
+A final isolated `tests/check.gd` pass verifies the last Back integration and the
+Good Company arrow opening Team. Daisy hire/rota/renewal and sponsored-drink
+automation checks use the new Team navigation.
+
+Regenerated seven hosted-drink and ten Daisy previews at 960×540. Inspected the
+combined room, hire control and Team view; the final Team view includes the pinned
+Back control. Earlier 1280×720 hosted previews remain documented below. Local
+documentation links and `git diff --check` pass. The release workflow independently
+repeats the full suite, exports all four platforms, smoke-tests Linux and verifies
+the Android signing certificate and release checksums before publication. These
+checks do not substitute for Android, Windows or macOS device play.
+
 ## Hosted drinks / Good Company — 26 November 2026
 
 Started from synced main `7c28019`, preserving concurrent Daisy roster/art work.

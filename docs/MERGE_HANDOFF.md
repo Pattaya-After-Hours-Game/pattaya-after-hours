@@ -1,6 +1,28 @@
 # Current implementation and release handoff
 
-## Hosted drinks / Good Company — local source, 26 November 2026
+## Combined release wrap-up — 26 November 2026
+
+User requested all finished local and deployment work be committed, pushed and
+built. Hosted drinks and Daisy are checkpointed in `20e032b`; integration
+`7435f05` retains upstream simplified Service (`b5c1cf5`) and discounted specialty
+packs (`366d56b`). Integration `d2d40e8` also retains the pinned Back controls
+from `b0c9d13`. Daisy hiring uses the new Team help controls, and the Good Company
+arrow opens Team directly. The other existing worktrees were clean and their
+feature commits already belonged to upstream main. Personal attachments remain
+outside source control.
+
+The combined `tools/test.sh` suite passes with zero failures, including 66 fresh
+campaigns. Final isolated gameplay/save/UI checks pass after the Back integration;
+hosted-drink and Daisy previews were regenerated and inspected. See
+[the integration verification record](TESTING.md#combined-release-verification--26-november-2026).
+The push runs both GitHub workflows; the release job retests, exports Android,
+Linux, Windows and macOS, verifies the Android signing certificate and archive
+checksums, then publishes. Publication status and downloads are recorded by
+[the release workflow](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/actions/workflows/release.yml)
+and [tagged releases](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases).
+Device play remains unverified.
+
+## Hosted drinks / Good Company — integrated source, 26 November 2026
 
 Built from synced `7c28019`; concurrent Daisy work was preserved. The Good Company
 card adds genuine sponsored drinks alongside barfines. New interested guests
@@ -17,11 +39,12 @@ receive no invitations or grants. Production host art is reused.
 
 Combined tests, final regressions, thirty comparison scenarios and two-resolution
 previews pass; see [verification](TESTING.md#hosted-drinks--good-company--26-november-2026).
-This chat has not committed or published the shared working tree. Daisy remains
-a separate concurrent addition; verify the combined state before any release.
+Committed together with Daisy in `20e032b` and integrated with upstream Service
+and supplier changes. The combined release handoff above supersedes the earlier
+local-only status.
 Device play and player feedback remain pending.
 
-## Daisy entertainer — local source, 26 November 2026
+## Daisy entertainer — integrated source, 26 November 2026
 
 Adds the requested fictional adult counterpart to Gabby with pale skin, a fuller
 bust, a red bikini/thong outfit, six-pose atlas and portrait. User clarified that
@@ -33,7 +56,8 @@ a roster place across the street. Existing host IDs are unchanged.
 
 This addition was made in shared `main` at `7c28019` while the hosted-drinks task
 edited economy/UI/save files. Those edits and attachments were preserved. No
-commit or release was made by the Daisy task. The combined wrapper and final
+commit or release was made by the Daisy task itself; the release wrap-up
+subsequently committed it in `20e032b`. The combined wrapper and final
 regression run passed; ten Daisy previews were reviewed. See
 [verification](TESTING.md#daisy-verification--26-november-2026). Further concurrent
 edits must be verified before release; Android device play remains untested.

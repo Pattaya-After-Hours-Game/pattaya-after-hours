@@ -35,7 +35,7 @@ venue. There is one Gabby across the street, and she works as a bartender.
 
 ## Hire Daisy
 
-At a **Hostess bar**, open **Service → Team & Payroll → Hire Daisy · ฿4,500**.
+At a **Hostess bar**, open **Service → Team → Hire Daisy · ฿4,500**.
 Daisy is a separate adult entertainer with a ten-day host contract, normal host
 wages and one floor position. Keep the next shift's payroll after hiring.
 She attracts visitors and uses the existing host training and booking controls;
