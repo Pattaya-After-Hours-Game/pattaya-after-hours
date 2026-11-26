@@ -70,6 +70,12 @@ for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','lo
         if 'group' in job: groups.setdefault(job['group'],[]).append(job['id']+'.png')
 if missing and '--partial' not in sys.argv:
     raise SystemExit('Missing source poses: '+', '.join(missing))
+# Split the generated equal 2x2 Gabby sheet before the ordinary pose packer.
+gabby=Image.open(SRC/'gabby-sheet.png').convert('RGBA')
+for i in range(4):
+    x,y=i%2,i//2
+    gabby.crop((round(x*gabby.width/2),round(y*gabby.height/2),round((x+1)*gabby.width/2),round((y+1)*gabby.height/2))).save(SRC/f'gabby-{i}.png')
+groups['gabby']=[f'gabby-{i}.png' for i in range(4)]
 packing={}
 for kind in ['beer','soi','gogo']:
     for stage in range(1,4):
@@ -129,6 +135,13 @@ if recipe.exists():
             head.thumbnail((88,92),NEAREST)
             portrait.alpha_composite(head,((96-head.width)//2,96-head.height))
             portrait.convert('RGB').save(OUT/('portrait-'+name.removeprefix('fight-')+'.png'))
+# A fixed head-and-shoulders crop from Gabby's idle cell, on the portrait palette.
+gabby=Image.open(SRC/'gabby-sheet.png').convert('RGBA')
+head=gabby.crop((225,0,378,153))
+head.thumbnail((88,88),NEAREST)
+portrait=Image.new('RGBA',(96,96),'#2c192b')
+portrait.alpha_composite(head,((96-head.width)//2,96-head.height))
+portrait.convert('RGB').save(OUT/'portrait-gabby.png')
 # Ownership patches use generated fan-free walls, cropped only at the fan.
 # Original venue plates remain byte-for-byte unchanged.
 fan_recipe=json.loads((ROOT/'art/recipes/fan-ownership.json').read_text())

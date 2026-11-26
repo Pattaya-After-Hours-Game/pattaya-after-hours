@@ -219,8 +219,8 @@ over a top-bar stat for a quick explanation.
 
 ## Project status
 
-The current source includes 72 runtime textures, twenty-two sprite atlases with
-149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
+The current source includes 76 runtime textures, twenty-five sprite atlases with
+155 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
 are checked together with 48 fresh-campaign simulations, 60 paired celebration scenarios and 80 stage-two
 income scenarios. The stage-two income pass adds smaller investments between
@@ -253,6 +253,10 @@ GODOT_BIN=/path/to/godot tools/release.sh
 For a signed Android export, set `ANDROID_HOME`, `JAVA_HOME`, `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. Keep the same signing key and increase Android's `version/code` for each published update. Keep the version in `project.godot` and the export presets in sync with the release tag. Windows updates use the published ZIP and `SHA256SUMS.txt`. The script writes packages and checksums to `dist/`.
 
 The streets, businesses, characters, artwork, and arcade moves are original fictional content. The game and original assets are [MIT licensed](LICENSE). Godot and the bundled [DejaVu font](assets/DejaVu-LICENSE.txt) have their own notices.
+
+Gabby is available in **Service → Team & Payroll → Hire Gabby**. Her ฿1,200
+ten-day bartender contract uses a normal team slot. Each drink she actually
+serves adds ฿5 to the nightly tip jar, alongside existing visit and drink bonuses.
 
 ## Staff contracts and waiting-order alerts
 

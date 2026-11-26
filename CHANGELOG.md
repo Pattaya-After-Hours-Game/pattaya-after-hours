@@ -1,5 +1,11 @@
 # Changelog
 
+## Gabby bartender — local source
+
+- Added Gabby's pale-skinned, short red-dress character art, portrait and named hiring/renewal controls.
+- Her real served drinks add ฿5 each to the nightly tips, preserving existing drink bonuses, staff timing and saved progress.
+
+
 ## Source update — No promoter commission, faster pool
 
 - Nida keeps her ฿1,200 ten-day contract fee; all new live/offline drink commission

@@ -96,6 +96,7 @@ func run() -> void:
 
 	load("res://tests/staff_check.gd").new().run(self)
 	load("res://tests/staff_ready_check.gd").new().run(self)
+	load("res://tests/gabby_check.gd").new().run(self)
 	load("res://tests/balance_guidance_check.gd").new().run(self)
 	load("res://tests/promoter_check.gd").new().run(self)
 	load("res://tests/automation_check.gd").new().run(self)
@@ -106,6 +107,7 @@ func run() -> void:
 	load("res://tests/boot_menu_check.gd").new().run(self)
 	await load("res://tests/action_check.gd").new().run_ui(self)
 	await load("res://tests/tips_check.gd").new().run_ui(self)
+	await load("res://tests/gabby_check.gd").new().run_ui(self)
 	await load("res://tests/balance_guidance_check.gd").new().run_ui(self)
 	await load("res://tests/regulars_club_check.gd").new().run_ui(self)
 	await test_ui()

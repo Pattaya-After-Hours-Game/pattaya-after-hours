@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-11-26",
+  "prompts": [
+    "Use case: stylized-concept. Asset: production character sprite sheet for the illustrated pixel-art game Pattaya After Hours. First two reference images supply Gabby's face, brown hair tied back, red short-sleeved collared zip-front mini dress, natural build and confident friendly expression. Third reference supplies ONLY rendering style: crisp detailed illustrated pixel art, plum outlines, clustered shading, warm highlights, adult proportions about six heads tall. Create Gabby as an adult bartender, tasteful and fully clothed, in that same red dress and simple black low shoes. No phone, mirror, bedroom, logos or text. Genuine transparent background. Exactly FOUR full-body poses in a clean equal 2x2 grid, each fully within its own quadrant with generous transparent padding: top-left relaxed idle hands at waist; top-right walking left foot forward; bottom-left walking right foot forward; bottom-right serving with one hand extending a small tray holding one beer glass toward the right. Same identity, outfit, scale and frontal three-quarter facing RIGHT in every cell. Feet visible, no cropping, no scenery, no floor, no ground shadows, no labels, no grid lines. Keep serving tray close enough that the complete silhouette fits its cell. PNG alpha transparency.",
+    "Edit this production 2x2 transparent sprite sheet of adult bartender Gabby. Change only her skin to very pale fair skin with subtle pink undertones (avoid the tan/orange skin), and shorten the red collared dress hem to a very short upper-thigh mini dress, with full opaque coverage in all four poses. Keep her brown tied-back hair, recognizable face, adult build, confident friendly expression, black low shoes, red dress collar and sleeves, all four idle/walk/walk/serving poses, tray with beer, crisp illustrated pixel-art rendering, exact grid and composition. Preserve genuine alpha transparency and all characters entirely within their cells. No text, scenery or shadows."
+  ],
+  "reference_roles": [
+    "User-supplied photos: face, hair and clothing reference; retained only in local attachments.",
+    "art/sources/dao-0.png: rendering style only."
+  ],
+  "source": "gabby-sheet.png",
+  "grid": [
+    2,
+    2
+  ],
+  "order": [
+    "idle",
+    "walk-left",
+    "walk-right",
+    "serve"
+  ],
+  "generation_receipts": [
+    "Generated images are saved to /home/zak/.codex/generated_images/01a216d5-c1b3-75d2-9d95-02e1528ae010 as /home/zak/.codex/generated_images/01a216d5-c1b3-75d2-9d95-02e1528ae010/exec-bc059c77-a32f-4fea-81e1-df4ad13fc815.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "Generated images are saved to /home/zak/.codex/generated_images/01a216d5-c1b3-75d2-9d95-02e1528ae010 as /home/zak/.codex/generated_images/01a216d5-c1b3-75d2-9d95-02e1528ae010/exec-3d0c5387-263e-45ae-bf1f-52caa4245f69.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  ],
+  "portrait_crop": [
+    225,
+    0,
+    378,
+    153
+  ],
+  "runtime_outputs": [
+    "assets/art/gabby.png",
+    "assets/art/portrait-gabby.png"
+  ]
+}

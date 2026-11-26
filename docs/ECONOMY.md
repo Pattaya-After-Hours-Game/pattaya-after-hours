@@ -714,3 +714,18 @@ At zero, completed cleaning is retained and the existing skip moves the clock
 to noon. Stock is not bought, no income is awarded, and contracts age through the
 skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
 The date already advanced at midnight, so the jump does not add another day.
+
+## Gabby's service tips
+
+Gabby is an optional named adult bartender: ฿1,200 for ten game days, standard
+bartender wages, training, reserve and floor-slot limits. Only one roster place
+across the street can belong to her, including expired contracts. She remains
+a bartender; renewal preserves her identity, training and service deadline.
+
+After each successful live staff sale by Gabby, add ฿5 to the existing saved
+`bonus_tips` jar. This stacks with first-visit tips and matched-drink bonuses,
+including on repeat rounds. No order, stock, availability or ready deadline means
+no bonus. Owner/other staff sales, offline estimates and manager/pool income earn
+none of her tips. Normal once-nightly settlement pays the jar; no separate sales,
+commission, healthy-margin or five-second trading entry is created. Existing
+campaigns receive no hire, identity replacement or retroactive tips.

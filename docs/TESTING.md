@@ -3,6 +3,22 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
+## Gabby verification — 26 November 2026
+
+Godot 4.7.2 `tools/test.sh` passes the combined gameplay/save/UI/art suite,
+48 fresh campaigns, 60 celebration scenarios and 80 stage-two scenarios.
+Additional isolated regression/UI checks pass for Gabby's paid hiring, named
+rota and renewal controls, actual-service tips, stacking with matched drinks,
+repeat rounds, stockouts, empty queues, offline exclusion, saved identity and
+training, retained deadlines, and once-nightly payment across reloads.
+
+Nine `gabby-*` economy previews at 960×540 cover hiring, roster, the three venue
+types, actual serving, the tip jar, off duty and expiry/renewal. Packed sprites
+were inspected against light/dark backgrounds and the portrait in the production
+UI. Existing worker artwork is preserved. Device playtesting and Gabby-specific
+full-campaign pacing remain unverified; existing baseline routes do not hire her.
+This is local source verification, not a release publication receipt.
+
 ## Current commission/pool verification — 26 November 2026
 
 The isolated Godot 4.7.2 wrapper passes gameplay/save/UI regressions, 48 fresh

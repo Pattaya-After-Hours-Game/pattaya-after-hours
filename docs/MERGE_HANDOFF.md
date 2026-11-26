@@ -1,5 +1,18 @@
 # Current implementation and release handoff
 
+## Gabby addition — local source, 26 November 2026
+
+Adds a named adult bartender with pale skin, a very short red dress and her own
+four-pose atlas/portrait. Service offers her normal ฿1,200 ten-day contract when
+a floor slot is free; one Gabby may belong to the street. Her actual staff sales
+add ฿5 each to the existing nightly bonus jar, stacking with matched-drink tips.
+Renewal preserves identity/training/deadlines. Old workers retain their looks;
+no migration rewards or offline tips are added. Schema remains 12.
+
+The pre-existing Nida/pool work was preserved and reached `cc30403` while this
+addition was underway. Combined tests and Gabby UI/art checks pass; see
+[testing](TESTING.md). Gabby is a local source change, not yet a published build.
+
 ## Nida and pool update — 26 November 2026
 
 Based on main `f1cc217`, published as v1.0.31. Nida's ฿1,200 ten-day fee remains,

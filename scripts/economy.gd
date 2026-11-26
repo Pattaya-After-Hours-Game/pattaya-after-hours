@@ -309,6 +309,12 @@ func promoter_index(bar: Dictionary) -> int:
 		if bar.team[i].role==3: return i
 	return -1
 
+func gabby_venue() -> String:
+	for venue in s.street.bars:
+		for person in venue.team:
+			if person.get("identity","")=="gabby": return str(venue.name)
+	return ""
+
 func role_change_fee(bar: Dictionary, index: int) -> int:
 	var person: Dictionary = bar.team[index]
 	var next_role := int(bar.type) if person.role==0 else 0
@@ -450,6 +456,7 @@ func staff_service(bar: Dictionary) -> void:
 		if not contracted(person) or not person.on or person.role!=0 or i in bar.away: continue
 		if action_time()<float(person.service_ready): continue
 		if serve(bar,1)>0:
+			if person.get("identity","")=="gabby": bar.bonus_tips += C.GABBY_TIP_PER_DRINK
 			person.service_ready = action_time()+service_seconds(person)
 			person.last_served = action_time()
 			person.drinks_served += 1
@@ -1212,6 +1219,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if bar.type==0 or index<0 or index>=bar.team.size(): return "Choose a team member at a Soi bar or gogo."
 			if index in bar.away: return "Wait until this team member returns."
 			var person: Dictionary = bar.team[index]
+			if person.get("identity","")=="gabby": return "Gabby works as a bartender."
 			if not contracted(person): return "Rehire this team member first."
 			if person.role==3: return "Promoters have their own frontage contract and cannot change role."
 			var fee := role_change_fee(bar,index)
@@ -1224,6 +1232,14 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			person.role = int(bar.type) if person.role==0 else 0
 			person.host = free_host(bar) if person.role==1 else -1
 			return "Role changed to %s. Contract adjustment ฿%d; remaining term and training retained." % [C.ROLE_NAMES[int(person.role)],fee]
+		"hire_gabby":
+			var venue := gabby_venue()
+			if not venue.is_empty(): return "Gabby already has a roster place at %s. Renew her existing contract there." % venue
+			var before: int = bar.team.size()
+			var result := action(bar,"hire",0)
+			if bar.team.size()==before: return result
+			bar.team.back()["identity"] = "gabby"
+			return "Gabby hired for ten days (฿1,200). Each drink she serves adds ฿5 to the nightly tip jar."
 		"hire":
 			if index<0 or index>3: return "Unknown role."
 			if index==1 and bar.type!=1: return "Hosts work in Soi venues."

@@ -36,8 +36,9 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	elif not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
+			if name_text=="gabby-hire": app.scroll.scroll_vertical = maxi(0,app.scroll.scroll_vertical-100)
 		await process_frame
 	await RenderingServer.frame_post_draw
 	get_root().get_texture().get_image().save_png(output.path_join(name_text+".png"))
@@ -62,6 +63,26 @@ func run() -> void:
 	await capture(app,"opening")
 	app.show_tutorial_hint = false
 	app.drawer_open = true
+	app.model = Campaign.new(72)
+	app.model.s.cash = 10000
+	await capture(app,"gabby-hire","Hire Gabby")
+	app.model.street.action("hire_gabby")
+	await capture(app,"gabby-roster","+฿5 tip")
+	app.drawer_open = false
+	for kind in 3:
+		app.model.street.selected().type = kind
+		await capture(app,"gabby-venue-"+str(kind))
+	app.model.street.selected().type = 0
+	app.model.street.economy.staff_service(app.model.street.selected())
+	await capture(app,"gabby-serving")
+	app.drawer_open = true
+	await capture(app,"gabby-tips","+฿5 tip")
+	app.model.street.selected().team[0].on = false
+	app.drawer_open = false
+	await capture(app,"gabby-off-duty")
+	app.model.street.selected().team[0].contract_left = 0
+	app.drawer_open = true
+	await capture(app,"gabby-renewal","Rehire Gabby")
 	app.model = Campaign.new(72)
 	app.model.s.day = 8
 	app.model.s.rep = 100

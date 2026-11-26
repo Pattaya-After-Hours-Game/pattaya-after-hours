@@ -23,6 +23,16 @@ House lager stock begins at ฿38 each: ฿228 for six. Supplier upgrades switch
 on improvements. A new game starts with twelve drinks and ฿228; updating an
 existing campaign does not change its cash, stock, waiting tabs or paid stock costs.
 
+## Hire Gabby
+
+In **Service → Team & Payroll**, choose **Hire Gabby · ฿1,200** when a floor
+position is free. She has the standard ten-day bartender contract, wages and
+25-second service, improved through normal training. Each real drink she serves
+earns an extra ฿5 in the nightly tip jar. Owner service and offline estimates
+do not earn her bonus. Existing matched-drink bonuses still apply. Gabby keeps
+her identity and training through expiry and renewal; renew her at her assigned
+venue. There is one Gabby across the street, and she works as a bartender.
+
 ## Find the next useful step
 
 At the top of **Service**, **Anong's Next Step** shows the current story objective,

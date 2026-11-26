@@ -1094,7 +1094,7 @@ func upgrade_offers() -> Array[Dictionary]:
 		var status: Dictionary = eco.training_offer(bar,i,audience)
 		if status.maxed: continue
 		var caption := "Attract more guests" if audience else "%ds → %ds per drink" % [eco.service_seconds(person),StreetContent.STAFF_SERVICE_SECONDS[status.level+1]]
-		var name_text := "Nida" if person.role==3 else "%s %d" % [StreetContent.ROLE_NAMES[person.role],i+1]
+		var name_text := "Gabby" if person.get("identity","")=="gabby" else "Nida" if person.role==3 else "%s %d" % [StreetContent.ROLE_NAMES[person.role],i+1]
 		offers.append(upgrade_offer("audience" if audience else "training","Train "+name_text,caption,"Training stays with this worker when their contract expires.","train_audience" if audience else "train_staff",i,status))
 	return offers
 
@@ -1238,6 +1238,10 @@ func street_panel() -> void:
 			if role>0 and role!=bar.type: continue
 			row_button("Hire %s · %s" % [StreetContent.ROLE_NAMES[role].to_lower(),cash(eco.contract_cost(role))],street_action.bind("hire",role))
 			body("Adds ฿%d/real min. Forecast break-even after hire: %.1f drinks/real min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool-eco.forecast(bar).manager)/maxf(1,eco.price(bar)-eco.stock_unit_cost(bar))),"One drink every 25s; help with the rush." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
+	if eco.floor_staff(bar)<model.street.staff_limit(bar) and eco.gabby_venue().is_empty():
+		character_card("gabby","Gabby · adult bartender","Red dress, quick wit, generous regulars")
+		row_button("Hire Gabby · ฿1,200",street_action.bind("hire_gabby"))
+		body("10 days · normal bartender wages and training. +฿%d per drink she serves, counted at closing. Uses one team position." % StreetContent.GABBY_TIP_PER_DRINK,MUTED,12)
 	body("FRONTAGE PROMOTER",GOLD,14)
 	body("Nida · adult promoter · ฿1,200 / ten days. No commission or hourly wage. One frontage slot; never serves drinks.",MUTED,12)
 	if bar.commission_paid>0: body("Historical commission paid: %s. No further commission is charged." % cash(bar.commission_paid),MUTED,12)
@@ -1263,6 +1267,8 @@ func street_panel() -> void:
 		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
 		if person.role==1: name_text = StreetContent.HOSTS[int(person.host)][0]
 		if person.role==3: name_text = "Nida"
+		if person.get("identity","")=="gabby": name_text = "Gabby"
+		if person.get("identity","")=="gabby": body("+฿%d tip per drink Gabby serves · paid at closing" % StreetContent.GABBY_TIP_PER_DRINK,TEAL,12)
 		character_card(Art.worker_id(bar,i),name_text,"Contract finished" if not eco.contracted(person) else "Serves waiting orders" if person.role==0 else "Attracts visitors")
 		live_body(func() -> String:
 			var remaining := int(person.get("contract_left",StreetContent.STAFF_CONTRACT_MINUTES))
@@ -1290,7 +1296,7 @@ func street_panel() -> void:
 				var training_button := row_button("Train %s · %s · needs stage %d" % [name_text,cash(StreetContent.AUDIENCE_TRAINING_COST*(audience_level+1)),audience_level+2],street_action.bind("train_audience",i))
 				training_button.icon = UpgradeIcons.get_icon("audience")
 		row_button("%s · %s" % [name_text,"On duty" if person.on else "Off duty"],street_action.bind("rota",i))
-		if bar.type>0 and person.role!=3: row_button("Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))],street_action.bind("role",i))
+		if bar.type>0 and person.role!=3 and person.get("identity","")!="gabby": row_button("Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))],street_action.bind("role",i))
 		if person.role==1:
 			body(StreetContent.HOSTS[int(person.host)][1],MUTED,12)
 			row_button("Bar-fine request · "+name_text,street_action.bind("bar_fine",i))

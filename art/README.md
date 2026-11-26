@@ -249,3 +249,19 @@ cooldown/readiness. Bartender atlases enter their existing serve animation only
 for two seconds after a real staff sale; the old decorative six-second loop is
 removed. No textures or atlas frames are replaced. Use `staff-ready-*` economy
 previews for ready, served, cooldown, quiet, stockout, rota and expiry states.
+
+## Gabby — 26 November 2026
+
+Gabby's pale skin, tied-back brown hair and very short red collared dress follow
+the supplied reference and requested revision. The built-in image generator made
+a transparent four-pose sheet, using Dao only as a rendering-style reference.
+[Exact prompts and receipts](recipes/gabby.json) record both passes. Personal
+reference photos remain local attachments and are not runtime assets.
+
+`art/sources/gabby-sheet.png` is split at fixed equal 2×2 cell boundaries by the
+existing packer, then normalized into `assets/art/gabby.png` (four 160×192 cells).
+A fixed idle-pose crop provides `assets/art/portrait-gabby.png`. The optional
+saved identity selects her own art without changing any existing worker's look.
+Only real staff sales trigger her serving pose; rota, expiry and closure still
+control presence. Use the economy preview filter `gabby-*` for hiring, roster,
+all three venue types, serving, tips, off-duty and renewal states.

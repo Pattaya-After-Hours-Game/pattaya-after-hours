@@ -87,6 +87,7 @@ static func frame(canvas: CanvasItem, id: String, index: int, foot: Vector2, sca
 static func atlas_specs() -> Dictionary:
 	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),9],"nida":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
 	specs["patrons-capybara"] = [Vector2(224,192),1]
+	specs["gabby"] = [Vector2(160,192),4]
 	specs["patrons-rainbow-duo"] = [Vector2(160,192),1]
 	for id in STAFF: specs[id] = [Vector2(160,192),4]
 	for id in HOSTS: specs[id] = [Vector2(160,256),6]
@@ -122,6 +123,7 @@ static func event_treatment(id: int) -> String:
 static func worker_id(bar: Dictionary, index: int) -> String:
 	if bar.has("team") and index<bar.team.size():
 		var person: Dictionary = bar.team[index]
+		if person.get("identity","")=="gabby": return "gabby"
 		if person.role==3: return "nida"
 		if person.role==1: return HOSTS[clampi(int(person.host),0,HOSTS.size()-1)]
 		if person.role==2: return HOSTS[index%HOSTS.size()]

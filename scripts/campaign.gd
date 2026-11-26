@@ -726,6 +726,7 @@ func _read(path: String) -> Variant:
 					if bar.shift.has(key) and not bar.shift[key] is Dictionary: return null
 				for person in bar.team:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
+					if person.has("identity") and (person.identity!="gabby" or int(person.role)!=0): return null
 					if not int(person.role) in ([0,1,2,3] if int(parsed.version)>=6 else [0,1,2]) or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
 					for key in ["training","service_clock","contract_left"]:
 						if person.has(key) and (not (person[key] is int or person[key] is float) or person[key]<0): return null

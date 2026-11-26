@@ -451,5 +451,18 @@
     ],
     "height": 180,
     "foot_x_fraction": 0.26
+  },
+  "gabby": {
+    "frames": [
+      "gabby-0.png",
+      "gabby-1.png",
+      "gabby-2.png",
+      "gabby-3.png"
+    ],
+    "cell": [
+      160,
+      192
+    ],
+    "height": 180
   }
 }

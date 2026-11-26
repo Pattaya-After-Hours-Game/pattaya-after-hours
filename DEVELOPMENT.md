@@ -424,3 +424,12 @@ settlement also ignores commitments still present in a live dictionary. Forecast
 offline estimates and hiring break-even calculations must not apply the former
 10% deduction. `POOL_SECONDS` is 30 for new games and forecast throughput; never
 replace a saved game's remaining time or fee on load.
+
+## Named bartender Gabby
+
+`hire_gabby` delegates to the existing bartender hire before attaching the
+optional `identity: "gabby"` field. Old team records retain their existing art
+and rules. Schema 12 validates the optional identity; no migration rewards or
+new counters are needed. `staff_service` adds her bonus only after `serve`
+succeeds, using the existing saved/settled `bonus_tips` jar. `gabby_check.gd`
+covers purchase, service, reload, renewal and once-only settlement.
