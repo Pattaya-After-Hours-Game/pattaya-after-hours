@@ -120,6 +120,7 @@ func test_ui() -> void:
 	await process_frame
 	use_button(app,"New Game")
 	check(app.show_tutorial_hint,"New players see the tutorial hint")
+	test_tuning(app)
 	for stat in ["TILL","REPUTATION","HEAT","TIME"]:
 		var button := find_button(app,stat)
 		check(not button.tooltip_text.is_empty(),"Hover explains "+stat)
@@ -285,6 +286,36 @@ func test_clock_ui(app: Control) -> void:
 	check(bar.dirt==80 and bar.clean_remaining==0 and app.model.s.street.minute==720,"Skip control cancels unfinished cleaning")
 	check(find_button(app,"Serve a drink").disabled and not find_button(app,"Welcome customers").disabled,"Noon allows welcoming; service waits for a real order")
 
+
+func test_tuning(app: Control) -> void:
+	app.change_tab(4)
+	var campaign = app.model
+	var elapsed: int = campaign.s.street.elapsed
+	var stock: int = campaign.street.selected().stock
+	use_button(app,"Start tuning playtest · 2×")
+	var saved := FileAccess.get_file_as_string(Campaign.SAVE)
+	check(app.model!=campaign and app.tuning_speed==2.0,"Tuning opens a separate campaign at double speed")
+	app._process(1.0)
+	check(app.model.s.street.elapsed==elapsed+2 and campaign.s.street.elapsed==elapsed,"Double speed advances two steps in the sandbox and keeps the main campaign frozen")
+	use_button(app,"Street speed · 2×")
+	app._process(1.0)
+	check(app.model.s.street.elapsed==elapsed+3 and app.tuning_speed==1.0,"Switching back to normal advances one step")
+	var eco = app.model.street.economy
+	var usual: float = eco.traffic_rate()
+	use_button(app,"Passing crowds · 100%")
+	use_button(app,"Owner cooldowns · 100%")
+	check(is_equal_approx(eco.traffic_rate(),usual*1.25),"Crowd tuning changes live traffic")
+	use_button(app,"Serve a drink")
+	check(app.model.street.selected().serve_duration==7.5 and app.model.street.selected().stock==stock-1,"Cooldown tuning affects a real sandbox sale")
+	use_button(app,"Trigger Rat Plague")
+	check(app.model.s.street.event.phase=="active" and app.model.street.selected().customers.is_empty(),"Sandbox can start the swarm immediately")
+	app.model.street.checkpoint_requested.emit()
+	app._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	check(FileAccess.get_file_as_string(Campaign.SAVE)==saved,"Sandbox actions, pause, and automatic checkpoints leave the campaign save alone")
+	app.change_tab(4)
+	use_button(app,"End playtest")
+	check(app.model==campaign and campaign.street.selected().stock==stock and campaign.s.street.event.is_empty(),"Ending the playtest restores untouched stock and events")
+	app.change_tab(0)
 
 func panel_has_text(app: Control, label: String) -> bool:
 	for node in app.column.get_children():

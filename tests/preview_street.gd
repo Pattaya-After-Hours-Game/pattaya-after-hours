@@ -188,13 +188,24 @@ func run() -> void:
 		app.scroll.scroll_vertical = 10000
 		await capture(app,"drawer-%d-bottom" % tab,false)
 	app.drawer_open = false
-	for event in 10:
+	for event in app.model.street.C.EVENTS.size():
 		for bar in app.model.s.street.bars: bar.closed = 0
 		app.model.street.announce(event)
 		await capture(app,"event-%02d-warning" % event)
 		app.model.street.start_event()
 		await capture(app,"event-%02d-active" % event)
+		if event==app.model.street.C.RAT_PLAGUE:
+			app.render()
+			app.city.set_process(false)
+			app.city.clock = app.scene_clock+.19
+			app.city.queue_redraw()
+			await capture(app,"event-10-scurrying",false)
 		app.model.s.street.event = {}
+	fresh(app)
+	app.change_tab(4)
+	app.start_tuning()
+	await capture(app,"tuning")
+	app.stop_tuning()
 	fresh(app)
 	app.offline_notice = 1234
 	await capture(app,"offline-income")

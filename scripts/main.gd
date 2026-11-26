@@ -53,6 +53,9 @@ var boot_menu := true
 var resume_available := false
 var new_game_confirmation := false
 var campaign_before_tutorial: Campaign
+var campaign_before_tuning: Campaign
+var tuning_open := false
+var tuning_speed := 1
 var tutorial_step := 0
 var stat_tip: Control
 var stat_tip_key := ""
@@ -211,7 +214,7 @@ func cancel_new_game() -> void:
 	render()
 
 func start_new_game() -> void:
-	if updater_worker or campaign_before_tutorial != null: return
+	if updater_worker or campaign_before_tutorial != null or campaign_before_tuning != null: return
 	var fresh := Campaign.new()
 	var error := fresh.save_game(true)
 	if error != OK:
@@ -311,13 +314,14 @@ func set_sound() -> void:
 	render(true)
 
 func save_state() -> void:
-	if boot_menu or campaign_before_tutorial != null: return
+	if boot_menu or campaign_before_tutorial != null or campaign_before_tuning != null: return
 	show_tutorial_hint = false
 	var error: int = model.save_game()
 	if error != OK: message = "Save failed (%d)." % error
 
 
 func change_tab(index: int) -> void:
+	tuning_open = false
 	upgrades_open = false
 	fridge_open = false
 	confirmation = false
@@ -370,7 +374,9 @@ func render(keep_scroll: bool = false) -> void:
 	var venue_name := abs_text(root_ui,Rect2(14,4,170 if windows_updates != null else 245,24),model.street.selected().name,19,GOLD)
 	venue_name.name = "VenueName"
 	venue_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	abs_text(root_ui,Rect2(14,27,170,16),"PRACTICE SHIFT" if practicing else model.weekday(),12,TEAL)
+	var subtitle: String = "PRACTICE SHIFT" if practicing else model.weekday()
+	if campaign_before_tuning != null: subtitle = "PLAYTEST · %d×" % tuning_speed
+	abs_text(root_ui,Rect2(14,27,170,16),subtitle,12,TEAL)
 	if windows_updates != null:
 		update_button = at_button(root_ui,Rect2(190,5,66,37),"Update",windows_updates.ask,true)
 		update_button.add_theme_font_size_override("font_size",12)
@@ -382,7 +388,7 @@ func render(keep_scroll: bool = false) -> void:
 	metric(570,70,"HEAT",str(int(model.s.heat)),PINK)
 	metric(644,99,"TIME",model.street.clock_text(),WHITE)
 	var tutorial_button := at_button(root_ui,Rect2(748,5,92,37),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
-	tutorial_button.disabled = model.s.phase == "godzilla"
+	tutorial_button.disabled = model.s.phase == "godzilla" or campaign_before_tuning != null
 	at_button(root_ui,Rect2(848,5,98,37),"Muted" if muted else "Sound",set_sound)
 	event_banner = null
 	if not practicing and (not model.s.street.event.is_empty() or model.street.celebration_info().days_left<=2 or model.street.celebration_info().active):
@@ -493,7 +499,9 @@ func render(keep_scroll: bool = false) -> void:
 				1: events_panel()
 				2: tours_panel()
 				3: empire_panel()
-				4: journal_panel()
+				4:
+					if tuning_open: tuning_panel()
+					else: journal_panel()
 			action_label = "Serve a drink"
 			action = street_action.bind("serve")
 		"guided":
@@ -719,7 +727,7 @@ func advance() -> void:
 	commit()
 
 func start_tutorial() -> void:
-	if campaign_before_tutorial != null: return
+	if campaign_before_tutorial != null or campaign_before_tuning != null: return
 	campaign_before_tutorial = model
 	tutorial_step = 0
 	show_tutorial_hint = false
@@ -1318,7 +1326,8 @@ func street_event_panel() -> void:
 		"Beer bars retain regular trade; premium venues slow down. A locals' night builds regulars.",
 		"Promote your lineup to capture overflow; otherwise expect quieter trade.",
 		"Preparation adds four seconds to the challenge. A loss closes venues for 30 seconds.",
-		"Double street traffic during the festival. Preparation adds four seconds against Godzilla."
+		"Double street traffic during the festival. Preparation adds four seconds against Godzilla.",
+		"Guests bolt and walk-ins dry up for 45 seconds. Bo keeps seated guests inside and helps save some trade."
 	][int(event.id)],MUTED,12)
 	live_body(func() -> String: return "%s · %ds · %s" % ["Starts in" if event.phase == "warning" else "Time remaining",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,14)
 	if event.phase == "warning" and not event.prepared:
@@ -1328,7 +1337,54 @@ func street_event_panel() -> void:
 			message = model.start_street_boss()
 			commit(),true)
 
+func start_tuning() -> void:
+	if campaign_before_tuning != null or campaign_before_tutorial != null or model.s.phase!="plan": return
+	save_state()
+	campaign_before_tuning = model
+	model = model.tuning_copy()
+	tuning_speed = 2
+	open_tuning()
+
+func open_tuning() -> void:
+	tuning_open = true
+	message = ""
+	render()
+
+func stop_tuning() -> void:
+	model = campaign_before_tuning
+	campaign_before_tuning = null
+	tuning_speed = 1
+	change_tab(4)
+
+func tuning_panel() -> void:
+	title("Tuning playtest")
+	body("Test copy · Your main campaign is paused.",GOLD,13)
+	row_button("Street speed · %d×" % tuning_speed,func() -> void:
+		tuning_speed = 1 if tuning_speed==2 else 2
+		render(true))
+	var eco = model.street.economy
+	row_button("Passing crowds · %d%%" % roundi(eco.walk_in_scale*100),func() -> void:
+		var rates := [1.0,1.25,1.5,.75]
+		eco.walk_in_scale = rates[(rates.find(eco.walk_in_scale)+1)%rates.size()]
+		render(true))
+	row_button("Owner cooldowns · %d%%" % roundi(eco.owner_recharge_scale*100),func() -> void:
+		var rates := [1.0,.75,.5,1.25]
+		eco.owner_recharge_scale = rates[(rates.find(eco.owner_recharge_scale)+1)%rates.size()]
+		render(true))
+	var rats := row_button("Trigger Rat Plague",func() -> void:
+		model.street.announce(StreetContent.RAT_PLAGUE)
+		model.street.start_event()
+		tab = 0
+		close_drawer())
+	rats.disabled = not model.s.street.event.is_empty() or not model.street.any_trading()
+	rats.tooltip_text = "Available during trading when the street has no active event." if rats.disabled else "Start the full swarm now."
+	row_pair("‹  Journal",change_tab.bind(4),"End playtest",stop_tuning)
+
 func journal_panel() -> void:
+	if campaign_before_tuning == null:
+		row_button("Start tuning playtest · 2×",start_tuning)
+	else:
+		row_pair("Tuning settings",open_tuning,"End playtest",stop_tuning)
 	character_card("anong","Anong","The street, the stories, and the books.")
 	chapter_panel()
 	body("NIGHTLY TIP JARS",GOLD,14)
@@ -1350,7 +1406,8 @@ Live overhead includes premises costs." % [model.week(),cash(model.s.cash),cash(
 	if not model.s.last_week.is_empty(): week_lines(model.s.last_week)
 	body("RECENT SHIFTS",GOLD,12)
 	for line in model.s.log: body(str(line),WHITE,14)
-	row_button("Restart campaign" if not confirmation else "Erase this run and restart",restart)
+	if campaign_before_tuning == null:
+		row_button("Restart campaign" if not confirmation else "Erase this run and restart",restart)
 
 func week_lines(entry: Dictionary) -> void:
 	body("WEEK %d    %d shifts / %d guests / %d tour tickets" % [entry.weeks,entry.nights,entry.guests,entry.tours],GOLD,12)
@@ -1475,7 +1532,7 @@ func _process(delta: float) -> void:
 	if campaign_before_tutorial == null:
 		var before := street_ui_state()
 		model.street.night_prep_visible = not is_instance_valid(fight) and not is_instance_valid(district)
-		model.street.advance(minf(delta,1.0))
+		model.street.advance(minf(delta,1.0)*tuning_speed)
 		refresh_street = refresh_street or before != street_ui_state()
 		update_action_controls()
 		live_seconds += minf(delta,1.0)
@@ -1606,7 +1663,7 @@ func _notification(what: int) -> void:
 		return
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if campaign_before_tutorial == null: save_state()
-	if what == NOTIFICATION_APPLICATION_RESUMED and campaign_before_tutorial == null:
+	if what == NOTIFICATION_APPLICATION_RESUMED and campaign_before_tutorial == null and campaign_before_tuning == null:
 		offline_notice = model.street.claim_offline(int(Time.get_unix_time_from_system()))
 		save_state()
 		refresh_street = true

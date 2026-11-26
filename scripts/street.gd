@@ -295,14 +295,23 @@ func next_goal() -> Dictionary:
 	return {"title":title,"detail":detail,"focus":focus,"tab":tab,"venue":0}
 
 func announce(id: int) -> void:
-	s.street.event = {"id":id,"phase":"warning","remaining":60,"prepared":false}
+	s.street.event = {"id":id,"phase":"warning","remaining":C.RAT_WARNING_SECONDS if id==C.RAT_PLAGUE else 60,"prepared":false}
 	record("COMING UP · " + C.EVENTS[id][0] + ": " + C.EVENTS[id][1])
 
 func start_event() -> void:
 	var event: Dictionary = s.street.event
 	event.phase = "active"
-	event.remaining = 90
+	event.remaining = C.RAT_PLAGUE_SECONDS if event.id==C.RAT_PLAGUE else 90
 	record("TONIGHT · " + C.EVENTS[int(event.id)][0])
+	if event.id==C.RAT_PLAGUE:
+		if event.prepared:
+			record("Bo ushers customers past the swarm. The guests inside hang on to their drinks.")
+		else:
+			var fled := 0
+			for bar in s.street.bars:
+				fled += bar.customers.size()
+				economy.clear_visits(bar)
+			record("RAT PLAGUE · %d guests bolt for the door. New walk-ins are scarce." % fled)
 	if event.id in [0,2,3,4] and not event.prepared:
 		var protected: bool = (event.id == 2 and s.license >= 75 and s.safety >= 65) or (event.id == 3 and s.trust >= 60)
 		if not protected:
@@ -491,8 +500,13 @@ func tick(seconds: int) -> void:
 			elif s.street.chapter>=1 and not economy.celebration_window():
 				s.street.event_wait -= 1
 				if s.street.event_wait<=0:
-					announce(1+int(s.street.event_index)%8)
-					s.street.event_index += 1
+					var slot := int(s.street.event_index)
+					# Keep the rare roll independent of the customer RNG and regular event rotation.
+					if posmod(hash(Vector3i(int(s.street.economy_seed),int(s.street.elapsed),slot)),C.RAT_EVENT_ODDS)==0:
+						announce(C.RAT_PLAGUE)
+					else:
+						announce(1+slot%8)
+						s.street.event_index += 1
 		economy.advance_contracts(1)
 		s.street.minute = (int(s.street.minute)+1)%C.DAY_MINUTES
 		if s.street.minute==0: next_calendar_day()

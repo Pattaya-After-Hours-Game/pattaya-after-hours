@@ -3,6 +3,8 @@ extends RefCounted
 const C = preload("res://scripts/street_content.gd")
 var s: Dictionary
 var last_sale := ""
+var walk_in_scale := 1.0
+var owner_recharge_scale := 1.0
 
 func _init(state: Dictionary, fresh: bool = false) -> void:
 	s = state
@@ -91,10 +93,13 @@ func finish_promotion(bar: Dictionary) -> void:
 	bar.promo = {}
 	bar.promo_cooldown = C.PROMOTION_COOLDOWN
 
-func close_customers(bar: Dictionary) -> void:
+func clear_visits(bar: Dictionary) -> void:
 	bar.customers.clear()
 	bar.games.clear()
 	bar.host_requests.clear()
+
+func close_customers(bar: Dictionary) -> void:
+	clear_visits(bar)
 	bar.welcome = 0
 	bar.service_clock = 0
 	for person in bar.team: person.service_clock = 0
@@ -571,9 +576,10 @@ func traffic_rate(offline: bool = false) -> float:
 		4: rate *= 1.7
 		5,9: rate *= 2.0
 		6: rate *= .7
+		C.RAT_PLAGUE: rate *= .55 if s.street.event.prepared else .15
 	if celebrating(s.street.bars[0]): rate = minf(rate*C.CELEBRATION_TRAFFIC,(C.TRAFFIC_PER_MINUTE+maxi(0,kinds.size()-1)*C.AUDIENCE_TRAFFIC_BONUS)*C.CELEBRATION_TRAFFIC_CAP)
 	if s.weather >= 5: rate *= .8
-	return rate
+	return rate*walk_in_scale
 
 func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minute: int = -1, offset: int = 0) -> float:
 	if not is_trading(bar,offline): return 0.0
@@ -659,6 +665,7 @@ func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minut
 	var net := sales*unit_margin+pool+management-costs
 	var reason := "Quiet: attract customers before hiring."
 	if not is_trading(bar,offline): reason = status(bar)
+	elif not offline and event_id()==C.RAT_PLAGUE: reason = "Rats everywhere! Few guests are coming in."
 	elif bar.stock <= 0: reason = "Out of stock: order a delivery."
 	elif bar.customers.size() >= seats(bar): reason = "Full: more seats or shorter queues would help."
 	elif pending(bar) > 0 and service < demand: reason = "Slow service: serve orders or add a bartender."
@@ -866,9 +873,9 @@ func action_time() -> float:
 	return float(s.street.elapsed)+float(s.street.get("tick_fraction",0.0))
 
 func action_cooldown(bar: Dictionary, id: String) -> float:
-	if id=="chat": return C.CHAT_SECONDS
+	if id=="chat": return C.CHAT_SECONDS*owner_recharge_scale
 	var key := "pouring" if id=="serve" else "welcoming"
-	return float(C.ACTION_COOLDOWNS[int(bar.action_levels[key])])
+	return float(C.ACTION_COOLDOWNS[int(bar.action_levels[key])])*owner_recharge_scale
 
 func start_cooldown(bar: Dictionary, id: String, duration: float) -> void:
 	bar[id+"_duration"] = duration
@@ -1092,7 +1099,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			customer.chatted = true
 			customer.life += C.CHAT_PATIENCE
 			customer.chat_until = action_time()+3.0
-			start_cooldown(bar,"welcome",C.CHAT_SECONDS)
+			start_cooldown(bar,"welcome",action_cooldown(bar,"chat"))
 			return "A little reassurance: 10 extra seconds to fulfil that order."
 		"action_upgrade": return buy_action_upgrade(bar,index)
 		"stock":

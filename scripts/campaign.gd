@@ -43,6 +43,13 @@ func _init(seed_value: int = 0, practice: bool = false) -> void:
 	street.checkpoint_requested.connect(save_checkpoint)
 	s.street.economy_seed = maxi(1,seed_value) if seed_value != 0 else rng.randi_range(1,2147483646)
 
+func tuning_copy() -> RefCounted:
+	var copy := new()
+	copy.s = s.duplicate(true)
+	copy.rng.state = rng.state
+	copy.street = Street.new(copy.s)
+	return copy
+
 func _add_staff(id: int) -> void:
 	s.staff.append({"id":id,"skill":C.STAFF[id][2],"guide":C.STAFF[id][3],"morale":72,"fatigue":12,"work":true,"hurt":0})
 

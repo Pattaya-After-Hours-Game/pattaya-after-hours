@@ -2,7 +2,47 @@ extends RefCounted
 const Campaign = preload("res://scripts/campaign.gd")
 const Content = preload("res://scripts/street_content.gd")
 
+func test_rat_plague(test: SceneTree) -> void:
+	var plagues := 0
+	for seed_value in range(1,401):
+		var candidate = Campaign.new(seed_value)
+		candidate.s.street.chapter = 1
+		candidate.s.street.event_wait = 1
+		candidate.s.street.pass_credit = -1_000_000
+		candidate.street.tick(1)
+		if candidate.s.street.event.id==Content.RAT_PLAGUE:
+			plagues += 1
+			test.check(candidate.s.street.event_index==0,"The rare infestation preserves the regular event rotation")
+	test.check(plagues>0 and plagues<25,"Rat Plague can roll randomly and stays rare")
+
+	var m = Campaign.new(72)
+	var eco = m.street.economy
+	var bar: Dictionary = m.street.selected()
+	var baseline: float = eco.traffic_rate()
+	var before := [bar.stock,m.s.cash,bar.happy,bar.tip_visits]
+	m.street.announce(Content.RAT_PLAGUE)
+	test.check(m.s.street.event.remaining==20 and eco.traffic_rate()==baseline,"The rat warning gives time to prepare without scaring guests off yet")
+	m.street.start_event()
+	test.check(bar.customers.is_empty() and eco.pending(bar)==0 and eco.is_trading(bar),"The swarm scares guests off without shutting down the bar")
+	test.check(before==[bar.stock,m.s.cash,bar.happy,bar.tip_visits],"Running guests do not earn rewards or consume stock")
+	test.check(is_equal_approx(eco.traffic_rate(),baseline*.15) and eco.traffic_rate(true)==baseline,"The rats deter live walk-ins while offline estimates ignore them")
+	m.save_game()
+	var loaded = Campaign.new(1)
+	test.check(loaded.load_game() and loaded.s.street.event.remaining==45 and loaded.street.selected().customers.is_empty(),"Reload preserves an active plague without restoring fleeing guests")
+	loaded.street.tick(45)
+	test.check(loaded.s.street.event.is_empty() and loaded.street.economy.traffic_rate()==baseline,"Traffic returns to normal when the swarm clears")
+
+	m = Campaign.new(72)
+	bar = m.street.selected()
+	m.street.announce(Content.RAT_PLAGUE)
+	var prep_cost: int = Content.EVENTS[Content.RAT_PLAGUE][3]
+	var opening_cash: int = m.s.cash
+	m.street.action("prepare")
+	m.street.start_event()
+	test.check(bar.customers.size()==3 and m.s.cash==opening_cash-prep_cost and is_equal_approx(m.street.economy.traffic_rate(),baseline*.55),"Bo's paid preparation keeps guests inside and saves some passing traffic")
+
 func run(test: SceneTree) -> void:
+	test_rat_plague(test)
 	var m = Campaign.new(72)
 	var eco = m.street.economy
 	var bar: Dictionary = m.street.selected()

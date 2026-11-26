@@ -37,6 +37,20 @@ Final renovations now cost ฿40,000 for a beer bar, ฿65,000 for a Soi venue a
 40 healthy shifts, plus operating cash. You can work on another bar while that
 customer base grows. The first renovation and ordinary drink prices are unchanged.
 
+## Try a faster shift
+
+In **Journal**, choose **Start tuning playtest · 2×**. The street runs at double
+speed in a disposable copy of your campaign. Toggle back to 1×, adjust passing
+crowds or owner cooldowns, or trigger Rat Plague during quiet trading. Return to
+**Journal → End playtest** to pick up your original campaign where you left it.
+
+## When the rats come out
+
+A rare **Rat Plague** can hit during live trading. The swarm drives seated
+customers out and scares away most walk-ins for 45 seconds. During the
+20-second warning, **Call Bo’s rat patrol** in Events for ฿120 to keep seated
+guests inside and save some passing trade.
+
 ## Look ahead to day seven
 
 Open **Events** to see the next free neighbourhood celebration. **Anong's

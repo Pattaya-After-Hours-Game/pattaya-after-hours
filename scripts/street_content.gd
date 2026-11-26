@@ -24,6 +24,10 @@ const CHAPTERS = [
 	["The Whole Soi Knows Your Name", "Own all three bar types, bring each to stage 3, then host the After Hours Street Festival."],
 	["The Soi Never Sleeps", "The first festival is in the books. Keep growing, weather new seasons and host it again."]
 ]
+const RAT_PLAGUE = 10
+const RAT_WARNING_SECONDS = 20
+const RAT_PLAGUE_SECONDS = 45
+const RAT_EVENT_ODDS = 50
 const EVENTS = [
 	["Reopening Blackout", "The new BLUE HOUR sign is ready. Bo suggests testing the generator before the party.", "Rent a generator", 350, "The sign lights up. So does the entire street. Only the karaoke machine loses power."],
 	["US Navy Carrier Visit", "Shore leave is announced. A lot of people will want the same cold drink.", "Book relief shifts & ice", 500, "Last orders! The rush back to the ship begins. Bo counts the empty crates twice."],
@@ -34,7 +38,8 @@ const EVENTS = [
 	["Low Season", "The tourist rush eases. The regulars are still here, arguing about the pool rules.", "Run a locals' night", 200, "The slow spell passes. Someone finally admits the pool table is not level."],
 	["Anton's Grand Re-Reopening", "Lantern House has a new sign, a new promotion and exactly the same chairs.", "Promote your own lineup", 350, "Anton's screen blows a fuse. His overflow crowd discovers your street."],
 	["Godzilla Wants a Cold One", "Something enormous is coming in from the bay. Find the largest glasses you own.", "Stage giant ice buckets", 450, "The harbour is quiet again. Nobody can agree whose tab the monster belongs on."],
-	["After Hours Street Festival", "Your whole street is on the programme. The headline guest has dorsal plates.", "Coordinate all venues", 1200, "Anong: You came here to relax. Now look at this place. Same time next year?"]
+	["After Hours Street Festival", "Your whole street is on the programme. The headline guest has dorsal plates.", "Coordinate all venues", 1200, "Anong: You came here to relax. Now look at this place. Same time next year?"],
+	["Rat Plague", "Anong heard scratching. The beer crates are moving.", "Call Bo's rat patrol", 120, "Bo saw the last rat leave with a cocktail umbrella. Word gets out that the coast is clear."]
 ]
 const HOSTS = [
 	["Bee", "Likes early shifts; accepts bar-fine requests", true],

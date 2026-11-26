@@ -2,6 +2,7 @@ extends Control
 const Art = preload("res://scripts/art.gd")
 const Economy = preload("res://scripts/economy.gd")
 const Content = preload("res://scripts/street_content.gd")
+const RatSwarm = preload("res://scripts/rat_swarm.gd")
 const INK = Color("#21131e")
 const TEAL = Color("#73f5dc")
 const PINK = Color("#f37ab0")
@@ -117,6 +118,8 @@ func _draw() -> void:
 			draw_string(font,Vector2(160,280),"CLEANING / %ds" % bar.clean_remaining,HORIZONTAL_ALIGNMENT_CENTER,390,18,TEAL)
 	if bar.get("raided",false): Art.frame(self,"event-inspection",0,Vector2(505,365),person_scale(365))
 	_draw_event(closed)
+	if int(street_event.get("id",-1))==Content.RAT_PLAGUE:
+		RatSwarm.draw_scurriers(self,clock,size/Vector2(960,540),street_event.phase=="active",street_event.prepared)
 	if weather >= 5:
 		for i in 65:
 			var p := Vector2(fposmod(i*53-clock*40,180),fposmod(i*71+clock*250,540))
