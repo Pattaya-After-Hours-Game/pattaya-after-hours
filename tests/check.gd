@@ -310,9 +310,14 @@ func test_ui() -> void:
 
 func test_tour_update(app: Control) -> void:
 	app.model = Campaign.new(48)
-	app.model.booking(2,0)
 	app.change_tab(2)
-	app.message = "Booking confirmed."
+	check(app.root_ui.get_node("TourBadge").text=="!","The Tours tab flags an empty agreement list")
+	var fern: Button = app.column.get_node("TourGuide_2")
+	check(fern.text.contains("Fern") and app.column.has_node("TourGuide_1") and not app.column.has_node("TourRoute_0"),"Tours opens on a guide list")
+	fern.pressed.emit()
+	check(app.model.s.bookings.is_empty() and app.drawer_close_button.text=="Back","Selecting a guide opens their routes without booking")
+	app.column.get_node("TourRoute_0").pressed.emit()
+	check(app.root_ui.get_node("TourBadge").text=="1" and app.tour_agreement_text(2)=="Active · Market loop · 120s left","The Tours badge and drawer identify the active deal")
 	app.model.s.street.pass_credit = 60000
 	app.model.s.street.next_group = 1
 	app.live_seconds = 1.0
@@ -320,6 +325,26 @@ func test_tour_update(app: Control) -> void:
 	var expected := "Tour guide Fern brought a new customer to Blue Hour."
 	var note: Label = app.root_ui.get_node("StreetUpdate")
 	check(app.model.street.selected().customers.size()==4 and note.text==expected and app.model.s.street.history.front()==expected,"A seated tour referral appears in the live street update over the booking confirmation")
+	check(app.tour_agreement_text(2).ends_with("119s left"),"The active countdown uses trading seconds")
+	app.model.s.street.seconds = app.model.street.SHIFT_SECONDS-1
+	app.model.s.street.pass_credit = 0
+	app.live_seconds = 1.0
+	app._process(1.0)
+	check(app.root_ui.get_node("TourBadge").text=="!" and app.tour_agreement_text(2)=="Expired · Market loop","The badge clears and the route shows Expired at shift end")
+	check(app.root_ui.get_node("StreetUpdate").text=="Tour agreement expired.","The update strip announces the end of the agreement")
+	app.drawer_close_button.pressed.emit()
+	check(app.column.get_node("TourGuide_2").text.contains("Expired · Market loop"),"Back returns to the guide list and shows the expired agreement")
+	app.model.save_game()
+	var restored = Campaign.new(48)
+	check(restored.load_game() and restored.s.street.expired_tours=={"2":0} and restored.s.bookings.is_empty(),"The expired route survives reload without reactivating")
+	app.model.s.cash = 1000
+	app.model._add_staff(4)
+	app.model.booking(2,0)
+	app.model.booking(3,1)
+	app.render()
+	check(app.root_ui.get_node("TourBadge").text=="2","The Tours badge counts agreements across guides")
+	app.model.booking(2,0)
+	check(app.tour_agreement_text(2)=="Available","Cancelling a renewed agreement returns the guide to Available")
 
 	for fixture in [[5,false],[48,true]]:
 		var m = Campaign.new(fixture[0])
@@ -346,7 +371,8 @@ func test_purchase_ui(app: Control) -> void:
 	var promotion := find_button(app,"Happy Hour · ฿80")
 	check(promotion.disabled and promotion.text.ends_with("Need %s more" % app.cash(eco.promotion_offer(bar,1).required)),"Promotions show the fee plus reserve shortfall")
 	app.change_tab(2)
-	var route: Button = app.column.find_children("*","Button",true,false)[2]
+	app.column.get_node("TourGuide_2").pressed.emit()
+	var route: Button = app.column.get_node("TourRoute_0")
 	check(route.disabled and route.text.ends_with("Need %s more" % app.cash(app.model.guide_pay(0))),"Tours disable unpaid bookings and show missing guide pay")
 	app.change_tab(3)
 	var lease: Button = app.column.get_node("Lease_0")

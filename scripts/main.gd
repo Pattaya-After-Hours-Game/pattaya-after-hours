@@ -97,7 +97,7 @@ var scene_clock := 0.0
 var duo_reaction := {}
 var service_animation := 0.0
 var tab := 0
-var guide := 2
+var guide := -1
 var message := ""
 var scroll: ScrollContainer
 var column: VBoxContainer
@@ -266,7 +266,7 @@ func start_new_game() -> void:
 	offline_notice = 0
 	live_seconds = 0.0
 	save_seconds = 0.0
-	guide = 2
+	guide = -1
 	tab = 0
 	drawer_open = false
 	show_tutorial_hint = true
@@ -365,6 +365,7 @@ func change_tab(index: int) -> void:
 	tuning_open = false
 	upgrades_open = false
 	fridge_open = false
+	guide = -1
 	confirmation = false
 	tab = index
 	drawer_open = true
@@ -495,6 +496,17 @@ func render(keep_scroll: bool = false) -> void:
 		b.add_theme_font_size_override("font_size",12)
 		b.disabled = model.s.phase != "plan" or practicing
 	if not practicing and model.s.phase=="plan":
+		var tours: int = model.s.bookings.size()
+		var tour_badge := at_button(root_ui,Rect2(180,478,21,21),str(tours) if tours>0 else "!",toggle_drawer.bind(2),tours>0)
+		tour_badge.name = "TourBadge"
+		tour_badge.custom_minimum_size = Vector2.ZERO
+		tour_badge.size = Vector2(21,21)
+		tour_badge.z_index = 2
+		tour_badge.tooltip_text = "%d active tour agreements" % tours if tours>0 else "No active tour agreements"
+		tour_badge.add_theme_font_size_override("font_size",11)
+		var tour_style := box(TEAL if tours>0 else Color("#b8293d"),DARK,2)
+		tour_style.set_corner_radius_all(10)
+		for state in ["normal","hover","pressed"]: tour_badge.add_theme_stylebox_override(state,tour_style)
 		upgrade_badge = at_button(root_ui,Rect2(56,478,21,21),"",open_upgrades.bind(true),true)
 		upgrade_badge.name = "UpgradeBadge"
 		upgrade_badge.custom_minimum_size = Vector2.ZERO
@@ -1218,26 +1230,53 @@ func promotion_report(bar: Dictionary) -> void:
 	live_body(func() -> String: return "Pool revenue %s · %d free games\nFees forgone %s\nAttributed customers %d · regulars %d · lost to queues %d\nAttributed drinks %s · stock %s · commission %s\nShift operating costs %s · promotion fee %s\nAttributed contribution after these costs %s\nBaseline visitors without promotion: %.1f (estimate)" % [cash(report.pool_revenue),report.free_games,cash(int(report.free_games)*50),report.customers,report.regulars,report.lost,cash(report.drink_revenue),cash(report.drink_cost),cash(report.get("commission",0)),cash(report.operating),cash(report.fee),cash(int(report.drink_revenue)+int(report.pool_revenue)-int(report.drink_cost)-int(report.operating)-int(report.fee)-int(report.get("commission",0))),float(report.baseline)],WHITE,13)
 
 func tours_panel() -> void:
-	title("City tours")
-	character_card(Art.STAFF[int(model.s.staff[guide].id)],"Your guide","Voluntary bookings · fair splits")
-	body("Pay a guide upfront to recommend your street this shift. Guides increase its appeal to existing passersby; they do not generate guaranteed ticket income.")
 	var crew: Array = model.s.staff
-	row_pair("Guide: "+Content.STAFF[crew[guide].id][0],func():
-		guide = (guide+1)%crew.size()
-		render(true),
+	if guide<0:
+		title("Tour guides")
+		body("Choose a guide to assign a tour. Guides recommend your street until the trading shift ends.")
+		for i in crew.size():
+			if int(crew[i].guide)<=0: continue
+			var staff_id := int(crew[i].id)
+			var caption := func() -> String: return "%s  ›\n%s" % [Content.STAFF[staff_id][0],tour_agreement_text(i)]
+			var card := row_button(caption.call(),func():
+				guide = i
+				render())
+			card.name = "TourGuide_%d" % i
+			card.icon = Art.texture("portrait-"+Art.STAFF[staff_id])
+			card.expand_icon = true
+			card.add_theme_constant_override("icon_max_width",48)
+			card.custom_minimum_size.y = 66
+			card.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			live_labels.append([card,caption])
+		return
+	title("Assign a tour")
+	var staff_id := int(crew[guide].id)
+	character_card(Art.STAFF[staff_id],Content.STAFF[staff_id][0],Content.STAFF[staff_id][1])
+	live_body(tour_agreement_text.bind(guide),GOLD,14)
+	row_button(
 		["Base split","Standard split","Premium split"][int(model.s.pay)],cycle.bind("pay",[0,1,2]))
 	for i in Content.ROUTES.size():
 		var item: Array = Content.ROUTES[i]
 		var booked: bool = model.s.bookings.get(str(guide),-1) == i
-		var caption := "%s  ·  %s" % [item[0],"Confirmed" if booked else "Short" if item[2] == 1 else "Long"]
+		var caption := "Cancel %s" % item[0] if booked else "Assign %s" % item[0]
 		var route := row_button(caption,func():
 			message = model.booking(guide,i)
 			commit(true),booked)
+		route.name = "TourRoute_%d" % i
 		if not booked: watch_purchase(route,caption,model.booking_offer.bind(guide,i))
 		live_body(func() -> String:
 			var reason: String = "" if booked else model.booking_offer(guide,i).reason
-			return "%s route listing · %s guide pay%s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i))," / "+reason if not reason.is_empty() else ""],MUTED,12)
-	body("%d guide bookings tonight" % model.s.bookings.size(),GOLD,13)
+			return "%s route · Guide pay %s%s" % ["Short" if item[2]==1 else "Long",cash(model.guide_pay(i)),"\n"+reason if not reason.is_empty() else ""],MUTED,12)
+
+func tour_agreement_text(index: int) -> String:
+	var key := str(index)
+	if model.s.bookings.has(key):
+		var remaining: int = model.street.SHIFT_SECONDS-int(model.s.street.seconds)
+		return "Active · %s · %ds left" % [Content.ROUTES[int(model.s.bookings[key])][0],remaining]
+	if model.s.street.expired_tours.has(key):
+		return "Expired · %s" % Content.ROUTES[int(model.s.street.expired_tours[key])][0]
+	var reason: String = model.tour_offer(index,0)
+	return "Available" if reason.is_empty() else reason
 
 func update_lease_controls() -> void:
 	for entry in lease_controls:
@@ -1848,13 +1887,15 @@ func update_drawer_navigation() -> void:
 	if not is_instance_valid(drawer_close_button): return
 	var help_open := is_instance_valid(service_help_panel)
 	var subview := service_subview_open()
-	drawer_close_button.text = "Back" if help_open or subview else "×"
-	drawer_close_button.tooltip_text = "Back to the service view" if help_open else "Back to Service" if subview else "Close drawer"
+	var guide_detail := tab==2 and guide>=0
+	drawer_close_button.text = "Back" if help_open or subview or guide_detail else "×"
+	drawer_close_button.tooltip_text = "Back to the service view" if help_open else "Back to Service" if subview else "Back to tour guides" if guide_detail else "Close drawer"
 	drawer_close_button.visible = help_open or subview or model.s.phase=="plan"
 
 func close_drawer_layer() -> void:
 	if is_instance_valid(service_help_panel): close_service_help()
 	elif service_subview_open(): change_tab(0)
+	elif tab==2 and guide>=0: change_tab(2)
 	else: close_drawer()
 
 func service_option(label: String, action: Callable, icon: String, help: Callable) -> Button:
@@ -2584,6 +2625,7 @@ func street_ui_state() -> Array:
 	if fridge_open:
 		state.append([model.street.economy.fridge_needs(bar),model.street.economy.emergency_stock_available(bar),not model.street.supplier_deal_offer().is_empty()])
 	state.append([int(model.s.street.night_prep.remaining)>0,model.s.street.night_prep.cancelled])
+	state.append(model.s.bookings.size())
 	for venue in model.s.street.bars:
 		state.append([venue.raided,venue.clean_remaining>0,venue.dirt==0])
 		for person in venue.team: state.append([model.street.economy.contracted(person),person.on,person.role])

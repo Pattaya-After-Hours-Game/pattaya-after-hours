@@ -5,6 +5,7 @@ const Crew = preload("res://scripts/content.gd")
 const Economy = preload("res://scripts/economy.gd")
 const OFFLINE_CAP = 8 * 60 * 60
 const SHIFT_SECONDS = 120
+const TOUR_UPDATE_SECONDS = 8
 var s: Dictionary
 var economy: RefCounted
 signal checkpoint_requested
@@ -44,6 +45,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	if not s.street.has("supplier_deal"): s.street.supplier_deal = {}
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
+	if not s.street.has("expired_tours"): s.street.expired_tours = {}
 	economy = Economy.new(s,fresh)
 	economy.tour_arrived.connect(record_tour_arrival)
 	s.version = 15
@@ -81,9 +83,14 @@ func record(line: String) -> void:
 func record_tour_arrival(guide_index: int, venue_name: String, guests: int) -> void:
 	var guide_name: String = Crew.STAFF[int(s.staff[guide_index].id)][0]
 	var customers := "a new customer" if guests==1 else "%d new customers" % guests
-	tour_update = "Tour guide %s brought %s to %s." % [guide_name,customers,venue_name]
-	tour_update_until = int(s.street.elapsed)+8
-	record(tour_update)
+	record_tour_update("Tour guide %s brought %s to %s." % [guide_name,customers,venue_name])
+
+func record_tour_update(line: String) -> void:
+	record(line)
+	# Give an arrival on the last tick of a shift time to show in the update strip.
+	if tour_update_until==int(s.street.elapsed)+TOUR_UPDATE_SECONDS: return
+	tour_update = line
+	tour_update_until = int(s.street.elapsed)+TOUR_UPDATE_SECONDS
 
 func pay(cost: int) -> bool:
 	if cost < 0 or int(s.cash) < cost: return false
@@ -518,7 +525,11 @@ func end_shift() -> void:
 		if event.get("id",-1)==C.Local.BED and event.has("runner") and s.street.bars[int(event.venue)]==bar:
 			if not int(event.runner) in bar.away: bar.away.append(event.runner)
 		economy.settle_shift(bar)
-	s.bookings.clear()
+	if not s.bookings.is_empty():
+		s.street.expired_tours.merge(s.bookings,true)
+		var count: int = s.bookings.size()
+		s.bookings.clear()
+		record_tour_update("Tour agreement expired." if count==1 else "%d tour agreements expired." % count)
 	s.night.erase("godzilla")
 
 func clock_text() -> String:

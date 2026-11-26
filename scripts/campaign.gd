@@ -127,14 +127,17 @@ func booking(index: int, route_id: int) -> String:
 	if s.phase != "plan":
 		return "Bookings are closed."
 	var key := str(index)
+	var legacy := legacy_mode()
 	if s.bookings.get(key, -1) == route_id:
 		s.bookings.erase(key)
-		return "Booking removed."
+		return "Booking removed." if legacy else "Tour agreement cancelled."
 	var offer := booking_offer(index,route_id)
 	if not offer.enabled: return offer.reason
-	if not legacy_mode() and not spend(offer.required): return "The guide needs their agreed pay upfront."
+	if not legacy and not spend(offer.required): return "The guide needs their agreed pay upfront."
 	s.bookings[key] = route_id
-	return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
+	if legacy: return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
+	s.street.expired_tours.erase(key)
+	return "Tour agreement active · Guide pay ฿%d." % guide_pay(route_id)
 
 func action(id: String, index: int = 0) -> String:
 	if not legacy_mode() and id in ["buy","hire","rota","train","reno"]:
@@ -695,6 +698,12 @@ func _read(path: String) -> Variant:
 			for key in ["bars","selected","chapter","served","earned","seconds","cycle","event","event_wait","event_index","events_survived","reopening","festival","festivals","last_seen","offline","history"]:
 				if not data.has(key): return null
 			if not data.bars is Array or data.bars.is_empty() or data.bars.size() > Street.C.NAMES.size(): return null
+			var expired_tours: Variant = data.get("expired_tours",{})
+			if not expired_tours is Dictionary or not parsed.staff is Array: return null
+			for guide_key in expired_tours:
+				var route_id: Variant = expired_tours[guide_key]
+				if not guide_key.is_valid_int() or not int(guide_key) in range(parsed.staff.size()): return null
+				if not _finite_number(route_id,0,C.ROUTES.size()-1) or float(route_id)!=floorf(float(route_id)): return null
 			if int(data.selected) < 0 or int(data.selected) >= data.bars.size(): return null
 			if int(data.chapter) < 0 or int(data.chapter) >= Street.C.CHAPTERS.size(): return null
 			for bar in data.bars:

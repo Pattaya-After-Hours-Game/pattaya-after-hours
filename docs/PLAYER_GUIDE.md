@@ -94,8 +94,12 @@ Bed Race take over the game screen until you finish or leave.
 
 ## See when tours bring in customers
 
-Book a guide in **Tours** to recommend your street for the current shift.
+Open **Tours**, choose a guide, then assign a route. The guide recommends your
+street for the current trading shift. Use **Back** to return to the guide list.
 When a referral gets a seat, the top-left update names the guide and venue.
+The badge above **Tours** counts active agreements and shows a red **!** when
+there are none. The guide list shows each agreement's remaining trading time
+or its **Expired** status.
 
 ## When the rats come out
 
