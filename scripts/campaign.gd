@@ -700,6 +700,14 @@ func _read(path: String) -> Variant:
 			for key in ["bars","selected","chapter","served","earned","seconds","cycle","event","event_wait","event_index","events_survived","reopening","festival","festivals","last_seen","offline","history"]:
 				if not data.has(key): return null
 			if not data.bars is Array or data.bars.is_empty() or data.bars.size() > Street.C.NAMES.size(): return null
+			if data.event is Dictionary and data.event.get("id")==Street.C.RAT_PLAGUE and data.event.has("rats"):
+				var rats: Variant = data.event.rats
+				if not rats is Array or rats.is_empty() or rats.size()>Street.C.RAT_COUNT: return null
+				var seen_rats := {}
+				for target in rats:
+					if not _finite_number(target,0,Street.C.RAT_COUNT-1) or float(target)!=floorf(float(target)): return null
+					if seen_rats.has(int(target)): return null
+					seen_rats[int(target)] = true
 			var expired_tours: Variant = data.get("expired_tours",{})
 			if not expired_tours is Dictionary or not parsed.staff is Array: return null
 			for guide_key in expired_tours:

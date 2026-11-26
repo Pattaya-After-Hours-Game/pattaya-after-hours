@@ -470,6 +470,26 @@ func test_tuning(app: Control) -> void:
 	check(app.model.street.selected().serve_duration==7.5 and app.model.street.selected().stock==stock-1,"Cooldown tuning affects a real sandbox sale")
 	use_button(app,"Trigger Rat Plague")
 	check(app.model.s.street.event.phase=="active" and app.model.street.selected().customers.is_empty(),"Sandbox can start the swarm immediately")
+	app.change_tab(1)
+	var rat: Button = app.city.rat_buttons[0]
+	var point := rat.get_global_transform_with_canvas()* (rat.size/2)
+	var before_rats: int = app.model.street.rat_targets().size()
+	check(app.rat_instruction.text.contains("Click or tap each rat"),"The bar gives an explicit instruction even with Events open")
+	for pressed: bool in [true,false]:
+		var click := InputEventMouseButton.new()
+		click.button_index = MOUSE_BUTTON_LEFT
+		click.position = point
+		click.global_position = point
+		click.pressed = pressed
+		root.push_input(click,true)
+	check(not rat.visible and app.model.street.rat_targets().size()==before_rats-1 and app.rat_instruction.text.ends_with("%d left" % (before_rats-1)),"A click catches one visible rat and immediately updates the HUD")
+	rat = app.city.rat_buttons[1]
+	for pressed: bool in [true,false]:
+		var tap := InputEventScreenTouch.new()
+		tap.position = rat.get_global_transform_with_canvas()*(rat.size/2)
+		tap.pressed = pressed
+		root.push_input(tap,true)
+	check(not rat.visible and app.model.street.rat_targets().size()==before_rats-2,"A touch catches exactly one rat through Godot's touch input")
 	app.model.street.checkpoint_requested.emit()
 	app._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	check(FileAccess.get_file_as_string(Campaign.SAVE)==saved,"Sandbox actions, pause, and automatic checkpoints leave the campaign save alone")

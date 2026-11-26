@@ -34,6 +34,7 @@ var rig := 0
 var bars: Array = []
 var selected_bar := 0
 var street_event: Dictionary = {}
+var rat_buttons := {}
 var service_flash := 0.0
 var fridge_install_flash := 0.0
 var fridge_capacity := 1
@@ -51,7 +52,19 @@ func _process(delta: float) -> void:
 	arrival_time += delta
 	service_flash = maxf(0,service_flash-delta)
 	fridge_install_flash = maxf(0,fridge_install_flash-delta)
+	position_rat_buttons()
 	queue_redraw()
+
+func position_rat_buttons() -> void:
+	if rat_buttons.is_empty(): return
+	if RatSwarm.frames.is_empty(): RatSwarm.build_frames()
+	for index: int in rat_buttons:
+		var button: Button = rat_buttons[index]
+		var center := Vector2(78+index%4*135,185+(index/4)*128)
+		var scurry := clock*2.3+index*1.7
+		center += Vector2(21*sin(scurry),12*cos(scurry*1.4))
+		button.position = center.round()-button.size/2
+		button.icon = RatSwarm.frames[int(clock*12+index)%RatSwarm.frames.size()]
 
 func _gui_input(event: InputEvent) -> void:
 	if bars.is_empty(): return
@@ -183,8 +196,8 @@ func _draw() -> void:
 			draw_string(font,Vector2(160,280),"CLEANING / %ds" % bar.clean_remaining,HORIZONTAL_ALIGNMENT_CENTER,390,18,TEAL)
 	if bar.get("raided",false): Art.frame(self,"event-inspection",0,Vector2(505,365),person_scale(365))
 	_draw_event(closed)
-	if int(street_event.get("id",-1))==Content.RAT_PLAGUE:
-		RatSwarm.draw_scurriers(self,clock,size/Vector2(960,540),street_event.phase=="active",street_event.prepared)
+	if int(street_event.get("id",-1))==Content.RAT_PLAGUE and street_event.phase=="warning":
+		RatSwarm.draw_warning(self,clock,size/Vector2(960,540))
 	if weather >= 5:
 		for i in 65:
 			var p := Vector2(fposmod(i*53-clock*40,180),fposmod(i*71+clock*250,540))

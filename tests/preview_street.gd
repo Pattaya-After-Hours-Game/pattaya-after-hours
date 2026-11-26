@@ -210,16 +210,32 @@ func run() -> void:
 	app.drawer_open = false
 	for event in app.model.street.C.EVENTS.size():
 		for bar in app.model.s.street.bars: bar.closed = 0
+		var selected: int = app.model.s.street.selected
+		if event==app.model.street.C.RAT_PLAGUE: app.model.s.street.selected = 0
 		app.model.street.announce(event)
 		await capture(app,"event-%02d-warning" % event)
+		if event==app.model.street.C.RAT_PLAGUE:
+			app.show_news(app.street_issue())
+			await capture(app,"event-10-dispatch")
+			app.close_news(false)
 		app.model.street.start_event()
 		await capture(app,"event-%02d-active" % event)
 		if event==app.model.street.C.RAT_PLAGUE:
 			app.render()
 			app.city.set_process(false)
 			app.city.clock = app.scene_clock+.19
-			app.city.queue_redraw()
+			app.city.position_rat_buttons()
 			await capture(app,"event-10-scurrying",false)
+			app.tab = 1
+			app.drawer_open = true
+			await capture(app,"event-10-patrol")
+			app.street_action("prepare")
+			app.catch_rat(0)
+			await capture(app,"event-10-patrol-progress")
+			for target in app.model.street.rat_targets().duplicate(): app.catch_rat(target)
+			app.drawer_open = false
+			await capture(app,"event-10-cleared")
+			app.model.s.street.selected = selected
 		app.model.s.street.event = {}
 	fresh(app)
 	app.model.street.announce(Local.CART)

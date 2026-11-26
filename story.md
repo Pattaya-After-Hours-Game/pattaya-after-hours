@@ -485,6 +485,7 @@ is not tied permanently to one venue type.
 | **Anton's Grand Re-Reopening** | Invite the player to profit from a rival's excess rather than simply imitate it. |
 | **Godzilla Wants a Cold One** | Escalate the normal service problem to an absurd scale. |
 | **After Hours Street Festival** | Bring the whole street and the first story arc together. |
+| **Rat Plague** | Guests bolt. Bo can help with the swarm, and the owner can chase down the stragglers to get trade moving again. |
 
 Free Pool Night, Happy Hour, Pool Tournament and Sports Night are player-run
 venue promotions, separate from these district events. Their story comes from

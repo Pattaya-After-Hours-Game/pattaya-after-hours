@@ -325,10 +325,15 @@ are paid for only when a real customer buys them. No buyer means no income.
 
 After the reopening chapter, each eligible random street-event slot has a 1 in
 50 chance to announce Rat Plague. The roll leaves the regular rotation intact.
-The 20-second warning offers Bo’s ฿120 rat patrol. Unprepared venues lose their
-current customers, pending orders and pool games. Passing traffic drops to 15%
-for 45 trading seconds. Preparation keeps current guests and preserves 55% of
-passing traffic. The event uses the saved street timer and affects live trade only.
+After a 20-second warning, all venues lose their current customers, pending
+orders and pool games. Passing traffic drops to 15%. The player can click or tap
+each of the eight rats to end the event early, or let it expire after 45 trading
+seconds.
+
+Bo’s ฿120 patrol is available during the warning and until only one rat remains.
+It removes up to three rats, leaves at least one for the player to catch, and
+preserves 55% of passing traffic. The event saves its timer and uncaught rats and
+affects live trade only.
 
 ## Drink demand and inventory
 

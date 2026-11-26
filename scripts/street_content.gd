@@ -29,6 +29,9 @@ const RAT_PLAGUE = 10
 const RAT_WARNING_SECONDS = 20
 const RAT_PLAGUE_SECONDS = 45
 const RAT_EVENT_ODDS = 50
+const RAT_COUNT = 8
+const RAT_PATROL_CATCHES = 3
+const RAT_INSTRUCTION = "Click or tap each rat to clear the infestation."
 const EVENTS = [
 	["Reopening Blackout", "The new BLUE HOUR sign is ready. Bo suggests testing the generator before the party.", "Rent a generator", 350, "The sign lights up. So does the entire street. Only the karaoke machine loses power."],
 	["US Navy Carrier Visit", "Shore leave is announced. A lot of people will want the same cold drink.", "Book relief shifts & ice", 500, "Last orders! The rush back to the ship begins. Bo counts the empty crates twice."],

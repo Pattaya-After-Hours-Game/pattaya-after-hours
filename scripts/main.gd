@@ -70,6 +70,7 @@ var drawer_close_button: Button
 var drawer: Control
 var event_banner: Button
 var event_badge: Button
+var rat_instruction: Label
 var news_issue := {}
 var supplier_special_open := false
 var seen_news := {}
@@ -386,6 +387,7 @@ func render(keep_scroll: bool = false) -> void:
 	lease_controls.clear()
 	upgrade_badge = null
 	event_badge = null
+	rat_instruction = null
 	upgrades_entry = null
 	upgrade_quotes.clear()
 	stock_controls.clear()
@@ -426,6 +428,7 @@ func render(keep_scroll: bool = false) -> void:
 	city.street_event = model.s.street.event
 	city.celebrating = model.street.economy.celebrating(model.street.selected())
 	root_ui.add_child(city)
+	if not practicing: add_rat_buttons()
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
 	var venue_name := abs_text(root_ui,Rect2(14,4,154 if windows_updates != null else 216,24),model.street.selected().name,19,GOLD)
@@ -665,7 +668,10 @@ func render(keep_scroll: bool = false) -> void:
 		cooldown_button(Rect2(594,490,172,40),"Welcome customers","welcome")
 		cooldown_button(Rect2(776,490,170,40),"Have a chat","chat")
 		update_action_controls()
-	if live_service:
+	if live_service and not model.street.rat_targets().is_empty():
+		pane(root_ui,Rect2(14,100,540,40),DARK,GOLD)
+		rat_instruction = abs_text(root_ui,Rect2(24,100,520,40),rat_instruction_text(),16,WHITE)
+	elif live_service:
 		var demand_note := abs_text(root_ui,Rect2(14,100,540,42),"",14,GOLD)
 		live_labels.append([demand_note,func() -> String:
 			var bar: Dictionary = model.street.selected()
@@ -2240,6 +2246,47 @@ func celebration_panel(compact: bool = false) -> void:
 			live_body(report_copy,WHITE,13)
 			body(scope,MUTED,12)
 
+func rat_instruction_text() -> String:
+	return "%s  ·  %d left" % [StreetContent.RAT_INSTRUCTION,model.street.rat_targets().size()]
+
+func add_rat_buttons() -> void:
+	var normal := box(Color("#21161fd9"),GOLD)
+	normal.set_corner_radius_all(18)
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = Color("#49303a")
+	hover.border_color = PINK
+	for index: int in model.street.rat_targets():
+		var rat := at_button(city,Rect2(0,0,68,52),"",catch_rat.bind(index))
+		rat.name = "Rat%d" % index
+		rat.tooltip_text = "Catch rat"
+		rat.accessibility_name = "Catch rat"
+		rat.expand_icon = true
+		rat.add_theme_constant_override("icon_max_width",48)
+		rat.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
+		rat.mouse_filter = Control.MOUSE_FILTER_STOP
+		rat.gui_input.connect(func(event: InputEvent) -> void:
+			if event is InputEventScreenTouch and event.pressed and event.device!=InputEvent.DEVICE_ID_EMULATION:
+				rat.accept_event()
+				rat.pressed.emit())
+		rat.add_theme_stylebox_override("normal",normal)
+		rat.add_theme_stylebox_override("hover",hover)
+		rat.add_theme_stylebox_override("pressed",hover)
+		city.rat_buttons[index] = rat
+	city.position_rat_buttons()
+
+func catch_rat(index: int) -> void:
+	if not model.street.catch_rat(index): return
+	if model.s.street.event.is_empty():
+		message = "All rats caught. The coast is clear!"
+		commit(true)
+		return
+	save_state()
+	var rat: Button = city.rat_buttons[index]
+	rat.hide()
+	rat.queue_free()
+	city.rat_buttons.erase(index)
+	rat_instruction.text = rat_instruction_text()
+
 func street_event_panel() -> void:
 	var event: Dictionary = model.s.street.event
 	if event.is_empty(): return
@@ -2255,7 +2302,7 @@ func street_event_panel() -> void:
 		"Promote your lineup to capture overflow; otherwise expect quieter trade.",
 		"Preparation adds four seconds to the challenge. A loss closes venues for 30 seconds.",
 		"Double street traffic during the festival. Preparation adds four seconds against Godzilla.",
-		"Guests bolt and walk-ins dry up for 45 seconds. Bo keeps seated guests inside and helps save some trade."
+		"Guests flee when the swarm starts. Click or tap each rat in the bar to clear the infestation early, or wait 45 trading seconds. Bo's patrol catches some rats and helps keep walk-ins coming."
 	]
 	var event_rules: String = Local.RULES[int(event.id)] if Local.RULES.has(int(event.id)) else rules[int(event.id)]
 	var dispatch := row_button(str(info[0])+"  ›",func() -> void: show_news(street_issue()))
@@ -2264,7 +2311,9 @@ func street_event_panel() -> void:
 	event_detail(dispatch,info[0],func() -> String: return str(info[1])+"\n\n"+event_rules)
 	var venue_name := str(model.s.street.bars[int(event.venue)].name)+" · " if event.has("venue") else ""
 	live_body(func() -> String: return "%s%s %ds · %s" % [venue_name,"Starts in" if event.phase == "warning" else "Time left",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,13)
-	if event.phase == "warning" and not event.prepared:
+	if event.id==StreetContent.RAT_PLAGUE:
+		body(StreetContent.RAT_INSTRUCTION+" Bo's patrol catches some rats and helps keep walk-ins coming.",WHITE,13)
+	if (event.phase=="warning" or event.id==StreetContent.RAT_PLAGUE) and not event.prepared:
 		if event.id==Local.ENCORE and not event.get("solo",false): row_button("Work the rush solo",street_action.bind("encore_solo"))
 		var caption: String = "%s · %s" % [info[2],cash(info[3])] if info[3]>0 else info[2]
 		watch_purchase(row_button(caption,street_action.bind("prepare")),caption,model.street.preparation_offer,event_rules)
@@ -2280,7 +2329,10 @@ func street_issue() -> Dictionary:
 	var event: Dictionary = model.s.street.event
 	var id := int(event.id)
 	var info: Array = StreetContent.EVENTS[id]
-	return {"id":id,"headline":info[0],"lead":info[1],"source":Local.SOURCES.get(id,[])}
+	var lead: String = info[1]
+	if id==StreetContent.RAT_PLAGUE:
+		lead += " Guests flee when the swarm starts. "+StreetContent.RAT_INSTRUCTION
+	return {"id":id,"headline":info[0],"lead":lead,"source":Local.SOURCES.get(id,[])}
 
 func poll_news() -> void:
 	if model.s.phase!="plan" or offline_notice>0 or is_instance_valid(district) or is_instance_valid(fight): return

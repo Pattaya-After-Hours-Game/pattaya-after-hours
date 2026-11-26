@@ -1,5 +1,14 @@
 # Testing and release checks
 
+## Rat Plague
+
+The street checks cover guests fleeing with and without the patrol, calling
+Bo during the swarm, catching each target once, clearing on the last catch,
+the timed fallback, and save compatibility. The UI check sends a mouse click
+and a touch through the viewport with Events open and checks the rat counter.
+The `event-10-*` previews cover the warning, Dispatch, active swarm, paid help,
+partial progress and early clear.
+
 ## Celebration notices — 27 November 2026
 
 Celebration checks cover no day-five notice, **Tomorrow** on day six, **Today**

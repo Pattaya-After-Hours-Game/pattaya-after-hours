@@ -170,8 +170,9 @@ func preparation_offer() -> Dictionary:
 	if event.is_empty(): return {"required":0,"enabled":false,"reason":"Preparation closes when the event starts."}
 	var required := int(C.EVENTS[int(event.id)][3])
 	var reason := ""
-	if event.phase!="warning": reason = "Preparation closes when the event starts."
+	if event.phase!="warning" and event.id!=C.RAT_PLAGUE: reason = "Preparation closes when the event starts."
 	elif event.prepared: reason = "Already prepared."
+	elif event.id==C.RAT_PLAGUE and event.phase=="active" and rat_targets().size()==1: reason = "Only one rat left. Click or tap it to clear the infestation."
 	elif event.id==C.Local.BED and race_staff(s.street.bars[int(event.venue)])<0: reason = "Enter with an available bartender."
 	elif s.cash<required: reason = "The preparation needs more cash."
 	return {"required":required,"reason":reason,"enabled":reason.is_empty()}
@@ -243,8 +244,12 @@ func action(id: String, index: int = 0) -> String:
 			var offer := preparation_offer()
 			if not offer.enabled: return offer.reason
 			if not pay(offer.required): return "The preparation needs more cash."
+			if event.id==C.RAT_PLAGUE and event.phase=="active":
+				var targets := rat_targets()
+				targets.resize(maxi(1,targets.size()-C.RAT_PATROL_CATCHES))
+				event.rats = targets
 			event.prepared = true
-			result = C.EVENTS[int(event.id)][2] + " arranged."
+			result = "Bo's rat patrol is on the job." if event.id==C.RAT_PLAGUE else C.EVENTS[int(event.id)][2] + " arranged."
 		"festival":
 			if s.street.chapter < 4 or not festival_ready(): return "Needs a stage-3 beer bar, Hostess bar and gogo."
 			if not s.street.event.is_empty(): return "Finish the current street event first."
@@ -418,20 +423,33 @@ func announce(id: int) -> void:
 	if id>=C.Local.ENCORE: s.street.event.venue = s.street.selected
 	record("COMING UP · " + C.EVENTS[id][0] + ": " + C.EVENTS[id][1])
 
+func rat_targets() -> Array:
+	var event: Dictionary = s.street.event
+	if event.get("id",-1)!=C.RAT_PLAGUE or event.phase!="active": return []
+	if event.has("rats"): return event.rats
+	return range(C.RAT_COUNT-C.RAT_PATROL_CATCHES if event.prepared else C.RAT_COUNT)
+
+func catch_rat(index: int) -> bool:
+	if not s.phase in ["plan","guided"]: return false
+	var targets := rat_targets()
+	if not targets.has(index): return false
+	targets.erase(index)
+	s.street.event.rats = targets
+	if targets.is_empty(): finish_event()
+	return true
+
 func start_event() -> void:
 	var event: Dictionary = s.street.event
 	event.phase = "active"
 	event.remaining = C.RAT_PLAGUE_SECONDS if event.id==C.RAT_PLAGUE else 45 if event.id>=C.Local.ENCORE else 90
 	record("TONIGHT · " + C.EVENTS[int(event.id)][0])
 	if event.id==C.RAT_PLAGUE:
-		if event.prepared:
-			record("Bo ushers customers past the swarm. The guests inside hang on to their drinks.")
-		else:
-			var fled := 0
-			for bar in s.street.bars:
-				fled += bar.customers.size()
-				economy.clear_visits(bar)
-			record("RAT PLAGUE · %d guests bolt for the door. New walk-ins are scarce." % fled)
+		event.rats = rat_targets()
+		var fled := 0
+		for bar in s.street.bars:
+			fled += bar.customers.size()
+			economy.clear_visits(bar)
+		record("RAT PLAGUE · %d guests bolt for the door. New walk-ins are scarce." % fled)
 	if int(event.id)>=C.Local.ENCORE:
 		var target: Dictionary = s.street.bars[int(event.venue)]
 		match int(event.id):

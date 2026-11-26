@@ -26,9 +26,12 @@ func test_rat_plague(test: SceneTree) -> void:
 	test.check(bar.customers.is_empty() and eco.pending(bar)==0 and eco.is_trading(bar),"The swarm scares guests off without shutting down the bar")
 	test.check(before==[bar.stock,m.s.cash,bar.happy,bar.tip_visits],"Running guests do not earn rewards or consume stock")
 	test.check(is_equal_approx(eco.traffic_rate(),baseline*.15) and eco.traffic_rate(true)==baseline,"The rats deter live walk-ins while offline estimates ignore them")
+	test.check(m.street.rat_targets().size()==Content.RAT_COUNT and not m.street.catch_rat(-1),"Only visible rats can be caught")
+	test.check(m.street.catch_rat(2) and not m.street.catch_rat(2),"Each rat can be caught once")
 	m.save_game()
 	var loaded = Campaign.new(1)
 	test.check(loaded.load_game() and loaded.s.street.event.remaining==45 and loaded.street.selected().customers.is_empty(),"Reload preserves an active plague without restoring fleeing guests")
+	test.check(loaded.street.rat_targets().size()==Content.RAT_COUNT-1 and not loaded.street.rat_targets().has(2),"Caught rats stay gone after reload")
 	loaded.street.tick(45)
 	test.check(loaded.s.street.event.is_empty() and loaded.street.economy.traffic_rate()==baseline,"Traffic returns to normal when the swarm clears")
 
@@ -39,7 +42,24 @@ func test_rat_plague(test: SceneTree) -> void:
 	var opening_cash: int = m.s.cash
 	m.street.action("prepare")
 	m.street.start_event()
-	test.check(bar.customers.size()==3 and m.s.cash==opening_cash-prep_cost and is_equal_approx(m.street.economy.traffic_rate(),baseline*.55),"Bo's paid preparation keeps guests inside and saves some passing traffic")
+	test.check(bar.customers.is_empty() and m.s.cash==opening_cash-prep_cost and is_equal_approx(m.street.economy.traffic_rate(),baseline*.55),"Guests always flee, and the paid patrol protects some passing traffic")
+	test.check(m.street.rat_targets().size()==Content.RAT_COUNT-Content.RAT_PATROL_CATCHES,"Calling Bo before the swarm leaves fewer rats to catch")
+
+	m = Campaign.new(72)
+	m.street.announce(Content.RAT_PLAGUE)
+	m.street.start_event()
+	m.s.street.event.erase("rats")
+	m.save_game()
+	test.check(loaded.load_game() and loaded.street.rat_targets().size()==Content.RAT_COUNT,"An old active plague with no target list loads with a full swarm")
+	loaded.street.catch_rat(0)
+	loaded.street.action("prepare")
+	test.check(loaded.s.cash==opening_cash-prep_cost and not loaded.street.preparation_offer().enabled,"The patrol can be called once after the swarm starts")
+	var remaining: Array = loaded.street.rat_targets().duplicate()
+	test.check(remaining.size()==Content.RAT_COUNT-Content.RAT_PATROL_CATCHES-1 and not remaining.has(0),"Active help removes rats without undoing previous catches")
+	for target in remaining:
+		test.check(not loaded.s.street.event.is_empty() and loaded.street.catch_rat(target),"Each remaining target can be caught")
+	test.check(loaded.s.street.event.is_empty() and loaded.s.street.events_survived==1 and is_equal_approx(loaded.street.economy.traffic_rate(),baseline),"The final catch clears the event immediately and restores traffic")
+	test.check(not loaded.street.catch_rat(remaining.back()) and loaded.s.street.events_survived==1,"Repeat input cannot finish the event twice")
 
 func run(test: SceneTree) -> void:
 	test_rat_plague(test)
