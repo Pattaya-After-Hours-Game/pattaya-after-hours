@@ -231,7 +231,7 @@ func run_ui(test: SceneTree) -> void:
 	test.check(test.find_button(app,"Serve a drink").disabled,"Rebuilding the drawer does not reset cooldown")
 	app.model.street.advance(5.5)
 	app.update_action_controls()
-	test.check(not test.find_button(app,"Serve a drink").disabled and app.action_controls[0][2].text.contains("Ready"),"Button re-enables at its deadline without a new render")
+	test.check(not test.find_button(app,"Serve a drink").disabled and app.action_controls[0][2].text.contains("waiting"),"At its deadline Serve shows the queue and re-enables without a new render")
 	app.model.street.selected().customers[1].wait = 40
 	app.update_action_controls()
 	test.check(not test.find_button(app,"Have a chat").disabled,"Chat button follows real customer urgency")
@@ -271,6 +271,21 @@ func run_ui(test: SceneTree) -> void:
 	eco.staff_service(bar)
 	app.update_action_controls()
 	test.check(serve.disabled and serve_caption.text.contains("Waiting for orders"),"The last order served by staff immediately disables manual Serve")
+	bar.welcome_ready = eco.action_time()
+	while bar.customers.size()<eco.seats(bar)-1 and eco.admit(bar): pass
+	app.render()
+	var capacity: Label = app.root_ui.get_node("CustomerCapacity")
+	test.check(capacity.position.y<48 and capacity.text=="1 SEAT LEFT · 5/6","The header flags the last empty seat")
+	eco.admit(bar)
+	app.update_action_controls()
+	welcome = test.find_button(app,"Bar full")
+	test.check(welcome.disabled,"A full bar visibly disables Welcome")
+	app.render()
+	test.check(app.root_ui.get_node("CustomerCapacity").text=="FULL · 6/6","The header reports exact occupancy at capacity")
+	bar.customers.pop_back()
+	app.update_action_controls()
+	test.check(not test.find_button(app,"Welcome customers").disabled,"Welcome returns when a seat opens")
+
 	app.queue_free()
 	await test.process_frame
 	DirAccess.remove_absolute(Campaign.SAVE)

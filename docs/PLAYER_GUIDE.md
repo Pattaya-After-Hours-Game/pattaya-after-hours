@@ -319,6 +319,10 @@ their assigned table, with its paid/free timer on the table front.
 
 ## Read the bottleneck
 
+The top bar shows occupied and empty seats. One seat left turns amber. At
+capacity it reads **Full**, and **Welcome customers** switches to **Bar full**.
+The **Serve** button shows how many orders are waiting.
+
 | What you see | What to try |
 | --- | --- |
 | Few visitors and staff waiting | Welcome, improve frontage or try an appropriate promotion |

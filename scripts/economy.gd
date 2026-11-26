@@ -1093,7 +1093,7 @@ func action_status(bar: Dictionary, id: String) -> Dictionary:
 	elif remaining>0.000001: reason = "%s ready in %.1fs." % ["Serve" if id=="serve" else "Welcome / Chat",remaining]
 	elif id=="welcome" and promoter_bonus(bar)>0: reason = "Nida is welcoming customers."
 	elif id=="chat" and chat_target(bar).is_empty(): reason = "Chat helps an unchatted guest with 10s or less left to wait."
-	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"needs_stock":needs_stock,"short_drink":short_drink,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
+	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"waiting":waiting,"needs_stock":needs_stock,"short_drink":short_drink,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
 
 func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var item: Dictionary = C.ACTION_UPGRADES[index]

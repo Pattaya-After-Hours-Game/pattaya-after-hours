@@ -410,22 +410,23 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui.add_child(city)
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
-	var venue_name := abs_text(root_ui,Rect2(14,4,170 if windows_updates != null else 245,24),model.street.selected().name,19,GOLD)
+	var venue_name := abs_text(root_ui,Rect2(14,4,154 if windows_updates != null else 216,24),model.street.selected().name,19,GOLD)
 	venue_name.name = "VenueName"
 	venue_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var subtitle: String = "PRACTICE SHIFT" if practicing else model.weekday()
 	if campaign_before_tuning != null: subtitle = "PLAYTEST · %d×" % tuning_speed
 	abs_text(root_ui,Rect2(14,27,170,16),subtitle,12,TEAL)
 	if windows_updates != null:
-		update_button = at_button(root_ui,Rect2(190,5,66,37),"Update",windows_updates.ask,true)
+		update_button = at_button(root_ui,Rect2(172,5,60,37),"Update",windows_updates.ask,true)
 		update_button.add_theme_font_size_override("font_size",12)
 		update_button.visible = not windows_updates.tag.is_empty()
 		update_button.disabled = model.s.phase == "godzilla"
-	metric(268,104,"TILL",cash(model.s.cash),TEAL)
-	metric(377,80,"STOCK",str(model.street.selected().stock),GOLD)
-	metric(462,104,"REPUTATION",str(int(model.s.rep)),TEAL)
-	metric(570,70,"HEAT",str(int(model.s.heat)),PINK)
-	metric(644,99,"TIME",model.street.clock_text(),WHITE)
+	metric(244,77,"TILL",cash(model.s.cash),TEAL)
+	metric(323,55,"STOCK",str(model.street.selected().stock),GOLD)
+	metric(382,90,"REPUTATION",str(int(model.s.rep)),TEAL)
+	metric(474,42,"HEAT",str(int(model.s.heat)),PINK)
+	capacity_hud()
+	metric(674,71,"TIME",model.street.clock_text(),WHITE)
 	var tutorial_button := at_button(root_ui,Rect2(748,5,92,37),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
 	tutorial_button.disabled = model.s.phase == "godzilla" or campaign_before_tuning != null
 	at_button(root_ui,Rect2(848,5,98,37),"Muted" if muted else "Sound",set_sound)
@@ -609,7 +610,9 @@ func render(keep_scroll: bool = false) -> void:
 			var warning := ""
 			if model.s.street.minute>=30 and model.s.street.minute<60: warning = "1am closing soon · "
 			elif model.s.street.minute>=60 and model.s.street.minute<180 and model.street.economy.is_trading(bar): warning = "LATE TRADE · Heat %d · " % model.s.heat
-			return "%d/%d customers · %d orders waiting\n%s%s" % [bar.customers.size(),model.street.economy.seats(bar),model.street.economy.pending(bar),warning,model.street.economy.forecast(bar).reason]])
+			if model.street.economy.is_trading(bar) and bar.shift.lost_full>=3 and bar.customers.size()>=model.street.economy.seats(bar):
+				return warning+"Anong: We’re turning people away. Try more seating."
+			return warning+model.street.economy.forecast(bar).reason])
 		demand_note.text = live_labels.back()[1].call()
 	if offline_notice > 0 and not practicing and model.s.phase == "plan":
 		var shade := ColorRect.new()
@@ -665,6 +668,40 @@ func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> vo
 				"SHIFT": return "D%03d" % model.s.day
 				"TIME": return model.street.clock_text()
 			return str(model.s.heat)])
+
+func capacity_hud() -> void:
+	var label := abs_text(root_ui,Rect2(519,3,154,17),"",12,Color.WHITE)
+	label.name = "CustomerCapacity"
+	var stools := Control.new()
+	stools.position = Vector2(519,24)
+	stools.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root_ui.add_child(stools)
+	var refresh := func() -> String:
+		var bar: Dictionary = model.street.selected()
+		var seats: int = model.street.economy.seats(bar)
+		var occupied: int = bar.customers.size()
+		var open_seats := seats-occupied
+		label.modulate = PINK if open_seats<=0 else GOLD if open_seats==1 else TEAL
+		stools.queue_redraw()
+		var status := "FULL" if open_seats<=0 else "1 SEAT LEFT" if open_seats==1 else "CUSTOMERS"
+		return "%s · %d/%d" % [status,occupied,seats]
+	label.text = refresh.call()
+	live_labels.append([label,refresh])
+	stools.draw.connect(func() -> void:
+		var bar: Dictionary = model.street.selected()
+		var seats: int = model.street.economy.seats(bar)
+		var occupied: int = bar.customers.size()
+		var pitch := 9
+		var per_row := 17
+		for seat in seats:
+			var origin := Vector2(seat%per_row*pitch,seat/per_row*11)
+			var tint := Color("#695368")
+			if seat<occupied: tint = PINK if occupied>=seats else TEAL
+			elif seats-occupied==1: tint = GOLD
+			stools.draw_rect(Rect2(origin,Vector2(7,2)),tint)
+			stools.draw_rect(Rect2(origin+Vector2(1,2),Vector2(1,6)),tint)
+			stools.draw_rect(Rect2(origin+Vector2(5,2),Vector2(1,6)),tint)
+			stools.draw_rect(Rect2(origin+Vector2(2,5),Vector2(3,1)),tint))
 
 # Presentation only: deadlines, training and tips remain owned by the economy.
 func bartender_hud() -> void:
@@ -1233,12 +1270,14 @@ func update_action_controls() -> void:
 		var stock_shortcut: bool = state.needs_stock and campaign_before_tutorial==null
 		var needed := "Need "+str(StreetContent.DRINKS[state.short_drink].name) if stock_shortcut else ""
 		var caption: String = entry[3]
-		if stock_shortcut: caption = "Restock fridge" if bar.stock==0 else needed
+		var bar_full: bool = entry[4]=="welcome" and eco.is_trading(bar) and bar.customers.size()>=eco.seats(bar) and campaign_before_tutorial==null
+		if bar_full: caption = "Bar full"
+		elif stock_shortcut: caption = "Restock fridge" if bar.stock==0 else needed
 		elif entry[4]=="serve" and eco.automatic_service(bar): caption = "Auto-serve"
-		entry[0].disabled = not (state.enabled or stock_shortcut) or not practice_action
-		entry[0].tooltip_text = state.reason+" Open the stock menu." if stock_shortcut else "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
+		entry[0].disabled = bar_full or not (state.enabled or stock_shortcut) or not practice_action
+		entry[0].tooltip_text = "All seats are taken." if bar_full else state.reason+" Open the stock menu." if stock_shortcut else "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
 		# Keep native button text for keyboard/accessibility; a child draws the caption over the fill.
-		entry[0].text = caption if stock_shortcut else entry[3]
+		entry[0].text = caption if bar_full or stock_shortcut else entry[3]
 		for color_name in ["font_color","font_disabled_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
 			entry[0].add_theme_color_override(color_name,Color.TRANSPARENT)
 		entry[1].size.x = 0 if state.no_orders or stock_shortcut else (entry[0].size.x-4)*state.fill
@@ -1246,8 +1285,12 @@ func update_action_controls() -> void:
 		entry[1].color.a = 0.24 if refilling or not entry[0].disabled else 0.07
 		var detail := "Ready" if state.enabled else "Unavailable"
 		if not eco.is_trading(bar): detail = "Venue closed"
+		elif bar_full: detail = "All seats taken"
 		elif state.no_orders: detail = "Waiting for orders"
-		elif stock_shortcut: detail = needed if bar.stock==0 else "Open stock menu"
+		elif stock_shortcut: detail = "%d waiting · Open fridge" % state.waiting
+		elif entry[4]=="serve" and state.waiting>0:
+			detail = "%d order%s waiting" % [state.waiting,"" if state.waiting==1 else "s"]
+			if refilling: detail = "%d waiting · %ds" % [state.waiting,ceili(state.remaining)]
 		elif refilling: detail = "Refilling · %ds" % ceili(state.remaining)
 		elif not state.enabled and entry[4]=="serve": detail = "Restock fridge"
 		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
@@ -1448,7 +1491,8 @@ func next_goal_panel() -> void:
 		match str(goal.focus):
 			"serve":
 				if eco.action_status(venue,"serve").needs_stock: return "Open Fridge  ›"
-				return "Go to Serve  ›" if eco.pending(venue)>0 else "Go to Welcome  ›"
+				if eco.pending(venue)>0: return "Go to Serve  ›"
+				return "Back to the bar  ›" if venue.customers.size()>=eco.seats(venue) else "Go to Welcome  ›"
 			"TEAM & PAYROLL": return "Open Team  ›"
 			"Upgrade ·": return "View renovation  ›"
 			"SUPPLIER AGREEMENT": return "View supplier  ›"

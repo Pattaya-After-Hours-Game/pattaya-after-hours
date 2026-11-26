@@ -284,6 +284,19 @@ func run() -> void:
 		await capture(app,"prices-"+str(kind),"House lager")
 	app.model = Campaign.new(72)
 	await capture(app,"economy-opening")
+	app.drawer_open = false
+	var capacity_bar: Dictionary = app.model.street.selected()
+	var capacity_economy = app.model.street.economy
+	while capacity_bar.customers.size()<5 and capacity_economy.admit(capacity_bar): pass
+	await capture(app,"capacity-one-seat")
+	capacity_economy.admit(capacity_bar)
+	for i in 3: capacity_economy.admit(capacity_bar)
+	await capture(app,"capacity-full")
+	capacity_bar.stage = 3
+	capacity_bar.equipment.seating = 7
+	await capture(app,"capacity-upgraded")
+	app.model = Campaign.new(72)
+
 	app.model.street.selected().stock = 0
 	app.open_fridge()
 	await capture(app,"fridge-stockout")
