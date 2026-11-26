@@ -143,6 +143,11 @@ or `customer-beard-glasses-*` for a small group led by the reference guest.
 
 The consolidated catalog has 72 runtime textures, 22 sprite atlases and 149 frames,
 including the fan ownership overlays and nine additional male customers.
+
+The capybara regular uses one wide sprite anchored under the customer's shoes.
+It appears in the opening crowd and on later visits through the same customer
+appearance lookup. The leash and pet are part of the sprite. The
+[generation recipe](recipes/customer-capybara.json) records the prompt.
 See [the cast lineup](../docs/customer-cast.png) and
 [testing notes](../docs/TESTING.md) for review coverage.
 

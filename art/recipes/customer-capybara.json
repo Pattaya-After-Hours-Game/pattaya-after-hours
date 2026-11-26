@@ -1,0 +1,14 @@
+[
+  {
+    "id": "customer-capybara",
+    "group": "patrons-capybara",
+    "tool": "Built-in image generation",
+    "references": [
+      "User-supplied portrait (likeness)",
+      "art/sources/customer-sunfaded-regular.png (rendering style)"
+    ],
+    "prompt": "Use case: identity-preserve / style-transfer. Create ONE production game sprite for Pattaya After Hours. Image 1 is the identity reference: preserve this adult man's broad recognizable face, tousled salt-and-pepper hair swept upward and sideways, prominent full silver and white beard and moustache, straight heavy brows, light olive skin and relaxed expression. Image 2 is rendering STYLE ONLY, match the existing adult sprite's crisp 2D illustrated pixel art, outlined plum shadows, clustered shading, warm amber highlights and muted cyan rim lighting. Full body, planted relaxed three-quarter stance facing right, wearing a simple black short-sleeve T-shirt with a small abstract pale chest mark, dark blue knee-length shorts and casual black trainers. At the man's side stands his friendly tawny-brown adult capybara, recognizably barrel-bodied with a blunt rectangular muzzle, tiny round ears and short legs, in a small muted teal harness. Thin clearly visible oxblood leash from the man's lowered hand to the harness, with a natural curve and no ambiguous attachment. Capybara on the right side of the image, directly beside him with paws on the same floor baseline as his shoes. At 180 pixels human height the capybara is knee-high, all four silhouettes and leash read distinctly. Both figures entirely visible, balanced in a slightly wide composition with padding. Use a truly transparent background, all pixels outside the two figures and leash transparent, no floor, no scenery, no shadow, no border, no branding, no letters. Crisp game sprite with no soft painterly edges, one composed sprite, not a character sheet.",
+    "source": "art/sources/customer-capybara.png",
+    "runtime": "assets/art/patrons-capybara.png"
+  }
+]

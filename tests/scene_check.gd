@@ -109,7 +109,7 @@ func run(test: SceneTree) -> void:
 			bar.raided = false
 			bar.late_open = false
 			model.s.street.minute = 720
-	test.check(appearances.size()==Art.CUSTOMER_VARIANTS.size(),"Live crowds can display every customer appearance")
+	test.check(appearances.size()==Art.CUSTOMER_VARIANTS.size()+1 and appearances.has("patrons-capybara/0"),"Live crowds can display every customer appearance, including the capybara regular")
 	# Stable table identities must survive completion of an earlier game.
 	bar.type = 0
 	bar.stage = 2

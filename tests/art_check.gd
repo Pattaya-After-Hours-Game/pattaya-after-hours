@@ -9,6 +9,7 @@ func run(test: SceneTree) -> void:
 		test.check(Art.atlas_specs().has(variant[0]) and variant[1]>=0 and variant[1]<Art.atlas_specs()[variant[0]][1],"Customer appearance resolves to a valid atlas cell")
 		if variant[0]=="patrons-men": male_variants[variant[1]] = true
 	test.check(male_variants.size()==9,"All nine male customer sprites, including the supplied-reference guest, are reachable")
+	test.check(Art.customer_sprite(2)==["patrons-capybara",0] and Art.customer_sprite(26)==Art.customer_sprite(2),"The capybara regular appears at the opening and on later visits")
 	for kind in 3:
 		for stage in range(1,4):
 			var tex := Art.venue(kind,stage)

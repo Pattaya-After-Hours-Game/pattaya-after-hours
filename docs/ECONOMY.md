@@ -426,8 +426,8 @@ backup; it starts with the ordinary opening cash, stock and customers.
 Managed-shift guidance has three decisions at the ordinary shift boundaries
 (start, 40s and 80s). Decision screens pause the model. Continuing resumes the
 same visitors, games, inventory and ledger. Repeated choices cannot skip time,
-create customers or settle another report. The original tutorial is a separate
-practice campaign. Old saves interrupted inside a legacy shift finish that shift
+create customers or settle another report. The tutorial practises the live service
+loop and closing in a separate campaign. Old saves interrupted inside a legacy shift finish that shift
 once, then enter the live economy.
 
 Version-seven saves add music, owner automation, manager/supplier levels, stock

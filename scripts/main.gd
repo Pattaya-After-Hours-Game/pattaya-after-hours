@@ -30,7 +30,14 @@ const COMPACT_EFFECTS = {
 	"tour":"tours","route":"tour route","demand":"demand","capacity":"capacity","partner":"Anong trust",
 }
 const TAB_NAMES = ["Service","Events","Tours","Empire","Journal"]
-const PRACTICE_STOCK = 24
+const STAT_TIPS = {
+	"TILL":"Shared cash for stock, wages, upgrades and leases. The small rate shows net trading per second over the last five seconds.",
+	"STOCK":"Drinks in this venue's fridge. Each sale uses one. Buy packs in Service.",
+	"REPUTATION":"Happy customers build your reputation. It attracts visitors and unlocks new venue types.",
+	"HEAT":"Trading after 1am raises Heat and increases the chance of a raid and fine. Closing on time lets it cool.",
+	"TIME":"The day changes at midnight. Bars open at noon and normally close at 1am.",
+}
+const TUTORIAL_ACTIONS = ["stock","serve","welcome","chat","hire"]
 const SHOT_GOAL = 10
 const SHOT_INTERVAL = 0.60
 const GODZILLA_SECONDS = 10.0
@@ -40,6 +47,9 @@ var boot_menu := true
 var resume_available := false
 var new_game_confirmation := false
 var campaign_before_tutorial: Campaign
+var tutorial_step := 0
+var stat_tip: Control
+var stat_tip_key := ""
 var show_tutorial_hint := false
 var offline_notice := 0
 var drawer_open := false
@@ -302,6 +312,8 @@ func change_tab(index: int) -> void:
 
 func render(keep_scroll: bool = false) -> void:
 	live_labels.clear()
+	stat_tip = null
+	stat_tip_key = ""
 	action_controls.clear()
 	upgrade_controls.clear()
 	stock_controls.clear()
@@ -330,12 +342,11 @@ func render(keep_scroll: bool = false) -> void:
 	city.weather = int(model.s.weather)
 	city.level = int(model.s.level)
 	city.legacy_staff = model.s.staff
-	if not practicing:
-		city.bars = model.s.street.bars
-		city.street_state = model.s.street
-		city.selected_bar = int(model.s.street.selected)
-		city.street_event = model.s.street.event
-		city.celebrating = model.street.economy.celebrating(model.street.selected())
+	city.bars = model.s.street.bars
+	city.street_state = model.s.street
+	city.selected_bar = int(model.s.street.selected)
+	city.street_event = model.s.street.event
+	city.celebrating = model.street.economy.celebrating(model.street.selected())
 	root_ui.add_child(city)
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
@@ -347,11 +358,11 @@ func render(keep_scroll: bool = false) -> void:
 		update_button.add_theme_font_size_override("font_size",12)
 		update_button.visible = not windows_updates.tag.is_empty()
 		update_button.disabled = model.s.phase == "godzilla"
-	metric(268,"TILL",cash(model.s.cash),TEAL)
-	metric(377,"STOCK",str(int(model.s.stock) if practicing else int(model.street.selected().stock)),GOLD)
-	metric(462,"REPUTATION",str(int(model.s.rep)),TEAL)
-	metric(570,"HEAT",str(int(model.s.heat)),PINK)
-	metric(644,"SHIFT" if practicing else "TIME","D%03d" % int(model.s.day) if practicing else model.street.clock_text(),WHITE)
+	metric(268,104,"TILL",cash(model.s.cash),TEAL)
+	metric(377,80,"STOCK",str(model.street.selected().stock),GOLD)
+	metric(462,104,"REPUTATION",str(int(model.s.rep)),TEAL)
+	metric(570,70,"HEAT",str(int(model.s.heat)),PINK)
+	metric(644,99,"TIME",model.street.clock_text(),WHITE)
 	var tutorial_button := at_button(root_ui,Rect2(748,5,92,37),"Exit" if practicing else "Tutorial",finish_tutorial if practicing else start_tutorial)
 	tutorial_button.disabled = model.s.phase == "godzilla"
 	at_button(root_ui,Rect2(848,5,98,37),"Muted" if muted else "Sound",set_sound)
@@ -440,25 +451,18 @@ func render(keep_scroll: bool = false) -> void:
 	drawer.visible = drawer_open or practicing or model.s.phase != "plan"
 	var action_label := ""
 	var action: Callable
-	match model.s.phase:
+	match "tutorial" if practicing else model.s.phase:
+		"tutorial":
+			tutorial_panel()
 		"plan":
-			if practicing:
-				title("1 / 3    Stock the bar")
-				if model.s.stock == PRACTICE_STOCK:
-					body("Check STOCK at the top. Every two guests use one unit. Buy a delivery before opening.")
-					row_button(stock_label(),do_action.bind("buy"),true)
-				else:
-					body("Delivery in. Open the doors to serve two waves of guests.",TEAL)
-				body("Dao, Mali, and Fern are on tonight. In the campaign, give tired staff a night off.")
-			else:
-				match tab:
-					0: service_panel()
-					1: events_panel()
-					2: tours_panel()
-					3: empire_panel()
-					4: journal_panel()
-			action_label = "Open the doors" if practicing else "Serve a drink"
-			action = begin if practicing else street_action.bind("serve")
+			match tab:
+				0: service_panel()
+				1: events_panel()
+				2: tours_panel()
+				3: empire_panel()
+				4: journal_panel()
+			action_label = "Serve a drink"
+			action = street_action.bind("serve")
 		"guided":
 			title("Guided shift · live service")
 			live_body(func() -> String: return "Wave %d/3 · %ds into this shift" % [int(model.s.street.guided.wave)+1,model.s.street.seconds],GOLD)
@@ -482,25 +486,15 @@ func render(keep_scroll: bool = false) -> void:
 			action_label = "Back to the street"
 			action = advance
 		"incident":
-			if practicing:
-				title("2 / 3    Run the shift")
-				body("Choose a response to serve the next wave. Spending can help service or relationships.")
 			incident_panel()
 			action_label = "Scale back service"
 			action = func():
 				model.fallback()
 				commit()
 		"report":
-			if practicing:
-				title("3 / 3    Check the books")
-				body("Compare sales with payroll and fees. Check guests turned away and stock used before planning tomorrow.")
 			report_panel()
-			if practicing:
-				action_label = "Finish tutorial"
-				action = finish_tutorial
-			else:
-				action_label = "Finish the story" if not model.s.end.is_empty() else "Next day"
-				action = advance
+			action_label = "Finish the story" if not model.s.end.is_empty() else "Next day"
+			action = advance
 		"end":
 			ending_panel()
 			action_label = "Start a new run" if not confirmation else "Confirm new run"
@@ -515,14 +509,14 @@ func render(keep_scroll: bool = false) -> void:
 			action_label = "Resume the fight"
 			action = enter_fight.bind(false)
 	var live_service: bool = not practicing and model.s.phase in ["plan","guided"]
-	if not live_service:
-		var primary := at_button(root_ui,Rect2(594,490,352,40),action_label,action,true)
-		primary.disabled = practicing and model.s.phase == "plan" and model.s.stock == PRACTICE_STOCK
-	if live_service:
+	if not live_service and not practicing:
+		at_button(root_ui,Rect2(594,490,352,40),action_label,action,true)
+	if live_service or practicing:
 		cooldown_button(Rect2(414,490,170,40),"Serve a drink","serve")
 		cooldown_button(Rect2(594,490,172,40),"Welcome customers","welcome")
 		cooldown_button(Rect2(776,490,170,40),"Have a chat","chat")
 		update_action_controls()
+	if live_service:
 		var demand_note := abs_text(root_ui,Rect2(14,100,540,42),"",14,GOLD)
 		live_labels.append([demand_note,func() -> String:
 			var bar: Dictionary = model.street.selected()
@@ -554,16 +548,20 @@ func close_drawer() -> void:
 	drawer_open = false
 	render()
 
-func metric(x: int,name_text: String,value: String,tint: Color) -> void:
-	var heading := abs_text(root_ui,Rect2(x,3,105,15),"DAY %d" % model.s.day if name_text=="TIME" else name_text,12 if name_text=="TIME" else 11,GOLD if name_text=="TIME" else MUTED)
+func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> void:
+	var target := at_button(root_ui,Rect2(x-4,2,width,44),name_text,toggle_stat_tip.bind(name_text,x))
+	target.tooltip_text = STAT_TIPS[name_text]
+	var empty := StyleBoxEmpty.new()
+	for state in ["normal","hover","pressed"]: target.add_theme_stylebox_override(state,empty)
+	for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
+		target.add_theme_color_override(state,Color.TRANSPARENT)
+	var heading := abs_text(root_ui,Rect2(x,3,width,15),"DAY %d" % model.s.day if name_text=="TIME" else name_text,12 if name_text=="TIME" else 11,GOLD if name_text=="TIME" else MUTED)
 	if name_text=="TIME":
 		heading.clip_text = true
-		heading.tooltip_text = "In-game day of this campaign. Starts at Day 1 and advances at midnight."
 		live_labels.append([heading,func() -> String: return "DAY %d" % model.s.day])
 	var label := abs_text(root_ui,Rect2(x,13 if name_text=="TILL" and campaign_before_tutorial==null else 20,105,24),value,16 if name_text=="TILL" else 18,tint)
 	if name_text=="TILL" and campaign_before_tutorial==null:
 		var rate := abs_text(root_ui,Rect2(x,33,105,14),"",10,TEAL)
-		rate.tooltip_text = "Net street trading over the last five foreground seconds: income less stock, wages, commission and fines. Excludes upgrade purchases, nightly tips and offline claims."
 		live_labels.append([rate,func() -> String: return "%s฿%.2f/s" % ["+" if model.s.street.net_per_second>=0 else "−",absf(model.s.street.net_per_second)]])
 		rate.text = live_labels.back()[1].call()
 	if campaign_before_tutorial == null:
@@ -575,6 +573,30 @@ func metric(x: int,name_text: String,value: String,tint: Color) -> void:
 				"SHIFT": return "D%03d" % model.s.day
 				"TIME": return model.street.clock_text()
 			return str(model.s.heat)])
+
+func toggle_stat_tip(key: String,x: int) -> void:
+	var was_open := stat_tip_key == key
+	close_stat_tip()
+	if was_open: return
+	stat_tip_key = key
+	stat_tip = pane(root_ui,Rect2(clampi(x-4,14,626),50,320,88),DARK,GOLD)
+	stat_tip.z_index = 2
+	stat_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	abs_text(stat_tip,Rect2(12,5,296,19),"DAY & TIME" if key=="TIME" else key,12,GOLD)
+	var text_label := abs_text(stat_tip,Rect2(12,25,296,56),STAT_TIPS[key],13)
+	text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+func close_stat_tip() -> void:
+	if is_instance_valid(stat_tip):
+		stat_tip.hide()
+		stat_tip.queue_free()
+	stat_tip = null
+	stat_tip_key = ""
+
+func _input(event: InputEvent) -> void:
+	if not is_instance_valid(stat_tip): return
+	if (event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT or event is InputEventScreenTouch) and event.pressed:
+		if not Rect2(264,0,479,48).has_point(event.position): close_stat_tip()
 
 func cash(amount: Variant) -> String:
 	return "%s฿%s" % ["−" if int(amount) < 0 else "",_group_digits(absi(int(amount)))]
@@ -660,12 +682,14 @@ func advance() -> void:
 func start_tutorial() -> void:
 	if campaign_before_tutorial != null: return
 	campaign_before_tutorial = model
+	tutorial_step = 0
 	show_tutorial_hint = false
 	confirmation = false
 	message = ""
-	model = Campaign.new(72,true)
-	model.s.stock = PRACTICE_STOCK
-	model.s.hours = 0
+	model = Campaign.new(72)
+	model.street.checkpoint_requested.disconnect(model.save_checkpoint)
+	model.s.cash = 2000
+	model.s.street.minute = StreetContent.DAY_MINUTES+StreetContent.CLOSE_MINUTE-75
 	render()
 
 func finish_tutorial() -> void:
@@ -675,9 +699,37 @@ func finish_tutorial() -> void:
 	message = ""
 	render()
 
-func stock_label() -> String:
-	var amount := mini(30,105+int(model.s.level)*20-int(model.s.stock))
-	return "Stock +%d · %s" % [amount,cash(amount*model.stock_price())]
+func tutorial_panel() -> void:
+	var bar: Dictionary = model.street.selected()
+	var headings := ["Stock the fridge","Serve an order","Welcome passersby","Help a waiting guest","Hire a bartender","Close at 1am","Check the books"]
+	title("%d / %d  ·  %s" % [tutorial_step+1,headings.size(),headings[tutorial_step]])
+	match tutorial_step:
+		0:
+			body("Buy a pack. Every drink sold uses one unit of stock. The Till and Stock counters show what changed.")
+			stock_controls.append(row_button("Buy drinks",street_action.bind("stock"),true))
+		1:
+			body("A gold dot marks an order. Tap Serve a drink to fill it and start the refill timer.")
+		2:
+			body("Serve is refilling. Try Welcome customers to draw more of the passing crowd while you wait.")
+		3:
+			body("A red dot means an order is about to be lost. Chat gives that guest 10 more seconds and shares Welcome’s timer.")
+		4:
+			body("Bartenders serve on their own when ready. Contracts last 10 game days, and training stays with the worker.")
+			row_button("Hire bartender · "+cash(StreetContent.BARTENDER_CONTRACT_COST),street_action.bind("hire"),true)
+		5:
+			body("Staff served %d drinks in practice. Close on time to let Heat cool. Staying open after 1am risks a raid and fine." % (int(model.s.street.served)-1))
+			row_button("Advance to 1am",tutorial_close,true)
+		6:
+			body("%d drinks sold · %s in tips" % [bar.last_shift.get("sales",0),cash(bar.last_tips.get("amount",0))],TEAL,16)
+			body("At closing, tips are counted and cleaning starts. In the live game, wait for noon or tap Stay here to prepare manually.")
+			body("In Service, follow Anong’s next step to upgrade, automate, and eventually buy another bar. Look in Events for parties and warnings.",MUTED,13)
+			row_button("Finish tutorial",finish_tutorial,true)
+
+func tutorial_close() -> void:
+	model.street.tick(StreetContent.CLOSE_MINUTE-int(model.s.street.minute))
+	tutorial_step += 1
+	message = "Tips counted. Cleaning has started."
+	render()
 
 func service_panel() -> void:
 	street_panel()
@@ -768,6 +820,17 @@ func select_bar(index: int) -> void:
 	commit()
 
 func street_action(id: String,index: int = 0) -> void:
+	if campaign_before_tutorial != null:
+		if tutorial_step>=TUTORIAL_ACTIONS.size() or id!=TUTORIAL_ACTIONS[tutorial_step]: return
+		var bar: Dictionary = model.street.selected()
+		var before := [bar.stock,bar.team.size(),bar.welcome_ready,model.s.street.served]
+		message = model.street.action(id,index)
+		if before!=[bar.stock,bar.team.size(),bar.welcome_ready,model.s.street.served]:
+			tutorial_step += 1
+			if id=="welcome": model.street.tick(35) # Let the opening orders become urgent.
+			if id=="hire": model.street.tick(StreetContent.STAFF_SERVICE_SECONDS[0])
+		render()
+		return
 	var sold_before := int(model.s.street.served)
 	message = model.street.action(id,index)
 	if id=="serve" and model.s.street.served>sold_before: service_animation = 0.7
@@ -797,7 +860,8 @@ func update_action_controls() -> void:
 	for entry in action_controls:
 		if not is_instance_valid(entry[0]): continue
 		var state: Dictionary = eco.action_status(bar,entry[4])
-		entry[0].disabled = not state.enabled
+		var practice_action: bool = campaign_before_tutorial == null or (tutorial_step<TUTORIAL_ACTIONS.size() and entry[4]==TUTORIAL_ACTIONS[tutorial_step])
+		entry[0].disabled = not state.enabled or not practice_action
 		entry[0].tooltip_text = "Ready" if state.enabled else state.reason
 		# Keep native button text for keyboard/accessibility; a child draws the caption over the fill.
 		entry[0].text = entry[3]
@@ -811,6 +875,7 @@ func update_action_controls() -> void:
 		elif not state.enabled and entry[4]=="serve": detail = "No orders" if eco.pending(bar)==0 else "Restock fridge"
 		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
 		elif not state.enabled and entry[4]=="welcome" and eco.promoter_bonus(bar)>0: detail = "Nida is welcoming"
+		elif not practice_action: detail = "Practice step"
 		entry[2].text = ("Auto-serve" if entry[4]=="serve" and eco.automatic_service(bar) else entry[3])+"\n"+detail
 		entry[2].modulate = DARK if state.enabled and entry[4]=="serve" else WHITE if state.enabled or state.remaining>0 else MUTED
 	for button in stock_controls:
