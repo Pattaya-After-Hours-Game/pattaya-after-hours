@@ -978,11 +978,14 @@ func drink_panel(bar: Dictionary, in_fridge: bool = false) -> void:
 		live_body(func() -> String:
 			var recent := int(bar.shift.drink_requests.get(item.id,0))+int(bar.last_shift.get("drink_requests",{}).get(item.id,0))
 			var missed := int(bar.shift.drink_misses.get(item.id,0))+int(bar.last_shift.get("drink_misses",{}).get(item.id,0))
-			var popularity := roundi(100.0*eco.drink_popularity(bar)[drink])
+			var share: float = eco.drink_popularity(bar)[drink]
+			var hint: String = eco.drink_demand_hint(bar,drink,share)
 			var waiting: int = eco.stock_waiting(bar,drink) if in_fridge else 0
-			var line := "%s · %s · %d stocked\n%d%% popular · +฿%d/sale" % [item.name,item.tier,eco.stock_of(bar,drink),popularity,eco.price(bar,drink)-eco.drink_cost(bar,drink)]
-			if waiting>0: return line+" · %d waiting" % waiting
-			return line+"\n%d asked · %d short" % [recent,missed],TEAL,13)
+			var line := "%s · %s · %d stocked\n%d%% popular · +฿%d/sale" % [item.name,item.tier,eco.stock_of(bar,drink),roundi(100.0*share),eco.price(bar,drink)-eco.drink_cost(bar,drink)]
+			if waiting>0:
+				return line+" · %d waiting" % waiting+("\n"+hint if not hint.is_empty() else "")
+			var history := "%d asked · %d short" % [recent,missed]
+			return line+"\n"+(hint+" · " if not hint.is_empty() else "")+history,TEAL,13)
 		row_pair("Buy %d · ฿%d ea" % [eco.pack_quantity(bar),eco.drink_cost(bar,drink)],street_action.bind("buy_drink",drink),"Return up to 3",street_action.bind("return_drink",drink))
 
 func live_body(value: Callable,tint: Color = MUTED,px: int = 15) -> void:

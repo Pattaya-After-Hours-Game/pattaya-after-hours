@@ -126,6 +126,7 @@ capacity cannot sell drinks to customers who are not there.
 
 Tap **Stock** or **Restock fridge** to open the drink list. Look for how many
 orders are waiting, the expected popularity and the gross margin per sale.
+A short note flags when the crowd or Happy Hour makes a drink more popular.
 
 Locals lean toward house lager and budget lime soda. Visitors order more Rum &
 cola. Big spenders are likelier to order Mango cocktails once you unlock the

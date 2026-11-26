@@ -66,6 +66,12 @@ func run() -> void:
 	app.model.street.selected().stock = 0
 	app.open_fridge()
 	await capture(app,"fridge-stockout")
+	app.model.street.announce(1)
+	app.model.street.start_event()
+	await capture(app,"fridge-visitors","Rum & cola")
+	app.model = Campaign.new(72)
+	app.model.street.action("promotion",1)
+	await capture(app,"fridge-happy-hour","Rum & cola")
 	app.change_tab(0)
 	app.model = Campaign.new(72)
 	var start_cash: int = app.model.s.cash

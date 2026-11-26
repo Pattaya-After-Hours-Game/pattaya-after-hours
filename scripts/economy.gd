@@ -497,20 +497,32 @@ func affordable_drink(bar: Dictionary, audience: int, wanted: int, budget: int, 
 	return -1
 
 func drink_popularity(bar: Dictionary, offline: bool = false) -> Array[float]:
+	return drink_mix(bar,audience_weights(offline),offline)
+
+func drink_mix(bar: Dictionary, crowd: Array, full_price: bool) -> Array[float]:
 	var demand: Array[float] = []
 	demand.resize(drink_count(bar))
 	demand.fill(0.0)
-	var crowd := audience_weights(offline)
 	var total := 0.0
 	for audience in 3:
 		var affinity: float = C.AUDIENCE_AFFINITY[int(bar.type)][audience]
 		for wanted in demand.size():
 			var weight := int(crowd[audience])*affinity*taste(bar,audience,wanted)
-			var drink := affordable_drink(bar,audience,wanted,1_000_000,offline)
+			var drink := affordable_drink(bar,audience,wanted,1_000_000,full_price)
 			demand[drink] += weight
 			total += weight
 	for drink in demand.size(): demand[drink] /= total
 	return demand
+
+func drink_demand_hint(bar: Dictionary, drink: int, popularity: float) -> String:
+	var crowd := audience_weights()
+	var usual_crowd := audience_weights(true)
+	var happy_hour: bool = bar.promo.get("kind",-1)==1
+	var discount_lift := popularity-drink_mix(bar,crowd,true)[drink] if happy_hour else 0.0
+	var crowd_lift := popularity-drink_mix(bar,usual_crowd,false)[drink] if crowd!=usual_crowd else 0.0
+	if discount_lift>=0.01 and discount_lift>=crowd_lift: return "Happy Hour boost"
+	if crowd_lift>=0.01: return "Visitor crowd boost" if event_id()==1 else "Local crowd boost"
+	return ["","Popular with locals","Visitor pick","Big-spender pick"][drink]
 
 
 # The opening's date owns the party through midnight, ending at normal 1am close.

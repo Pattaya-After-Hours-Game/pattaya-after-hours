@@ -230,10 +230,20 @@ func test_drink_stock(test: SceneTree) -> void:
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
 	var normal_mix: Array = eco.drink_popularity(bar)
+	test.check(eco.drink_demand_hint(bar,2,normal_mix[2])=="Visitor pick","Normal demand teaches the audience for the drink")
+	bar.promo = {"kind":1}
+	var discount_mix: Array = eco.drink_popularity(bar)
+	test.check(eco.drink_demand_hint(bar,2,discount_mix[2])=="Happy Hour boost" and eco.drink_demand_hint(bar,1,discount_mix[1])=="Popular with locals","Only orders more popular because of the discount get a Happy Hour cue")
+	bar.promo = {}
 	model.street.announce(1)
 	model.street.start_event()
 	var tourist_mix: Array = eco.drink_popularity(bar)
-	test.check(tourist_mix[2]>normal_mix[2],"Shore leave increases demand for mixed drinks")
+	test.check(tourist_mix[2]>normal_mix[2] and eco.drink_demand_hint(bar,2,tourist_mix[2])=="Visitor crowd boost","Shore leave explains higher demand for mixed drinks")
+	test.check(eco.drink_demand_hint(bar,1,tourist_mix[1])=="Popular with locals","A tourist-heavy crowd does not claim to boost soda orders")
+	model.street.announce(6)
+	model.street.start_event()
+	var locals_mix: Array = eco.drink_popularity(bar)
+	test.check(eco.drink_demand_hint(bar,1,locals_mix[1])=="Local crowd boost","Low season explains higher demand for budget drinks")
 	test.check(eco.price(bar,2)-Content.DRINKS[2].cost>eco.price(bar)-Content.STOCK_COST,"Rum earns more per sale than house lager")
 	var cash_before := int(model.s.cash)
 	model.street.action("buy_drink",3)
