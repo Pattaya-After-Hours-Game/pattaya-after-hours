@@ -100,6 +100,7 @@ func _ready() -> void:
 	interface_font.fallbacks = [preload("res://assets/DejaVuSans.ttf")]
 	theme = Theme.new()
 	theme.default_font = interface_font
+	$BuildVersion.text = str(ProjectSettings.get_setting("application/config/version"))
 	resume_available = model.load_game()
 	var config := ConfigFile.new()
 	if config.load("user://settings.cfg") == OK: muted = config.get_value("audio","muted",false)
