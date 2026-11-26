@@ -8,7 +8,7 @@ are documented below; future hooks are ideas, not shipped quests.
 ## You came here to relax
 
 You and Anong have taken over **The Blue Hour**, a tired beer bar with six stools,
-a warm fridge and a neon sign that currently reads **BLUE HO**.
+a warm fridge and a battered neon sign.
 
 The previous owner said it was a goldmine. He also said the roof didn't leak.
 

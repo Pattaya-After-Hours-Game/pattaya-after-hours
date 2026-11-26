@@ -367,9 +367,10 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui.add_child(city)
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
-	abs_text(root_ui,Rect2(14,4,170 if windows_updates != null else 235,24),"AFTER HOURS" if windows_updates != null else "PATTAYA / AFTER HOURS",19,GOLD)
-	var date_label := abs_text(root_ui,Rect2(14,27,170 if windows_updates != null else 245,16),"PRACTICE SHIFT" if practicing else "%s · %s" % [model.weekday(),model.street.selected().name],12,TEAL)
-	date_label.clip_text = true
+	var venue_name := abs_text(root_ui,Rect2(14,4,170 if windows_updates != null else 245,24),model.street.selected().name,19,GOLD)
+	venue_name.name = "VenueName"
+	venue_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	abs_text(root_ui,Rect2(14,27,170,16),"PRACTICE SHIFT" if practicing else model.weekday(),12,TEAL)
 	if windows_updates != null:
 		update_button = at_button(root_ui,Rect2(190,5,66,37),"Update",windows_updates.ask,true)
 		update_button.add_theme_font_size_override("font_size",12)

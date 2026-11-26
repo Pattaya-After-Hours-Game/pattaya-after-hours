@@ -221,7 +221,7 @@ all nine stages; the economy preview includes a real comfort purchase.
 
 Nida's existing four-frame production atlas is mirrored in-engine so she faces
 the street. No artwork pixels or manifest hashes change. A purchased music
-system receives an engine-drawn playing/off indicator beneath the venue sign.
+system receives an engine-drawn playing/off indicator in the venue.
 The till gains a compact five-second net-trading readout; all amounts and
 automation states come from the shared model. Use the `automation-*` economy
 preview filter for controls, supplier/manager tiers, refills and closure.

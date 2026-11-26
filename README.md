@@ -1,6 +1,6 @@
 # Pattaya After Hours
 
-Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build the Blue Hour into a thriving beer bar, then own a mixed street of Soi-style bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
+Start with six stools and a warm fridge. Build the Blue Hour into a thriving beer bar, then own a mixed street of Soi-style bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
 
 **[Get it on Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522io.github.rknell.pattayaafterhours%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FPattaya-After-Hours-Game%252Fpattaya-after-hours%2522%252C%2522author%2522%253A%2522Pattaya-After-Hours-Game%2522%252C%2522name%2522%253A%2522Pattaya%2520After%2520Hours%2522%257D)** · **[Android APK](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest/download/PattayaAfterHours.apk)** · **[Desktop downloads](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)**
 

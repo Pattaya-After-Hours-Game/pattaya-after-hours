@@ -74,6 +74,10 @@ func run(test: SceneTree) -> void:
 		test.check(thumb.size==Vector2(56,32),"Property thumbnail stays inside card")
 		await click(test,card)
 		test.check(app.model.s.street.selected==i,"Pointer selects property %d" % i)
+		var heading: Label = app.root_ui.get_node("VenueName")
+		test.check(heading.text==app.model.street.selected().name,"Header shows the selected venue's full name")
+		var label_width := heading.get_theme_font("font").get_string_size(heading.text,HORIZONTAL_ALIGNMENT_LEFT,-1,heading.get_theme_font_size("font_size")).x
+		test.check(label_width<=170,"Venue name fits beside the Windows update button")
 	app.model.street.announce(2)
 	app.close_drawer()
 	await click(test,app.event_banner)

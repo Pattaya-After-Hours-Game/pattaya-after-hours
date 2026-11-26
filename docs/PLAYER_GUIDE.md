@@ -6,7 +6,7 @@ build. On the startup menu, choose **New Game** to open your first bar or
 to confirm erasing the previous campaign, including its backup; **Cancel** keeps
 it. Resume is disabled when no readable save is available.
 
-The main street is the live business. Open **Tutorial** for a short practice shift.
+The selected bar’s name appears at the top left. Open **Tutorial** for a short practice shift.
 Buy a pack, serve an order, help an impatient guest, hire a bartender and close
 for the night. Practice uses its own till and does not change your save.
 Tap a top-bar stat on mobile or hover over it on desktop for a quick explanation.
