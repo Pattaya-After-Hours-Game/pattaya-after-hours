@@ -88,6 +88,10 @@ const RAID_FINE_PER_STAGE = 300
 const STARTING_CASH = 228
 const STOCK_COST = 38
 const CONSIGNMENT_COST = 14
+const SUPPLIER_DEAL_UNITS = 12
+const SUPPLIER_DEAL_START = 14*60
+const SUPPLIER_DEAL_END = 15*60+15
+const SUPPLIER_DEAL_INTERVAL = 3
 const LEGACY_STOCK_COST = 14 # Backfill only for saves predating paid inventory lots.
 const DRINKS = [
 	{"id":"lager","name":"House lager","tier":"House","cost":STOCK_COST,"offset":0,"substitute":100},

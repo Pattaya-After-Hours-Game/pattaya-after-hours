@@ -693,6 +693,14 @@ func _read(path: String) -> Variant:
 					if not bar.has(key): return null
 				if not int(bar.type) in [0,1,2] or not int(bar.stage) in [1,2,3]: return null
 				if int(bar.crew) < 0 or int(bar.crew) > (7 if int(parsed.version)>=6 else 6) or not bar.away is Array: return null
+			if data.has("supplier_deal"):
+				var deal: Variant = data.supplier_deal
+				if not deal is Dictionary: return null
+				if not deal.is_empty():
+					for entry in [["day",1,parsed.day],["venue",0,data.bars.size()-1],["drink",2,3]]:
+						var value: Variant = deal.get(entry[0])
+						if not _finite_number(value,entry[1],entry[2]) or float(value)!=floorf(float(value)): return null
+					if not deal.get("seen") is bool or not deal.get("bought") is bool: return null
 			if not data.event is Dictionary: return null
 			if not data.event.is_empty():
 				for key in ["id","phase","remaining","prepared"]:

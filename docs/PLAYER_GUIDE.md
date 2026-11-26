@@ -203,6 +203,11 @@ Serve a guest’s requested specialty drink on their first round for a chance at
 Mixed delivery follows the expected order mix. Return slow stock at half its
 purchase cost to free space.
 
+Bo occasionally offers **12 discounted specialty drinks** in the afternoon.
+The popup shows your wholesale saving, the till after buying, and how far that
+would leave you from your current cash goal. Tap **Not now** to pass. You can
+reopen the deal from **Fridge** until 3:15pm.
+
 ## Give yourself a faster shift
 
 Open **Service → Upgrades** to see what you can buy. The number badge on Service

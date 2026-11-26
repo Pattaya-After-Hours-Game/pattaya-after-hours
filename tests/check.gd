@@ -124,6 +124,7 @@ func run() -> void:
 	var local_checks = load("res://tests/local_events_check.gd").new()
 	local_checks.run(self)
 	await local_checks.run_ui(self)
+	await load("res://tests/drink_prices_check.gd").new().run_ui(self)
 	if failures == 0:
 		print("PASS · incident deck, endless year, street economy, chapters, migration, offline earnings, events, UI, arcade, tutorial, Godzilla, decision odds and Windows update checks")
 	quit(1 if failures else 0)

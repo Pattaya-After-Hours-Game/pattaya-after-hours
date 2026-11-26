@@ -76,6 +76,15 @@ func run() -> void:
 	app.start_new_game()
 	app.model = Campaign.new(72)
 	await capture(app,"opening")
+	app.model.s.street.served = 10
+	app.model.street.selected().regulars = 1
+	app.model.s.cash = 4900
+	app.model.s.street.minute = 840
+	app.model.street.supplier_deal_tick()
+	app.open_supplier_special()
+	await capture(app,"supplier-special")
+	app.close_supplier_special()
+	app.model = Campaign.new(72)
 	app.change_tab(0)
 	await capture(app,"service-overview")
 	await capture(app,"service-team","TEAM & PAYROLL")

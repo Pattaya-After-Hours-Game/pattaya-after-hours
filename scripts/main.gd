@@ -70,6 +70,7 @@ var drawer_close_button: Button
 var drawer: Control
 var event_banner: Button
 var news_issue := {}
+var supplier_special_open := false
 var seen_news := {}
 var event_overlay: Control
 var event_game := -1
@@ -872,10 +873,11 @@ func _input(event: InputEvent) -> void:
 	if event_game==Local.CART and cart_pointer_input(event):
 		get_viewport().set_input_as_handled()
 		return
-	if (event_game>=0 or not news_issue.is_empty()) and event is InputEventKey:
+	if (event_game>=0 or not news_issue.is_empty() or supplier_special_open) and event is InputEventKey:
 		var playing := event_game>=0
 		if event.is_action_pressed("ui_cancel"):
 			if event_game>=0: end_event_game(false)
+			elif supplier_special_open: close_supplier_special()
 			else: close_news(false)
 		elif event is InputEventKey and event.pressed and not event.echo:
 			if event_game==Local.BED and event.physical_keycode==KEY_SPACE: tap_race()
@@ -1239,6 +1241,10 @@ func open_fridge() -> void:
 
 func fridge_panel() -> void:
 	row_button("‹  Service",change_tab.bind(0))
+	var deal: Dictionary = model.street.supplier_deal_offer()
+	if not deal.is_empty():
+		var special := row_button("Bo’s special · save "+cash(deal.normal-deal.price),open_supplier_special)
+		special.icon = UpgradeIcons.get_icon("supplier")
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
 	var shortage: int = eco.blocking_drink(bar)
@@ -1848,6 +1854,56 @@ func draw_event_overlay() -> void:
 		draw_event_game()
 	elif not news_issue.is_empty():
 		draw_newspaper()
+	elif supplier_special_open:
+		draw_supplier_special()
+
+func open_supplier_special() -> void:
+	if model.street.supplier_deal_offer().is_empty(): return
+	model.s.street.supplier_deal.seen = true
+	supplier_special_open = true
+	save_state()
+	draw_event_overlay()
+
+func close_supplier_special() -> void:
+	supplier_special_open = false
+	draw_event_overlay()
+
+func accept_supplier_special() -> void:
+	message = model.street.action("supplier_deal")
+	supplier_special_open = false
+	commit(true)
+
+func draw_supplier_special() -> void:
+	var deal: Dictionary = model.street.supplier_deal_offer()
+	if deal.is_empty():
+		supplier_special_open = false
+		return
+	var panel := overlay_panel(Rect2(181,61,598,418),DARK,GOLD)
+	var drink: Dictionary = StreetContent.DRINKS[deal.drink]
+	abs_text(panel,Rect2(24,14,548,27),"BO’S SUPPLIER SPECIAL  ·  "+str(deal.bar.name),13,GOLD)
+	abs_text(panel,Rect2(24,43,550,48),"%s · %d bottles" % [drink.name,deal.quantity],26,WHITE)
+	var price_card := pane(panel,Rect2(24,102,550,64),Color("#32252f"),EDGE)
+	abs_text(price_card,Rect2(14,10,326,43),"%s now  ·  Usually %s" % [cash(deal.price),cash(deal.normal)],19,WHITE)
+	abs_text(price_card,Rect2(369,10,165,43),"Save "+cash(deal.normal-deal.price),23,TEAL)
+	var eco = model.street.economy
+	var share := roundi(100.0*eco.drink_popularity(deal.bar)[deal.drink])
+	abs_text(panel,Rect2(24,173,550,34),"%d%% expected orders · %s gross per sale at the deal cost" % [share,cash(eco.price(deal.bar,deal.drink)-deal.unit)],14,TEAL)
+	var leftover := int(deal.remaining_cash)
+	var before := maxi(0,int(deal.target)-int(model.s.cash))
+	var after := maxi(0,int(deal.target)-leftover)
+	var till_line := "Till after buying: "+cash(leftover) if leftover>=0 else "You need "+cash(-leftover)+" more to buy this pack."
+	var trade_off := "Still enough for %s." % deal.goal_name
+	if after>0:
+		trade_off = "%s short of %s after buying." % [cash(after),deal.goal_name] if before==0 else "%s → %s short of %s." % [cash(before),cash(after),deal.goal_name]
+	var balance := pane(panel,Rect2(24,216,550,82),Color("#272332"),EDGE)
+	abs_text(balance,Rect2(14,8,522,29),till_line,16,WHITE)
+	var opportunity := abs_text(balance,Rect2(14,35,522,40),trade_off,15,GOLD if after>0 else TEAL)
+	opportunity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var note: String = deal.reason if not deal.enabled else "Offer ends at 3:15pm. Sales depend on demand."
+	abs_text(panel,Rect2(24,302,550,37),note,13,MUTED)
+	at_button(panel,Rect2(24,350,238,46),"Not now",close_supplier_special).grab_focus()
+	var buy := at_button(panel,Rect2(274,350,300,46),"Buy pack · "+cash(deal.price),accept_supplier_special,true)
+	buy.disabled = not deal.enabled
 
 func draw_newspaper() -> void:
 	var ink := Color("#392526")
@@ -2254,6 +2310,7 @@ func serve_godzilla() -> void:
 func street_ui_state() -> Array:
 	var bar: Dictionary = model.street.selected()
 	var state := [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day,model.s.phase,bar.open,bar.promo.is_empty(),model.street.economy.is_trading(bar),bar.late_open,bar.raided,bar.clean_remaining>0,bar.dirt==0,model.street.can_skip(),int(model.s.street.minute)/30,"" if model.s.street.history.is_empty() else model.s.street.history.front()]
+	if fridge_open: state.append(not model.street.supplier_deal_offer().is_empty())
 	state.append([int(model.s.street.night_prep.remaining)>0,model.s.street.night_prep.cancelled])
 	for venue in model.s.street.bars:
 		state.append([venue.raided,venue.clean_remaining>0,venue.dirt==0])
@@ -2274,10 +2331,15 @@ func _process(delta: float) -> void:
 				if race_left<=0: end_event_game(false)
 				else: update_race()
 		return
-	if not news_issue.is_empty(): return
+	if not news_issue.is_empty() or supplier_special_open: return
 	if campaign_before_tutorial == null:
 		poll_news()
 		if not news_issue.is_empty(): return
+		if model.s.phase=="plan" and offline_notice==0 and not is_instance_valid(fight) and not is_instance_valid(district) and not is_instance_valid(service_help_panel):
+			var deal: Dictionary = model.s.street.supplier_deal
+			if not deal.get("seen",true) and not model.street.supplier_deal_offer().is_empty():
+				open_supplier_special()
+				return
 		var before := street_ui_state()
 		model.street.night_prep_visible = not is_instance_valid(fight) and not is_instance_valid(district)
 		model.street.advance(minf(delta,1.0)*tuning_speed)
@@ -2421,6 +2483,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if event_game>=0: end_event_game(false)
 		elif not news_issue.is_empty(): close_news(false)
+		elif supplier_special_open: close_supplier_special()
 		elif is_instance_valid(district): close_district()
 		elif is_instance_valid(fight): leave_fight(fight.result if fight.over else false)
 		elif campaign_before_tutorial != null: finish_tutorial()
