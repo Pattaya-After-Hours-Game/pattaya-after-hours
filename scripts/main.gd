@@ -914,10 +914,14 @@ func update_action_controls() -> void:
 		var state: Dictionary = eco.action_status(bar,entry[4])
 		var practice_action: bool = campaign_before_tutorial == null or (tutorial_step<TUTORIAL_ACTIONS.size() and entry[4]==TUTORIAL_ACTIONS[tutorial_step])
 		var stock_shortcut: bool = state.needs_stock and campaign_before_tutorial==null
+		var needed := "Need "+str(StreetContent.DRINKS[state.short_drink].name) if stock_shortcut else ""
+		var caption: String = entry[3]
+		if stock_shortcut: caption = "Restock fridge" if bar.stock==0 else needed
+		elif entry[4]=="serve" and eco.automatic_service(bar): caption = "Auto-serve"
 		entry[0].disabled = not (state.enabled or stock_shortcut) or not practice_action
-		entry[0].tooltip_text = "Open the stock menu" if stock_shortcut else "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
+		entry[0].tooltip_text = state.reason+" Open the stock menu." if stock_shortcut else "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
 		# Keep native button text for keyboard/accessibility; a child draws the caption over the fill.
-		entry[0].text = "Restock fridge" if stock_shortcut else entry[3]
+		entry[0].text = caption if stock_shortcut else entry[3]
 		for color_name in ["font_color","font_disabled_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
 			entry[0].add_theme_color_override(color_name,Color.TRANSPARENT)
 		entry[1].size.x = 0 if state.no_orders or stock_shortcut else (entry[0].size.x-4)*state.fill
@@ -926,20 +930,20 @@ func update_action_controls() -> void:
 		var detail := "Ready" if state.enabled else "Unavailable"
 		if not eco.is_trading(bar): detail = "Venue closed"
 		elif state.no_orders: detail = "Waiting for orders"
-		elif stock_shortcut: detail = "Open stock menu"
+		elif stock_shortcut: detail = needed if bar.stock==0 else "Open stock menu"
 		elif refilling: detail = "Refilling · %ds" % ceili(state.remaining)
 		elif not state.enabled and entry[4]=="serve": detail = "Restock fridge"
 		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
 		elif not state.enabled and entry[4]=="welcome" and eco.promoter_bonus(bar)>0: detail = "Nida is welcoming"
 		elif not practice_action: detail = "Practice step"
-		entry[2].text = ("Restock fridge" if stock_shortcut else "Auto-serve" if entry[4]=="serve" and eco.automatic_service(bar) else entry[3])+"\n"+detail
+		entry[2].text = caption+"\n"+detail
 		entry[2].modulate = DARK if not entry[0].disabled and entry[4]=="serve" else WHITE if not entry[0].disabled or refilling else MUTED
 	for button in stock_controls:
 		if not is_instance_valid(button): continue
 		var offer: Dictionary = eco.stock_offer(bar)
 		button.disabled = not offer.enabled
 		button.tooltip_text = "%d drinks; cash after purchase %s" % [offer.quantity,cash(offer.remaining_cash)] if offer.enabled else offer.reason
-		button.text = "Buy %d drinks · %s" % [offer.quantity,cash(offer.price)]+("\n"+offer.reason if not offer.enabled else "")
+		button.text = "Buy %d %s · %s" % [offer.quantity,"House lager" if fridge_open else "drinks",cash(offer.price)]+("\n"+offer.reason if not offer.enabled else "")
 
 func stock_button(in_fridge: bool = false) -> void:
 	live_body(func() -> String:
@@ -971,15 +975,27 @@ func open_fridge() -> void:
 func fridge_panel() -> void:
 	row_button("‹  Service",change_tab.bind(0))
 	var bar: Dictionary = model.street.selected()
-	stock_button(true)
-	drink_panel(bar,true)
+	var eco = model.street.economy
+	var shortage: int = eco.blocking_drink(bar)
+	var wrong_stock: bool = shortage>=0 and bar.stock>0
+	if wrong_stock:
+		live_body(func() -> String:
+			var offer: Dictionary = eco.stock_offer(bar,false,shortage)
+			var line := "Orders need %s." % StreetContent.DRINKS[shortage].name
+			if offer.room<offer.quantity:
+				return line+" Return spare stock to free %d slots." % (offer.quantity-offer.room)
+			if not offer.enabled: return line+" "+offer.reason
+			return line,GOLD,13)
+		drink_panel(bar,true,shortage)
+		stock_button(true)
+	else:
+		stock_button(true)
+		drink_panel(bar,true)
 	live_body(func() -> String: return model.street.economy.tips_text(bar),TEAL,12)
 
-func drink_panel(bar: Dictionary, in_fridge: bool = false) -> void:
+func drink_panel(bar: Dictionary, in_fridge: bool = false, shortage: int = -1) -> void:
 	var eco = model.street.economy
-	if in_fridge:
-		row_button("Mixed delivery",street_action.bind("mixed_drinks"))
-	else:
+	if not in_fridge:
 		row_pair("Mixed delivery",street_action.bind("mixed_drinks"),"Hide drink list" if drink_list_open else "Drinks & margins",func() -> void:
 			drink_list_open = not drink_list_open
 			render(true))
@@ -987,6 +1003,9 @@ func drink_panel(bar: Dictionary, in_fridge: bool = false) -> void:
 	var drinks := range(eco.drink_count(bar))
 	if in_fridge:
 		drinks.sort_custom(func(a: int,b: int) -> bool: return eco.stock_waiting(bar,a)>eco.stock_waiting(bar,b))
+		if shortage>=0:
+			drinks.erase(shortage)
+			drinks.push_front(shortage)
 	for drink in drinks:
 		var item: Dictionary = StreetContent.DRINKS[drink]
 		live_body(func() -> String:
@@ -1001,6 +1020,8 @@ func drink_panel(bar: Dictionary, in_fridge: bool = false) -> void:
 			var history := "%d asked · %d short" % [recent,missed]
 			return line+"\n"+(hint+" · " if not hint.is_empty() else "")+history,TEAL,13)
 		row_pair("Buy %d · ฿%d ea" % [eco.pack_quantity(bar),eco.drink_cost(bar,drink)],street_action.bind("buy_drink",drink),"Return up to 3",street_action.bind("return_drink",drink))
+	if in_fridge:
+		row_button("Mixed delivery",street_action.bind("mixed_drinks"))
 
 func live_body(value: Callable,tint: Color = MUTED,px: int = 15) -> void:
 	var label := body(value.call(),tint,px)

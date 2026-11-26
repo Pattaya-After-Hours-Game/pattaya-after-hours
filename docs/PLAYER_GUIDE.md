@@ -160,7 +160,10 @@ capacity cannot sell drinks to customers who are not there.
 
 ## Pick what to stock
 
-Tap **Stock** or **Restock fridge** to open the drink list. Look for how many
+Tap **Stock** to open the drink list. If a stocked fridge can’t fill any
+waiting orders, Serve names the missing drink, for example **Need Rum & cola**.
+Tap it to see that drink first. If the fridge is full, use **Return up to 3**
+on spare stock until there is room for the pack. Look for how many
 orders are waiting, the expected popularity and the gross margin per sale.
 A short note flags when the crowd or Happy Hour makes a drink more popular.
 

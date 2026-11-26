@@ -148,7 +148,17 @@ func test_ui() -> void:
 	app.update_action_controls()
 	use_button(app,"Restock fridge")
 	check(app.fridge_open and bar.stock==0 and app.model.s.cash==original_cash and app.model.s.street.served==0,"Serve stockout opens the fridge without buying or selling")
+	bar.stock = 30
+	var original_customers: Array = bar.customers.duplicate(true)
+	for customer in bar.customers:
+		customer.drink = 2
+		customer.lager_quote = 0
+	app.update_action_controls()
+	use_button(app,"Need Rum & cola")
+	check(app.fridge_open and panel_has_text(app,"Orders need Rum & cola. Return spare stock to free 6 slots."),"Wrong-stock shortcut names the missing drink and explains how to make space")
+	check(app.column.get_child(2).text.begins_with("Rum & cola") and bar.stock==30 and app.model.s.cash==original_cash,"The needed drink is first even with a full fridge, and opening it is free")
 	bar.stock = original_stock
+	bar.customers = original_customers
 	use_button(app,"‹  Service")
 	var initial_save := FileAccess.get_file_as_string(Campaign.SAVE)
 	use_button(app,"Tutorial")

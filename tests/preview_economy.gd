@@ -61,6 +61,15 @@ func run() -> void:
 	app.start_new_game()
 	app.model = Campaign.new(72)
 	await capture(app,"opening")
+	var wrong_stock: Dictionary = app.model.street.selected()
+	wrong_stock.stock = 30
+	for guest in wrong_stock.customers:
+		guest.drink = 2
+		guest.lager_quote = 0
+	app.open_fridge()
+	await capture(app,"fridge-wrong-stock")
+	app.change_tab(0)
+	app.model = Campaign.new(72)
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	app.model = Campaign.new(72)

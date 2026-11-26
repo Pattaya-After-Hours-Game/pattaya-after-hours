@@ -712,8 +712,10 @@ func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minut
 	var management := manager_rate(bar)*60 if is_trading(bar,offline) else 0
 	var net := sales*unit_margin+pool+management-costs
 	var reason := "Quiet: attract customers before hiring."
+	var short_drink := blocking_drink(bar) if not offline else -1
 	if not is_trading(bar,offline): reason = status(bar)
 	elif not offline and event_id()==C.RAT_PLAGUE: reason = "Rats everywhere! Few guests are coming in."
+	elif short_drink>=0: reason = "Waiting orders need %s. Tap Stock." % C.DRINKS[short_drink].name
 	elif bar.stock <= 0: reason = "Out of stock: order a delivery."
 	elif bar.customers.size() >= seats(bar): reason = "Full: more seats or shorter queues would help."
 	elif pending(bar) > 0 and service < demand: reason = "Slow service: serve orders or add a bartender."
@@ -897,6 +899,15 @@ func stock_waiting(bar: Dictionary, drink: int = -1) -> int:
 		if customer.order and (drink<0 or customer.drink==drink) and serving_choice(bar,customer)<0: total += 1
 	return total
 
+# A single sellable order keeps Serve available, including accepted substitutes.
+func blocking_drink(bar: Dictionary) -> int:
+	var first := -1
+	for customer in bar.customers:
+		if not customer.order: continue
+		if serving_choice(bar,customer)>=0: return -1
+		if first<0: first = int(customer.get("drink",0))
+	return first
+
 func record_stock_miss(bar: Dictionary, drink: int) -> void:
 	var key: String = C.DRINKS[drink].id
 	bar.shift.drink_misses[key] = int(bar.shift.drink_misses.get(key,0))+1
@@ -1002,15 +1013,16 @@ func action_status(bar: Dictionary, id: String) -> Dictionary:
 	var waiting := pending(bar) if id=="serve" else 0
 	var no_orders := id=="serve" and waiting==0
 	var trading := is_trading(bar)
-	var needs_stock := id=="serve" and trading and waiting>0 and waiting==stock_waiting(bar)
+	var short_drink := blocking_drink(bar) if id=="serve" and trading and waiting>0 else -1
+	var needs_stock := short_drink>=0
 	var reason := ""
 	if not trading: reason = status(bar)
-	elif needs_stock: reason = "Restock the fridge."
+	elif needs_stock: reason = "Waiting orders need %s." % C.DRINKS[short_drink].name
 	elif no_orders: reason = "No orders waiting. Welcome customers or plan a promotion."
 	elif remaining>0.000001: reason = "%s ready in %.1fs." % ["Serve" if id=="serve" else "Welcome / Chat",remaining]
 	elif id=="welcome" and promoter_bonus(bar)>0: reason = "Nida is welcoming customers."
 	elif id=="chat" and chat_target(bar).is_empty(): reason = "Chat helps an unchatted guest with 10s or less left to wait."
-	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"needs_stock":needs_stock,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
+	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"needs_stock":needs_stock,"short_drink":short_drink,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
 
 func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var item: Dictionary = C.ACTION_UPGRADES[index]
