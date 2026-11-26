@@ -31,7 +31,7 @@ const COMPACT_EFFECTS = {
 	"tour":"tours","route":"tour route","demand":"demand","capacity":"capacity","partner":"Anong trust",
 }
 const EQUIPMENT_CAPTIONS = {
-	"sign":"More walk-ins", "comfort":"Longer visits", "fridge":"+40 drinks of space",
+	"sign":"More walk-ins", "comfort":"More patient guests", "fridge":"+40 drinks of space",
 	"pool":"฿50 per game", "screen":"Unlock Sports Night", "menu":"Unlock Mango cocktails",
 	"music":"Repeat orders 10s sooner", "seating":"More seats",
 }
@@ -84,6 +84,7 @@ var sfx: AudioStreamPlayer
 var sfx_streams := {}
 var muted := false
 var training := false
+var visit_plans_open := false
 var arcade_circuit := false
 
 var live_labels: Array = []
@@ -1062,6 +1063,9 @@ func upgrade_offers() -> Array[Dictionary]:
 		if status.maxed: continue
 		var caption: String = EQUIPMENT_CAPTIONS[item.id]
 		var name_text: String = item.name
+		if bar.type==0 and StreetContent.BEER_CAPS.has(item.id): name_text += " · Level %d" % (int(bar.equipment[item.id])+1)
+		if item.id=="sign": caption = "+2 appeal"+(" · street draw uses the best sign" if bar.type==0 and bar.equipment.sign>=1 else "")
+		if item.id=="fridge": caption = "+40 stock room · colder-beer reputation"
 		if item.id=="music":
 			caption = "%ds → %ds between rounds" % [StreetContent.MUSIC_INTERVALS[bar.equipment.music],StreetContent.MUSIC_INTERVALS[bar.equipment.music+1]]
 			if bar.equipment.music==1: name_text = "Better sound system"
@@ -1075,7 +1079,7 @@ func upgrade_offers() -> Array[Dictionary]:
 	var club: Dictionary = eco.club_offer(bar)
 	if club.level<3:
 		var estimate: Dictionary = eco.club_forecast(bar)
-		var help := "New visitors join the club, stay 20s longer and budget for a third drink. Birthday visits still cap at three. Needs stock, service and local regulars. Estimated automatic net change: %+.2f baht/s; actual takings vary." % estimate.delta
+		var help := "Members plan and budget for one extra round, up to three. After the final drink they leave or finish pool. Birthday visits still cap at three. Needs stock, service and local regulars. Estimated automatic net change: %+.2f baht/s; actual takings vary." % estimate.delta
 		offers.append(upgrade_offer("club","Regulars Club · Level %d" % (club.level+1),"%d%% of new visitors · extra round" % club.chance,help,"regulars_club",0,club))
 	var supplier: Dictionary = eco.supplier_offer(bar)
 	if supplier.level<StreetContent.SUPPLIER_PRICES.size():
@@ -1148,6 +1152,8 @@ func upgrade_card(offer: Dictionary) -> void:
 	row.add_theme_constant_override("separation",6)
 	column.add_child(row)
 	var caption := "%s · %s" % [offer.caption,cash(status.price)]
+	if status.get("required_stage",1)>model.street.selected().stage:
+		caption += "\nNeeds venue stage %d" % status.required_stage
 	var purchase := button("%s\n%s" % [offer.name,caption],street_action.bind(offer.action,offer.index))
 	purchase.name = "Upgrade_"+offer.icon if not offer.action.begins_with("train_") else "Upgrade_%s_%d" % [offer.icon,offer.index]
 	purchase.icon = UpgradeIcons.get_icon(offer.icon)
@@ -1221,7 +1227,15 @@ func street_panel() -> void:
 		body(bar.close_reason,PINK,13)
 		row_button("Owner-run recovery shift",street_action.bind("recovery"))
 	if bar.club_level>0:
-		live_body(func() -> String: return "Regulars Club %d/3 · %d%% of new guests may order a third round" % [bar.club_level,StreetContent.CLUB_CHANCE[bar.club_level]],TEAL,12)
+		live_body(func() -> String: return "Regulars Club %d/3 · %d%% of new guests plan an extra round (max 3)" % [bar.club_level,StreetContent.CLUB_CHANCE[bar.club_level]],TEAL,12)
+	body("YOUR PROFIT CYCLE",TEAL,14)
+	live_body(func() -> String:
+		var view: Dictionary = eco.business_summary(bar)
+		return "%s (%ds) · customer profit %s/min\nManager income %s/min (separate)\n%d arrivals · %d orders · %d sales · %d completed visits\nNow: %d waiting · %d drinking · %d finishing\n%s" % [view.sample,view.sample_seconds,cash(view.profit_per_minute),cash(view.manager_per_minute),view.arrivals,view.orders,view.sales,view.completed,view.waiting,view.drinking,view.finishing,view.reason],WHITE,13)
+	row_button("Hide visit plans" if visit_plans_open else "Show visit plans",func() -> void:
+		visit_plans_open = not visit_plans_open
+		render(true))
+	if visit_plans_open: live_body(func() -> String: return eco.visit_lines(bar),MUTED,12)
 	live_body(func() -> String: return "Next business report in %ds of trading" % (model.street.SHIFT_SECONDS-int(model.s.street.seconds)),MUTED,12)
 	if bar.equipment.pool>0:
 		body("POOL · ฿50 PER GAME",GOLD,14)
@@ -1272,7 +1286,7 @@ func street_panel() -> void:
 		character_card(Art.worker_id(bar,i),name_text,"Contract finished" if not eco.contracted(person) else "Serves waiting orders" if person.role==0 else "Attracts visitors")
 		live_body(func() -> String:
 			var remaining := int(person.get("contract_left",StreetContent.STAFF_CONTRACT_MINUTES))
-			return ("Contract: %dd %dh %dm left" % [remaining/1440,remaining%1440/60,remaining%60] if remaining>0 else "Contract finished · rehire available")+" · Training %d/%d" % [int(person.get("audience_training",0) if person.role in [2,3] else person.get("training",0)),2 if person.role in [2,3] else StreetContent.STAFF_SERVICE_SECONDS.size()-1],GOLD,12)
+			return ("Contract: %dd %dh %dm left" % [remaining/1440,remaining%1440/60,remaining%60] if remaining>0 else "Contract finished · rehire available")+" · Training %d/%d" % [int(person.get("audience_training",0) if person.role in [2,3] else person.get("training",0)),2 if person.role in [2,3] else eco.training_limit(bar)],GOLD,12)
 		if not eco.contracted(person):
 			if person.role!=3:
 				row_button("Rehire %s · %s" % [name_text,cash(eco.contract_cost(int(person.role)))],street_action.bind("rehire",i))
@@ -1281,7 +1295,7 @@ func street_panel() -> void:
 		if person.role==0:
 			live_body(func() -> String: return eco.staff_status(bar,person).text+" · %d staff drinks served" % int(person.get("drinks_served",0)),TEAL,12)
 			body("Ready staff serve immediately, then recover for %ds (%.1f/min). You can serve alongside them." % [eco.service_seconds(person),60.0/eco.service_seconds(person)],MUTED,12)
-			if int(person.get("training",0))<StreetContent.STAFF_SERVICE_SECONDS.size()-1:
+			if int(person.get("training",0))<eco.training_limit(bar):
 				var offer: Dictionary = eco.training_offer(bar,i,false)
 				var training_button := row_button("Train %s · %s · %ds" % [name_text,cash(offer.price),StreetContent.STAFF_SERVICE_SECONDS[offer.level+1]],street_action.bind("train_staff",i))
 				live_body(func() -> String:
@@ -1322,7 +1336,7 @@ func celebration_panel() -> void:
 		var current: Dictionary = model.street.celebration_info()
 		return "LIVE until 1am · day %d opening" % current.day if current.active else "Day %d at noon · %s" % [current.day,"today" if current.days_left==0 else "tomorrow" if current.days_left==1 else "%d game days to go" % current.days_left],GOLD,14)
 	body(StreetContent.CELEBRATIONS[model.street.Economy.celebration_index(int(info.day))][1],WHITE,14)
-	body("+40% shared street traffic and extra Blue Hour appeal. Up to 3 drinks per visit if budgets allow; next round in 26s, 19s with music, or 14s with better sound. Visitors stay 15s longer and wait 10s longer. Traffic boosts cap at 2.4× normal. Normal prices, pool fees and wages still apply.",MUTED,13)
+	body("+40% shared street traffic and extra Blue Hour appeal. One extra planned round, up to 3 if budgets allow. Drinking takes 26/19/14/11/8s by music tier, including the final round. Visitors wait 10s longer for orders. Traffic boosts cap at 2.4× normal. Normal prices, pool fees and wages still apply.",MUTED,13)
 	body("Prepare: clean the bar, fill the fridge, check staff contracts and leave room for deliveries. Serve the queue or use Chat before advertising harder. No entry fee or paid preparation; offline time cannot use up the party.",WHITE,13)
 	var report: Dictionary = model.s.street.celebration.report
 	if report.is_empty(): report = model.s.street.celebration.last_report

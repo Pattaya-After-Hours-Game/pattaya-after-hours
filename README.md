@@ -91,12 +91,30 @@ cash for the next shift—not just a large bank balance.
 Tap **Stock** or **Restock fridge** to compare popularity with profit per sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
 Mango cocktails.
 
+## Chase the next bottleneck
+
+New customers plan one or two rounds; club members and birthday guests can plan
+one extra, capped at three. They finish drinking the last round before leaving,
+or finish their pool game. Music speeds drinking and turnover; it does not invent
+buyers. A satisfied one-drink visit can earn a regular.
+
+Beer bars now have several investments per stage: seating caps **3/5/7**, frontage
+**1/3/5**, fridges **2/3/4**, music **1/2/4**, and bartender training **2/4/6**.
+The next tier shows its stage requirement. Higher frontage grows one shared street
+visitor pool. Other venue types keep their existing purchase limits.
+
+**Service → Your profit cycle** separates actual customer profit from manager
+income and explains the last shift's bottleneck. **Show visit plans** reveals
+who is waiting, drinking or finishing pool. A cyan glass means drinking; the
+existing yellow/red dot means a waiting order. See the
+[profit-cycle design](docs/design/PROFIT_CYCLE.md) for tiers, prices and rules.
+
 ## Music, automation and management income
 
 | Purchase | Price and effect |
 | --- | --- |
-| Music system / better sound | ฿1,200 for 35→25-second repeats; stage two adds an ฿2,400 upgrade for 18-second repeats. Budgets, visit limits, stock and service still apply. |
-| Regulars Club | Stage two: ฿600 / ฿1,200 / ฿2,400; 35% / 65% / 100% of new visitors stay longer and budget for a third round. Requires 10 / 20 / 35 local regulars. |
+| Music system / better sound | ฿1,200 for 35→25-second repeats; stage two adds ฿2,400 for 18 seconds; beer-bar stage three adds ฿3,600/4,800 for 14/11 seconds. Budgets, visit limits, stock and service still apply. |
+| Regulars Club | Stage two: ฿600 / ฿1,200 / ฿2,400; 35% / 65% / 100% of new visitors plan and budget for an extra round, capped at three. Requires 10 / 20 / 35 local regulars. |
 | Auto-serve | ฿3,000 per venue; uses the existing Serve timer as rush backup for bartenders, or covers the bar without them. Manual taps share it. |
 | Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
 | Manager levels 1 / 2 / 3 | ฿8,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
@@ -178,8 +196,9 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 12.
-Schema 12 retains club membership, better sound and advanced training. Older
+retain money, staff, venues and owned stages when migrated to save schema 13.
+Schema 13 retains individual visit plans and expanded beer-bar tiers. Existing
+visitors finish under their saved legacy stay, quotes and timers. Older
 saves get no free purchases, extra rounds for existing guests or manager refunds.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
 Schema 9 preserves staff cooldown deadlines and actual service counters. Older

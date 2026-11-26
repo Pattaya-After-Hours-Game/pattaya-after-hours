@@ -100,8 +100,8 @@ const CHAT_SECONDS = 20
 const CHAT_PATIENCE = 10
 const CHAT_THRESHOLD = 10
 const EQUIPMENT = [
-	{"id":"sign", "name":"Better frontage", "cost":900, "max":1, "help":"More passersby consider entering; no extra service speed."},
-	{"id":"comfort", "name":"Fans & comfortable seats", "cost":900, "max":1, "help":"Guests stay longer and wait more patiently; uses one seat and adds ฿4/min overhead."},
+	{"id":"sign", "name":"Better frontage", "cost":900, "max":1, "help":"+2 venue attraction per tier. Beer-bar tiers beyond one also expand the shared street audience; no extra service speed."},
+	{"id":"comfort", "name":"Fans & comfortable seats", "cost":900, "max":1, "help":"Guests wait more patiently; uses one seat and adds ฿4/min overhead."},
 	{"id":"fridge", "name":"Better fridge", "cost":800, "max":2, "help":"Store 40 more drinks. Each fridge tier adds +1 reputation per ten satisfied visits: colder beer, happier regulars."},
 	{"id":"pool", "name":"Pool table", "cost":2000, "max":2, "help":"฿50 per 30-second game; replaces two seats. Beer bars only."},
 	{"id":"seating", "name":"Extra seating", "cost":400, "max":3, "help":"Two more seats. Beer bars gain a third compact layout, recovering up to three furniture places."},
@@ -109,7 +109,7 @@ const EQUIPMENT = [
 	# Legacy slot retained for save/action indices; training is now per person.
 	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
 	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Lets you stock Mango cocktails. Stage 2+."},
-	{"id":"music", "name":"Music system", "cost":1200, "max":2, "help":"Repeat orders: 35 → 25 → 18 seconds. Level two needs stage two. Visit limits, budgets, stock and service still apply."}
+	{"id":"music", "name":"Music system", "cost":1200, "max":2, "help":"Drinking time: 35 → 25 → 18 → 14 → 11 seconds. Beer-bar stages unlock later tiers. Faster final drinks free seats; budgets and service still apply."}
 ]
 const PROMOTIONS = [
 	{"name":"Free Pool Night", "fee":0, "boost":6, "requires":"pool", "help":"Free games attract pool groups; drinks stay full price."},
@@ -130,7 +130,10 @@ const STAGE_GOALS = [
 const TRAFFIC_PER_MINUTE = 7.3 # Maintains fresh-campaign pacing with nightly prep and dirt.
 const AUDIENCE_TRAFFIC_BONUS = 2.0
 const BASE_SEATS = [6,12,20]
-const VISIT_SECONDS = 90
+const BEER_CAPS = {"seating":[3,5,7],"sign":[1,3,5],"fridge":[2,3,4],"music":[1,2,4],"training":[2,4,6]}
+const ONE_ROUND_CHANCE = [20,40,10] # Local / tourist / nightlife; appearance never changes plans.
+const FRONTAGE_TRAFFIC = 2.0
+const VISIT_SECONDS = 90 # Legacy visitors only.
 const ORDER_SECONDS = 35
 const PATIENCE_SECONDS = 25
 const REGULAR_CHANCE = 20
@@ -139,7 +142,7 @@ const BARTENDER_CONTRACT_COST = 1200
 const GABBY_TIP_PER_DRINK = 5
 const STAFF_CONTRACT_DAYS = 10
 const STAFF_CONTRACT_MINUTES = STAFF_CONTRACT_DAYS * DAY_MINUTES
-const STAFF_SERVICE_SECONDS = [25,20,15,12,10] # One drink, per bartender; training stays with the person.
+const STAFF_SERVICE_SECONDS = [25,20,15,12,10,8,6] # One drink, per bartender; training stays with the person.
 const STAFF_TRAINING_COST = 400
 const ORDER_ALERT_SECONDS = 10.0
 const PROMOTION_SECONDS = 120
@@ -157,7 +160,7 @@ const COMMISSION_PERCENT = 0 # Nida is paid by contract only; legacy ledgers sta
 const AUTO_SERVE_URGENT_SECONDS = 10
 const AUTO_SERVE_COST = 3000
 const MUSIC_ORDER_SECONDS = 25 # Legacy first-tier reference.
-const MUSIC_INTERVALS = [35,25,18]
+const MUSIC_INTERVALS = [35,25,18,14,11]
 const SUPPLIER_PRICES = [900,1200,2400,4800,9600]
 const SUPPLIER_UNIT_COSTS = [38,38,36,34,32,30]
 const SUPPLIER_STAGES = [1,1,2,2,3]

@@ -1,5 +1,22 @@
 # Current implementation and release handoff
 
+## Profit-cycle implementation — 26 November 2026
+
+Branch `codex/profit-cycle` preserves completed Gabby work in its own checkpoint
+`1a23e49` above main `cc30403`, then adds variable visit plans, final-drink
+turnover, expanded beer-bar tracks, shared frontage traffic, separate customer
+profit and schema-13 saves. No other worktrees or attachments were changed.
+See the [design](design/PROFIT_CYCLE.md), [economy](ECONOMY.md) and measured
+[verification](TESTING.md#profit-cycle-verification--26-november-2026).
+
+Gameplay/save/UI checks and matched bottleneck scenarios pass. Baseline stage
+two is slightly faster than the existing lower target in two runs; five new
+purchase-cadence medians are slightly below the requested three minutes. These
+failures remain visible in tests. The user decision on keeping prices and
+accepting faster lower bounds versus retuning is pending. Do not merge/publish
+this branch as verified until that decision and the complete wrapper pass.
+The local desktop export is not a signed Android release or device playtest.
+
 ## Gabby addition — local source, 26 November 2026
 
 Adds a named adult bartender with pale skin, a very short red dress and her own
@@ -11,7 +28,7 @@ no migration rewards or offline tips are added. Schema remains 12.
 
 The pre-existing Nida/pool work was preserved and reached `cc30403` while this
 addition was underway. Combined tests and Gabby UI/art checks pass; see
-[testing](TESTING.md). Gabby is a local source change, not yet a published build.
+[testing](TESTING.md). Gabby was preserved in local commit `1a23e49`, not yet a published build.
 
 ## Nida and pool update — 26 November 2026
 

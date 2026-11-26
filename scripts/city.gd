@@ -59,7 +59,7 @@ func _draw() -> void:
 	if backdrop:
 		for region in counter_regions(kind,stage):
 			draw_texture_rect_region(backdrop,region,region)
-	if kind==0 and bar.get("equipment",{}).get("seating",0)==3: _draw_compact_layout()
+	if kind==0 and bar.get("equipment",{}).get("seating",0)>=3: _draw_compact_layout()
 	# Tables and people share the depth order. The original illustrated table
 	# remains visible (but labelled not open) when it is not owned.
 	var floor_items := people.filter(func(person: Dictionary) -> bool: return not person.behind_bar)
@@ -84,6 +84,11 @@ func _draw() -> void:
 			var marker := order_position(person)
 			draw_circle(marker,6,INK)
 			draw_circle(marker,4,order_color(person.order_seconds_left))
+		elif person.get("visit_phase","")=="drinking":
+			# A cyan glass means drinking; only pending orders receive urgency dots.
+			var marker := order_position(person)
+			draw_rect(Rect2(marker-Vector2(3,3),Vector2(6,6)),INK)
+			draw_polyline(PackedVector2Array([marker+Vector2(-3,-3),marker+Vector2(-2,3),marker+Vector2(2,3),marker+Vector2(3,-3)]),TEAL,1.5)
 	if bar.has("games") and bar.equipment.pool>0:
 		# Status is model-owned; the artwork never creates a pool fee.
 		for i in int(bar.equipment.pool):
@@ -264,6 +269,7 @@ func scene_people(bar: Dictionary) -> Array:
 		var customer_id: int = int(bar.customers[i].id) if bar.has("customers") else i+1
 		var appearance := Art.customer_sprite(customer_id)
 		people.append({"who":appearance[0],"pose":appearance[1],"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})
+		people.back().visit_phase = bar.customers[i].get("visit_phase","legacy") if bar.has("customers") else "legacy"
 		people.back().order_seconds_left = Economy.order_seconds_left(bar,bar.customers[i]) if bar.has("customers") else Content.PATIENCE_SECONDS
 	people.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.foot.y<b.foot.y)
 	return people

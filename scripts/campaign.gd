@@ -676,7 +676,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -703,6 +703,7 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)<13: defaults.erase("completed")
 				if int(parsed.version)<12: defaults.erase("club_level")
 				if int(parsed.version)<11:
 					for key in Street.Economy.tip_fields(): defaults.erase(key)
@@ -793,7 +794,7 @@ func _read(path: String) -> Variant:
 				if not _finite_number(bar.manager_level,0,3) or float(bar.manager_level)!=floorf(bar.manager_level): return null
 				if not bar.auto_serve is bool or not bar.auto_serve_on is bool: return null
 				if not _finite_number(bar.supplier_level,0,5) or float(bar.supplier_level)!=floorf(bar.supplier_level): return null
-				if not _finite_number(bar.equipment.get("music"),0,2 if int(parsed.version)>=12 else 1): return null
+				if not _finite_number(bar.equipment.get("music"),0,4 if int(parsed.version)>=13 and bar.type==0 else 2 if int(parsed.version)>=12 else 1): return null
 				for lot in bar.stock_lots:
 					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),1,Street.C.STOCK_COST): return null
 					if not _finite_number(lot.get("drink",0),0,Street.C.DRINKS.size()-1): return null
@@ -812,6 +813,16 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=13:
+			for bar in parsed.street.bars:
+				if not _finite_number(bar.completed,0,1e15) or float(bar.completed)!=floorf(bar.completed): return null
+				for item in Street.C.EQUIPMENT:
+					var value: Variant = bar.equipment[item.id]
+					if not _finite_number(value,0,Street.Economy.equipment_limit(bar,item.id,item.max)) or float(value)!=floorf(value): return null
+				for customer in bar.customers:
+					if not customer.get("visit_phase") in ["legacy","waiting","drinking","finished"]: return null
+					if not _finite_number(customer.get("planned_rounds"),0 if customer.visit_phase=="legacy" else 1,3): return null
+					if float(customer.planned_rounds)!=floorf(customer.planned_rounds) or not customer.get("visit_complete") is bool: return null
 		if int(parsed.version)>=12:
 			for bar in parsed.street.bars:
 				if not _finite_number(bar.get("club_level"),0,3) or float(bar.club_level)!=floorf(bar.club_level): return null

@@ -66,6 +66,7 @@ func run(test: SceneTree) -> void:
 	bar.equipment.comfort = 0
 	model.street.action("chat")
 	test.check(customer.chatted and marker_color(city,bar,customer.id)==City.GOLD,"Successful Chat updates the marker from the extended patience")
+	customer.visit_phase = "legacy"
 	customer.life = 10
 	test.check(marker_color(city,bar,customer.id)==City.ORDER_URGENT,"A visit ending soon is urgent even with order patience left")
 	model.street.action("serve")

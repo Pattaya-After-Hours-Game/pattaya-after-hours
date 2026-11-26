@@ -42,6 +42,7 @@ func run(test: SceneTree) -> void:
 		var guest: Dictionary = b.customers[0]
 		guest.drinks = 2
 		guest.missed = false
+		guest.visit_complete = true
 		e.depart(b,guest)
 		test.check(m.s.rep==rep+1+fridge,"Ten satisfied visits earn base reputation plus each fridge tier")
 		b.happy = 19
@@ -54,6 +55,7 @@ func run(test: SceneTree) -> void:
 		guest = b.customers[0]
 		guest.drinks = 2
 		guest.missed = false
+		guest.visit_complete = true
 		e.depart(b,guest)
 		test.check(m.s.rep==100,"Fridge reputation respects the reputation cap")
 	# Role prices cannot be bypassed with a bartender contract.

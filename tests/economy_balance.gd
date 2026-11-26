@@ -12,6 +12,9 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 	var times := {"seed":seed_value,"style":style,"opening":opening,"chat":use_chat,"feature":feature,"promoter":-1,"compact":-1,"hire":-1,"manager":-1,"chapter1":-1,"longest_investment_gap":0,"manager_saving_gap":0,"first":-1,"pool":-1,"stage2":-1,"second":-1,"stage3":-1}
 	var last_investment := 0
 	var last_investments := investment_count(model.s.street.bars)
+	var last_flagship_investments := investment_count([st.selected()])
+	times.cycle_purchases = []
+	times.established_investments = []
 	for second in minutes*60:
 		# Real player prep actions; seconds spent cleaning count toward pacing.
 		if st.can_skip():
@@ -76,6 +79,11 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 			for member in bar.team.size():
 				if bar.team[member].role==0 and bar.team[member].training<4: st.action("train_staff",member)
 		if feature in ["regulars-club","stage-two-bundle"] and eco.club_offer(bar).enabled: st.action("regulars_club")
+		if feature=="profit-cycle" and bar.stage>=2 and second%10==0:
+			var purchase := cycle_purchase(model,style!="mostly-idle")
+			if not purchase.is_empty():
+				purchase.second = second
+				times.cycle_purchases.append(purchase)
 		if bar.stage==1 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
 		if bar.stage>=2 and times.stage2<0: times.stage2 = second
 		if owner_first and bar.stage>=2 and bar.action_levels.pouring<3:
@@ -113,6 +121,8 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if model.s.street.chapter>=1 and times.chapter1<0: times.chapter1 = second
 		var investments := investment_count(model.s.street.bars)
 		if investments>last_investments:
+			if bar.stage==2 and second>int(times.stage2) and investment_count([bar])>last_flagship_investments: times.established_investments.append(second)
+			last_flagship_investments = investment_count([bar])
 			times.longest_investment_gap = maxi(times.longest_investment_gap,second-last_investment)
 			last_investment = second
 			last_investments = investments
@@ -137,7 +147,47 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 	times.orders = model.s.street.orders
 	times.offered = model.s.street.offered
 	times.arrivals = model.s.street.arrivals
+	if feature!="profit-cycle":
+		times.erase("cycle_purchases")
+		times.erase("established_investments")
 	return times
+
+# Choose a useful investment by estimated extra customer contribution per baht.
+# No purchase schedule, free cash, changed deadlines or waiting timer is imposed.
+func cycle_purchase(model, owner_active: bool) -> Dictionary:
+	var e = model.street.economy
+	var b: Dictionary = model.street.selected()
+	if not e.is_trading(b): return {}
+	var baseline: Dictionary = e.forecast(b,false,-1,-1,0,owner_active)
+	var candidates := []
+	var club: Dictionary = e.club_offer(b)
+	if club.enabled:
+		var after := b.duplicate(true)
+		after.club_level += 1
+		var view: Dictionary = e.forecast(after,false,-1,-1,0,owner_active,{"original":b,"bar":after})
+		candidates.append({"action":"regulars_club","index":0,"name":"club","price":club.price,"gain":view.net-baseline.net})
+	for index in [0,4,8]:
+		var id: String = C.EQUIPMENT[index].id
+		var offer: Dictionary = e.equipment_offer(b,index)
+		if not offer.enabled: continue
+		var after := b.duplicate(true)
+		after.equipment[id] += 1
+		var view: Dictionary = e.forecast(after,false,-1,-1,0,owner_active,{"original":b,"bar":after})
+		candidates.append({"action":"equipment","index":index,"name":id,"price":offer.price,"gain":view.net-baseline.net})
+	for index in b.team.size():
+		var offer: Dictionary = e.training_offer(b,index,false)
+		if not offer.enabled: continue
+		var after := b.duplicate(true)
+		after.team[index].training += 1
+		var view: Dictionary = e.forecast(after,false,-1,-1,0,owner_active,{"original":b,"bar":after})
+		candidates.append({"action":"train_staff","index":index,"name":"training","price":offer.price,"gain":view.net-baseline.net})
+	var best := {}
+	for candidate in candidates:
+		if candidate.gain<=.1: continue
+		if best.is_empty() or candidate.gain/candidate.price>best.gain/best.price: best = candidate
+	if best.is_empty(): return {}
+	model.street.action(best.action,best.index)
+	return best
 
 # Purchases that improve the business; deliveries/renewals are ordinary upkeep.
 func investment_count(bars: Array) -> int:

@@ -24,7 +24,7 @@ func run(test: SceneTree) -> void:
 	test.check(m.s.street.minute==104 and m.street.selected().dirt==0 and m.s.street.night_prep.cancelled,"Last-second cancellation keeps time in prep while cleaning finishes")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==12 and loaded.s.street.night_prep.cancelled,"Cancellation survives reload")
+	test.check(loaded.load_game() and loaded.s.version==13 and loaded.s.street.night_prep.cancelled,"Cancellation survives reload")
 	loaded.street.tick(20)
 	test.check(loaded.s.street.minute==124,"Reload cannot restart the cancelled night's jump")
 	loaded.street.action("skip")

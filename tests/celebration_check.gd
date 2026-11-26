@@ -22,18 +22,20 @@ func run(test: SceneTree) -> void:
 	for i in 10: m.street.celebration_info()
 	test.check(JSON.stringify(m.s)==snapshot,"Countdown reads never advance or reward the event")
 	b.customers.clear()
-	e.admit(b)
+	e.admit(b,false,true)
 	var guest: Dictionary = b.customers[0]
-	test.check(guest.life==105 and E.patience(b,guest)==35,"Party visitors get fifteen more seconds to stay and ten more patience")
+	test.check(guest.planned_rounds==3 and guest.party_patience==10 and E.patience(b,guest)==55,"Opening-party guest plans three rounds and retains party plus opening-rush patience")
 	e.serve(b)
 	test.check(guest.next==26,"Party repeat order is faster at normal drink prices")
 	guest.order = false
 	guest.drinks = 2
 	guest.budget = 80
+	guest.next = 0
 	e.order(b,guest)
 	test.check(guest.order,"Party guests can request a third drink if they can afford it")
 	e.serve(b)
 	guest.budget = 10000
+	guest.next = 0
 	e.order(b,guest)
 	test.check(not guest.order and guest.drinks==3,"Celebrations never create an unlimited drink budget or order count")
 	b.equipment.music = 1
@@ -61,7 +63,7 @@ func run(test: SceneTree) -> void:
 	m.s.street.bars.pop_back()
 	m.save_game()
 	var loaded = Campaign.new(11)
-	test.check(loaded.load_game() and loaded.s.version==12 and JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reload preserves one active party ledger")
+	test.check(loaded.load_game() and loaded.s.version==13 and JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reload preserves one active party ledger")
 	loaded.street.celebration_tick()
 	test.check(JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reloading cannot restart or clear party results")
 	m.s.day = 8

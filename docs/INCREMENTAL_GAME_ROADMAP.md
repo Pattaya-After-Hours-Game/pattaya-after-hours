@@ -22,14 +22,14 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Nida contract-only pay and thirty-second pool |
-| Status | DONE; based on main `f1cc217`; verified for main release |
+| Active feature | Profit cycle: seats → service → appeal → seats |
+| Status | REVIEW; based on `cc30403` plus preserved Gabby integration `1a23e49` |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Codex verified tests and layout; independent device play pending |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `main`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Promoter commission, pool duration, legacy save compatibility, UI, tests and docs |
-| Next handoff / blocker | Full suite passed; Nida/pool previews inspected; main workflow publishes, device play pending |
+| Working branch / chat / PR | `codex/profit-cycle`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Visit lifecycle, beer upgrade tracks, bounded traffic, model feedback, save migration, tests and docs |
+| Next handoff / blocker | Gameplay/visual checks pass; explicit faster-pacing target decision pending; no release yet |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-26 |
 

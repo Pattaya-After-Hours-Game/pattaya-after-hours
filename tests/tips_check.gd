@@ -50,6 +50,7 @@ func run(test: SceneTree) -> void:
 	e.serve(b)
 	test.check(b.tip_visits==1 and m.s.cash==money+80 and b.tips_total==0,"First real sale banks one ten-baht tip without paying it early")
 	var guest: Dictionary = b.customers[0]
+	guest.next = 0
 	e.order(b,guest)
 	e.serve(b)
 	test.check(guest.drinks==2 and b.tip_visits==1,"Repeat drink during the same visit cannot earn another tip")
@@ -140,7 +141,7 @@ func run(test: SceneTree) -> void:
 	m.s.version = 10
 	m.save_game()
 	loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==12 and loaded.street.selected().tip_visits==0,"Old saves start with an empty tip jar, retaining cash and progress")
+	test.check(loaded.load_game() and loaded.s.version==13 and loaded.street.selected().tip_visits==0,"Old saves start with an empty tip jar, retaining cash and progress")
 	b = loaded.street.selected()
 	loaded.street.economy.order(b,b.customers[0])
 	loaded.street.economy.serve(b)

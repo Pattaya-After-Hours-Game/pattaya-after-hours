@@ -116,6 +116,7 @@ func chat(test: SceneTree) -> void:
 	# A nearly finished visit also qualifies, even if its order is new.
 	guest.missed = false
 	guest.wait = 0
+	guest.visit_phase = "legacy"
 	guest.life = 5
 	test.check(e.chat_target(b)==guest,"Chat accounts for visit expiry as well as order patience")
 
@@ -193,7 +194,7 @@ func saves(test: SceneTree) -> void:
 	file.store_string(JSON.stringify(m.s))
 	file.close()
 	loaded = Campaign.new(9)
-	test.check(loaded.load_game() and loaded.s.version==12,"A genuine v4 campaign migrates to v12")
+	test.check(loaded.load_game() and loaded.s.version==13,"A genuine v4 campaign migrates to v13")
 	b = loaded.street.selected()
 	test.check(b.serve_ready==1 and b.welcome_ready==10 and b.action_levels.pouring==0 and b.games==games and b.customers.size()==3 and not b.customers[0].chatted,"Migration preserves pending deadlines and paid games without granting upgrades or resetting customers")
 	loaded.save_game()

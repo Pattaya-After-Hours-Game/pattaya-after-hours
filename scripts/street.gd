@@ -41,7 +41,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	economy = Economy.new(s,fresh)
-	s.version = 12
+	s.version = 13
 
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()

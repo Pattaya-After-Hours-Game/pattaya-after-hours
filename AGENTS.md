@@ -40,6 +40,19 @@ claiming behaviour exists; update the relevant documentation when it changes.
   levels 0–5; premium orders and promotions retain their separate rules. Fresh
   campaigns start with ฿228 and twelve drinks. Preserve saved quotes, budgets
   and paid inventory costs; never revalue an existing fridge or grant cash on update.
+- The repeating profit cycle is seats → service → appeal → seats. New visitors
+  plan one/two rounds, with one-round chances 20/40/10% by local/tourist/nightlife
+  audience; opening guests plan two. Budget is house price × rounds + ฿100.
+  Club OR birthday adds one round, max three. Drink the last round before leaving;
+  active pool games/bounded pool queues can retain the guest. Satisfied one-round
+  visits count happy. Never replace an existing saved visit with a new random plan.
+  Beer-bar cumulative caps by stage are seating 3/5/7, sign 1/3/5, fridge 2/3/4,
+  music 1/2/4 and staff training 2/4/6. Costs per tier N are 400N/900N/800N/1200N/400N.
+  Compact-layout recovery applies at seating >=3. Other venue tracks stay unchanged.
+  Base traffic is 7.3 + 2 × max(0, highest owned beer sign − 1), one shared pool.
+  Advice and visit details are read-only. Customer contribution uses consumed paid
+  stock and excludes manager income, tips and investments; keep the till cashflow
+  sample unchanged. See [profit-cycle rules](docs/design/PROFIT_CYCLE.md).
 - Pool costs **฿50 per game per table**, charged once at game start; new games last 30 seconds.
   Preserve saved remaining time for games already underway, including older 45-second games. Free Pool
   Night trades fees for attraction. Timers, capacity, customer budgets and
@@ -56,7 +69,8 @@ claiming behaviour exists; update the relevant documentation when it changes.
   for switching back. Training belongs to the person and survives expiry/rehire. Base bartender
   service starts ready: sell one real order, then recover for 25 seconds, improving
   to 20/15 through training costing ฿400/800; stage two adds 12/10 seconds
-  for ฿1,200/1,600 per person. Keep the saved deadline through queue changes, owner
+  for ฿1,200/1,600 per person. Beer-bar stage three adds 8/6 seconds for
+  ฿2,000/2,400. Keep the saved deadline through queue changes, owner
   clicks, rota/role changes and reloads. Staff precede purchased owner auto-serve. Owner automation is relief: serve
   when pending orders exceed available bartenders, or a guest has at most ten
   seconds left and no bartender can recover before their deadline. No eligible
@@ -87,11 +101,13 @@ claiming behaviour exists; update the relevant documentation when it changes.
   purchase prices ฿8,000/36,000/72,000. Keep it separate from drink/pool sales,
   commission, customer counters and healthy-service milestones. No closed income.
 - Music costs ฿1,200 for 35→25-second repeats; stage-two better sound costs
-  ฿2,400 and reaches 18 seconds (party 14). Preserve existing repeat deadlines.
+  ฿2,400 and reaches 18 seconds (party 14). Beer-bar stage three adds ฿3,600/4,800
+  tiers for 14/11 seconds (party 11/8). Preserve existing drinking deadlines,
+  including the final round.
   Regulars Club has stage-two tiers ฿600/1,200/2,400, requiring 10/20/35 local
   regulars plus a stock-pack/operating reserve. New visitors join at 35/65/100%,
-  gaining twenty seconds and one house-price budget allowance for a third round.
-  Birthday and club never stack past three. Schema 12 saves visit membership;
+  adding one planned round and its house-price budget allowance, capped at three.
+  Birthday and club never stack past three. Schema 13 saves visit plans/phases; pre-13 guests retain their legacy visit rules;
   old guests receive no extra round and old managers receive no refund. All
   sales still need orders, budgets, stock and service; membership persists per visit.
   Music preserves budgets and visit limits. Auto-serve costs ฿3,000 per venue and uses the SAME
@@ -101,7 +117,7 @@ claiming behaviour exists; update the relevant documentation when it changes.
 - Day seven's Blue Hour opening hosts Anong's Birthday, noon to normal 1am close.
   Later seventh-day openings rotate reunions, mixtape and thank-you nights. Keep
   the countdown/warning, free entry, finite shared traffic, real orders/budgets,
-  normal prices and actual report. Only the flagship gets the party third drink and
+  normal prices and actual report. Only the flagship gets the party extra planned round (max three) and
   faster party repeat timing; closed venues gain no party attraction. Never replay
   party income offline or advance a party on the menu. Schema 8 preserves its
   ledger/date and guest patience, with no retroactive migration reward.

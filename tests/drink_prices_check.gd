@@ -36,6 +36,7 @@ func run(test: SceneTree) -> void:
 	test.check(b.stock_lots==[{"units":5,"cost":6},{"units":7,"cost":14}] and b.customers[0].quoted==55,"Old supplier costs and waiting quotes survive reload unchanged")
 	e.serve(b)
 	test.check(loaded.s.cash==1042 and b.shift.consumed_stock==6,"An old tab settles once at its saved price using its original paid stock cost")
+	b.customers[0].next = 0
 	e.order(b,b.customers[0])
 	test.check(b.customers[0].quoted==e.price(b,int(b.customers[0].drink)) and b.customers[0].budget==155,"Only the next round adopts the new price; old customer budgets are preserved")
 	for path in [Campaign.SAVE,Campaign.BACKUP]:

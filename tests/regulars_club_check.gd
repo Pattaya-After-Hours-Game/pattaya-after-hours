@@ -34,21 +34,26 @@ func run(test: SceneTree) -> void:
 	b.customers.clear()
 	e.admit(b,false,true)
 	var guest: Dictionary = b.customers[0]
-	test.check(guest.club and guest.life==110 and guest.budget==340,"A club visitor has twenty extra seconds and a finite extra-round budget")
+	test.check(guest.club and guest.planned_rounds==3 and guest.budget==340,"A club visitor has three planned rounds and a finite budget")
 	for i in 3:
+		guest.next = 0
 		e.order(b,guest)
 		e.serve(b)
+	guest.next = 0
 	e.order(b,guest)
 	test.check(guest.drinks==3 and not guest.order and b.tip_visits==1,"Club serves three real drinks but only one base tip")
 	m.s.day = 7
 	m.street.celebration_tick()
+	guest.next = 0
 	e.order(b,guest)
 	test.check(not guest.order,"Club and birthday cannot stack into a fourth drink")
 	guest.drinks = 2
 	guest.budget = 0
+	guest.next = 0
 	e.order(b,guest)
 	test.check(not guest.order,"An extra round still needs a customer budget")
 	guest.budget = 100
+	guest.next = 0
 	e.order(b,guest)
 	b.stock = 0
 	money = m.s.cash
@@ -97,8 +102,8 @@ func run(test: SceneTree) -> void:
 	test.check(person.training==4 and person.service_ready==17.25,"Advanced training and deadline survive rehire")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==12 and loaded.street.selected().club_level==3 and loaded.street.selected().customers[0].club,"Club level and visit entitlement survive reload")
-	test.check(loaded.street.selected().equipment.music==2 and loaded.street.selected().team[0].training==4 and loaded.street.selected().team[0].service_ready==17.25,"Schema twelve retains better sound and advanced training")
+	test.check(loaded.load_game() and loaded.s.version==13 and loaded.street.selected().club_level==3 and loaded.street.selected().customers[0].club,"Club level and visit entitlement survive reload")
+	test.check(loaded.street.selected().equipment.music==2 and loaded.street.selected().team[0].training==4 and loaded.street.selected().team[0].service_ready==17.25,"Schema thirteen retains better sound and advanced training")
 	guest.order = true
 	guest.budget = 300
 	person.service_ready = 0.0

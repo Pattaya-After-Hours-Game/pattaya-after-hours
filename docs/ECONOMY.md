@@ -10,7 +10,29 @@ The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
 
-## Current promoter and pool update — 26 November 2026
+## Current profit-cycle rules — 26 November 2026
+
+The [profit-cycle specification](design/PROFIT_CYCLE.md) defines the current
+visitor lifecycle, beer-bar tier caps/prices, bounded frontage traffic, financial
+feedback and schema-13 compatibility. New visitors have variable one/two-round
+plans; club or birthday adds one non-stacking round. They drink the final round
+before leaving, with bounded pool waiting. Happy one-drink visits count.
+
+Beer caps by stage: seating **3/5/7**, frontage **1/3/5**, fridges **2/3/4**,
+music **1/2/4**, service training **2/4/6**. Prices per tier N are respectively
+฿400N/900N/800N/1,200N/400N. Only beer bars gain these additional tracks.
+Music takes 35/25/18/14/11 seconds (party 26/19/14/11/8); bartender service takes
+25/20/15/12/10/8/6. Existing timers are never shortened retroactively.
+
+Base street traffic is 7.3 + 2 × max(0, highest owned beer frontage − 1) per minute,
+shared among all venues. Completed-shift advice reads actual losses/occupancy;
+customer profit subtracts consumed paid stock and operating expenses, excluding
+manager income and tips. The till sample remains actual cashflow. Offline visitor
+estimates divide settled drinks by expected variable rounds, not a fixed two.
+Older visitors keep legacy rules until departure; paid progress is preserved.
+Dated previous sections below describe earlier releases where explicitly labelled.
+
+## Previous promoter and pool update — 26 November 2026
 
 Nida's ฿1,200 ten-day contract is her entire fee; commission is removed. New
 pool games last **30 seconds**, still costing **฿50 once per table at start**.
@@ -156,12 +178,12 @@ Host attraction gets +2 before audience/peak/dirt factors. Other venues compete
 for the same finite supply; they do not copy host timing or the third-drink limit.
 New random event announcements wait during the party; existing events continue.
 
-The host permits up to three orders per visit instead of two, subject to actual
-budgets. Repeat timing becomes 26 seconds, 19 with music or 14 with better sound. Existing timers and
-quoted orders are preserved. New party visitors gain fifteen seconds of life
-and ten seconds of patience; the per-visit patience is saved through reload.
+New host visitors plan one extra round, capped at three, subject to actual
+budgets. Drinking timing becomes 26/19/14/11/8 seconds by music tier, including
+the final drink. Existing timers and quoted orders are preserved. New party
+visitors gain ten seconds of patience, saved through reload.
 After closing, no new third rounds are requested. Real stock, serving deadlines,
-space, pool capacity, normal prices and commission remain authoritative.
+space, pool capacity and normal prices remain authoritative. Nida has no commission.
 
 The active/last report records actual host arrivals, sales, happy visits, regulars,
 lost business and paid costs during the window. Trading contribution is drink
@@ -326,8 +348,9 @@ working-capital limits.
 Beer-bar seating levels cost ฿400, ฿800 and ฿1,200. Stage-one capacity before
 furniture is 6/8/10/12. Pool normally uses two places per table and comfort one;
 the third seating level recovers up to three furniture places. Thus every legal
-stage-one combination holds twelve. Stage two holds eighteen with one table and
-comfort, sixteen with two. Other venue types retain two seating upgrades.
+stage-one combination holds twelve. At seating tier three, stage two holds eighteen with one table and
+comfort, sixteen with two. Tiers four/five add two more each. The layout recovery
+applies to all seating tiers from three onward. Other venue types retain two seating upgrades.
 Purchases preserve the next shift's operating reserve and show actual capacity.
 
 `pack_quantity`, `stock_offer` and `restock` settle six drinks for ฿228 at supplier
@@ -388,7 +411,7 @@ and dancers never count as bartenders. The ฿3,000 price is unchanged.
 Forecasts and offline income retain demand-limited sustained capacity estimates;
 they do not simulate the live queue dispatch or promise its exact throughput.
 
-The base cooldown is 25 seconds; training makes subsequent cooldowns 20/15, then 12/10 at stage two.
+The base cooldown is 25 seconds; training makes subsequent cooldowns 20/15, then 12/10 at stage two; beer-bar stage three adds 8/6 for ฿2,000/2,400.
 Training preserves a deadline already running. Owner clicks, empty queues,
 stockouts, rotas, closure, reassignments and reloads never reset it. Foreground
 closed/off-duty time can finish recovery; paused/menu/offline time does not
@@ -442,7 +465,9 @@ or new audio dependency is needed.
 ## Music, supplier tiers and manager income
 
 Music costs ฿1,200 for 25-second repeat orders instead of 35. Stage-two better
-sound costs another ฿2,400 for 18-second repeats. Neither adds visitors, enlarges
+sound costs another ฿2,400 for 18-second repeats. Beer-bar stage three adds
+฿3,600/4,800 tiers for 14/11 seconds. Music also controls finishing the final
+drink, allowing earlier departure. None of these tiers adds visitors, enlarges
 budgets, raises visit limits or bypasses service/stock. Existing timers stay
 intact. Forecast demand uses expected rounds per visit, including club membership;
 actual timing and losses determine whether music improves sales.

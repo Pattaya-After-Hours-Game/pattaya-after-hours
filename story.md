@@ -61,14 +61,14 @@ remains a subsidised ฿14-per-sale favour, not an ordinary wholesale deal.
 ## A reason to stay for another round
 
 After the first renovation, Anong notices an awkward quiet patch: the bar looks
-better, but the same customers finish two drinks and leave. She starts the
+better, but customers finish the visit they came for and leave. She starts the
 **Regulars Club**, a place to settle in rather than a discount on the beer.
 
 > **Anong:** “You bought them comfortable chairs. Give them a reason to stay in them.”
 
 At stage two, ฿600/1,200/2,400 club investments and 10/20/35 local regulars
-invite 35%/65%/100% of new visitors to stay twenty seconds longer and budget for
-a third drink. Existing guests keep the visit they arrived for. The birthday
+invite 35%/65%/100% of new visitors to plan and budget for one extra drink,
+up to three. Existing guests keep the visit they arrived for. The birthday
 still stops at three rounds; nobody gets a fourth because of a membership card.
 
 Pim's better sound system costs ฿2,400 after the original ฿1,200 music purchase,
@@ -81,6 +81,32 @@ The first management appointment now costs ฿8,000. Dao can bring in the existi
 ฿10 per open second sooner, while the owner chooses between better visits,
 faster service and the next building. Anong still insists on stock and payroll
 reserves: an empty fridge cannot serve an encore.
+
+## The next problem is a better problem
+
+The Blue Hour's progress is a repeating business comedy. Add seats and discover
+that Dao cannot pour quickly enough. Train the team and discover an empty room.
+Improve the frontage and discover a queue outside. Now those extra seats make
+sense again. Anong calls this progress. Bo calls it another delivery.
+
+> **Anong:** “Yesterday we needed customers. Today we need chairs. Tomorrow you
+> will tell me we need a second pair of your hands.”
+
+Visitors arrive with one or two rounds in mind. Locals are more likely to settle
+in; tourists may stop for one. A club invitation or birthday adds one round, not
+an unlimited tab. They finish the final drink, finish pool if necessary, and go.
+Even someone who only came for one can leave happy and become a regular.
+
+Pim's music speeds the rhythm of drinking and frees seats sooner. Across the
+three beer-bar stages, owners can buy seven seating tiers, five frontage tiers,
+four fridges, four music tiers and six personal service-training tiers. Each
+stage opens more options; none installs itself. Other venue types retain their
+existing investments while sharing the new visitor behaviour.
+
+Service's profit report gives Anong evidence: actual arrivals, orders, drinks and
+completed visits, with guaranteed manager income shown separately. Her advice
+points to the constraint the last shift exposed. These are working business
+systems, not new personal quests or promises of an endless customer stream.
 
 ## A shift has a rhythm
 
@@ -147,7 +173,7 @@ reminder ask the owner to fill the fridge and sort the rota.
 
 The invitations and bunting cost nothing. From noon until the normal 1am close,
 the street gets more visitors and the Blue Hour is the gathering place. Guests
-stay a little longer, give the team more patience and may buy a third drink.
+plan an extra round, give the team more patience and may buy a third drink.
 Pim's purchased music brings the next round forward again. Nobody conjures
 stock, customers still have budgets, and serving the room earns the night's money.
 A crowded party can expose a slow bar; Chat, a colleague and a prepared fridge

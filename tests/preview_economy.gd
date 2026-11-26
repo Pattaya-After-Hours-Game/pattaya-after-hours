@@ -17,7 +17,7 @@ func find_text(node: Node, text: String) -> Control:
 
 func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not filter.is_empty() and not name_text.match(filter): return
-	var targets := {"Regulars Club":"Upgrade_club","Better sound system":"Upgrade_music","Train Bartender":"Upgrade_training_0","YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
+	var targets := {"Cycle seating":"Upgrade_seating","Cycle music":"Upgrade_music","Regulars Club":"Upgrade_club","Better sound system":"Upgrade_music","Train Bartender":"Upgrade_training_0","YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
 	var upgrade_target: String = targets.get(scroll_to,"")
 	var was_open: bool = app.upgrades_open
 	var ready_only: bool = app.upgrades_ready_only
@@ -36,7 +36,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	elif not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 			if name_text=="gabby-hire": app.scroll.scroll_vertical = maxi(0,app.scroll.scroll_vertical-100)
 		await process_frame
@@ -63,6 +63,49 @@ func run() -> void:
 	await capture(app,"opening")
 	app.show_tutorial_hint = false
 	app.drawer_open = true
+	app.model = Campaign.new(72)
+	app.model.s.cash = 10000
+	var cycle_bar: Dictionary = app.model.street.selected()
+	cycle_bar.equipment.seating = 3
+	await capture(app,"cycle-stage-one-lock","Cycle seating")
+	cycle_bar.stage = 2
+	await capture(app,"cycle-stage-two-seating","Cycle seating")
+	cycle_bar.equipment.music = 2
+	await capture(app,"cycle-stage-two-music-lock","Cycle music")
+	app.visit_plans_open = true
+	app.model.street.economy.serve(cycle_bar)
+	await capture(app,"cycle-visit-plans","Hide visit plans")
+	await capture(app,"cycle-profit","YOUR PROFIT CYCLE")
+	app.drawer_open = false
+	cycle_bar.stage = 3
+	cycle_bar.equipment.seating = 7
+	cycle_bar.equipment.pool = 2
+	cycle_bar.equipment.comfort = 1
+	for i in 40: app.model.street.economy.admit(cycle_bar)
+	app.model.street.economy.pool_tick(cycle_bar)
+	await capture(app,"cycle-full-furnished")
+	cycle_bar.equipment.pool = 0
+	cycle_bar.equipment.comfort = 0
+	cycle_bar.games.clear()
+	for i in 3: app.model.street.economy.admit(cycle_bar)
+	await capture(app,"cycle-full-34")
+	app.model = Campaign.new(72)
+	cycle_bar = app.model.street.selected()
+	cycle_bar.stage = 3
+	cycle_bar.equipment.pool = 1
+	cycle_bar.equipment.music = 4
+	app.model.street.economy.clear_visits(cycle_bar)
+	app.model.s.street.pass_credit = -1000000
+	for i in 2:
+		app.model.street.economy.admit(cycle_bar)
+		cycle_bar.customers.back().planned_rounds = 1
+		cycle_bar.customers.back().pool = true
+	app.model.street.economy.pool_tick(cycle_bar)
+	app.model.street.economy.serve(cycle_bar,2)
+	app.model.street.tick(11)
+	app.drawer_open = true
+	await capture(app,"cycle-finishing-pool","Hide visit plans")
+	app.visit_plans_open = false
 	app.model = Campaign.new(72)
 	app.model.s.cash = 10000
 	await capture(app,"gabby-hire","Hire Gabby")

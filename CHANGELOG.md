@@ -1,5 +1,17 @@
 # Changelog
 
+## Profit cycle — source implementation
+
+- Visitors plan variable rounds, finish the final drink and leave or finish pool.
+  Satisfied one-round visits count; club/birthday adds one non-stacking round.
+- Added beer-bar frontage, seating, fridge, music and personal training tiers
+  across all three stages, with one bounded shared street traffic pool.
+- Added customer-profit/bottleneck feedback and optional live visit details,
+  with drinking markers and guaranteed manager income shown separately.
+- Schema 13 preserves paid progress and legacy visitors; offline estimates use
+  variable rounds. Existing prices and manager exception remain.
+- Includes the separately preserved Gabby integration below.
+
 ## Gabby bartender — local source
 
 - Added Gabby's pale-skinned, short red-dress character art, portrait and named hiring/renewal controls.

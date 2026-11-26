@@ -3,6 +3,66 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
+## Profit-cycle verification — 26 November 2026
+
+Working branch: `codex/profit-cycle`, based on `cc30403` and the separate Gabby
+checkpoint `1a23e49`. Source and release status are distinct.
+
+Gameplay/save/UI regressions pass, including variable visit plans, final-drink
+occupancy, happy one-drink departures, budget/stock limits, pool completion and
+bounded waiting, locked tiers, paid upgrades, preserved cooldowns, schema-13 and
+legacy visits, malformed tiers and read-only profit/visit views. Existing Gabby,
+nightly tips, commission-free Nida and thirty-second pool checks remain included.
+
+All promoter, automation, celebration and Regulars Club suites pass separately.
+The new 120 paired bottleneck scenarios pass: ten seeds × four bottlenecks ×
+three choices, each trading for 600 seconds. Total operating contribution:
+
+| Bottleneck | Baseline | Matching purchase | Unrelated purchase |
+| --- | ---: | ---: | ---: |
+| Seats | ฿27,632 | ฿36,608 | ฿29,084 |
+| Drinking turnover | ฿27,632 | ฿34,980 | ฿29,084 |
+| Service | ฿14,300 | ฿19,756 | ฿14,300 |
+| Appeal | ฿27,764 | ฿38,984 | ฿27,764 |
+
+These are paired test businesses, not fresh-game earnings or guaranteed returns;
+purchase prices are excluded from operating contribution. No scenario bypasses
+orders, stock, cash or shared visitor supply.
+
+Fresh active routes across three seeds each:
+
+| Measure | Original baseline policy | New profit-cycle policy |
+| --- | ---: | ---: |
+| First purchase | 2.6–3.7 min | 2.6–3.7 min |
+| First pool | 13.0–17.9 | 13.0–17.9 |
+| Stage two | 27.9–33.3 | 27.9–33.3 |
+| First manager | 71.7–81.9 | 80.0–87.3 |
+| Second property | 86.7–95.8 | 92.1–101.9 |
+| Stage three | 121.8–132.3 | 118.9–129.7 |
+| Saving gap before manager | 15.3–20.9 | 3.2–9.8 |
+| Longest gap between investments | 32.5–35.4 | 24.3–25.4 |
+
+The new policy reinvests more before management, so it reaches management later
+but has useful purchases during the wait. Its stage-two flagship purchase median
+is **160–189 seconds** (2m40s–3m09s). All gaps are printed, including occasional
+5–11-minute gaps and much longer late idle-route gaps. Mostly-idle routes remain
+slower and solvent; their cadence is not held to the active-player target.
+
+**Unresolved acceptance:** `tools/test.sh` currently fails the unchanged baseline
+stage-two lower bound in two click-heavy seeds: 1676s and 1769s against the
+30-minute target. The new cycle suite also reports five active cadence medians
+below 180s. No target was silently weakened and no unrelated price changed.
+The user has been asked whether to keep prices and accept 28-minute stage two /
+2.5–5-minute median purchase cadence, or retune to the original lower bounds.
+Until resolved, the branch is not release-ready and is not deployed to main.
+
+Production-art previews at 960×540 and 1280×720 cover locked/unlocked tiers,
+waiting/drinking/finishing-pool details, customer profit and 32/34-person capacity.
+Linux, Windows and macOS exports and isolated Linux startup were checked locally.
+Android device play, Windows/macOS execution, human retention and a published
+release of this feature remain unverified. Previous dated records below are
+historical and do not certify this feature's pending pacing targets.
+
 ## Gabby verification — 26 November 2026
 
 Godot 4.7.2 `tools/test.sh` passes the combined gameplay/save/UI/art suite,
@@ -431,7 +491,7 @@ Review these behaviours, not just whether a PNG exists:
   rates clearly use real minutes. Prep exposes cleaning, stock and optional skip.
 
 - Use `empty-*`, `full-*` and `closed-*` general-preview filters for all three
-  venue types, including the 24-customer maximum. Check character proportions,
+  venue types, including the 34-customer unfurnished beer-bar maximum. Check character proportions,
   visible feet, counter/table occlusion and a clear outside lane.
 - Use `passerby-*` to inspect six consecutive crossings and the empty gap.
   Appearances change between crossings, remain stable during each crossing, and

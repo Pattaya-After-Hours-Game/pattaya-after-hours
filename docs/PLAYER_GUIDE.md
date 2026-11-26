@@ -71,7 +71,8 @@ entry fee or paid preparation is required.
 Clean the Blue Hour, fill its fridge, check contracts and prepare to serve. The
 party adds 40% shared street traffic and more appeal for the host bar. Visitors
 can request up to three drinks if affordable, with repeat timing of 26 seconds
-or 19 with music. They stay fifteen seconds longer and wait ten seconds longer.
+or 19 with music (14/11/8 with later sound tiers). They plan one extra round,
+capped at three, and wait ten seconds longer.
 Full venues still turn people away, and slow or empty bars still lose orders.
 Drinks and pool retain their prices; free-pool promotions remain separate.
 
@@ -393,7 +394,7 @@ optional. The street continues after the festival.
 
 ## Twelve places and Nida outside
 
-Beer bars offer three seating purchases: ฿400, ฿800 and **Compact layout · ฿1,200**.
+Stage-one beer bars offer three seating purchases: ฿400, ฿800 and **Compact layout · ฿1,200**.
 At stage one, the last purchase holds **twelve customers with pool and fans**.
 The wall benches show the new arrangement. It increases room, not demand or speed.
 
@@ -420,13 +421,38 @@ At venue stage two, train Nida or a dancer for ฿800; stage three unlocks a sec
 with the person after rehiring. Attraction still competes for shared street
 visitors; it does not guarantee a sale.
 
+## Follow the profit cycle
+
+A visitor normally plans one or two rounds. The optional **Show visit plans**
+control in Service tells you their actual plan and whether they are waiting,
+drinking or finishing pool. A cyan glass is a drinking guest; yellow/red dots
+still indicate waiting orders. They finish the final drink before freeing a seat.
+Happy one-drink visitors can become regulars too.
+
+**Your profit cycle** shows the last completed shift's actual customer profit,
+manager income separately, its sample duration, and distinct arrival/order/sale/
+completed-visit counts. Before the first report it uses the current shift.
+This uses the cost of stock sold; the till's five-second cashflow also counts
+whole stock deliveries, so the two figures can differ. Neither is a reward button.
+
+- Turned-away guests: add seats or improve drinking turnover with music.
+- Waiting orders lost: help serve or train a bartender.
+- Empty room with spare service: improve frontage or invite customers.
+- Stockouts: stock and deliveries come before advertising harder.
+
+Each beer-bar stage unlocks more purchases: seating caps 3/5/7, frontage 1/3/5,
+fridges 2/3/4, music 1/2/4 and personal bartender training 2/4/6. Stage-three
+training adds 8-second service for ฿2,000 and 6-second service for ฿2,400.
+The next locked upgrade shows its required stage. All still cost money; raising
+a stage does not buy them for you. Check the
+[price table](design/PROFIT_CYCLE.md#beer-bar-investment-tracks).
+
 ## Getting past the stage-two saving gap
 
 Open **Service → Upgrades** for the **Regulars Club**. It costs ฿600, then
 ฿1,200 and ฿2,400, requiring 10/20/35 regulars at that venue. Keep a full pack's
 cost and the next shift's operating costs in reserve. At each tier, 35/65/100%
-of new arrivals join: they stay twenty seconds longer and budget for a third
-round. Visitors already in the bar are unchanged. Birthday and club still cap
+of new arrivals join: they plan and budget for an extra round, capped at three. Visitors already in the bar are unchanged. Birthday and club still cap
 at three drinks. The offer's estimated net change is not a guaranteed payout.
 
 For an upgraded bar with no waiting orders, try the club and better music before
@@ -441,7 +467,9 @@ Buy **Music system · ฿1,200** in Service equipment. Customers ask for their n
 round after 25 seconds rather than 35; they still need money and service. The
 Music indicator shows playing while open and off while closed. At stage two,
 **Better sound system · ฿2,400** reduces future repeats to 18 seconds. Existing
-repeat timers finish normally. Party repeats become 14 seconds. Muting the game
+repeat timers finish normally. Beer-bar stage three adds ฿3,600 and ฿4,800 tiers
+for 14 and 11 seconds. Drinking the final round uses the same timer before the
+guest leaves (or finishes pool). Party timing is 26/19/14/11/8 seconds. Muting the game
 does not remove the upgrade's effect.
 
 **Buy auto-serve · ฿3,000** replaces repeated Serve taps. It uses the same timer,
@@ -473,8 +501,9 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Current schema 12 retains Regulars Club visits, both music tiers and advanced
-bartender training. Older campaigns receive no free upgrades or refunds; existing
+Current schema 13 retains visit plans/phases, all beer-bar tiers and personal
+training. Existing visitors finish their old saved visit rules; new arrivals use
+the new plans. Older campaigns receive no free upgrades or refunds; existing
 guests keep their budgets and visit limits. Save schema 9 retains staff cooldowns and actual service counters; older partial
 work keeps its remaining wait. Schema 8 also retains celebration dates, reports and visitor patience.
 The schema-7 fields preserve music, auto-serve, supplier/manager tiers, stock purchase

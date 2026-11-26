@@ -433,3 +433,27 @@ and rules. Schema 12 validates the optional identity; no migration rewards or
 new counters are needed. `staff_service` adds her bonus only after `serve`
 succeeds, using the existing saved/settled `bonus_tips` jar. `gabby_check.gd`
 covers purchase, service, reload, renewal and once-only settlement.
+
+## Profit cycle and schema thirteen
+
+`street_content.gd` defines `BEER_CAPS`, audience one-round chances and expanded
+service/music intervals. The live model assigns a saved plan at admission,
+transitions waiting → drinking → finished, and releases the seat after the final
+drink plus any bounded pool obligation. Legacy visitors keep `visit_phase=legacy`
+and their saved lifetime/quotes/timers. Completion is distinct from sales and
+nightly first-drink tips. Existing reports gain zeroed timing/completion fields.
+
+`business_summary()` and `visit_lines()` are pure reads. The UI displays actual
+customer contribution separately from guaranteed management; no accounting lives
+in the HUD. Cyan glasses use actual drinking state. `base_traffic()` grows one
+shared supply using the highest owned beer sign; forecasts substitute candidate
+bars into that same competition. Offline forecasts use expected variable rounds
+and visit duration; visitor totals remain labelled estimates.
+
+`profit_cycle_check.gd` covers lifecycle, pool, stage gates, preserved deadlines,
+new/legacy saves, pure reports and UI. `profit_cycle_balance.gd` adds matched
+bottleneck scenarios and fresh click-heavy/balanced/mostly-idle investment routes.
+No grants, forced waiting or changed baseline policy hide pacing misses. Use
+`PATTAYA_PREVIEW_FILTER='cycle-*'` with the economy runner for locked tiers,
+visit/profit views and the 32/34-person production-art capacity cases.
+See [design](docs/design/PROFIT_CYCLE.md) and [verification](docs/TESTING.md).
