@@ -85,6 +85,21 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.model = Campaign.new(72)
+	if filter.begins_with("reputation-"):
+		app.show_tutorial_hint = false
+		app.model.s.rep = 0
+		app.render()
+		var bar: Dictionary = app.model.street.selected()
+		var guest: Dictionary = bar.customers[0]
+		bar.happy = 9
+		guest.visit_complete = true
+		app.model.street.economy.depart(bar,guest)
+		await capture(app,"reputation-gain")
+		app.model.s.street.event = {"id":5,"prepared":false}
+		app.model.street.finish_event()
+		await capture(app,"reputation-loss")
+		quit()
+		return
 	await capture(app,"opening")
 	app.model.s.cash = 50
 	app.open_fridge()

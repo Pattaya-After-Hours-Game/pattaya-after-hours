@@ -116,6 +116,10 @@ var visit_plans_open := false
 var arcade_circuit := false
 
 var live_labels: Array = []
+var reputation_label: Label
+var reputation_float: Label
+var reputation_campaign := 0
+var displayed_reputation := 0
 var action_controls: Array = []
 var skip_to_open: Button
 var bartender_controls: Array = []
@@ -384,12 +388,15 @@ func render(keep_scroll: bool = false) -> void:
 	stock_controls.clear()
 	refresh_street = false
 	var previous := scroll.scroll_vertical if keep_scroll and is_instance_valid(scroll) else 0
-	if is_instance_valid(root_ui):
-		remove_child(root_ui)
-		root_ui.queue_free()
+	var previous_ui := root_ui
 	root_ui = Control.new()
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
+	if is_instance_valid(previous_ui):
+		# Keep the popup moving when a street refresh rebuilds the HUD.
+		if is_instance_valid(reputation_float): reputation_float.reparent(root_ui)
+		remove_child(previous_ui)
+		previous_ui.queue_free()
 	if boot_menu:
 		duo_reaction.clear()
 		render_boot_menu()
@@ -634,6 +641,7 @@ func render(keep_scroll: bool = false) -> void:
 		at_button(welcome,Rect2(24,142,512,40),"Back to the street",dismiss_offline,true)
 	if previous > 0: scroll.set_deferred("scroll_vertical",previous)
 	draw_event_overlay()
+	update_reputation_hud()
 
 func toggle_drawer(index: int) -> void:
 	if drawer_open and tab == index:
@@ -662,6 +670,9 @@ func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> vo
 		heading.clip_text = true
 		live_labels.append([heading,func() -> String: return "DAY %d" % model.s.day])
 	var label := abs_text(root_ui,Rect2(x,13 if name_text=="TILL" and campaign_before_tutorial==null else 20,105,24),value,16 if name_text=="TILL" else 18,tint)
+	if name_text=="REPUTATION":
+		reputation_label = label
+		return
 	if name_text=="TILL" and campaign_before_tutorial==null:
 		var rate := abs_text(root_ui,Rect2(x,33,105,14),"",10,TEAL)
 		live_labels.append([rate,func() -> String: return "%s฿%.2f/s" % ["+" if model.s.street.net_per_second>=0 else "−",absf(model.s.street.net_per_second)]])
@@ -671,10 +682,31 @@ func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> vo
 			match name_text:
 				"TILL": return cash(model.s.cash) if model.s.cash < 100000 else "฿%.1fk" % (model.s.cash/1000.0)
 				"STOCK": return str(model.street.selected().stock)
-				"REPUTATION": return str(model.s.rep)
 				"SHIFT": return "D%03d" % model.s.day
 				"TIME": return model.street.clock_text()
 			return str(model.s.heat)])
+
+func update_reputation_hud() -> void:
+	var reputation := int(model.s.rep)
+	var change := reputation-displayed_reputation
+	var campaign_id: int = model.get_instance_id()
+	if campaign_id!=reputation_campaign or change!=0:
+		if is_instance_valid(reputation_float): reputation_float.free()
+		if campaign_id==reputation_campaign and root_ui.visible:
+			var origin := reputation_label.position+Vector2(40,7)
+			var caption := "+%d" % change if change>0 else "−%d" % -change
+			var tint := TEAL if change>0 else Color("#ff686e")
+			reputation_float = abs_text(root_ui,Rect2(origin,Vector2(42,18)),caption,15,tint)
+			reputation_float.z_index = 1
+			reputation_float.add_theme_color_override("font_outline_color",DARK)
+			reputation_float.add_theme_constant_override("outline_size",4)
+			var animation := reputation_float.create_tween().set_parallel()
+			animation.tween_property(reputation_float,"position:y",origin.y-12.0,.85).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			animation.tween_property(reputation_float,"modulate:a",0.0,.55).set_delay(.3)
+			animation.chain().tween_callback(reputation_float.queue_free)
+		reputation_campaign = campaign_id
+		displayed_reputation = reputation
+		reputation_label.text = str(reputation)
 
 func capacity_hud() -> void:
 	var label := abs_text(root_ui,Rect2(519,3,154,17),"",12,Color.WHITE)
@@ -2578,6 +2610,7 @@ func _process(delta: float) -> void:
 		var before := street_ui_state()
 		model.street.night_prep_visible = not is_instance_valid(fight) and not is_instance_valid(district)
 		model.street.advance(minf(delta,1.0)*tuning_speed)
+		update_reputation_hud()
 		refresh_street = refresh_street or before != street_ui_state()
 		update_action_controls()
 		update_bartender_hud()

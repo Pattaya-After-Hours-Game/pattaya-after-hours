@@ -42,6 +42,24 @@ func run(test: SceneTree) -> void:
 	app.render()
 	await test.process_frame
 	test.check(not app.drawer.visible,"Management starts dismissed")
+	var rep_bar: Dictionary = app.model.street.selected()
+	var rep_guest: Dictionary = rep_bar.customers[0]
+	var initial_rep: int = app.model.s.rep
+	rep_bar.happy = 9
+	rep_guest.visit_complete = true
+	app.model.street.economy.depart(rep_bar,rep_guest)
+	app.update_reputation_hud()
+	var gain: Label = app.reputation_float
+	test.check(is_instance_valid(gain) and gain.text=="+1" and app.reputation_label.text==str(initial_rep+1),"A satisfied departure shows its reputation gain immediately")
+	app.render()
+	test.check(is_instance_valid(gain) and app.reputation_float==gain and gain.get_parent()==app.root_ui,"HUD redraws preserve the current reputation animation")
+	app.model.s.street.event = {"id":5,"prepared":false}
+	app.model.street.finish_event()
+	app.render()
+	test.check(is_instance_valid(app.reputation_float) and app.reputation_float.text=="−2" and app.reputation_label.text==str(initial_rep-1),"Reputation loss shows the actual signed amount")
+	app.model = Campaign.new(555)
+	app.render()
+	test.check(not is_instance_valid(app.reputation_float),"Switching campaigns does not animate their reputation difference")
 	var duo_point := Vector2(592,300)
 	var before_reaction := JSON.stringify(app.model.s)
 	var mouse := InputEventMouseButton.new()

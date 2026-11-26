@@ -126,6 +126,8 @@ bonus. Later saves get the next scheduled event rather than retroactive cash.
 **Reputation attracts visitors; it does not speed their drinking.** More visitors
 can mean more total orders, but stock, seats and service still limit sales. Music
 and parties shorten repeat timing. Fridges earn reputation through happy visits.
+A signed number floats beside **Reputation** whenever it changes. Gains appear
+in teal and losses appear in red.
 
 ## Is my bartender working?
 
