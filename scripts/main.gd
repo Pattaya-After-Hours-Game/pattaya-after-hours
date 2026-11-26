@@ -1639,18 +1639,14 @@ func upgrades_panel() -> void:
 	row_button("Show all" if upgrades_ready_only else "Ready only",open_upgrades.bind(not upgrades_ready_only))
 	var bar: Dictionary = model.street.selected()
 	body("Stage %d/3 · Supplier %d/5 · Manager %d/3" % [bar.stage,bar.supplier_level,bar.manager_level],MUTED,12)
-	var ready: Array[Dictionary] = []
-	var locked: Array[Dictionary] = []
-	for offer in offers:
-		(ready if offer.status.enabled else locked).append(offer)
-	if ready.is_empty():
-		body("No upgrades ready" if not offers.is_empty() else "All upgrades installed",MUTED,13)
-	else:
-		body("READY TO BUY",TEAL,12)
-		for offer in ready: upgrade_card(offer)
-	if not upgrades_ready_only and not locked.is_empty():
-		body("LOCKED",MUTED,12)
-		for offer in locked: upgrade_card(offer)
+	var visible_offers := offers.filter(func(offer: Dictionary) -> bool: return offer.status.enabled) if upgrades_ready_only else offers
+	if visible_offers.is_empty():
+		body("All upgrades installed" if offers.is_empty() else "No upgrades ready",MUTED,13)
+		return
+	visible_offers.sort_custom(func(a: Dictionary,b: Dictionary) -> bool:
+		if a.status.price==b.status.price: return String(a.name).naturalnocasecmp_to(b.name)<0
+		return a.status.price<b.status.price)
+	for offer in visible_offers: upgrade_card(offer)
 
 func upgrade_card(offer: Dictionary) -> void:
 	var status: Dictionary = offer.status

@@ -103,6 +103,8 @@ func run(test: SceneTree) -> void:
 	await click(test,app.upgrade_badge)
 	test.check(app.upgrades_open and app.upgrades_ready_only,"The Service notification opens the ready list with a pointer tap")
 	var pouring := app.column.find_child("Upgrade_pouring",true,false) as Button
+	await test.process_frame
+	app.scroll.ensure_control_visible(pouring)
 	await click(test,pouring)
 	test.check(app.model.s.cash==100 and app.model.street.selected().action_levels.pouring==1 and not app.upgrade_badge.visible,"Buying from the upgrade card updates cash, speed and the badge")
 	app.close_drawer()

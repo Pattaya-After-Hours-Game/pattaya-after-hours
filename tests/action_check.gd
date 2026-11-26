@@ -250,6 +250,15 @@ func run_ui(test: SceneTree) -> void:
 	pouring = app.column.find_child("Upgrade_pouring",true,false) as Button
 	test.check(pouring.disabled and pouring.icon!=null,"Show all reveals locked upgrades and keeps their icons")
 	app.model.s.cash = 10000
+	app.open_upgrades(false)
+	var ready_seating: Button = app.column.find_child("Upgrade_seating",true,false)
+	var locked_club: Button = app.column.find_child("Upgrade_club",true,false)
+	pouring = app.column.find_child("Upgrade_pouring",true,false)
+	test.check(not ready_seating.disabled and locked_club.disabled and not pouring.disabled and ready_seating.get_parent().get_index()<locked_club.get_parent().get_index() and locked_club.get_parent().get_index()<pouring.get_parent().get_index(),"Show all sorts ฿400 seating, ฿600 locked club, and ฿900 pouring by price")
+	app.open_upgrades(true)
+	ready_seating = app.column.find_child("Upgrade_seating",true,false)
+	pouring = app.column.find_child("Upgrade_pouring",true,false)
+	test.check(app.column.find_child("Upgrade_club",true,false)==null and ready_seating.get_parent().get_index()<pouring.get_parent().get_index(),"Ready only still filters locked cards and sorts the rest by price")
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	for guest in bar.customers: guest.order = false
