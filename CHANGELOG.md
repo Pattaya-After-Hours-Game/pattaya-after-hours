@@ -1,5 +1,18 @@
 # Changelog
 
+## Source update — Stage-two income bridge
+
+- Added Regulars Club tiers for ฿600/1,200/2,400 at stage two, gated by local
+  regulars. New member visits can buy a third round, with finite budgets and
+  twenty extra seconds; birthdays never stack a fourth round.
+- Added better sound for ฿2,400: 25→18-second repeat orders from stage two.
+- Added stage-two bartender training: 15→12→10-second service for ฿1,200/1,600.
+  Existing deadlines finish normally and skills survive rehire.
+- Reduced first management from ฿12,000 to ฿8,000, keeping its gates and +฿10/s.
+- Schema 12 preserves old progress without retroactive purchases or refunds.
+  Added purchase/save/UI regressions and fresh-campaign/scenario comparisons.
+
+
 ## Standard drink prices and supplier balance — 26 November 2026
 
 - Beer/Soi/gogo standard drinks cost ฿80/100/120; premium menu and Happy Hour

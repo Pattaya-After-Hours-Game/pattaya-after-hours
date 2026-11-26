@@ -70,7 +70,8 @@ Bartenders serve orders; hosts and dancers attract visitors. Bartender hiring or
 costs **฿1,200 for ten game days**, matching Nida’s upfront price; hosts and dancers
 remain ฿4,500. Floor staff retain on-duty wages, and bartenders have no drink commission. A base bartender serves
 one drink every **25 seconds**; individual training improves this to 20 and then
-15 seconds, with training priced at ฿400 then ฿800. Help serve during a rush. Contracts expire, but each person's training
+15 seconds, with training priced at ฿400 then ฿800. Stage two adds 12-second
+and 10-second training for ฿1,200 and ฿1,600 per bartender. Help serve during a rush. Contracts expire, but each person's training
 stays with them when rehired. Service shows the remaining term and rehire controls.
 Closed hours, skipped nights and offline time count toward contracts.
 
@@ -96,10 +97,11 @@ Mango cocktails.
 
 | Purchase | Price and effect |
 | --- | --- |
-| Music system | ฿1,200; repeat drink orders after 25 seconds instead of 35. Visitors still need budget, stock and service. |
+| Music system / better sound | ฿1,200 for 35→25-second repeats; stage two adds an ฿2,400 upgrade for 18-second repeats. Budgets, visit limits, stock and service still apply. |
+| Regulars Club | Stage two: ฿600 / ฿1,200 / ฿2,400; 35% / 65% / 100% of new visitors stay longer and budget for a third round. Requires 10 / 20 / 35 local regulars. |
 | Auto-serve | ฿3,000 per venue; uses the existing Serve timer as rush backup for bartenders, or covers the bar without them. Manual taps share it. |
 | Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
-| Manager levels 1 / 2 / 3 | ฿12,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
+| Manager levels 1 / 2 / 3 | ฿8,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
 | Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; delivery prices ฿228 for 6, then ฿432 / ฿408 / ฿384 / ฿360 for 12. |
 
 Manager income is separate from drink/pool receipts, uses no stock and pays no
@@ -178,7 +180,9 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 11.
+retain money, staff, venues and owned stages when migrated to save schema 12.
+Schema 12 retains club membership, better sound and advanced training. Older
+saves get no free purchases, extra rounds for existing guests or manager refunds.
 Pre-clock saves start at noon on the existing day, with initially clean venues.
 Schema 9 preserves staff cooldown deadlines and actual service counters. Older
 partial work is converted once; existing purchases get no refund. Schema 8 retains celebration dates, active/last reports and visitor patience,
@@ -220,9 +224,10 @@ over a top-bar stat for a quick explanation.
 The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
-are checked together with 42 fresh-campaign simulations plus 60 paired celebration scenarios. Baseline active
-runs with the revised drink prices reach stage 2 in 32–34 minutes, a second venue in 93–98 minutes and stage 3
-in approximately 130–136 minutes. Optional promoter-first investment takes longer to repay;
+are checked together with 48 fresh-campaign simulations, 60 paired celebration scenarios and 80 stage-two
+income scenarios. The stage-two income pass adds smaller investments between
+renovations and lowers the first manager price; measured timings are recorded
+in [Testing](docs/TESTING.md). Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
@@ -307,7 +312,7 @@ Tap it to open Service. Staff sprites use their serving pose after actual sales.
 Counters begin at hiring or this update and exclude owner taps and offline estimates.
 
 A bartender starts ready. If an order and stock are available, she serves on the
-next simulation tick, then recovers for 25 seconds (20/15 with training). Empty
+next simulation tick, then recovers for 25 seconds (20/15 with basic training, 12/10 with stage-two training). Empty
 queues and owner clicks do not restart her cooldown. Quiet time readies one
 serve, never a burst of banked sales. Staff get first chance at an order when
 purchased owner auto-serve is also ready; owner manual taps retain their own timer.
@@ -337,15 +342,15 @@ expansion and the festival. **Show next step** opens the relevant tab or purchas
 section without spending anything. Progress is read from the existing save;
 there is no checklist payout or extra compulsory purchase.
 
-Bartender training now costs **฿400 / ฿800** and the first manager costs
-**฿12,000**. Stage-three renovations cost **฿40,000 / ฿65,000 / ฿120,000** for
+Bartender training costs **฿400 / ฿800**, then **฿1,200 / ฿1,600** from stage two. The first manager costs **฿8,000**. Stage-three renovations cost **฿40,000 / ฿65,000 / ฿120,000** for
 beer / Soi / gogo venues, requiring **450 happy visits, 70 regulars and 40 healthy
 shifts at that venue**, plus the operating reserve. Stage-two gates and prices
 are unchanged. Existing upgrades stay owned, with no retroactive refunds.
 
-The active baseline's first-manager saving stretch falls from roughly 44–48 to
-25–27 minutes. This is measured simulation pacing, not proof of human retention;
-we still need player feedback on how the revised middle of the game feels.
+Regulars Club starts at **฿600** from stage two, giving regular visitors a reason
+to stay for another paid round while you save for management. See the
+[stage-two income design](docs/design/STAGE_TWO_INCOME.md) for the costs, limits
+and measured trade-offs. Human feedback is still needed on the revised pacing.
 
 ## Closing clean-up and tomorrow's opening
 

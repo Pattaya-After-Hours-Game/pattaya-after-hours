@@ -3,7 +3,53 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current venue-price verification — 26 November 2026
+## Current stage-two income verification — 26 November 2026
+
+Godot 4.7.2 `tools/test.sh` passes gameplay/save/UI regressions, **48 fresh
+campaigns**, **60 paired celebration scenarios** and **80 stage-two scenarios**.
+The latter compare club tiers across ten matched seeds, music/training options
+and service-limited controls. The fresh routes add club-first and the combined
+stage-two purchases to the existing baseline, promoter and automation policies.
+
+`regulars_club_check.gd` covers local gates, exact purchase reserves, no retroactive
+visit rewards, real third-drink settlement, birthday cap, finite budgets,
+stockouts, repeat-safe offline projection, schema-eleven migration, saved
+membership/music/training, retained cooldowns through rehire, and actual advanced
+staff service. UI checks buy club level one from a ฿2,611 till, then purchase
+better sound and advanced training through the actual Upgrades drawer.
+
+| Baseline active milestone | Three seeds, click-heavy and balanced |
+| --- | ---: |
+| First purchase | 2.5–3.6 min |
+| First pool table | 13.8–16.4 min |
+| Stage two | 31.7–33.7 min |
+| First manager | 69.9–73.7 min |
+| Second property | 86.0–89.8 min |
+| Stage three | 121.4–126.1 min |
+| Saving specifically for first manager | 16.5–19.5 min |
+| Longest gap between investments | 33.0–34.2 min |
+
+The full stage-two bundle reaches management in 85.6–87.8 minutes, the second
+property in 100.8–103.0 and stage three in 133.7–136.6. Buying every optional
+upgrade costs time; the baseline does not buy them all. Both routes finish
+solvent with bounded traffic and sales no greater than orders. Current targets
+are 30–45 / 75–115 / 110–210 minutes for stage two/property two/stage three,
+with exact 20/38-minute saving-gap ceilings. This intentionally supersedes the
+previous longer curve in response to the day-eight player report.
+
+Matched day-eight contribution rises from ฿38,486 to ฿51,912 across ten
+600-second runs at club level zero versus three: about 35%, or ฿2.24/sec.
+Music and training benefits depend on the bottleneck; the
+[design note](design/STAGE_TWO_INCOME.md) records separate results and costs.
+These estimates exclude purchase fees and do not guarantee human play outcomes.
+
+Four `club-*` states rendered at **960×540 and 1280×720** show the affordable
+club offer, next tier, better sound and advanced training against the production
+art. New purchase controls are exercised in the UI suite. No production assets
+were replaced. Android device play, Windows/macOS execution and full-festival
+pacing remain unverified; CI exports are not device playtests.
+
+## Previous venue-price verification — 26 November 2026
 
 `tools/test.sh` passes on Godot 4.7.2: gameplay/save/UI regressions, 42 fresh
 campaigns and sixty paired celebration scenarios. Existing minute-based targets remain; comparisons now round to the
@@ -300,7 +346,7 @@ campaigns; use the wrapper rather than running them against your personal saves.
 | --- | --- |
 | Customer economy | Real orders, stockouts, service delays, full rooms and bounded shared traffic |
 | Finance | Quiet-period payroll, closure/recovery, raid fine ledgers and local renovation gates |
-| Staff | Exact 25/20/15-second service, individual training, expiry/rehires, skipped/closed/offline time, migration, partial work and UI buttons |
+| Staff | Exact 25/20/15-second service plus stage-two 12/10-second tiers, individual training, expiry/rehires, skipped/closed/offline time, migration, partial work and UI buttons |
 | Waiting bell | Empty queues, immediate notification, ten-second repeat limit, empty/refilled queues and mute/inactive suppression |
 | Clock and prep | Noon/midnight/1am/3am boundaries, nightly permissions, manager/manual cleaning, skipped work and closure precedence |
 | Peak hours | Separate beer/Soi/gogo windows, midnight wrap, bounded shared demand, double dirt and legal-hours offline segments |

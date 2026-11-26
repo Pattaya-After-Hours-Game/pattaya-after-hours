@@ -17,7 +17,7 @@ func find_text(node: Node, text: String) -> Control:
 
 func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not filter.is_empty() and not name_text.match(filter): return
-	var targets := {"YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
+	var targets := {"Regulars Club":"Upgrade_club","Better sound system":"Upgrade_music","Train Bartender":"Upgrade_training_0","YOUR ACTION UPGRADES":"Upgrade_pouring","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}
 	var upgrade_target: String = targets.get(scroll_to,"")
 	var was_open: bool = app.upgrades_open
 	var ready_only: bool = app.upgrades_ready_only
@@ -36,7 +36,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	elif not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -62,6 +62,26 @@ func run() -> void:
 	await capture(app,"opening")
 	app.show_tutorial_hint = false
 	app.drawer_open = true
+	app.model = Campaign.new(72)
+	app.model.s.day = 8
+	app.model.s.rep = 100
+	app.model.s.cash = 2611
+	var club_bar: Dictionary = app.model.street.selected()
+	club_bar.stage = 2
+	club_bar.regulars = 40
+	club_bar.supplier_level = 4
+	app.upgrades_open = true
+	await capture(app,"club-day-eight","Regulars Club")
+	app.model.street.action("regulars_club")
+	app.model.street.action("regulars_club")
+	await capture(app,"club-next-level","Regulars Club")
+	app.model.s.cash = 5000
+	app.model.street.action("equipment",8)
+	app.model.street.action("hire",0)
+	club_bar.team[0].training = 2
+	await capture(app,"club-music","Better sound system")
+	await capture(app,"club-training","Train Bartender")
+	app.upgrades_open = false
 	for kind in 3:
 		app.model = Campaign.new(72)
 		app.model.street.selected().type = kind

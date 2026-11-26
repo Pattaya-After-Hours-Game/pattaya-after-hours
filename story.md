@@ -58,6 +58,30 @@ agreement. A fresh Blue Hour opens with twelve drinks and ฿228 for a full
 six-pack. Existing owners keep their till and fridge. His emergency consignment
 remains a subsidised ฿14-per-sale favour, not an ordinary wholesale deal.
 
+## A reason to stay for another round
+
+After the first renovation, Anong notices an awkward quiet patch: the bar looks
+better, but the same customers finish two drinks and leave. She starts the
+**Regulars Club**, a place to settle in rather than a discount on the beer.
+
+> **Anong:** “You bought them comfortable chairs. Give them a reason to stay in them.”
+
+At stage two, ฿600/1,200/2,400 club investments and 10/20/35 local regulars
+invite 35%/65%/100% of new visitors to stay twenty seconds longer and budget for
+a third drink. Existing guests keep the visit they arrived for. The birthday
+still stops at three rounds; nobody gets a fourth because of a membership card.
+
+Pim's better sound system costs ฿2,400 after the original ฿1,200 music purchase,
+bringing repeat orders from 25 to 18 seconds. Bartenders can learn 12-second,
+then 10-second service at stage two for ฿1,200 and ฿1,600. The extra skill stays
+with the person, even after a contract ends. These are business purchases,
+not additional character quests or automatic rewards.
+
+The first management appointment now costs ฿8,000. Dao can bring in the existing
+฿10 per open second sooner, while the owner chooses between better visits,
+faster service and the next building. Anong still insists on stock and payroll
+reserves: an empty fridge cannot serve an encore.
+
 ## A shift has a rhythm
 
 The owner can pour a drink, step outside to welcome passersby, or reassure a guest
@@ -98,7 +122,7 @@ This is her playable role, not a new scripted quest. She leaves her post when
 off duty or out of contract, and keeps her training if she returns.
 
 The colleague behind the counter is now visibly doing real work. Ready staff
-serve an actual waiting order, then take their 25/20/15-second recovery. The owner
+serve an actual waiting order, then take their 25/20/15-second recovery (12/10 after stage-two training). The owner
 clearing a queue no longer sends them back to the beginning of a warmup. Their
 serving pose and the bottom-right staff tally confirm what they sold. When the
 fridge is empty, the indicator says so instead of pretending someone is pouring.
@@ -152,11 +176,11 @@ past the first birthday get the next scheduled gathering without a cash handout.
 | Reputation and colder beer | Reputation helps the street consider your venues. Each fridge tier adds +1 extra reputation per ten satisfied visits, up to 100. It does not make an individual drink faster. |
 | A bigger local | Seating, fans, pool and screens give real visitors space and reasons to stay. The compact stage-one beer bar fits twelve even with its pool table and fans. |
 | Pool and promotions | Pool charges ฿50 once per game per table. Free pool swaps fees for appeal; promotions still need space, service and stock. |
-| A colleague behind the bar | Bartenders cost ฿1,200 for ten days, plus wages. They serve every 25/20/15 seconds, with training costing ฿400 then ฿800; skills stay through rehire. A ready colleague serves immediately, then recovers. |
+| A colleague behind the bar | Bartenders cost ฿1,200 for ten days, plus wages. They serve every 25/20/15 seconds, with training costing ฿400 then ฿800. Stage two adds 12/10-second service for ฿1,200/1,600; skills stay through rehire. A ready colleague serves immediately, then recovers. |
 | Nida at the door | Her ฿1,200 ten-day contract plus 10% drink commission replaces welcoming while she works. Owner Welcome upgrades only help during her absence. |
 | Bo's bulk terms | Six drinks initially cost ฿228. Supplier level two requires twelve spaces and ฿432, with later twelve-drink bills of ฿408/384/360. Old stock keeps its paid cost. |
-| Music and automatic pouring | Music costs ฿1,200 and normally brings repeat orders forward from 35 to 25 seconds. ฿3,000 auto-serve uses the owner's existing cooldown; the stage-two pouring tier can reduce it to two seconds. |
-| Management | ฿12,000/36,000/72,000 incremental appointments earn separate ฿10/20/40 per trading second and enable bounded offline estimates. They do not fabricate customer visits. |
+| Music and automatic pouring | Music costs ฿1,200 and normally brings repeat orders forward from 35 to 25 seconds; stage-two better sound costs ฿2,400 and reaches 18 seconds. ฿3,000 auto-serve uses the owner's existing cooldown; the stage-two pouring tier can reduce it to two seconds. |
+| Management | ฿8,000/36,000/72,000 incremental appointments earn separate ฿10/20/40 per trading second and enable bounded offline estimates. They do not fabricate customer visits. |
 | The till and the books | The five-second ฿/s sample shows actual net trading. Shift, promotion and party reports explain why a busy room did or did not pay. |
 
 These are implemented mechanics, not new personal-quest promises. Equipment,

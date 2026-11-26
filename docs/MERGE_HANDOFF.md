@@ -1,31 +1,27 @@
 # Current implementation and release handoff
 
-Updated **26 November 2026**. Main `9d35018` shipped as **v1.0.22** with nightly
-tips and visible consignment recovery. This branch also merges Ryan’s main
-through `6003191`: per-drink inventory/fridge, demand hints, matched-drink bonus
-tips, live tutorial, capybara regular, upgrade UI, version/name HUD and mobile
-sparring controls. **`codex/venue-drink-prices`** implements
-the requested standard price ladder: beer ฿80, Soi ฿100, gogo ฿120.
+Updated **26 November 2026**. This work starts from main `0b00fc8` (published as
+v1.0.30), retaining Ryan's drink inventory, tutorial, capybara, rainbow duo/dog,
+rat event, tuning sandbox, upgraded UI and mobile sparring. Branch
+**`codex/stage-two-regulars`** implements the requested day-eight income bridge
+and the follow-up music/training upgrades.
 
-House lager stock now costs ฿38/38/36/34/32/30 at supplier levels 0–5. Packs remain
-six, then twelve; fees for upgrades, staff and managers are unchanged. Fresh
-campaigns have twelve drinks and ฿228, while existing cash, stock lots, queued
-quotes and budgets survive unchanged. Opening a property retains a full base
-pack in its reserve. Schema stays 11 with expanded paid-cost validation.
-Bo's recovery consignment stays a separate ฿14 per sale, including offline.
+- Regulars Club: ฿600/1,200/2,400, stage two, 10/20/35 local regulars. Invites
+  35/65/100% of new visitors to stay longer with budget for a third round.
+- Better sound: ฿2,400 after original music; stage-two repeat timing 25→18s.
+- Advanced bartender training: ฿1,200/1,600 for 15→12→10s service at stage two.
+- First manager: ฿8,000 instead of ฿12,000, same +฿10/open second and gates.
+- Schema 12 retains existing progress, deadlines, prices paid and queues,
+  without retroactive membership, free upgrades or manager refunds.
 
-The full test wrapper passes regressions, 42 fresh campaigns and sixty paired
-party scenarios. Existing minute targets pass with nearest-minute comparison; saving-gap
-ceilings remain exact. A focused party
-rerun corrects its old fixed-cost inventory valuation. Three venue price previews
-at 960 × 540 and the gogo price at 1280 × 720 are inspected. See
-[testing](TESTING.md) for measured times and compatibility coverage.
-
-Ready for the user-authorized commit and release workflow. Verify the run and
-[latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for published source/tag; this source note does not claim publication. Android
-device play remains unverified. Other worktrees and attachments are untouched.
-The audit below is historical.
+The isolated Godot 4.7.2 suite passes regressions, 48 fresh campaigns, 60 paired
+party comparisons and 80 stage-two income scenarios. Four affected UI states
+were rendered at 960×540 and 1280×720. See [testing](TESTING.md) and the
+[design](design/STAGE_TWO_INCOME.md) for exact comparisons and limitations.
+Main's push workflow tests again, exports/signs and publishes the release.
+Verify the workflow and [latest downloads](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+for the actual published tag; this source record is not a publication receipt.
+Android device play remains unverified. Other worktrees and attachments are untouched.
 
 ## Historical consolidation audit
 

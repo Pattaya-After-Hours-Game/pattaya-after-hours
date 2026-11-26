@@ -109,7 +109,7 @@ const EQUIPMENT = [
 	# Legacy slot retained for save/action indices; training is now per person.
 	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
 	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Lets you stock Mango cocktails. Stage 2+."},
-	{"id":"music", "name":"Music system", "cost":1200, "max":1, "help":"Repeat drink orders arrive after 25s instead of 35s. Budgets, two-drink limit and service still apply."}
+	{"id":"music", "name":"Music system", "cost":1200, "max":2, "help":"Repeat orders: 35 → 25 → 18 seconds. Level two needs stage two. Visit limits, budgets, stock and service still apply."}
 ]
 const PROMOTIONS = [
 	{"name":"Free Pool Night", "fee":0, "boost":6, "requires":"pool", "help":"Free games attract pool groups; drinks stay full price."},
@@ -138,7 +138,7 @@ const STAFF_CONTRACT_COST = 4500
 const BARTENDER_CONTRACT_COST = 1200
 const STAFF_CONTRACT_DAYS = 10
 const STAFF_CONTRACT_MINUTES = STAFF_CONTRACT_DAYS * DAY_MINUTES
-const STAFF_SERVICE_SECONDS = [25,20,15] # One drink, per bartender; training stays with the person.
+const STAFF_SERVICE_SECONDS = [25,20,15,12,10] # One drink, per bartender; training stays with the person.
 const STAFF_TRAINING_COST = 400
 const ORDER_ALERT_SECONDS = 10.0
 const PROMOTION_SECONDS = 120
@@ -155,11 +155,16 @@ const COMMISSION_PERCENT = 10
 
 const AUTO_SERVE_URGENT_SECONDS = 10
 const AUTO_SERVE_COST = 3000
-const MUSIC_ORDER_SECONDS = 25
+const MUSIC_ORDER_SECONDS = 25 # Legacy first-tier reference.
+const MUSIC_INTERVALS = [35,25,18]
 const SUPPLIER_PRICES = [900,1200,2400,4800,9600]
 const SUPPLIER_UNIT_COSTS = [38,38,36,34,32,30]
 const SUPPLIER_STAGES = [1,1,2,2,3]
-const MANAGER_PRICES = [12000,36000,72000]
+const MANAGER_PRICES = [8000,36000,72000]
+const CLUB_PRICES = [600,1200,2400]
+const CLUB_REGULARS = [10,20,35]
+const CLUB_CHANCE = [0,35,65,100]
+const CLUB_EXTRA_STAY = 20
 const MANAGER_INCOME = [0,10,20,40]
 const MANAGER_STAGES = [2,3,3]
 

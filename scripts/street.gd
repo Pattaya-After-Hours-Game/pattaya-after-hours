@@ -41,7 +41,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("tick_fraction"): s.street.tick_fraction = 0.0
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	economy = Economy.new(s,fresh)
-	s.version = 11
+	s.version = 12
 
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()
@@ -126,7 +126,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","stock","buy_drink","mixed_drinks","return_drink","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
+		"serve","regulars_club","stock","buy_drink","mixed_drinks","return_drink","hire","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:

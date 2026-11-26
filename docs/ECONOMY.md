@@ -10,7 +10,40 @@ The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
 
-## Venue pricing pass — 26 November 2026
+## Current stage-two income rules — 26 November 2026
+
+See the [stage-two design and measured trade-offs](design/STAGE_TWO_INCOME.md).
+Regulars Club tiers cost **฿600/1,200/2,400**, require stage two and **10/20/35
+local regulars**, and invite **35/65/100%** of new arrivals to stay twenty seconds
+longer with an extra house-price budget allowance and a third-drink limit.
+Membership is saved per visit; existing guests are unchanged by purchase.
+The club does not generate arrivals or sales. Birthday and membership never
+combine into a fourth round. Purchase retains a full stock pack plus the next
+shift's operating costs. Forecasts include extra occupancy and expected rounds.
+
+Better sound costs **฿2,400** after the original ฿1,200 music purchase, at stage
+two. Repeat intervals are **35/25/18 seconds**, or **26/19/14** at the birthday.
+Bartender training adds **15→12→10-second** recovery for **฿1,200 then ฿1,600**
+from stage two, after the existing ฿400/800 tiers. Existing customer and staff
+deadlines finish normally. Skills survive contract expiry and rehire.
+
+First management costs **฿8,000**, with unchanged ฿10/sec income and prerequisites.
+Later tiers remain ฿36,000/72,000. The first appointment's additional ฿588/min
+net management income repays its fee in roughly 13.6 open minutes, excluding
+other trading changes. Renovation prices and local milestone gates are unchanged.
+
+Schema **12** saves these purchases and visit entitlements. Older saves preserve
+all owned progress, cash, paid stock, quotes, budgets and timers, with no club
+entitlement, free training or retroactive manager refund. Ordinary receipts and
+offline estimates remain limited by demand, service, supply and operating costs.
+
+Current active pacing acceptance: stage two **30–45 min**, second property
+**75–115**, stage three **110–210**; manager saving gap **≤20 min**, longest
+investment gap **≤38 min**. Milestones use nearest-minute comparisons; gaps use
+exact seconds. The following dated pricing/bonus/balance sections document prior
+passes; their historical timings do not override these targets.
+
+## Earlier venue pricing pass — 26 November 2026
 
 | Venue | Standard receipt | Starting stock cost | Gross contribution | After Nida's 10%, before other costs |
 | --- | ---: | ---: | ---: | ---: |
@@ -36,7 +69,7 @@ a windfall from repricing eighteen free drinks. New-property opening reserves
 now use a full current base pack instead of the old fixed ฿140 stock allowance.
 Normal purchases and old saves do not grant a free cash adjustment.
 
-Save schema remains 11. Existing waiting quotes and budgets, inventory quantities
+That pricing pass retained schema 11; the current stage-two pass uses schema 12. Existing waiting quotes and budgets, inventory quantities
 and paid FIFO lot costs survive; only future orders and deliveries use new prices.
 Pre-lot saves backfill inventory/report costs at the historical ฿14, not today's
 price. Validation accepts paid drink costs from ฿1 to ฿38, including old lots. Consignment
@@ -111,7 +144,7 @@ for the same finite supply; they do not copy host timing or the third-drink limi
 New random event announcements wait during the party; existing events continue.
 
 The host permits up to three orders per visit instead of two, subject to actual
-budgets. Repeat timing becomes 26 seconds, or 19 with music. Existing timers and
+budgets. Repeat timing becomes 26 seconds, 19 with music or 14 with better sound. Existing timers and
 quoted orders are preserved. New party visitors gain fifteen seconds of life
 and ten seconds of patience; the per-visit patience is saved through reload.
 After closing, no new third rounds are requested. Real stock, serving deadlines,
@@ -190,7 +223,8 @@ actual orders; welcome passersby when there are no orders. A yellow/gold dot mar
 waiting order and turns red when the lesser of remaining order patience and
 visit time is ten seconds or less. The display uses the same remaining-time rule
 as Chat, including comfort and reassurance bonuses; it adds no new timers.
-Customers can buy two drinks during a visit, have a spending
+Customers normally buy up to two drinks during a visit (three for club members
+or flagship party visitors), have a spending
 budget, and leave unhappy when an order waits too long. A quiet click neither
 uses stock nor earns money. Manual service immediately sells one ordered drink,
 then refills for ten foreground seconds. Failed attempts consume no cooldown.
@@ -230,7 +264,8 @@ An empty bar needs appeal; a queue needs service; a full bar needs more space.
 Useful early investments include signage, seating, deliveries, pool and a fridge.
 A bartender contract costs ฿1,200, matching Nida’s upfront fee without her commission. Base service is one drink
 per 25 real seconds (2.4/min); individual training costs ฿400 then ฿800 and
-reduces this to 20s (3/min) then 15s (4/min). Each bartender has a saved cooldown deadline. She starts ready, serves one
+reduces this to 20s (3/min) then 15s (4/min). Stage two adds 12s (5/min) for
+฿1,200 and 10s (6/min) for ฿1,600. Each bartender has a saved cooldown deadline. She starts ready, serves one
 actual order on the next live tick, and only then begins recovery. Empty queues
 and stockouts do not restart that deadline or bank multiple future sales. Manual
 serving remains useful alongside staff. Hosts and dancers attract
@@ -344,7 +379,7 @@ and dancers never count as bartenders. The ฿3,000 price is unchanged.
 Forecasts and offline income retain demand-limited sustained capacity estimates;
 they do not simulate the live queue dispatch or promise its exact throughput.
 
-The base cooldown is 25 seconds; training makes subsequent cooldowns 20/15.
+The base cooldown is 25 seconds; training makes subsequent cooldowns 20/15, then 12/10 at stage two.
 Training preserves a deadline already running. Owner clicks, empty queues,
 stockouts, rotas, closure, reassignments and reloads never reset it. Foreground
 closed/off-duty time can finish recovery; paused/menu/offline time does not
@@ -397,11 +432,10 @@ or new audio dependency is needed.
 
 ## Music, supplier tiers and manager income
 
-Music is a one-time ฿1,200 equipment purchase. Newly served drinks start a
-25-second repeat-order interval instead of 35 seconds: 40% faster repeat timing.
-It does not add visitors, enlarge budgets, remove the two-drink limit, guarantee
-satisfaction or bypass stock/service. Already-running repeat timers stay intact.
-Forecast demand remains the conservative two-orders-per-visit capacity estimate;
+Music costs ฿1,200 for 25-second repeat orders instead of 35. Stage-two better
+sound costs another ฿2,400 for 18-second repeats. Neither adds visitors, enlarges
+budgets, raises visit limits or bypasses service/stock. Existing timers stay
+intact. Forecast demand uses expected rounds per visit, including club membership;
 actual timing and losses determine whether music improves sales.
 
 | Supplier level | Incremental purchase | Drinks per delivery | Unit / delivery cost | Minimum venue stage |
@@ -421,7 +455,7 @@ Consignment drinks retain Bo's original ฿14 repayment regardless of supplier t
 
 | Manager level | Incremental purchase | Separate income per real second | Minimum venue stage |
 | --- | ---: | ---: | ---: |
-| 1 | ฿12,000 | ฿10 | 2 |
+| 1 | ฿8,000 | ฿10 | 2 |
 | 2 | ฿36,000 | ฿20 | 3 |
 | 3 | ฿72,000 | ฿40 | 3 |
 
@@ -552,7 +586,7 @@ separate time away from eligible trading seconds and list estimated customers se
 income, costs, net profit and limiting factors. Monotonic saved claim timestamps
 prevent repeat rewards, including clock rollback.
 
-## Opening-arc balance pass — 26 November 2026
+## Historical opening-arc balance pass — 26 November 2026
 
 The first manager now costs ฿12,000; later levels remain ฿36,000/72,000.
 Bartender training is ฿400 then ฿800, with unchanged 25/20/15-second service.
@@ -597,7 +631,7 @@ It points to supplies, local renovation, reopening events, staff, deliveries,
 management and expansion. It cannot change money, RNG, time or progression.
 Story reminders grant no reward and add no new mandatory steps or save fields.
 
-## Balance verification
+## Historical opening-arc balance verification
 
 Run `tools/test.sh` with Godot 4.7.2. Temporary save/config directories isolate
 regressions and 42 fresh campaigns: fifteen baseline/no-Chat runs, twelve promoter

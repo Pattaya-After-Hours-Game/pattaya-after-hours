@@ -140,7 +140,7 @@ func run(test: SceneTree) -> void:
 	m.s.version = 10
 	m.save_game()
 	loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==11 and loaded.street.selected().tip_visits==0,"Old saves start with an empty tip jar, retaining cash and progress")
+	test.check(loaded.load_game() and loaded.s.version==12 and loaded.street.selected().tip_visits==0,"Old saves start with an empty tip jar, retaining cash and progress")
 	b = loaded.street.selected()
 	loaded.street.economy.order(b,b.customers[0])
 	loaded.street.economy.serve(b)

@@ -71,6 +71,11 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 				if not bar.auto_serve: st.action("auto_serve")
 				elif bar.action_levels.pouring<4: st.action("action_upgrade",0)
 			if feature in ["supplier-first","automation-bundle"] and bar.stage>=2 and bar.supplier_level<3: st.action("restock")
+		if feature=="stage-two-bundle" and bar.stage>=2:
+			if bar.equipment.music<2: st.action("equipment",8)
+			for member in bar.team.size():
+				if bar.team[member].role==0 and bar.team[member].training<4: st.action("train_staff",member)
+		if feature in ["regulars-club","stage-two-bundle"] and eco.club_offer(bar).enabled: st.action("regulars_club")
 		if bar.stage==1 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
 		if bar.stage>=2 and times.stage2<0: times.stage2 = second
 		if owner_first and bar.stage>=2 and bar.action_levels.pouring<3:
@@ -117,6 +122,8 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if not model.s.street.event.is_empty() and model.s.street.event.phase=="warning" and model.s.cash>700:
 			if model.s.street.event.id in [0,3]: st.action("prepare")
 		st.tick(1)
+	times.club = st.selected().club_level
+	times.staff_training = st.selected().team[0].get("training",0) if not st.selected().team.is_empty() else 0
 	times.music = st.selected().equipment.music
 	times.auto_serve = st.selected().auto_serve
 	times.supplier = st.selected().supplier_level
@@ -136,7 +143,7 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 func investment_count(bars: Array) -> int:
 	var result := 0
 	for bar in bars:
-		result += int(bar.stage)+int(bar.auto_serve)+int(bar.manager_level)+int(bar.supplier_level)+bar.team.size()
+		result += int(bar.club_level)+int(bar.stage)+int(bar.auto_serve)+int(bar.manager_level)+int(bar.supplier_level)+bar.team.size()
 		for value in bar.equipment.values(): result += int(value)
 		for value in bar.action_levels.values(): result += int(value)
 		for person in bar.team: result += int(person.get("training",0))+int(person.get("audience_training",0))
@@ -152,8 +159,8 @@ func run() -> void:
 				printerr("ECONOMY FAIL: strategy bypassed cash or customer limits")
 				failures += 1
 			# Opening-arc pass: preserve the first renovation, shorten the mid-game saving wall.
-			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[5400,7500],"stage3":[7800,14400]}
-			if style!="mostly-idle" and (result.manager_saving_gap>1800 or result.longest_investment_gap>2280):
+			var bounds := {"first":[120,300],"pool":[600,1200],"stage2":[1800,2700],"second":[4500,6900],"stage3":[6600,12600]}
+			if style!="mostly-idle" and (result.manager_saving_gap>1200 or result.longest_investment_gap>2280):
 				printerr("PACING FAIL: excessive saving gap / "+style)
 				failures += 1
 			for milestone in bounds:

@@ -161,7 +161,7 @@ per-customer chat state. Action deadlines are fractional foreground seconds;
 Do not run both `advance` and `tick` for the same elapsed interval.
 
 Changes to the save dictionary need compatibility handling; the current schema
-version is 11. Promoter roster/commission fields and fractional offline accounting
+version is 12. Promoter roster/commission fields and fractional offline accounting
 are migrated without granting purchases. Keep whole-pack delivery and commission
 settlement inside `economy.gd`; UI/animation code must not mint receipts.
 Manager income is a separate model-owned receipt, not a drink. Stock lots retain
@@ -397,3 +397,21 @@ backfills pre-lot inventory/reports; `CONSIGNMENT_COST` stays ฿14 for live and
 offline recovery. Do not use the ordinary purchase cost for old consignment.
 `drink_prices_check.gd` verifies settlement across venue types and old-tab/lot
 preservation; current pricing and balance evidence live in the economy/testing docs.
+
+## Stage-two income and schema twelve
+
+`scripts/street_content.gd` owns club tier prices, regular thresholds, invitation
+shares, extra stay, music intervals and staff service intervals. `economy.gd`
+owns read-only club offers/forecasts, purchases, visit entitlement and settlement.
+`club_level` belongs to the venue; `customer.club` is fixed when admitted. Higher
+club levels affect future arrivals only. No extra simulation runs in the UI.
+
+Schema 12 retains those fields and validates the expanded music range. Versions
+1–11 retain their investments, deadlines, quotes, budgets and stock costs, with
+club level zero and no retroactive membership or cheaper-manager refund. Advanced
+training uses the existing person record and saved service deadline. Music uses
+the existing equipment level and leaves current repeat timers intact.
+
+The normal isolated test wrapper includes `regulars_club_check.gd`, two new
+fresh-campaign routes and `regulars_club_balance.gd`. Render `club-*` states with
+the economy preview runner for the offers on the production artwork.

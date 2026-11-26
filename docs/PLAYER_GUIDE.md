@@ -89,7 +89,7 @@ and offline estimates.
 
 She starts ready and automatically serves a waiting customer on the next live
 tick if stock is available. Then she recovers for 25 seconds, improving to 20/15
-with training. Your clicks and a temporarily empty queue cannot restart her wait.
+with basic training, then 12/10 at stage two for ฿1,200/1,600. Your clicks and a temporarily empty queue cannot restart her wait.
 An empty bar can leave her ready, but it never banks multiple drinks. Her serving
 pose now follows an actual sale. Ready staff get the first order before owner
 auto-serve; both still respect the same real stock and customers.
@@ -412,11 +412,28 @@ At venue stage two, train Nida or a dancer for ฿800; stage three unlocks a sec
 with the person after rehiring. Attraction still competes for shared street
 visitors; it does not guarantee a sale.
 
+## Getting past the stage-two saving gap
+
+Open **Service → Upgrades** for the **Regulars Club**. It costs ฿600, then
+฿1,200 and ฿2,400, requiring 10/20/35 regulars at that venue. Keep a full pack's
+cost and the next shift's operating costs in reserve. At each tier, 35/65/100%
+of new arrivals join: they stay twenty seconds longer and budget for a third
+round. Visitors already in the bar are unchanged. Birthday and club still cap
+at three drinks. The offer's estimated net change is not a guaranteed payout.
+
+For an upgraded bar with no waiting orders, try the club and better music before
+hiring more servers. If orders queue, stage-two bartender training adds
+**15→12 seconds for ฿1,200**, then **12→10 for ฿1,600** per person. Training
+survives rehire; current recovery finishes normally. Use the staff indicator and
+shift report to see whether these purchases actually sell more drinks.
+
 ## Music and automation purchases
 
 Buy **Music system · ฿1,200** in Service equipment. Customers ask for their next
 round after 25 seconds rather than 35; they still need money and service. The
-Music indicator shows playing while open and off while closed. Muting the game
+Music indicator shows playing while open and off while closed. At stage two,
+**Better sound system · ฿2,400** reduces future repeats to 18 seconds. Existing
+repeat timers finish normally. Party repeats become 14 seconds. Muting the game
 does not remove the upgrade's effect.
 
 **Buy auto-serve · ฿3,000** replaces repeated Serve taps. It uses the same timer,
@@ -430,7 +447,7 @@ cost ฿228 for six, then ฿432/408/384/360 for twelve. Levels three/four need 
 stage three. Discounts affect new stock, including manual purchases. Previously
 bought drinks keep their paid cost in profit reports.
 
-Managers cost ฿12,000, then ฿36,000 and ฿72,000 to upgrade. They generate a
+Managers cost ฿8,000, then ฿36,000 and ฿72,000 to upgrade. They generate a
 separate ฿10/฿20/฿40 per game minute (real second) while the venue trades,
 before operating costs. Level one needs stage two, a bartender, deliveries and
 eight healthy shifts; later levels need stage three. They also keep their
@@ -448,7 +465,9 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Save schema 9 retains staff cooldowns and actual service counters; older partial
+Current schema 12 retains Regulars Club visits, both music tiers and advanced
+bartender training. Older campaigns receive no free upgrades or refunds; existing
+guests keep their budgets and visit limits. Save schema 9 retains staff cooldowns and actual service counters; older partial
 work keeps its remaining wait. Schema 8 also retains celebration dates, reports and visitor patience.
 The schema-7 fields preserve music, auto-serve, supplier/manager tiers, stock purchase
 costs and the five-second net sample alongside existing timers and commission.

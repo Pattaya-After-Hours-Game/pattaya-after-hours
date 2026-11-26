@@ -31,9 +31,9 @@ func run(test: SceneTree) -> void:
 	test.check(st.next_goal().focus=="SUPPLIER AGREEMENT","Guidance finds delivery automation before management")
 	st.action("restock")
 	bar.healthy = 8
-	test.check(st.next_goal().focus=="MANAGEMENT" and st.next_goal().detail.contains("฿12000"),"Manager target quotes the current price")
+	test.check(st.next_goal().focus=="MANAGEMENT" and st.next_goal().detail.contains("฿8000"),"Manager target quotes the current price")
 	var reserve: int = (e.operating_rate(bar)+12)*2
-	m.s.cash = 12000+reserve-1
+	m.s.cash = 8000+reserve-1
 	st.action("manager")
 	test.check(not bar.manager,"Cheaper manager still requires the operating reserve")
 	m.s.cash += 1
