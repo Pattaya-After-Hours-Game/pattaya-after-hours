@@ -169,7 +169,7 @@ func run_ui(test: SceneTree) -> void:
 	app.model.s.cash = 39
 	app.model.street.selected().stock = 0
 	app.model.s.street.minute = 1045
-	app.change_tab(0)
+	app.open_fridge()
 	test.check(test.find_button(app,"Bo's recovery delivery · 6 drinks").visible,"Screenshot stockout exposes recovery directly beside stock")
 	test.use_button(app,"Bo's recovery delivery · 6 drinks")
 	test.check(app.model.s.cash==39 and app.model.street.selected().stock==6,"Recovery UI invokes model consignment without cash handout")

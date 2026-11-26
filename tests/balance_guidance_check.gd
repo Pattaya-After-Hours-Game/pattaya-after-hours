@@ -11,7 +11,7 @@ func run(test: SceneTree) -> void:
 	test.check(st.next_goal().title.contains("first ten"),"Opening guidance starts with real service")
 	test.check(JSON.stringify(m.s)==before,"Reading guidance never rewards, advances time, rolls RNG or saves")
 	m.s.street.served = 10
-	test.check(st.next_goal().title.contains("return"),"First regular gives the opening a small story objective")
+	test.check(st.next_goal().title=="Earn your first regular","First regular gives the opening a small story objective")
 	bar.regulars = 1
 	test.check(st.next_goal().detail.contains("70 happy") and st.next_goal().focus=="Upgrade ·","Renovation guidance uses actual local milestones and links to its control")
 	bar.stage = 2
@@ -77,22 +77,22 @@ func run_ui(test: SceneTree) -> void:
 	app.show_tutorial_hint = false
 	app.change_tab(0)
 	var before := JSON.stringify(app.model.s)
-	test.use_button(app,"Show next step")
+	test.use_button(app,"Go to Serve  ›")
 	await test.process_frame
 	await test.process_frame
 	test.check(not app.drawer_open and JSON.stringify(app.model.s)==before,"Opening next-step reveals serving controls without serving or simulating")
 	app.model.street.selected().stock = 0
 	app.change_tab(0)
 	before = JSON.stringify(app.model.s)
-	test.use_button(app,"Show next step")
+	test.use_button(app,"Open Fridge  ›")
 	await test.process_frame
 	await test.process_frame
-	test.check(app.scroll.scroll_vertical>0 and JSON.stringify(app.model.s)==before,"Stockout guidance scrolls to supplies without buying")
+	test.check(app.fridge_open and JSON.stringify(app.model.s)==before,"Stockout guidance opens the fridge without buying")
 	app.model.s.street.bars[0].stage = 2
 	app.model.s.street.served = 10
 	app.model.s.street.bars[0].regulars = 10
 	app.change_tab(0)
-	test.use_button(app,"Show next step")
+	test.use_button(app,"Open Events  ›")
 	test.check(app.tab==1 and app.drawer_open,"Reopening next-step button opens Events")
 	app.queue_free()
 	await test.process_frame

@@ -200,7 +200,7 @@ func run_ui(test: SceneTree) -> void:
 	guest_with_rounds(app.model,1)
 	var snapshot := JSON.stringify(app.model.s)
 	app.visit_plans_open = true
-	app.render()
+	app.open_service_section("reports")
 	test.check(snapshot==JSON.stringify(app.model.s),"Visit-plan and profit UI are read-only")
 	test.check(app.model.street.economy.visit_lines(b).contains("Waiting for round 1/1"),"Live detail exposes the actual one-round plan")
 	app.model.street.economy.serve(b)

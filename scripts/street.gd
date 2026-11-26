@@ -262,44 +262,53 @@ func next_goal() -> Dictionary:
 	var title := "The soi never sleeps"
 	var detail := "Keep your mixed street healthy, try a different promotion or host the festival again. No reset required."
 	var focus := ""
+	var summary := "Manage your venues or host another festival."
 	var tab := 1
 	if chapter<5 and chapter_requirements()[chapter]:
-		return {"title":"Milestone ready","detail":"The business has earned its next chapter. Continue trading to record it.","focus":"","tab":0,"venue":0}
+		return {"title":"Milestone ready","summary":"Keep trading to record it.","detail":"The business has earned its next chapter. Continue trading to record it.","focus":"","tab":0,"venue":0}
 	if chapter==0:
 		tab = 0
 		if s.street.served<10:
-			title = "Ice duty: the first ten drinks"
+			title = "Serve your first ten drinks"
+			summary = "%d / 10 served" % mini(10,int(s.street.served))
 			detail = "%d/10 real orders served. Anong: Cold drinks first. Empire later. Serve waiting guests; welcome passersby when quiet." % mini(10,int(s.street.served))
 			focus = "Buy %d drinks" % economy.pack_quantity(first) if first.stock==0 else "serve"
 		elif first.regulars==0:
-			title = "Give someone a reason to return"
+			title = "Earn your first regular"
+			summary = "Serve guests before their orders expire."
 			detail = "Keep orders moving and stock ready. Happy departures can earn your first regular. Anong: A second visit beats a five-star promise."
 			focus = "TEAM & PAYROLL"
 		elif first.stage<2:
 			var target: Dictionary = C.STAGE_GOALS[0]
-			title = "Make the Blue Hour a local favourite"
+			title = "Renovate the Blue Hour"
+			summary = "%d/%d happy · %d/%d regulars · %d/%d shifts" % [mini(first.happy,target.happy),target.happy,mini(first.regulars,target.regulars),target.regulars,mini(first.healthy,target.healthy),target.healthy]
 			detail = "%d/%d happy visits · %d/%d regulars · %d/%d healthy shifts. %s" % [mini(first.happy,target.happy),target.happy,mini(first.regulars,target.regulars),target.regulars,mini(first.healthy,target.healthy),target.healthy,goal_cash(upgrade_cost(first),economy.operating_rate(first)*2)]
 			focus = "Upgrade ·"
 		elif s.street.events_survived==0:
-			title = "The reopening: keep the lights on"
+			title = "Get through the reopening"
+			summary = "Open Events for Bo’s generator."
 			detail = "The new sign is ready. Check Events for Bo's generator offer and see the reopening through. A setback will not end the business."
 			tab = 1
 		elif not first.manager:
 			if economy.on_duty(first,0)==0:
-				title = "A colleague behind the counter"
+				title = "Get a bartender on duty"
+				summary = "Hire or rehire in Team."
 				detail = "Hire or rehire a bartender for ฿%d and put them on duty. Training stays with them. Dao needs a serving team before taking the keys." % C.BARTENDER_CONTRACT_COST
 				focus = "TEAM & PAYROLL"
 			elif not first.restock:
-				title = "Give Bo a standing order"
+				title = "Automate deliveries"
+				summary = "Set up a supplier agreement."
 				detail = "Supplier level 1 automates paid deliveries when orders need stock. %s" % goal_cash(C.SUPPLIER_PRICES[0],economy.operating_rate(first)*2)
 				focus = "SUPPLIER AGREEMENT"
 			else:
 				title = "Hand Dao the keys"
 				var offer: Dictionary = economy.manager_offer(first)
+				summary = "Manager ready" if offer.enabled else "Save for a manager · ฿%d" % offer.price
 				detail = "%s Dao enables managed offline trading and ฿10 per open second. %s" % [goal_cash(offer.price,(economy.operating_rate(first)+12)*2),"Ready to appoint." if offer.enabled else offer.reason]
 				focus = "MANAGEMENT"
 	elif chapter==1:
-		title = "A second address on the soi"
+		title = "Open a second bar"
+		summary = "Reputation %d / 20 · Check the lease" % mini(20,int(s.rep))
 		detail = "Anong: He's retiring again. This time, get the keys. Hostess lease: %s Reputation %d/20. Other venue types remain your choice." % [goal_cash(purchase_cost(1),opening_reserve(1)),mini(20,int(s.rep))]
 		tab = 3
 	elif chapter==2:
@@ -308,20 +317,23 @@ func next_goal() -> Dictionary:
 		for bar in s.street.bars:
 			managers += int(bar.manager)
 			soi = soi or bar.type==1
-		title = "Trust the team with two venues"
+		title = "Run two managed bars"
+		summary = "%d / 2 managers · Hostess bar %s" % [mini(2,managers),"owned" if soi else "needed"]
 		detail = "Hostess bar: %s · managers %d/2. Each new bar must earn its own customers and healthy shifts. Dao: Two sets of keys. One owner who finally sits down." % ["owned" if soi else "still needed",mini(2,managers)]
 		tab = 3
 	elif chapter==3:
-		title = "Give Anton something to worry about"
+		title = "Open a gogo and reach stage 2"
+		summary = "Lease a gogo or develop the one you own."
 		detail = "Open a gogo and earn its second stage. Dancers attract; bartenders serve. Anton has ordered another screen. Pim suggests a better show."
 		tab = 3
 	elif chapter==4:
 		var developed := [false,false,false]
 		for bar in s.street.bars:
 			if bar.stage==3: developed[int(bar.type)] = true
-		title = "Bring the whole street together"
+		title = "Host the street festival"
+		summary = "%d / 3 venue types at stage 3" % developed.count(true)
 		detail = "Stage-three venues: beer %d/1 · Soi %d/1 · gogo %d/1. Then arrange the After Hours Street Festival in Events. The guest list includes something from the bay." % [int(developed[0]),int(developed[1]),int(developed[2])]
-	return {"title":title,"detail":detail,"focus":focus,"tab":tab,"venue":0}
+	return {"title":title,"summary":summary,"detail":detail,"focus":focus,"tab":tab,"venue":0}
 
 func announce(id: int) -> void:
 	s.street.event = {"id":id,"phase":"warning","remaining":C.RAT_WARNING_SECONDS if id==C.RAT_PLAGUE else 30 if id>=C.Local.ENCORE else 60,"prepared":false,"serial":s.street.get("elapsed",0)}
