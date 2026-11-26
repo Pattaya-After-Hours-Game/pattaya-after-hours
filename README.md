@@ -84,8 +84,7 @@ costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
 cash for the next shift—not just a large bank balance.
 
-Open **Service → Drinks & margins** to compare patron preferences with profit per
-sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
+Tap **Stock** or **Restock fridge** to compare popularity with profit per sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
 Mango cocktails.
 
 ## Music, automation and management income
@@ -366,9 +365,9 @@ The date already advanced at midnight, so the jump does not add another day.
 ## Anong counts the tip jar
 
 Each customer visit earns **฿10 on its first successfully served drink**. Extra
-rounds do not tip again. At nightly street closure, Anong counts the jars and adds
-the money to your till before the fifteen-second clean-up. Service and Journal
-show pending visits, the last payout and total tips. Cancelling the jump, reloading
+rounds do not tip again. Serving a guest’s requested specialty drink on their first round can add a **฿5 bonus**.
+Anong counts the jars at nightly closure before the fifteen-second clean-up.
+The fridge, Service and Journal show the pending amount and payout history. Cancelling the jump, reloading
 or reopening the report cannot pay twice. Offline estimates earn no tips.
 
 For **zero stock and too little cash for a pack**, Service now shows **Bo's

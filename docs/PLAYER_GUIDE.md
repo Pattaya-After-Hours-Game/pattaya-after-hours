@@ -124,11 +124,16 @@ capacity cannot sell drinks to customers who are not there.
 
 ## Pick what to stock
 
-House lager appeals to a broad crowd. Lime soda is cheap to stock, and visitors
-order more Rum & cola. The stage-2 premium menu lets you stock Mango cocktails.
-The drink list shows the expected order share, recent requests and shortages,
-and the current gross margin per sale. Mixed delivery helps match the crowd.
-Return slow stock at half its purchase cost to free fridge space.
+Tap **Stock** or **Restock fridge** to open the drink list. Look for how many
+orders are waiting, the expected popularity and the gross margin per sale.
+
+Locals lean toward house lager and budget lime soda. Visitors order more Rum &
+cola. Big spenders are likelier to order Mango cocktails once you unlock the
+stage-2 premium menu. Happy Hour can put pricier drinks within a guest’s budget.
+Serve a guest’s requested specialty drink on their first round for a chance at a **฿5 tip**.
+
+Mixed delivery follows the expected order mix. Return slow stock at half its
+purchase cost to free space.
 
 ## Give yourself a faster shift
 

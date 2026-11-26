@@ -6,7 +6,43 @@ func close_night(m) -> void:
 	m.s.street.minute = 59
 	m.street.tick(1)
 
+func test_drink_bonus(test: SceneTree) -> void:
+	var m = Campaign.new(72)
+	var bar: Dictionary = m.street.selected()
+	var eco = m.street.economy
+	bar.customers.resize(1)
+	var guest: Dictionary = bar.customers[0]
+	while posmod(hash(Vector3i(int(guest.id),1,-7)),100)>=60: guest.id += 1
+	guest.drink = 1
+	guest.quoted = eco.price(bar,1)
+	guest.lager_quote = eco.price(bar)
+	eco.restock(bar,false,1)
+	var cash_before: int = m.s.cash
+	eco.serve(bar,1,true)
+	test.check(bar.bonus_tips==5 and m.s.cash==cash_before+45 and eco.last_sale.contains("+฿5 tip"),"A matched first drink can add a visible bonus to the jar")
+	m.save_game()
+	var loaded = Campaign.new(1)
+	test.check(loaded.load_game() and loaded.street.selected().bonus_tips==5,"An earned bonus survives reload")
+	bar = loaded.street.selected()
+	guest = bar.customers[0]
+	eco = loaded.street.economy
+	guest.order = true
+	eco.serve(bar)
+	test.check(bar.bonus_tips==5 and bar.tip_visits==1,"Refills cannot award another bonus")
+	eco.admit(bar)
+	guest = bar.customers.back()
+	guest.drink = 1
+	guest.lager_quote = eco.price(bar)
+	while eco.stock_of(bar,1)>0: eco.consume_stock(bar,1)
+	eco.serve(bar)
+	test.check(bar.tip_visits==2 and bar.bonus_tips==5,"A substitute earns the base tip only")
+	close_night(loaded)
+	test.check(bar.bonus_tips==0 and bar.last_tips.amount==25 and bar.last_tips.bonus==5,"Nightly settlement pays the bonus exactly once")
+	loaded.save_game()
+	test.check(Campaign.new(1).load_game(),"Settled bonus reports survive reload")
+
 func run(test: SceneTree) -> void:
+	test_drink_bonus(test)
 	var m = Campaign.new(72)
 	var b: Dictionary = m.street.selected()
 	var e = m.street.economy
@@ -27,9 +63,11 @@ func run(test: SceneTree) -> void:
 	b.stock = 0
 	e.serve(b)
 	test.check(b.tip_visits==1,"Empty orders and stockouts cannot earn tips")
+	b.erase("bonus_tips")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.street.selected().tip_visits==1,"Pending jar persists across reload")
+	test.check(loaded.load_game() and loaded.street.selected().tip_visits==1 and loaded.street.selected().bonus_tips==0,"Old schema-11 saves retain pending visits and start with zero bonus")
+	b.bonus_tips = 0
 	m.s.street.pass_credit = -10000000
 	money = m.s.cash
 	close_night(m)

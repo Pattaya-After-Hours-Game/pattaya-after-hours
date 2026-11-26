@@ -367,7 +367,7 @@ func night_ready() -> bool:
 func count_tips() -> void:
 	var report: Dictionary = economy.settle_tips()
 	if report.amount>0:
-		record("Anong counts the tip jars: %d served visits × ฿%d = ฿%d added to the till. Tomorrow's cold beer fund." % [report.visits,C.TIP_PER_VISIT,report.amount])
+		record("Anong counts the tip jars: ฿%d from %d served visits%s. Tomorrow's cold beer fund." % [report.amount,report.visits," (฿%d in drink bonuses)" % report.bonus if report.bonus>0 else ""])
 
 func night_prep_tick() -> void:
 	if not night_ready(): return

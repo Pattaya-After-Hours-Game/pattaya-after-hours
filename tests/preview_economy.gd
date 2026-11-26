@@ -63,6 +63,11 @@ func run() -> void:
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	await capture(app,"economy-opening")
+	app.model.street.selected().stock = 0
+	app.open_fridge()
+	await capture(app,"fridge-stockout")
+	app.change_tab(0)
+	app.model = Campaign.new(72)
 	var start_cash: int = app.model.s.cash
 	app.model.s.cash = 1800
 	await capture(app,"upgrades-badge")

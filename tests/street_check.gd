@@ -243,6 +243,10 @@ func test_drink_stock(test: SceneTree) -> void:
 	guest.order = false
 	guest.taste_roll = 99
 	eco.order(bar,guest)
+	test.check(guest.drink==0,"Budget crowd passes on rum at full price")
+	guest.order = false
+	guest.audience = 1
+	eco.order(bar,guest)
 	guest.lager_quote = 0
 	test.check(guest.drink==2 and bar.shift.drink_requests.rum==1 and eco.stock_waiting(bar)==1,"Unstocked rum demand is recorded even with lager in the fridge")
 	model.street.action("serve")

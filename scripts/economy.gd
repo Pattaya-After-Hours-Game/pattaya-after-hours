@@ -133,10 +133,10 @@ static func new_fields() -> Dictionary:
 	return fields
 
 static func tip_fields() -> Dictionary:
-	return {"tip_visits":0,"tips_total":0,"last_tips":{}}
+	return {"tip_visits":0,"bonus_tips":0,"tips_total":0,"last_tips":{}}
 
 func settle_tips() -> Dictionary:
-	var report := {"visits":0,"amount":0}
+	var report := {"visits":0,"amount":0,"bonus":0}
 	if s.phase!="plan" or s.street.minute<C.CLOSE_MINUTE or s.street.minute>=C.OPEN_MINUTE: return report
 	for venue in s.street.bars:
 		if is_trading(venue): return report
@@ -145,9 +145,12 @@ func settle_tips() -> Dictionary:
 	s.street.tip_night = int(s.day)
 	for bar in s.street.bars:
 		var visits := int(bar.tip_visits)
-		var amount := visits*C.TIP_PER_VISIT
-		bar.last_tips = {"day":maxi(1,int(s.day)-1),"visits":visits,"amount":amount}
+		var bonus := int(bar.bonus_tips)
+		var amount := visits*C.TIP_PER_VISIT+bonus
+		bar.last_tips = {"day":maxi(1,int(s.day)-1),"visits":visits,"amount":amount,"bonus":bonus}
 		bar.tip_visits = 0
+		bar.bonus_tips = 0
+		report.bonus += bonus
 		bar.tips_total += amount
 		report.visits += visits
 		report.amount += amount
@@ -157,7 +160,8 @@ func settle_tips() -> Dictionary:
 	return report
 
 func tips_text(bar: Dictionary) -> String:
-	var text := "Tip jar: %d served visits × ฿%d = ฿%d pending. Counted at street closing." % [bar.tip_visits,C.TIP_PER_VISIT,int(bar.tip_visits)*C.TIP_PER_VISIT]
+	var text := "Tip jar · ฿%d pending · counted at closing" % (int(bar.tip_visits)*C.TIP_PER_VISIT+int(bar.bonus_tips))
+	if bar.bonus_tips>0: text += " (+฿%d in drink bonuses)" % bar.bonus_tips
 	if not bar.last_tips.is_empty():
 		text += "\nLast count · day %d: %d served visits · ฿%d paid. Total tips ฿%d." % [bar.last_tips.day,bar.last_tips.visits,bar.last_tips.amount,bar.tips_total]
 	return text
@@ -484,17 +488,27 @@ func taste(bar: Dictionary, audience: int, drink: int) -> int:
 	if drink == 2 and drink_count(bar) == 3: weight += int(C.DRINK_TASTES[audience][3])
 	return weight
 
+func affordable_drink(bar: Dictionary, audience: int, wanted: int, budget: int, offline: bool = false) -> int:
+	var limit := mini(budget, int(C.TYPES[int(bar.type)].drink)+int(C.DRINK_PRICE_HEADROOM[audience]))
+	if price(bar,wanted,offline)<=limit: return wanted
+	# Keep the wider house-lager market while allowing guests to trade down on price.
+	for drink in [0,1]:
+		if price(bar,drink,offline)<=limit: return drink
+	return -1
+
 func drink_popularity(bar: Dictionary, offline: bool = false) -> Array[float]:
 	var demand: Array[float] = []
+	demand.resize(drink_count(bar))
+	demand.fill(0.0)
 	var crowd := audience_weights(offline)
 	var total := 0.0
-	for drink in drink_count(bar):
-		var weight := 0.0
-		for audience in 3:
-			var affinity: float = C.AUDIENCE_AFFINITY[int(bar.type)][audience]
-			weight += int(crowd[audience])*affinity*taste(bar,audience,drink)
-		demand.append(weight)
-		total += weight
+	for audience in 3:
+		var affinity: float = C.AUDIENCE_AFFINITY[int(bar.type)][audience]
+		for wanted in demand.size():
+			var weight := int(crowd[audience])*affinity*taste(bar,audience,wanted)
+			var drink := affordable_drink(bar,audience,wanted,1_000_000,offline)
+			demand[drink] += weight
+			total += weight
 	for drink in demand.size(): demand[drink] /= total
 	return demand
 
@@ -709,10 +723,9 @@ func preferred_drink(bar: Dictionary, customer: Dictionary) -> int:
 func order(bar: Dictionary, customer: Dictionary) -> void:
 	if not is_trading(bar): return
 	if customer.order or customer.drinks >= (C.CELEBRATION_DRINK_LIMIT if celebrating(bar) else 2) or customer.missed: return
-	var drink := preferred_drink(bar,customer)
-	if customer.budget<price(bar,drink): drink = 0
+	var drink := affordable_drink(bar,int(customer.get("audience",0)),preferred_drink(bar,customer),int(customer.budget))
+	if drink<0: return
 	var amount := price(bar,drink)
-	if customer.budget < amount: return
 	customer.drink = drink
 	var accepts_lager := not carries_drink(bar,drink) or posmod(hash(Vector3i(int(customer.id),int(customer.drinks),-1)),100)<int(C.DRINKS[drink].substitute)
 	customer.lager_quote = price(bar) if drink>0 and accepts_lager and customer.budget>=price(bar) else 0
@@ -762,10 +775,10 @@ func serving_choice(bar: Dictionary, customer: Dictionary) -> int:
 	if customer.get("lager_quote",0)>0 and can_supply(bar,0): return 0
 	return -1
 
-func stock_waiting(bar: Dictionary) -> int:
+func stock_waiting(bar: Dictionary, drink: int = -1) -> int:
 	var total := 0
 	for customer in bar.customers:
-		if customer.order and serving_choice(bar,customer)<0: total += 1
+		if customer.order and (drink<0 or customer.drink==drink) and serving_choice(bar,customer)<0: total += 1
 	return total
 
 func record_stock_miss(bar: Dictionary, drink: int) -> void:
@@ -801,7 +814,14 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		bar.shift.consumed_stock += consumed
 		customer.budget -= quote
 		customer.order = false
-		if customer.drinks==0: bar.tip_visits += 1
+		var tip_bonus := 0
+		if customer.drinks==0:
+			bar.tip_visits += 1
+			var chance := int(C.DRINK_TIP_CHANCE[int(customer.get("audience",0))][drink])
+			# Use a stable roll so this does not advance the traffic RNG.
+			if not substituted and posmod(hash(Vector3i(int(customer.id),drink,-7)),100)<chance:
+				tip_bonus = C.DRINK_TIP_BONUS
+				bar.bonus_tips += tip_bonus
 		customer.drinks += 1
 		customer.next = repeat_order_seconds(bar)
 		party_add(bar,"sales")
@@ -823,6 +843,7 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		sold += 1
 		if manual:
 			last_sale = "%s sold · ฿%d margin%s" % [C.DRINKS[drink].name,quote-consumed-commission," · substitute" if substituted else ""]
+			if tip_bonus>0: last_sale += " · +฿%d tip" % tip_bonus
 	if manual and sold > 0: start_cooldown(bar,"serve",action_cooldown(bar,"serve"))
 	return sold
 
@@ -860,15 +881,18 @@ func action_status(bar: Dictionary, id: String) -> Dictionary:
 	var timer := "serve" if id=="serve" else "welcome"
 	var remaining := maxf(0.0,float(bar[timer+"_ready"])-action_time())
 	var duration := maxf(0.001,float(bar[timer+"_duration"]))
-	var no_orders := id=="serve" and pending(bar)==0
+	var waiting := pending(bar) if id=="serve" else 0
+	var no_orders := id=="serve" and waiting==0
+	var trading := is_trading(bar)
+	var needs_stock := id=="serve" and trading and waiting>0 and waiting==stock_waiting(bar)
 	var reason := ""
-	if not is_trading(bar): reason = status(bar)
+	if not trading: reason = status(bar)
+	elif needs_stock: reason = "Restock the fridge."
 	elif no_orders: reason = "No orders waiting. Welcome customers or plan a promotion."
 	elif remaining>0.000001: reason = "%s ready in %.1fs." % ["Serve" if id=="serve" else "Welcome / Chat",remaining]
 	elif id=="welcome" and promoter_bonus(bar)>0: reason = "Nida is welcoming customers."
-	elif id=="serve" and pending(bar)==stock_waiting(bar): reason = "Restock the fridge."
 	elif id=="chat" and chat_target(bar).is_empty(): reason = "Chat helps an unchatted guest with 10s or less left to wait."
-	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
+	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"needs_stock":needs_stock,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
 
 func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var item: Dictionary = C.ACTION_UPGRADES[index]

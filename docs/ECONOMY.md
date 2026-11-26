@@ -16,7 +16,10 @@ Each real visit's first successful drink sale increments `bar.tip_visits`; the
 saved `customer.drinks` counter prevents repeat tips for further rounds. Manual,
 staff and owner automation share settlement. Tips are an additional house bonus
 of ฿10 per served visit, outside the existing drink budget and Nida's commission.
-They are never earned by arrivals alone, pool, managers or offline estimates.
+Serving the requested specialty drink on the first round can also add ฿5 to the same nightly jar.
+The odds depend on drink and audience. The roll is stable per guest and drink,
+independent of traffic RNG. Substitutes earn the base tip only.
+Tips are never earned by arrivals alone, pool, managers or offline estimates.
 
 The street counts all jars at final nightly closure, or an explicit legal night
 skip. Daytime close/open toggles and short business reports do not count them.
@@ -205,7 +208,11 @@ are paid for only when a real customer buys them. No buyer means no income.
 Patron audience affects drink preferences. The fridge shares capacity across
 house lager, lime soda, rum and cola, and premium mango cocktails. Guests may
 accept house lager at its order-time quote if their preferred drink is unavailable.
-Unfilled requests and substitutions appear in the drink list.
+Unfilled requests and substitutions appear in the drink list. Locals, visitors
+and big spenders have different willingness to pay. Guests can trade down to
+lager or soda if an order exceeds their price ceiling or remaining budget.
+Popularity and mixed delivery use the audience and current menu prices, including
+Happy Hour. Pending orders keep their original quotes.
 
 Manual orders can buy a full pack of a single drink or a mixed selection based on
 current demand. Supplier terms apply to each product. Automatic deliveries cover

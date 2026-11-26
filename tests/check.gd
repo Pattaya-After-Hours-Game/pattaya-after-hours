@@ -119,7 +119,7 @@ func test_ui() -> void:
 	await process_frame
 	use_button(app,"New Game")
 	check(app.show_tutorial_hint,"New players see the tutorial hint")
-	for stat in ["TILL","STOCK","REPUTATION","HEAT","TIME"]:
+	for stat in ["TILL","REPUTATION","HEAT","TIME"]:
 		var button := find_button(app,stat)
 		check(not button.tooltip_text.is_empty(),"Hover explains "+stat)
 		use_button(app,stat)
@@ -129,6 +129,19 @@ func test_ui() -> void:
 	outside.pressed = true
 	app._input(outside)
 	check(app.stat_tip==null,"Touching outside a stat tip dismisses it")
+	check(not find_button(app,"STOCK").tooltip_text.is_empty(),"Stock header still has a hover explanation")
+	use_button(app,"STOCK")
+	check(app.fridge_open and app.drawer_open and app.column.get_child_count()>4,"Tapping Stock opens the drink list")
+	use_button(app,"‹  Service")
+	var bar: Dictionary = app.model.street.selected()
+	var original_stock: int = bar.stock
+	var original_cash: int = app.model.s.cash
+	bar.stock = 0
+	app.update_action_controls()
+	use_button(app,"Restock fridge")
+	check(app.fridge_open and bar.stock==0 and app.model.s.cash==original_cash and app.model.s.street.served==0,"Serve stockout opens the fridge without buying or selling")
+	bar.stock = original_stock
+	use_button(app,"‹  Service")
 	var initial_save := FileAccess.get_file_as_string(Campaign.SAVE)
 	use_button(app,"Tutorial")
 	check(FileAccess.get_file_as_string(Campaign.SAVE)==initial_save,"Opening a tutorial leaves the new campaign save untouched")

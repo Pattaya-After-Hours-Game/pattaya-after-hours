@@ -69,15 +69,18 @@ const RAID_FINE_PER_STAGE = 300
 const STARTING_CASH = 200
 const STOCK_COST = 14
 const DRINKS = [
-	{"id":"lager","name":"House lager","cost":STOCK_COST,"offset":0,"substitute":100},
-	{"id":"soda","name":"Lime soda","cost":6,"offset":-10,"substitute":80},
-	{"id":"rum","name":"Rum & cola","cost":19,"offset":18,"substitute":90},
-	{"id":"mango","name":"Mango cocktail","cost":25,"offset":30,"substitute":75},
+	{"id":"lager","name":"House lager","tier":"House","cost":STOCK_COST,"offset":0,"substitute":100},
+	{"id":"soda","name":"Lime soda","tier":"Value","cost":6,"offset":-10,"substitute":80},
+	{"id":"rum","name":"Rum & cola","tier":"Select","cost":19,"offset":18,"substitute":90},
+	{"id":"mango","name":"Mango cocktail","tier":"Premium","cost":25,"offset":30,"substitute":75},
 ]
 # The audience order is locals, visitors, and big spenders.
 const DRINK_TASTES = [[63,24,11,2],[46,10,32,12],[27,8,38,27]]
+const DRINK_PRICE_HEADROOM = [8,22,50]
+const DRINK_TIP_CHANCE = [[0,60,20,8],[0,22,50,20],[0,10,42,75]]
 const AUDIENCE_AFFINITY = [[1.5,1.0,.5],[.6,1.0,1.6],[.3,1.3,1.5]]
 const TIP_PER_VISIT = 10
+const DRINK_TIP_BONUS = 5
 const POOL_FEE = 50
 const POOL_SECONDS = 45
 const ACTION_COOLDOWNS = [10,8,6,4,2]

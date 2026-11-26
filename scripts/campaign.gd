@@ -658,6 +658,9 @@ func save_game(replace_campaign: bool = false) -> int:
 		if error != OK: return error
 	return DirAccess.rename_absolute(temporary,SAVE)
 
+func _valid_tip_bonus(value: Variant, visits: Variant) -> bool:
+	return _finite_number(value,0,float(visits)*Street.C.DRINK_TIP_BONUS) and fmod(float(value),Street.C.DRINK_TIP_BONUS)==0
+
 func _finite_number(value: Variant, minimum: float, maximum: float) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value)>=minimum and float(value)<=maximum
 
@@ -704,7 +707,7 @@ func _read(path: String) -> Variant:
 				if int(parsed.version)==3:
 					for key in Street.Economy.clock_fields(): defaults.erase(key)
 				for key in defaults:
-					if key=="drink_stock" and not bar.has(key): continue
+					if key in ["drink_stock","bonus_tips"] and not bar.has(key): continue
 					if not bar.has(key): return null
 					if defaults[key] is Array and not bar[key] is Array: return null
 					if defaults[key] is Dictionary and not bar[key] is Dictionary: return null
@@ -805,10 +808,13 @@ func _read(path: String) -> Variant:
 			for bar in parsed.street.bars:
 				for key in ["tip_visits","tips_total"]:
 					if not _finite_number(bar.get(key),0,1e15) or float(bar[key])!=floorf(float(bar[key])): return null
+				if not _valid_tip_bonus(bar.get("bonus_tips",0),bar.tip_visits): return null
 				if not bar.last_tips.is_empty():
 					for key in ["day","visits","amount"]:
 						if not _finite_number(bar.last_tips.get(key),0,1e15) or float(bar.last_tips[key])!=floorf(float(bar.last_tips[key])): return null
-					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT: return null
+					var bonus: Variant = bar.last_tips.get("bonus",0)
+					if not _valid_tip_bonus(bonus,bar.last_tips.visits): return null
+					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT+bonus: return null
 		if int(parsed.version)>=10:
 			var prep: Variant = parsed.street.get("night_prep")
 			if not prep is Dictionary: return null

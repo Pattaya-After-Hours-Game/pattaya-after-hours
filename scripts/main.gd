@@ -38,7 +38,7 @@ const EQUIPMENT_CAPTIONS = {
 const TAB_NAMES = ["Service","Events","Tours","Empire","Journal"]
 const STAT_TIPS = {
 	"TILL":"Shared cash for stock, wages, upgrades and leases. The small rate shows net trading per second over the last five seconds.",
-	"STOCK":"Drinks in this venue's fridge. Each sale uses one. Buy packs in Service.",
+	"STOCK":"Drinks in this venue's fridge. Each sale uses one. Tap to open the fridge.",
 	"REPUTATION":"Happy customers build your reputation. It attracts visitors and unlocks new venue types.",
 	"HEAT":"Trading after 1am raises Heat and increases the chance of a raid and fine. Closing on time lets it cool.",
 	"TIME":"The day changes at midnight. Bars open at noon and normally close at 1am.",
@@ -86,6 +86,7 @@ var arcade_circuit := false
 var live_labels: Array = []
 var action_controls: Array = []
 var upgrades_open := false
+var fridge_open := false
 var upgrades_ready_only := true
 var upgrade_badge: Button
 var upgrades_entry: Button
@@ -318,6 +319,7 @@ func save_state() -> void:
 
 func change_tab(index: int) -> void:
 	upgrades_open = false
+	fridge_open = false
 	confirmation = false
 	tab = index
 	drawer_open = true
@@ -460,7 +462,8 @@ func render(keep_scroll: bool = false) -> void:
 	drawer.size = Vector2(380,422)
 	root_ui.add_child(drawer)
 	pane(drawer,Rect2(0,0,380,422),Color("#241820f7"))
-	abs_text(drawer,Rect2(16,5,290,30),"SHIFT DESK" if practicing or model.s.phase != "plan" else "UPGRADES" if upgrades_open and tab==0 else TAB_NAMES[tab].to_upper(),16,GOLD)
+	var show_fridge: bool = fridge_open and not practicing and model.s.phase in ["plan","guided"]
+	abs_text(drawer,Rect2(16,5,290,30),"FRIDGE" if show_fridge else "SHIFT DESK" if practicing or model.s.phase != "plan" else "UPGRADES" if upgrades_open and tab==0 else TAB_NAMES[tab].to_upper(),16,GOLD)
 	if not practicing and model.s.phase == "plan":
 		at_button(drawer,Rect2(324,4,48,36),"×",close_drawer)
 	scroll = ScrollContainer.new()
@@ -483,7 +486,8 @@ func render(keep_scroll: bool = false) -> void:
 		"plan":
 			match tab:
 				0:
-					if upgrades_open: upgrades_panel()
+					if show_fridge: fridge_panel()
+					elif upgrades_open: upgrades_panel()
 					else: service_panel()
 				1: events_panel()
 				2: tours_panel()
@@ -492,9 +496,11 @@ func render(keep_scroll: bool = false) -> void:
 			action_label = "Serve a drink"
 			action = street_action.bind("serve")
 		"guided":
-			title("Guided shift · live service")
-			live_body(func() -> String: return "Wave %d/3 · %ds into this shift" % [int(model.s.street.guided.wave)+1,model.s.street.seconds],GOLD)
-			street_panel()
+			if show_fridge: fridge_panel()
+			else:
+				title("Guided shift · live service")
+				live_body(func() -> String: return "Wave %d/3 · %ds into this shift" % [int(model.s.street.guided.wave)+1,model.s.street.seconds],GOLD)
+				street_panel()
 			action_label = "Serve a drink"
 			action = street_action.bind("serve")
 		"guided_choice":
@@ -574,11 +580,14 @@ func toggle_drawer(index: int) -> void:
 
 func close_drawer() -> void:
 	upgrades_open = false
+	fridge_open = false
 	drawer_open = false
 	render()
 
 func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> void:
-	var target := at_button(root_ui,Rect2(x-4,2,width,44),name_text,toggle_stat_tip.bind(name_text,x))
+	var stock_shortcut: bool = name_text=="STOCK" and campaign_before_tutorial==null and model.s.phase in ["plan","guided"]
+	var callback := open_fridge if stock_shortcut else toggle_stat_tip.bind(name_text,x)
+	var target := at_button(root_ui,Rect2(x-4,2,width,44),name_text,callback)
 	target.tooltip_text = STAT_TIPS[name_text]
 	var empty := StyleBoxEmpty.new()
 	for state in ["normal","hover","pressed"]: target.add_theme_stylebox_override(state,empty)
@@ -734,7 +743,7 @@ func tutorial_panel() -> void:
 	title("%d / %d  ·  %s" % [tutorial_step+1,headings.size(),headings[tutorial_step]])
 	match tutorial_step:
 		0:
-			body("Buy a pack. Every drink sold uses one unit of stock. The Till and Stock counters show what changed.")
+			body("Buy a pack. In a live shift, tap Stock or Restock fridge to open this menu.")
 			stock_controls.append(row_button("Buy drinks",street_action.bind("stock"),true))
 		1:
 			body("A gold dot marks an order. Tap Serve a drink to fill it and start the refill timer.")
@@ -750,8 +759,8 @@ func tutorial_panel() -> void:
 			row_button("Advance to 1am",tutorial_close,true)
 		6:
 			body("%d drinks sold · %s in tips" % [bar.last_shift.get("sales",0),cash(bar.last_tips.get("amount",0))],TEAL,16)
-			body("At closing, tips are counted and cleaning starts. In the live game, wait for noon or tap Stay here to prepare manually.")
-			body("In Service, follow Anong’s next step to upgrade, automate, and eventually buy another bar. Look in Events for parties and warnings.",MUTED,13)
+			body("Serve the specialty drink a guest asks for on their first round for a chance at a ฿5 tip. Tips pay out at closing.")
+			body("At closing, wait for noon or tap Stay here. Follow Anong’s next step in Service to grow the bar.",MUTED,13)
 			row_button("Finish tutorial",finish_tutorial,true)
 
 func tutorial_close() -> void:
@@ -860,6 +869,9 @@ func street_action(id: String,index: int = 0) -> void:
 			if id=="hire": model.street.tick(StreetContent.STAFF_SERVICE_SECONDS[0])
 		render()
 		return
+	if id=="serve" and model.street.economy.action_status(model.street.selected(),id).needs_stock:
+		open_fridge()
+		return
 	var sold_before := int(model.s.street.served)
 	message = model.street.action(id,index)
 	if id=="serve" and model.s.street.served>sold_before: service_animation = 0.7
@@ -891,24 +903,26 @@ func update_action_controls() -> void:
 		if not is_instance_valid(entry[0]): continue
 		var state: Dictionary = eco.action_status(bar,entry[4])
 		var practice_action: bool = campaign_before_tutorial == null or (tutorial_step<TUTORIAL_ACTIONS.size() and entry[4]==TUTORIAL_ACTIONS[tutorial_step])
-		entry[0].disabled = not state.enabled or not practice_action
-		entry[0].tooltip_text = "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
+		var stock_shortcut: bool = state.needs_stock and campaign_before_tutorial==null
+		entry[0].disabled = not (state.enabled or stock_shortcut) or not practice_action
+		entry[0].tooltip_text = "Open the stock menu" if stock_shortcut else "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
 		# Keep native button text for keyboard/accessibility; a child draws the caption over the fill.
-		entry[0].text = entry[3]
+		entry[0].text = "Restock fridge" if stock_shortcut else entry[3]
 		for color_name in ["font_color","font_disabled_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
 			entry[0].add_theme_color_override(color_name,Color.TRANSPARENT)
-		entry[1].size.x = 0 if state.no_orders else (entry[0].size.x-4)*state.fill
-		var refilling: bool = state.remaining>0.000001 and not state.no_orders
+		entry[1].size.x = 0 if state.no_orders or stock_shortcut else (entry[0].size.x-4)*state.fill
+		var refilling: bool = state.remaining>0.000001 and not state.no_orders and not stock_shortcut
 		entry[1].color.a = 0.24 if refilling or not entry[0].disabled else 0.07
 		var detail := "Ready" if state.enabled else "Unavailable"
 		if not eco.is_trading(bar): detail = "Venue closed"
 		elif state.no_orders: detail = "Waiting for orders"
+		elif stock_shortcut: detail = "Open stock menu"
 		elif refilling: detail = "Refilling · %ds" % ceili(state.remaining)
 		elif not state.enabled and entry[4]=="serve": detail = "Restock fridge"
 		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
 		elif not state.enabled and entry[4]=="welcome" and eco.promoter_bonus(bar)>0: detail = "Nida is welcoming"
 		elif not practice_action: detail = "Practice step"
-		entry[2].text = ("Auto-serve" if entry[4]=="serve" and eco.automatic_service(bar) else entry[3])+"\n"+detail
+		entry[2].text = ("Restock fridge" if stock_shortcut else "Auto-serve" if entry[4]=="serve" and eco.automatic_service(bar) else entry[3])+"\n"+detail
 		entry[2].modulate = DARK if not entry[0].disabled and entry[4]=="serve" else WHITE if not entry[0].disabled or refilling else MUTED
 	for button in stock_controls:
 		if not is_instance_valid(button): continue
@@ -917,30 +931,58 @@ func update_action_controls() -> void:
 		button.tooltip_text = "%d drinks; cash after purchase %s" % [offer.quantity,cash(offer.remaining_cash)] if offer.enabled else offer.reason
 		button.text = "Buy %d drinks · %s" % [offer.quantity,cash(offer.price)]+("\n"+offer.reason if not offer.enabled else "")
 
-func stock_button() -> void:
+func stock_button(in_fridge: bool = false) -> void:
 	stock_controls.append(row_button("Buy drinks",street_action.bind("stock")))
 	var recovery := row_button("Bo's recovery delivery · 6 drinks",street_action.bind("emergency_stock"))
 	recovery.name = "EmergencyStock"
-	live_body(func() -> String:
-		var target: Dictionary = model.street.selected()
-		recovery.visible = model.street.economy.emergency_stock_available(target)
-		return "No upfront cash. ฿14 per drink is paid when sold. Staff go off duty; Anong covers 2 minutes of overhead. Existing orders stay." if recovery.visible else "",GOLD,12)
 	var bar: Dictionary = model.street.selected()
+	var recovery_note := body("",GOLD,12)
+	var note := func() -> String:
+		recovery.visible = model.street.economy.emergency_stock_available(bar)
+		recovery_note.visible = recovery.visible
+		return "No upfront cash. ฿14 per drink is paid when sold. Staff go off duty; Anong covers 2 minutes of overhead. Existing orders stay." if recovery.visible else ""
+	recovery_note.text = note.call()
+	live_labels.append([recovery_note,note])
+	if in_fridge: return
 	live_body(func() -> String: return "%d/%d stocked · cash after pack %s · next operating charge ≤%s" % [bar.stock,model.street.capacity(bar),cash(int(model.s.cash)-model.street.economy.pack_price(bar)),cash(ceili(model.street.economy.operating_rate(bar)/60.0))],MUTED,12)
 
-func drink_panel(bar: Dictionary) -> void:
+func open_fridge() -> void:
+	tab = 0
+	drawer_open = true
+	upgrades_open = false
+	fridge_open = true
+	message = ""
+	render()
+
+func fridge_panel() -> void:
+	row_button("‹  Service",change_tab.bind(0))
+	var bar: Dictionary = model.street.selected()
+	stock_button(true)
+	drink_panel(bar,true)
+	live_body(func() -> String: return model.street.economy.tips_text(bar),TEAL,12)
+
+func drink_panel(bar: Dictionary, in_fridge: bool = false) -> void:
 	var eco = model.street.economy
-	row_pair("Mixed delivery",street_action.bind("mixed_drinks"),"Hide drink list" if drink_list_open else "Drinks & margins",func() -> void:
-		drink_list_open = not drink_list_open
-		render(true))
-	if not drink_list_open: return
-	for drink in eco.drink_count(bar):
+	if in_fridge:
+		row_button("Mixed delivery",street_action.bind("mixed_drinks"))
+	else:
+		row_pair("Mixed delivery",street_action.bind("mixed_drinks"),"Hide drink list" if drink_list_open else "Drinks & margins",func() -> void:
+			drink_list_open = not drink_list_open
+			render(true))
+		if not drink_list_open: return
+	var drinks := range(eco.drink_count(bar))
+	if in_fridge:
+		drinks.sort_custom(func(a: int,b: int) -> bool: return eco.stock_waiting(bar,a)>eco.stock_waiting(bar,b))
+	for drink in drinks:
 		var item: Dictionary = StreetContent.DRINKS[drink]
 		live_body(func() -> String:
 			var recent := int(bar.shift.drink_requests.get(item.id,0))+int(bar.last_shift.get("drink_requests",{}).get(item.id,0))
 			var missed := int(bar.shift.drink_misses.get(item.id,0))+int(bar.last_shift.get("drink_misses",{}).get(item.id,0))
 			var popularity := roundi(100.0*eco.drink_popularity(bar)[drink])
-			return "%s · %d stocked · +฿%d/sale\n%d%% expected · %d asked · %d short" % [item.name,eco.stock_of(bar,drink),eco.price(bar,drink)-eco.drink_cost(bar,drink),popularity,recent,missed],TEAL,13)
+			var waiting: int = eco.stock_waiting(bar,drink) if in_fridge else 0
+			var line := "%s · %s · %d stocked\n%d%% popular · +฿%d/sale" % [item.name,item.tier,eco.stock_of(bar,drink),popularity,eco.price(bar,drink)-eco.drink_cost(bar,drink)]
+			if waiting>0: return line+" · %d waiting" % waiting
+			return line+"\n%d asked · %d short" % [recent,missed],TEAL,13)
 		row_pair("Buy %d · ฿%d ea" % [eco.pack_quantity(bar),eco.drink_cost(bar,drink)],street_action.bind("buy_drink",drink),"Return up to 3",street_action.bind("return_drink",drink))
 
 func live_body(value: Callable,tint: Color = MUTED,px: int = 15) -> void:
@@ -1051,6 +1093,7 @@ func sync_upgrade_badge(rebuild: bool = false) -> void:
 	if changed and rebuild and drawer_open and upgrades_open: render(true)
 
 func open_upgrades(ready_only: bool) -> void:
+	fridge_open = false
 	tab = 0
 	drawer_open = true
 	upgrades_open = true
