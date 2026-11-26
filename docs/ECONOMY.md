@@ -96,7 +96,7 @@ surcharge and Happy Hour its 20% discount. Renovation never adds a price bump.
 Ryan's concurrent drink-inventory work is retained. The ladder is the house-lager
 base. Lime soda stays ฿10 below it, rum and cola ฿18 above it, mango cocktails
 ฿30 above it. Those products retain base supply costs ฿6/19/25; supplier discounts
-still apply to each. Single-drink packs, partial mixed deliveries, paid-cost
+still apply to each. Single-drink packs, paid-cost
 returns, audience preferences, lager substitutions and matched-drink tip bonuses
 use the merged model. These are distinct products, not cheaper beer stock.
 
@@ -332,14 +332,15 @@ passing traffic. The event uses the saved street timer and affects live trade on
 Patron audience affects drink preferences. The fridge shares capacity across
 house lager, lime soda, rum and cola, and premium mango cocktails. Guests may
 accept house lager at its order-time quote if their preferred drink is unavailable.
-Unfilled requests and substitutions appear in the drink list. Locals, visitors
+Drinks with more waiting requests than stock appear under Needed now when
+automatic deliveries cannot cover the shortage. Locals, visitors
 and big spenders have different willingness to pay. Guests can trade down to
 lager or soda if an order exceeds their price ceiling or remaining budget.
-Popularity and mixed delivery use the audience and current menu prices, including
+Expected popularity uses the audience and current menu prices, including
 Happy Hour. Pending orders keep their original quotes.
 
-Manual orders can buy a full pack of a single drink or a mixed selection based on
-current demand. Supplier terms apply to each product. Automatic deliveries cover
+Manual orders buy a full pack of one drink. Supplier terms apply to each product.
+The first Supplier upgrade unlocks automatic deliveries for
 drinks already stocked at that bar. Stock lots retain their paid prices for FIFO
 service and half-cost returns. Old stock becomes house lager and pending orders
 keep their saved quote. Offline trading estimates a drink mix within stock and

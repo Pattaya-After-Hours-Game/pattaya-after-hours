@@ -152,7 +152,7 @@ func test_ui() -> void:
 	check(app.stat_tip==null,"Touching outside a stat tip dismisses it")
 	check(not find_button(app,"STOCK").tooltip_text.is_empty(),"Stock header still has a hover explanation")
 	use_button(app,"STOCK")
-	check(app.fridge_open and app.drawer_open and app.column.get_child_count()>4,"Tapping Stock opens the drink list")
+	check(app.fridge_open and app.drawer_open and app.column.get_node_or_null("Drink_lager")!=null,"Tapping Stock opens the drink list")
 	use_button(app,"Back")
 	var bar: Dictionary = app.model.street.selected()
 	var original_stock: int = bar.stock
@@ -168,8 +168,11 @@ func test_ui() -> void:
 		customer.lager_quote = 0
 	app.update_action_controls()
 	use_button(app,"Need Rum & cola")
-	check(app.fridge_open and panel_has_text(app,"Orders need Rum & cola. Return spare stock to free 6 slots."),"Wrong-stock shortcut names the missing drink and explains how to make space")
-	check(app.column.get_child(1).text.begins_with("Rum & cola") and bar.stock==30 and app.model.s.cash==original_cash,"The needed drink is first even with a full fridge, and opening it is free")
+	check(app.fridge_open and panel_has_text(app,"NEEDED NOW") and panel_has_text(app,"Return spare stock to free 6 slots."),"Wrong-stock shortcut highlights demand and explains how to make space")
+	var demand_card: Control = app.column.get_node("Drink_rum")
+	var house_card: Control = app.column.get_node("Drink_lager")
+	check(demand_card.get_index()<house_card.get_index() and panel_has_text(app,"OTHER DRINKS") and bar.stock==30 and app.model.s.cash==original_cash,"The missing drink is separated from regular stock; opening the fridge is free")
+	check(find_button(app,"Buy 6 · ฿114").disabled and demand_card.find_children("*","TextureRect",true,false).size()==1,"The needed drink has an icon and its purchase is blocked while the fridge is full")
 	bar.stock = original_stock
 	bar.customers = original_customers
 	use_button(app,"Back")
@@ -315,7 +318,7 @@ func test_clock_ui(app: Control) -> void:
 	use_button(app,"Back")
 	check(not find_button(app,"Open Hours  ›").disabled,"Closed overview guides players to prep instead of serving")
 	use_button(app,"Fridge")
-	use_button(app,"Buy 6 House lager · ฿228")
+	use_button(app,"Buy 6 · ฿228")
 	check(bar.stock==stock_before+6,"Prep restocking uses the live stock action in Fridge")
 	use_button(app,"Back")
 	use_button(app,"Skip to 12pm")

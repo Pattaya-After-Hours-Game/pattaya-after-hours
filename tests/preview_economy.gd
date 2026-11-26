@@ -27,7 +27,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 		if scroll_to in ["TEAM & PAYROLL","FRONTAGE PROMOTER","Hire Gabby","Rehire Gabby","+฿5 tip"] or scroll_to.begins_with("HOST") or name_text.begins_with("barfine-") and not scroll_to.is_empty(): app.service_section = "team"
 		if scroll_to in ["PREP FOR OPENING","Heat"]: app.service_section = "hours"
 		if scroll_to in ["YOUR PROFIT CYCLE","NIGHTLY TIPS","Show visit plans","Hide visit plans"]: app.service_section = "reports"
-		if scroll_to.begins_with("Buy ") or name_text=="economy-drinks": app.fridge_open = true
+		if name_text.begins_with("prices-") or scroll_to.begins_with("Buy ") or name_text=="economy-drinks": app.fridge_open = true
 	if not upgrade_target.is_empty():
 		app.upgrades_open = true
 		app.upgrades_ready_only = false
@@ -39,15 +39,19 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 		if card: app.scroll.ensure_control_visible(card)
 		await process_frame
 	elif not scroll_to.is_empty():
-		var target_text := scroll_to.replace(" drinks"," House lager") if app.fridge_open and scroll_to.begins_with("Buy ") else scroll_to
-		var help_target := "Explain Hire Nida · ฿1,200" if name_text=="promoter-hire-forecast" else "Explain Hire bartender · ฿1,200" if name_text=="service-team-help" else ""
+		var help_targets := {
+			"promoter-hire-forecast":"Explain Hire Nida · ฿1,200",
+			"service-team-help":"Explain Hire bartender · ฿1,200",
+			"fridge-drink-help":"Show price, demand and margin for Rum & cola",
+		}
+		var help_target: String = help_targets.get(name_text,"")
 		if not help_target.is_empty():
 			for control in app.column.find_children("*","Button",true,false):
 				if control.tooltip_text==help_target:
 					control.pressed.emit()
 					await create_timer(.22).timeout
 					break
-		var target := find_text(app.column,target_text)
+		var target := find_text(app.column,scroll_to)
 		if target:
 			if name_text.begins_with("hosted-") or name_text.begins_with("barfine-") or name_text.begins_with("lease-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
@@ -90,7 +94,11 @@ func run() -> void:
 	await capture(app,"service-team","TEAM & PAYROLL")
 	await capture(app,"service-team-help","TEAM & PAYROLL")
 	app.open_fridge()
-	await capture(app,"service-pinned-back","Mixed delivery")
+	await capture(app,"fridge-overview")
+	app.model.s.cash = 2000
+	app.model.street.action("restock")
+	await capture(app,"fridge-auto-restock")
+	app.model = Campaign.new(72)
 	app.change_tab(0)
 	await capture(app,"service-reports","YOUR PROFIT CYCLE")
 	app.model.s.street.minute = 60
@@ -173,11 +181,14 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	var wrong_stock: Dictionary = app.model.street.selected()
 	wrong_stock.stock = 30
+	wrong_stock.equipment.menu = 1
 	for guest in wrong_stock.customers:
 		guest.drink = 2
 		guest.lager_quote = 0
 	app.open_fridge()
 	await capture(app,"fridge-wrong-stock")
+	await capture(app,"service-pinned-back","Unlock auto-restock")
+	await capture(app,"fridge-drink-help","Rum & cola")
 	app.change_tab(0)
 	app.model = Campaign.new(72)
 	app.show_tutorial_hint = false
@@ -270,7 +281,7 @@ func run() -> void:
 		app.model.street.selected().type = kind
 		app.model.street.selected().customers.clear()
 		app.model.street.economy.admit(app.model.street.selected())
-		await capture(app,"prices-"+str(kind),"Standard drink")
+		await capture(app,"prices-"+str(kind),"House lager")
 	app.model = Campaign.new(72)
 	await capture(app,"economy-opening")
 	app.model.street.selected().stock = 0
@@ -295,7 +306,7 @@ func run() -> void:
 	await capture(app,"upgrades-locked")
 	app.upgrades_open = false
 	app.upgrades_ready_only = true
-	app.model.street.action("mixed_drinks")
+	app.model.street.action("buy_drink",2)
 	await capture(app,"economy-drinks")
 	await capture(app,"actions-ready")
 	app.model.street.action("serve")
@@ -421,9 +432,9 @@ func run() -> void:
 	app.model.s.street.minute = 1045
 	app.model.street.selected().stock = 0
 	app.drawer_open = true
-	await capture(app,"tips-stockout","Buy 6 drinks")
+	await capture(app,"tips-stockout","Buy 6")
 	app.model.street.action("emergency_stock")
-	await capture(app,"tips-recovery","Buy 6 drinks")
+	await capture(app,"tips-recovery","Buy 6")
 	app.model.street.economy.serve(app.model.street.selected(),2)
 	await capture(app,"tips-pending","NIGHTLY TIPS")
 	app.model.s.day = 2

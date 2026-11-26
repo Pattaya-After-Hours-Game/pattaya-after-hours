@@ -10,7 +10,7 @@ func run(test: SceneTree) -> void:
 	model.s.cash = 5000
 	model.street.announce(Local.CART)
 	model.street.start_event()
-	test.check(not eco.stock_offer(bar).enabled and eco.mixed_delivery(bar)==0,"Cart Jam blocks pack and mixed deliveries at the affected venue")
+	test.check(not eco.stock_offer(bar).enabled and not eco.stock_offer(bar,true).enabled,"Cart Jam blocks manual and automatic deliveries at the affected venue")
 	test.check(model.street.begin_event_game()==Local.CART,"The jam offers one puzzle attempt")
 	var board := Local.BOARD.duplicate(true)
 	test.check(not Local.slide(board,0,1),"A vehicle cannot slide into another vehicle")

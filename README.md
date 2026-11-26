@@ -89,8 +89,9 @@ costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
 cash for the next shift—not just a large bank balance.
 
-Tap **Stock** or **Restock fridge** to compare popularity with profit per sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
-Mango cocktails.
+Tap **Stock** or **Restock fridge** to buy packs of individual drinks. Tap **?**
+to compare demand and margin. The Supplier upgrade unlocks automatic restocking,
+and the premium menu unlocks Mango cocktails.
 
 ## Good company earns its keep
 

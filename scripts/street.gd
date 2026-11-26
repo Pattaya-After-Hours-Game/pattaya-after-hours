@@ -152,7 +152,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
-		"serve","regulars_club","stock","buy_drink","mixed_drinks","return_drink","hire","hire_gabby","hire_daisy","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","host_drink","auto_host_drinks","bar_fine","train_host","auto_bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
+		"serve","regulars_club","stock","buy_drink","return_drink","hire","hire_gabby","hire_daisy","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","recovery","host_drink","auto_host_drinks","bar_fine","train_host","auto_bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:
@@ -225,7 +225,7 @@ func action(id: String, index: int = 0) -> String:
 			return "Unknown street action."
 	reconcile_closures()
 	settle_overnight()
-	if not id in ["serve","welcome","stock","buy_drink","mixed_drinks","return_drink"]: record(result)
+	if not id in ["serve","welcome","stock","buy_drink","return_drink"]: record(result)
 	check_chapters()
 	return result
 

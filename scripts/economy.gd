@@ -305,6 +305,7 @@ func buy_supplier(bar: Dictionary) -> String:
 	s.weekly.costs += offer.price
 	bar.supplier_level += 1
 	bar.restock = true
+	if offer.level==0: return "Auto-restock unlocked. Bo now reorders drinks you carry."
 	return "Supplier level %d: %d drinks cost ฿%d. Existing stock keeps its purchase cost." % [bar.supplier_level,pack_quantity(bar),pack_price(bar)]
 
 func sample_earnings() -> void:
@@ -827,26 +828,6 @@ func restock(bar: Dictionary, automatic: bool = false, drink: int = 0) -> bool:
 	add_stock(bar,drink,offer.quantity,drink_cost(bar,drink))
 	return true
 
-func mixed_delivery(bar: Dictionary) -> int:
-	if cart_delivery_blocked(bar): return 0
-	var mix := drink_popularity(bar)
-	var target := mini(stock_capacity(bar),int(bar.stock)+pack_quantity(bar))
-	var delivered := 0
-	while bar.stock<target:
-		var best := -1
-		var shortage := -INF
-		for drink in mix.size():
-			var missing := target*mix[drink]-stock_of(bar,drink)
-			if missing>shortage and s.cash>=drink_cost(bar,drink):
-				best = drink
-				shortage = missing
-		if best<0: break
-		var unit_cost := drink_cost(bar,best)
-		cost(bar,unit_cost,"stock_cost")
-		add_stock(bar,best,1,unit_cost)
-		delivered += 1
-	return delivered
-
 func preferred_drink(bar: Dictionary, customer: Dictionary) -> int:
 	if customer.opening and customer.drinks==0 or bar.consignment>0: return 0
 	# Draw independently of traffic and keep the preference stable for this order.
@@ -950,6 +931,23 @@ func serving_choice(bar: Dictionary, customer: Dictionary) -> int:
 	if can_supply(bar,drink): return drink
 	if customer.get("lager_quote",0)>0 and can_supply(bar,0): return 0
 	return -1
+
+func drink_orders(bar: Dictionary, drink: int) -> int:
+	var total := 0
+	for customer in bar.customers:
+		if customer.order and int(customer.get("drink",0))==drink: total += 1
+	if drink==0:
+		for round in bar.get("host_rounds",[]):
+			if round.state=="waiting": total += 1
+	return total
+
+func fridge_needs(bar: Dictionary) -> Array[int]:
+	var needs: Array[int] = []
+	for drink in drink_count(bar):
+		if drink_orders(bar,drink)<=stock_of(bar,drink): continue
+		if auto_drink(bar,drink) and stock_offer(bar,true,drink).enabled: continue
+		needs.append(drink)
+	return needs
 
 func stock_waiting(bar: Dictionary, drink: int = -1) -> int:
 	var total := 0
@@ -1307,10 +1305,6 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if index<0 or index>=drink_count(bar): return "This drink is not on your menu yet."
 			var offer := stock_offer(bar,false,index)
 			return "%d %s delivered for ฿%d." % [offer.quantity,C.DRINKS[index].name,offer.price] if restock(bar,false,index) else offer.reason
-		"mixed_drinks":
-			if cart_delivery_blocked(bar): return "Cart Jam: clear Bo’s route in Events."
-			var units := mixed_delivery(bar)
-			return "%d drinks stocked for this crowd." % units if units>0 else "Fridge full, or insufficient cash for a delivery."
 		"return_drink":
 			if index<0 or index>=drink_count(bar): return "This drink is not on your menu yet."
 			var units := mini(3,stock_of(bar,index)-(int(bar.consignment) if index==0 else 0))

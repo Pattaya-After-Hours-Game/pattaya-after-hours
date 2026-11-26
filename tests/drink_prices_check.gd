@@ -3,6 +3,7 @@ const Campaign = preload("res://scripts/campaign.gd")
 
 func run(test: SceneTree) -> void:
 	supplier_special(test)
+	supplier_auto_restock(test)
 	for kind in 3:
 		var m = Campaign.new(72)
 		var b: Dictionary = m.street.selected()
@@ -42,6 +43,23 @@ func run(test: SceneTree) -> void:
 	test.check(b.customers[0].quoted==e.price(b,int(b.customers[0].drink)) and b.customers[0].budget==155,"Only the next round adopts the new price; old customer budgets are preserved")
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
+
+func supplier_auto_restock(test: SceneTree) -> void:
+	var model := Campaign.new(72)
+	var bar: Dictionary = model.street.selected()
+	var eco = model.street.economy
+	model.s.cash = 5000
+	model.street.action("buy_drink",2)
+	for unit in 6: eco.consume_stock(bar,2)
+	var guest: Dictionary = bar.customers[0]
+	guest.drink = 2
+	guest.lager_quote = 0
+	guest.quoted = eco.price(bar,2)
+	var cash_before: int = model.s.cash
+	test.check(eco.serve(bar)==1 and guest.order and model.s.cash==cash_before+80,"Before the supplier upgrade, only the other guest can be served")
+	model.street.action("restock")
+	cash_before = model.s.cash
+	test.check(eco.serve(bar)==1 and not guest.order and eco.stock_of(bar,2)==5 and model.s.cash==cash_before-114+int(guest.quoted),"After the upgrade, a real rum order buys a paid pack and uses one drink")
 
 func supplier_special(test: SceneTree) -> void:
 	var m := Campaign.new(72)

@@ -1251,24 +1251,7 @@ func update_action_controls() -> void:
 		var offer: Dictionary = eco.stock_offer(bar)
 		button.disabled = not offer.enabled
 		button.tooltip_text = "%d drinks; cash after purchase %s" % [offer.quantity,cash(offer.remaining_cash)] if offer.enabled else offer.reason
-		button.text = "Buy %d %s · %s" % [offer.quantity,"House lager" if fridge_open else "drinks",cash(offer.price)]+("\n"+offer.reason if not offer.enabled else "")
-
-func stock_button() -> void:
-	live_body(func() -> String:
-		var bar: Dictionary = model.street.selected()
-		var eco = model.street.economy
-		return "Standard drink %s · next delivery %s per drink" % [cash(eco.price(bar)),cash(eco.stock_unit_cost(bar))],TEAL,12)
-	stock_controls.append(row_button("Buy drinks",street_action.bind("stock")))
-	var recovery := row_button("Bo's recovery delivery · 6 drinks",street_action.bind("emergency_stock"))
-	recovery.name = "EmergencyStock"
-	var bar: Dictionary = model.street.selected()
-	var recovery_note := body("",GOLD,12)
-	var note := func() -> String:
-		recovery.visible = model.street.economy.emergency_stock_available(bar)
-		recovery_note.visible = recovery.visible
-		return "No upfront cash. ฿14 per drink is paid when sold. Staff go off duty; Anong covers 2 minutes of overhead. Existing orders stay." if recovery.visible else ""
-	recovery_note.text = note.call()
-	live_labels.append([recovery_note,note])
+		button.text = "Buy %d drinks · %s" % [offer.quantity,cash(offer.price)]+("\n"+offer.reason if not offer.enabled else "")
 
 func open_fridge() -> void:
 	service_section = ""
@@ -1280,51 +1263,124 @@ func open_fridge() -> void:
 	render()
 
 func fridge_panel() -> void:
+	var bar: Dictionary = model.street.selected()
+	var eco = model.street.economy
+	var needs: Array[int] = eco.fridge_needs(bar)
+	if not needs.is_empty():
+		body("NEEDED NOW",GOLD,14)
+		for drink in needs:
+			fridge_drink(bar,drink,true)
+		var space := body("",GOLD,12)
+		var space_note := func() -> String:
+			var quote: Dictionary = eco.stock_offer(bar,false,needs[0])
+			var missing := int(quote.quantity)-int(quote.room)
+			space.visible = missing>0
+			return "Return spare stock to free %d slots." % missing
+		space.text = space_note.call()
+		live_labels.append([space,space_note])
+		fridge_divider("OTHER DRINKS" if needs.size()<eco.drink_count(bar) else "")
+	for drink in eco.drink_count(bar):
+		if drink not in needs: fridge_drink(bar,drink,false)
 	var deal: Dictionary = model.street.supplier_deal_offer()
 	if not deal.is_empty():
 		var special := row_button("Bo’s special · save "+cash(deal.normal-deal.price),open_supplier_special)
 		special.icon = UpgradeIcons.get_icon("supplier")
-	var bar: Dictionary = model.street.selected()
-	var eco = model.street.economy
-	var shortage: int = eco.blocking_drink(bar)
-	var wrong_stock: bool = shortage>=0 and bar.stock>0
-	if wrong_stock:
-		live_body(func() -> String:
-			var offer: Dictionary = eco.stock_offer(bar,false,shortage)
-			var line := "Orders need %s." % StreetContent.DRINKS[shortage].name
-			if offer.room<offer.quantity:
-				return line+" Return spare stock to free %d slots." % (offer.quantity-offer.room)
-			if not offer.enabled: return line+" "+offer.reason
-			return line,GOLD,13)
-		drink_panel(bar,shortage)
-		stock_button()
-	else:
-		stock_button()
-		drink_panel(bar)
-	live_body(func() -> String: return model.street.economy.tips_text(bar),TEAL,12)
+	if eco.emergency_stock_available(bar):
+		var recovery := service_option("Bo's recovery delivery · 6 drinks",street_action.bind("emergency_stock"),"supplier",func() -> String:
+			return "No upfront cash. Pay ฿14 per drink when it sells. Staff go off duty and Anong covers two minutes of overhead. Waiting orders stay.")
+		recovery.name = "EmergencyStock"
+	if bar.restock:
+		body("Auto-restock on",TEAL,12)
+	elif model.s.phase=="plan":
+		var supplier := row_button("Unlock auto-restock · "+cash(eco.supplier_offer(bar).price),open_upgrades.bind(false,"Upgrade_supplier"))
+		supplier.icon = UpgradeIcons.get_icon("supplier")
 
-func drink_panel(bar: Dictionary, shortage: int = -1) -> void:
+func fridge_divider(caption: String) -> void:
+	var divider := HSeparator.new()
+	var line := StyleBoxLine.new()
+	line.color = GOLD
+	line.thickness = 2
+	divider.add_theme_stylebox_override("separator",line)
+	column.add_child(divider)
+	if not caption.is_empty(): body(caption,MUTED,12)
+
+func fridge_drink(bar: Dictionary, drink: int, needed: bool) -> void:
 	var eco = model.street.economy
-	var drinks := range(eco.drink_count(bar))
-	drinks.sort_custom(func(a: int,b: int) -> bool: return eco.stock_waiting(bar,a)>eco.stock_waiting(bar,b))
-	if shortage>=0:
-		drinks.erase(shortage)
-		drinks.push_front(shortage)
-	for drink in drinks:
-		var item: Dictionary = StreetContent.DRINKS[drink]
-		live_body(func() -> String:
-			var recent := int(bar.shift.drink_requests.get(item.id,0))+int(bar.last_shift.get("drink_requests",{}).get(item.id,0))
-			var missed := int(bar.shift.drink_misses.get(item.id,0))+int(bar.last_shift.get("drink_misses",{}).get(item.id,0))
-			var share: float = eco.drink_popularity(bar)[drink]
-			var hint: String = eco.drink_demand_hint(bar,drink,share)
-			var waiting: int = eco.stock_waiting(bar,drink)
-			var line := "%s · %s · %d stocked\n%d%% popular · +฿%d/sale" % [item.name,item.tier,eco.stock_of(bar,drink),roundi(100.0*share),eco.price(bar,drink)-eco.drink_cost(bar,drink)]
-			if waiting>0:
-				return line+" · %d waiting" % waiting+("\n"+hint if not hint.is_empty() else "")
-			var history := "%d asked · %d short" % [recent,missed]
-			return line+"\n"+(hint+" · " if not hint.is_empty() else "")+history,TEAL,13)
-		row_pair("Buy %d · ฿%d ea" % [eco.pack_quantity(bar),eco.drink_cost(bar,drink)],street_action.bind("buy_drink",drink),"Return up to 3",street_action.bind("return_drink",drink))
-	row_button("Mixed delivery",street_action.bind("mixed_drinks"))
+	var item: Dictionary = StreetContent.DRINKS[drink]
+	var card := PanelContainer.new()
+	card.name = "Drink_"+item.id
+	var frame := box(Color("#382830") if needed else Color("#2d2029"),GOLD if needed else EDGE)
+	frame.content_margin_left = 6
+	frame.content_margin_right = 6
+	frame.content_margin_top = 7
+	frame.content_margin_bottom = 7
+	card.add_theme_stylebox_override("panel",frame)
+	column.add_child(card)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation",5)
+	card.add_child(row)
+	var icon := TextureRect.new()
+	icon.texture = UpgradeIcons.get_drink_icon(item.id)
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2(40,40)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(icon)
+	var labels := VBoxContainer.new()
+	labels.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	labels.alignment = BoxContainer.ALIGNMENT_CENTER
+	labels.add_theme_constant_override("separation",0)
+	row.add_child(labels)
+	var drink_name := Label.new()
+	drink_name.text = item.name
+	drink_name.add_theme_font_size_override("font_size",14)
+	labels.add_child(drink_name)
+	var count := Label.new()
+	count.add_theme_font_size_override("font_size",12)
+	count.add_theme_color_override("font_color",GOLD if needed else MUTED)
+	labels.add_child(count)
+	var buy := button("",street_action.bind("buy_drink",drink),needed)
+	buy.custom_minimum_size.x = 86
+	buy.add_theme_font_size_override("font_size",12)
+	buy.add_theme_color_override("font_disabled_color",MUTED)
+	buy.add_theme_stylebox_override("disabled",box(Color("#231c25"),EDGE))
+	row.add_child(buy)
+	var give_back := button("Return",street_action.bind("return_drink",drink))
+	give_back.custom_minimum_size.x = 48
+	give_back.add_theme_font_size_override("font_size",11)
+	give_back.tooltip_text = "Return up to 3 paid drinks for half their purchase cost"
+	row.add_child(give_back)
+	var info := button("?",func() -> void: show_service_help(item.name,fridge_drink_details(bar,drink)))
+	info.custom_minimum_size.x = 36
+	info.tooltip_text = "Show price, demand and margin for "+item.name
+	row.add_child(info)
+	var refresh := func() -> String:
+		var quote: Dictionary = eco.stock_offer(bar,false,drink)
+		var on_hand: int = eco.stock_of(bar,drink)
+		buy.text = "Buy %d · %s" % [quote.quantity,cash(quote.price)]
+		buy.disabled = not quote.enabled
+		buy.tooltip_text = "Cash after purchase "+cash(quote.remaining_cash) if quote.enabled else quote.reason
+		give_back.disabled = on_hand<=(int(bar.consignment) if drink==0 else 0)
+		if needed: return "%d orders · %d stocked" % [eco.drink_orders(bar,drink),on_hand]
+		return "%d in stock" % on_hand
+	count.text = refresh.call()
+	live_labels.append([count,refresh])
+
+func fridge_drink_details(bar: Dictionary, drink: int) -> String:
+	var eco = model.street.economy
+	var id: String = StreetContent.DRINKS[drink].id
+	var cost: int = eco.drink_cost(bar,drink)
+	var selling: int = eco.price(bar,drink)
+	var share: float = eco.drink_popularity(bar)[drink]
+	var recent := int(bar.shift.drink_requests.get(id,0))+int(bar.last_shift.get("drink_requests",{}).get(id,0))
+	var missed := int(bar.shift.drink_misses.get(id,0))+int(bar.last_shift.get("drink_misses",{}).get(id,0))
+	var detail := "%s to buy · %s to sell\n+%s margin per sale\n\n%d%% expected popularity\n%d requested · %d missed in the last two shifts" % [cash(cost),cash(selling),cash(selling-cost),roundi(100.0*share),recent,missed]
+	var hint: String = eco.drink_demand_hint(bar,drink,share)
+	if not hint.is_empty(): detail += "\n"+hint
+	var offer: Dictionary = eco.stock_offer(bar,false,drink)
+	if not offer.enabled: detail += "\n\n"+offer.reason
+	return detail
 
 func live_body(value: Callable,tint: Color = MUTED,px: int = 15) -> void:
 	var label := body(value.call(),tint,px)
@@ -1402,10 +1458,7 @@ func show_next_goal() -> void:
 	model.s.street.selected = goal.venue
 	var upgrade_target: String = {"Upgrade ·":"Upgrade_renovate","SUPPLIER AGREEMENT":"Upgrade_supplier","MANAGEMENT":"Upgrade_manager"}.get(goal.focus,"")
 	if not upgrade_target.is_empty():
-		open_upgrades(false)
-		await get_tree().process_frame
-		var card := column.find_child(upgrade_target,true,false) as Control
-		if card != null: scroll.ensure_control_visible(card)
+		open_upgrades(false,upgrade_target)
 		return
 	if goal.focus=="TEAM & PAYROLL":
 		open_service_section("team")
@@ -1476,7 +1529,8 @@ func upgrade_offers() -> Array[Dictionary]:
 		offers.append(upgrade_offer("club","Regulars Club · Level %d" % (club.level+1),"%d%% of new visitors · extra round" % club.chance,help,"regulars_club",0,club))
 	var supplier: Dictionary = eco.supplier_offer(bar)
 	if supplier.level<StreetContent.SUPPLIER_PRICES.size():
-		offers.append(upgrade_offer("supplier","Supplier · Level %d" % (supplier.level+1),"%d drinks / %s" % [supplier.quantity,cash(supplier.pack)],"Automatic deliveries buy whole packs when orders need stock. Later levels lower wholesale prices.","restock",0,supplier))
+		var caption := "Unlock auto-restock" if supplier.level==0 else "%d drinks / %s" % [supplier.quantity,cash(supplier.pack)]
+		offers.append(upgrade_offer("supplier","Supplier · Level %d" % (supplier.level+1),caption,"Bo buys paid packs of drinks you carry when orders come in and supplies are low. You need fridge space and cash for the pack plus the next operating charge. Later tiers lower the price per drink.","restock",0,supplier))
 	var manager: Dictionary = eco.manager_offer(bar)
 	if manager.level<StreetContent.MANAGER_PRICES.size():
 		offers.append(upgrade_offer("manager","Manager · Level %d" % (manager.level+1),"+%s/s while open" % cash(manager.rate),"Manager income uses no stock. Management also enables offline trading.","manager",0,manager))
@@ -1513,7 +1567,7 @@ func sync_upgrade_badge(rebuild: bool = false) -> void:
 		upgrades_entry.text = "Upgrades" if ready.is_empty() else "Upgrades   ·   %d ready" % ready.size()
 	if changed and rebuild and drawer_open and upgrades_open: render(true)
 
-func open_upgrades(ready_only: bool) -> void:
+func open_upgrades(ready_only: bool, focus: String = "") -> void:
 	service_section = ""
 	fridge_open = false
 	tab = 0
@@ -1521,6 +1575,11 @@ func open_upgrades(ready_only: bool) -> void:
 	upgrades_open = true
 	upgrades_ready_only = ready_only
 	render()
+	if focus.is_empty(): return
+	await get_tree().process_frame
+	if not upgrades_open: return
+	var card := column.find_child(focus,true,false) as Control
+	if card != null: scroll.ensure_control_visible(card)
 
 func upgrades_panel() -> void:
 	var offers := upgrade_offers()
@@ -2363,7 +2422,8 @@ func serve_godzilla() -> void:
 func street_ui_state() -> Array:
 	var bar: Dictionary = model.street.selected()
 	var state := [model.s.street.chapter,model.s.street.event.get("id",-1),model.s.street.event.get("phase",""),model.s.day,model.s.phase,bar.open,bar.promo.is_empty(),model.street.economy.is_trading(bar),bar.late_open,bar.raided,bar.clean_remaining>0,bar.dirt==0,model.street.can_skip(),int(model.s.street.minute)/30,"" if model.s.street.history.is_empty() else model.s.street.history.front()]
-	if fridge_open: state.append(not model.street.supplier_deal_offer().is_empty())
+	if fridge_open:
+		state.append([model.street.economy.fridge_needs(bar),model.street.economy.emergency_stock_available(bar),not model.street.supplier_deal_offer().is_empty()])
 	state.append([int(model.s.street.night_prep.remaining)>0,model.s.street.night_prep.cancelled])
 	for venue in model.s.street.bars:
 		state.append([venue.raided,venue.clean_remaining>0,venue.dirt==0])

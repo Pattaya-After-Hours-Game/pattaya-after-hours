@@ -57,14 +57,42 @@ func run(test: SceneTree) -> void:
 	test.check(app.service_help_panel==null and app.service_section=="team" and app.drawer_close_button.tooltip_text=="Back to Service","The pinned button backs out of help first")
 	await click(test,app.drawer_close_button)
 	test.check(app.service_section.is_empty() and app.drawer_close_button.text=="×","Only the overview closes")
+	var fridge_bar: Dictionary = app.model.street.selected()
+	var saved_stock: int = fridge_bar.stock
+	var saved_customers: Array = fridge_bar.customers.duplicate(true)
+	fridge_bar.equipment.menu = 1
+	fridge_bar.stock = 30
+	for guest in fridge_bar.customers:
+		guest.drink = 2
+		guest.lager_quote = 0
 	await click(test,test.find_button(app,"Fridge"))
-	test.check(app.fridge_open and test.find_button(app,"Buy 6 · ฿19 ea")!=null,"Fridge exposes individual wholesale prices")
+	test.check(app.fridge_open and test.find_button(app,"Buy 6 · ฿114")!=null,"Fridge shows the total pack price")
+	var sprites: Array = []
+	for card in app.column.find_children("Drink_*","PanelContainer",false,false):
+		var icon: TextureRect = card.find_children("*","TextureRect",true,false)[0]
+		if not sprites.has(icon.texture): sprites.append(icon.texture)
+	test.check(sprites.size()==4 and app.column.size.x<=app.scroll.size.x,"Four distinct drink sprites fit the drawer without horizontal scrolling")
+	await click(test,test.find_button(app,"?"))
+	test.check(is_instance_valid(app.service_help_panel) and app.service_help_panel.find_children("*","Label",true,false)[1].text.contains("expected popularity"),"Drink economics open in the help slide-out")
+	await click(test,app.drawer_close_button)
 	var back_rect: Rect2 = app.drawer_close_button.get_global_rect()
 	app.scroll.scroll_vertical = 1000
 	await test.process_frame
 	test.check(app.scroll.scroll_vertical>0 and app.drawer_close_button.get_global_rect()==back_rect,"Back stays pinned while Fridge scrolls")
 	await click(test,app.drawer_close_button)
 	test.check(not app.fridge_open and app.service_section.is_empty(),"Fridge returns to the compact dashboard from the bottom of the list")
+	await click(test,test.find_button(app,"Fridge"))
+	app.scroll.scroll_vertical = 1000
+	await test.process_frame
+	var cash_before: int = app.model.s.cash
+	await click(test,test.find_button(app,"Unlock auto-restock · ฿900"))
+	await test.process_frame
+	var supplier: Control = app.column.find_child("Upgrade_supplier",true,false)
+	test.check(app.upgrades_open and supplier!=null and app.scroll.get_global_rect().intersects(supplier.get_global_rect()) and app.model.s.cash==cash_before,"Fridge opens the supplier upgrade without spending the till")
+	await click(test,app.drawer_close_button)
+	fridge_bar.equipment.menu = 0
+	fridge_bar.stock = saved_stock
+	fridge_bar.customers = saved_customers
 	await click(test,test.find_button(app,"×"))
 	test.check(not app.drawer.visible,"Pointer dismisses management")
 	var before := int(app.model.s.street.served)
@@ -107,7 +135,7 @@ func run(test: SceneTree) -> void:
 	escape.pressed = true
 	app._unhandled_key_input(escape)
 	test.check(not app.drawer.visible,"Keyboard cancel dismisses management")
-	app.open_fridge()
+	app.open_upgrades(false)
 	await test.process_frame
 	var wheel := InputEventMouseButton.new()
 	wheel.position = app.scroll.get_global_rect().get_center()
