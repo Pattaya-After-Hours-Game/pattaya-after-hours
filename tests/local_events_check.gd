@@ -67,6 +67,36 @@ func run_ui(test: SceneTree) -> void:
 	app.render()
 	test.use_button(app,"Clear traffic · Play")
 	test.check(app.event_game==Local.CART and app.cart_board.size()==11,"Events opens the sliding puzzle")
+	test.check(app.event_overlay.size==Vector2(960,540) and app.event_overlay.z_index>0,"Cart Jam covers the game view and its HUD")
+	await test.process_frame
+	var mouse := InputEventMouseButton.new()
+	mouse.button_index = MOUSE_BUTTON_LEFT
+	mouse.position = app.cart_tiles[0].get_global_rect().get_center()
+	mouse.pressed = true
+	test.root.push_input(mouse,true)
+	var motion := InputEventMouseMotion.new()
+	motion.position = mouse.position+Vector2(150,40)
+	motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+	test.root.push_input(motion,true)
+	test.check(app.cart_held==0 and app.cart_tiles[0].position==app.cart_tile_start,"The van follows its lane and stops at a blocker")
+	mouse.position = motion.position
+	mouse.pressed = false
+	test.root.push_input(mouse,true)
+	test.check(app.cart_board[0][0]==0 and app.cart_moves==0,"Releasing a blocked drag leaves the board unchanged")
+	var touch := InputEventScreenTouch.new()
+	touch.index = 2
+	touch.position = app.cart_tiles[5].get_global_rect().get_center()
+	touch.pressed = true
+	test.root.push_input(touch,true)
+	var finger := InputEventScreenDrag.new()
+	finger.index = touch.index
+	finger.position = touch.position+Vector2(-128,38)
+	test.root.push_input(finger,true)
+	test.check(app.cart_tiles[5].position.y==app.cart_tile_start.y and app.cart_offset<0,"A touch drag moves only along the selected cart’s lane")
+	touch.position = finger.position
+	touch.pressed = false
+	test.root.push_input(touch,true)
+	test.check(app.cart_board[5][0]==0 and app.cart_moves==1 and app.cart_held<0,"A touch release snaps a multi-cell drag into place")
 	app.end_event_game(false)
 	app.model.street.finish_event()
 	app.model.street.action("hire",0)
@@ -80,6 +110,8 @@ func run_ui(test: SceneTree) -> void:
 		key.physical_keycode = KEY_SPACE
 		key.pressed = true
 		app._input(key)
+	test.check(app.race_course.target==1.0 and app.race_course.victory and app.model.street.selected().bed_trophy,"The winning push banks the trophy and animates through the finish")
+	app._process(.7)
 	test.check(app.event_game<0 and app.model.street.selected().bed_trophy,"Keyboard tapping wins the race and puts up the trophy")
 	app.queue_free()
 	await test.process_frame

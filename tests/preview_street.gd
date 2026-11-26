@@ -210,6 +210,11 @@ func run() -> void:
 	app.model.street.start_event()
 	app.start_event_game()
 	await capture(app,"cart-game")
+	var grip: Vector2 = app.cart_tiles[5].get_global_rect().get_center()
+	app.begin_cart_drag(grip,0)
+	app.move_cart_drag(grip+Vector2(-98,0),0)
+	await capture(app,"cart-game-drag",false)
+	app.finish_cart_drag(grip+Vector2(-98,0),0,false)
 	app.end_event_game(false)
 	app.model.street.finish_event()
 	app.model.street.action("hire",0)
@@ -217,8 +222,14 @@ func run() -> void:
 	app.model.street.action("prepare")
 	app.model.street.start_event()
 	app.start_event_game()
-	for i in 11: app.tap_race()
-	await capture(app,"bed-game")
+	for i in 17: app.tap_race()
+	app.race_left = 5.1
+	app.update_race()
+	app.race_course.player = app.race_course.target
+	await capture(app,"bed-game",false)
+	for i in 21: app.tap_race()
+	app.race_course.player = app.race_course.target
+	await capture(app,"bed-game-finish",false)
 	app.end_event_game(false)
 	fresh(app)
 	app.change_tab(4)

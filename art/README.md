@@ -265,3 +265,11 @@ saved identity selects her own art without changing any existing worker's look.
 Only real staff sales trigger her serving pose; rota, expiry and closure still
 control presence. Use the economy preview filter `gabby-*` for hiring, roster,
 all three venue types, serving, tips, off-duty and renewal states.
+
+
+## Street-event mini-games
+
+Cart Jam uses a directly overhead atlas of a delivery van and three decorated
+food carts. The bed race uses an illustrated Beach Road panorama and two
+separate side-on racing teams. The packer trims and aligns the sprites. Godot
+rotates the cart tiles and animates the racing beds, wheels and finish effects.

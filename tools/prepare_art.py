@@ -170,6 +170,26 @@ for item in fan_recipe['assets']:
         canvas.alpha_composite(im,((canvas.width-im.width)//2,0))
         im=canvas
     im.save(OUT/(item['id']+'.png'))
+# Mini-game sprites use cell-centred footprints and wheel baselines.
+for sheet, cols, rows, cell in [
+    ('cart-jam-overhead', 2, 2, (144, 72)),
+    ('bed-race-teams', 1, 2, (192, 88)),
+]:
+    source = Image.open(SRC/(sheet+'.png')).convert('RGBA')
+    source.putalpha(source.getchannel('A').point(lambda a: 0 if a<160 else 255))
+    atlas = Image.new('RGBA', (cols*cell[0],rows*cell[1]))
+    for i in range(cols*rows):
+        x, y = i%cols, i//cols
+        sprite = source.crop((x*source.width//cols,y*source.height//rows,
+                              (x+1)*source.width//cols,(y+1)*source.height//rows))
+        sprite = sprite.crop(sprite.getbbox())
+        sprite.thumbnail((cell[0]-4,cell[1]-4),NEAREST)
+        left = x*cell[0]+(cell[0]-sprite.width)//2
+        top = y*cell[1]+(cell[1]-2-sprite.height if sheet=='bed-race-teams' else (cell[1]-sprite.height)//2)
+        atlas.alpha_composite(sprite,(left,top))
+    atlas.save(OUT/(sheet+'.png'))
+Image.open(SRC/'bed-race-beach.png').convert('RGB').resize((960,320),NEAREST).save(OUT/'bed-race-beach.png')
+
 manifest={}
 for p in sorted(OUT.glob('*.png')):
     im=Image.open(p)

@@ -59,12 +59,14 @@ crowds or owner cooldowns, or trigger Rat Plague during quiet trading. Return to
 New street events, celebrations and late-night raids open a short newspaper
 notice. Open **Events** from the paper to act, or **Back to the bar** to dismiss
 it. When a story draws on real reporting, the paper includes a short note and
-a button that opens the original article in your browser.
+a button that opens the original article in your browser. Cart Jam and Bo’s
+Bed Race take over the game screen until you finish or leave.
 
 - **Encore Rush** offers a solo rush or paid relief during the warning.
 - **Cart Jam** stops deliveries at the affected bar. Book a hand delivery in
-  advance, wait for the jam to end, or play the puzzle. Select a vehicle and
-  use the arrows to clear a path for Bo’s van to the right-hand exit.
+  advance, wait for the jam to end, or play the puzzle. Drag vehicles along
+  their lanes to free Bo’s van at the right-hand exit. On desktop, arrow keys
+  also move the selected vehicle.
 - **Last Call of the Dead** offers a costume contest that fills seats with
   guests who can order up to three rounds.
 - **Bo’s Bed Race** takes one bartender off the floor. Tap **Push** or press

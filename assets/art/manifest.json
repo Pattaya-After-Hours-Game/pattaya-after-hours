@@ -31,6 +31,22 @@
     ],
     "sha256": "b380fe728b29f64d5e62b0dd94c46486d47a489dbdc42b75a5c112b2698aa3ed"
   },
+  "bed-race-beach": {
+    "file": "res://assets/art/bed-race-beach.png",
+    "size": [
+      960,
+      320
+    ],
+    "sha256": "20d0c2f4c21846eed66c93025a8434202a09c083830c72db05276aefb41e18de"
+  },
+  "bed-race-teams": {
+    "file": "res://assets/art/bed-race-teams.png",
+    "size": [
+      192,
+      176
+    ],
+    "sha256": "dd33233f75da442943f539f87e8241cb0d21b5d6aa1a6f9ff42f58e0f64867a2"
+  },
   "bee": {
     "file": "res://assets/art/bee.png",
     "size": [
@@ -62,6 +78,14 @@
       540
     ],
     "sha256": "7586e298f452d5bcc06d080ccc563b9dc928cc4c820515118c749f56f6cc1196"
+  },
+  "cart-jam-overhead": {
+    "file": "res://assets/art/cart-jam-overhead.png",
+    "size": [
+      288,
+      144
+    ],
+    "sha256": "7e8ab431d5e9cc2924434a16fd41ce769a1fd1c6164e586753adbe12fdd267b2"
   },
   "compact-bench": {
     "file": "res://assets/art/compact-bench.png",

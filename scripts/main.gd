@@ -4,6 +4,7 @@ const Campaign = preload("res://scripts/campaign.gd")
 const Content = preload("res://scripts/content.gd")
 const StreetContent = preload("res://scripts/street_content.gd")
 const Local = preload("res://scripts/local_events.gd")
+const BedRaceCourse = preload("res://scripts/bed_race_course.gd")
 const City = preload("res://scripts/city.gd")
 const District = preload("res://scripts/district.gd")
 const Art = preload("res://scripts/art.gd")
@@ -71,15 +72,25 @@ var news_issue := {}
 var seen_news := {}
 var event_overlay: Control
 var event_game := -1
+const CART_CELL = 66
 var cart_board := []
 var cart_selected := 0
 var cart_moves := 0
+var cart_slide_offset := Vector2.ZERO
+var cart_tiles: Array[Panel] = []
+var cart_held := -1
+var cart_pointer := -2
+var cart_touch_start := Vector2.ZERO
+var cart_tile_start := Vector2.ZERO
+var cart_axis := Vector2.ZERO
+var cart_limits := Vector2.ZERO
+var cart_offset := 0.0
 var race_left := 0.0
+var race_finish_left := -1.0
 var race_taps := 0
 var race_meter: ProgressBar
 var race_clock: Label
-var race_bed: Label
-var race_rival: Label
+var race_course: Control
 var scene_clock := 0.0
 var service_animation := 0.0
 var tab := 0
@@ -657,6 +668,9 @@ func close_stat_tip() -> void:
 	stat_tip_key = ""
 
 func _input(event: InputEvent) -> void:
+	if event_game==Local.CART and cart_pointer_input(event):
+		get_viewport().set_input_as_handled()
+		return
 	if (event_game>=0 or not news_issue.is_empty()) and event is InputEventKey:
 		var playing := event_game>=0
 		if event.is_action_pressed("ui_cancel"):
@@ -664,7 +678,7 @@ func _input(event: InputEvent) -> void:
 			else: close_news(false)
 		elif event is InputEventKey and event.pressed and not event.echo:
 			if event_game==Local.BED and event.physical_keycode==KEY_SPACE: tap_race()
-			elif event_game==Local.CART:
+			elif event_game==Local.CART and cart_held<0:
 				var horizontal: bool = cart_board[cart_selected][3]
 				if (horizontal and event.physical_keycode==KEY_LEFT) or (not horizontal and event.physical_keycode==KEY_UP): slide_cart(-1)
 				if (horizontal and event.physical_keycode==KEY_RIGHT) or (not horizontal and event.physical_keycode==KEY_DOWN): slide_cart(1)
@@ -1475,6 +1489,7 @@ func close_news(details: bool) -> void:
 func overlay_panel(rect: Rect2, fill: Color, border: Color) -> Panel:
 	event_overlay = pane(root_ui,Rect2(0,0,960,540),Color(0.03,0.02,0.04,.68),Color.TRANSPARENT)
 	event_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	event_overlay.z_index = 12
 	return pane(event_overlay,rect,fill,border)
 
 func draw_event_overlay() -> void:
@@ -1528,84 +1543,187 @@ func start_event_game() -> void:
 	cart_board = Local.BOARD.duplicate(true)
 	cart_selected = 0
 	cart_moves = 0
+	cart_held = -1
 	race_left = Local.BED_SECONDS
+	race_finish_left = -1.0
 	race_taps = 0
 	draw_event_overlay()
 
 func end_event_game(won: bool) -> void:
-	message = model.street.settle_event_game(event_game,won)
+	if event_game!=Local.BED or race_finish_left<0:
+		message = model.street.settle_event_game(event_game,won)
 	event_game = -1
+	cart_held = -1
 	commit(true)
 
 func slide_cart(direction: int) -> void:
 	if event_game!=Local.CART: return
-	if Local.slide(cart_board,cart_selected,direction): cart_moves += 1
+	var horizontal: bool = cart_board[cart_selected][3]
+	if Local.slide(cart_board,cart_selected,direction):
+		cart_moves += 1
+		cart_slide_offset = Vector2(-direction*CART_CELL,0) if horizontal else Vector2(0,-direction*CART_CELL)
 	if Local.delivery_free(cart_board): end_event_game(true)
 	else: draw_event_overlay()
 
-func choose_cart(index: int) -> void:
-	cart_selected = index
-	draw_event_overlay()
+func cart_pointer_input(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		var point: Vector2 = event_overlay.get_global_transform_with_canvas().affine_inverse()*event.position
+		return begin_cart_drag(point,event.index) if event.pressed else finish_cart_drag(point,event.index,event.canceled)
+	if event is InputEventScreenDrag:
+		return move_cart_drag(event_overlay.get_global_transform_with_canvas().affine_inverse()*event.position,event.index)
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
+		if event.device==InputEvent.DEVICE_ID_EMULATION: return cart_held>=0
+		var point: Vector2 = event_overlay.get_global_transform_with_canvas().affine_inverse()*event.position
+		return begin_cart_drag(point,-1) if event.pressed else finish_cart_drag(point,-1,false)
+	if event is InputEventMouseMotion:
+		return move_cart_drag(event_overlay.get_global_transform_with_canvas().affine_inverse()*event.position,-1)
+	return false
+
+func begin_cart_drag(point: Vector2, pointer: int) -> bool:
+	if cart_held>=0: return true
+	for i in cart_tiles.size():
+		var tile := cart_tiles[i]
+		if not Rect2(tile.position,tile.size).has_point(point): continue
+		cart_selected = i
+		cart_held = i
+		cart_pointer = pointer
+		cart_touch_start = point
+		cart_tile_start = tile.position
+		cart_axis = Vector2.RIGHT if cart_board[i][3] else Vector2.DOWN
+		cart_offset = 0.0
+		cart_limits = Vector2.ZERO
+		for direction in [-1,1]:
+			var board := cart_board.duplicate(true)
+			var steps := 0
+			while Local.slide(board,i,direction): steps += 1
+			if direction<0: cart_limits.x = -steps*CART_CELL
+			else: cart_limits.y = steps*CART_CELL
+		for j in cart_tiles.size(): style_cart_tile(cart_tiles[j],j==i)
+		tile.z_index = 1
+		return true
+	return false
+
+func move_cart_drag(point: Vector2, pointer: int) -> bool:
+	if cart_held<0 or pointer!=cart_pointer: return false
+	cart_offset = clampf((point-cart_touch_start).dot(cart_axis),cart_limits.x,cart_limits.y)
+	cart_tiles[cart_held].position = cart_tile_start+cart_axis*cart_offset
+	return true
+
+func finish_cart_drag(point: Vector2, pointer: int, cancelled: bool) -> bool:
+	if not move_cart_drag(point,pointer): return false
+	var steps := 0 if cancelled else roundi(cart_offset/CART_CELL)
+	cart_held = -1
+	if steps!=0:
+		for i in absi(steps): Local.slide(cart_board,cart_selected,signi(steps))
+		cart_moves += 1
+		tone("click")
+	cart_slide_offset = cart_axis*(cart_offset-float(steps*CART_CELL))
+	if Local.delivery_free(cart_board): end_event_game(true)
+	else: draw_event_overlay()
+	return true
 
 func tap_race() -> void:
-	if event_game!=Local.BED or race_left<=0: return
+	if event_game!=Local.BED or race_left<=0 or race_finish_left>=0: return
 	race_taps += 1
-	if race_taps>=Local.BED_TAPS: end_event_game(true)
-	else: update_race()
+	if race_taps==Local.BED_TAPS:
+		race_finish_left = .65
+		message = model.street.settle_event_game(event_game,true)
+		save_state()
+	update_race()
 
 func update_race() -> void:
 	race_meter.value = race_taps
-	race_clock.text = "%.1fs left · %d / %d pushes" % [race_left,race_taps,Local.BED_TAPS]
-	race_bed.position.x = 30+486.0*float(race_taps)/Local.BED_TAPS
-	race_rival.position.x = 30+442.0*(1.0-race_left/Local.BED_SECONDS)
+	race_clock.text = "FIRST ACROSS!" if race_finish_left>=0 else "%.1fs left · %d / %d pushes" % [race_left,race_taps,Local.BED_TAPS]
+	race_course.victory = race_finish_left>=0
+	race_course.target = float(race_taps)/Local.BED_TAPS
+	race_course.rival = 1.0-race_left/Local.BED_SECONDS
+
+func cart_art(vehicle: Panel, index: int, horizontal: bool, slide: Vector2) -> void:
+	var tile := 0 if index==0 else 1+(index-1)%3
+	var atlas := AtlasTexture.new()
+	atlas.atlas = Art.texture("cart-jam-overhead")
+	atlas.region = Rect2((tile%2)*144,(tile/2)*72,144,72)
+	var sprite := TextureRect.new()
+	sprite.texture = atlas
+	sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sprite.size = vehicle.size-Vector2(8,8) if horizontal else Vector2(vehicle.size.y-8,vehicle.size.x-8)
+	var resting := (vehicle.size-sprite.size)*.5
+	sprite.position = resting+slide
+	sprite.pivot_offset = sprite.size*.5
+	sprite.rotation = 0.0 if horizontal else PI/2
+	vehicle.add_child(sprite)
+	if slide!=Vector2.ZERO:
+		sprite.create_tween().tween_property(sprite,"position",resting,.14).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func draw_event_game() -> void:
-	var panel := overlay_panel(Rect2(167,28,626,484),DARK,GOLD)
+	var stage := overlay_panel(Rect2(0,0,960,540),Color("#1d1526"),Color("#1d1526"))
 	if event_game==Local.CART:
-		abs_text(panel,Rect2(21,9,575,39),"Cart Jam",25,GOLD)
-		abs_text(panel,Rect2(21,50,584,43),"Pick a vehicle, then slide along its lane. Get Bo’s van to the exit →",16)
-		var cell := 52
-		for y in 6:
-			for x in 6:
-				pane(panel,Rect2(23+x*cell,108+y*cell,cell,cell),Color("#38343e"),Color("#4c4551"))
-		abs_text(panel,Rect2(344,213,90,42),"EXIT →",15,TEAL)
-		for i in cart_board.size():
-			var car: Array = cart_board[i]
-			var rect := Rect2(25+int(car[0])*cell,110+int(car[1])*cell,(int(car[2]) if car[3] else 1)*cell-4,(1 if car[3] else int(car[2]))*cell-4)
-			var vehicle := at_button(panel,rect,"BO" if i==0 else "↔" if car[3] else "↕",choose_cart.bind(i),i==cart_selected)
-			vehicle.focus_mode = Control.FOCUS_NONE
-			if i!=cart_selected:
-				var paint: Color = [Color("#615065"),Color("#864b47"),Color("#4b6262"),Color("#726343")][i%4]
-				vehicle.add_theme_stylebox_override("normal",box(paint,GOLD if i==0 else EDGE,2))
-		var horizontal: bool = cart_board[cart_selected][3]
-		abs_text(panel,Rect2(366,120,228,38),"%d moves" % cart_moves,17,TEAL)
-		var first := at_button(panel,Rect2(366,266,232,48),"← Left" if horizontal else "↑ Up",slide_cart.bind(-1))
-		var second := at_button(panel,Rect2(366,324,232,48),"Right →" if horizontal else "Down ↓",slide_cart.bind(1))
-		first.focus_mode = Control.FOCUS_NONE
-		second.focus_mode = Control.FOCUS_NONE
-		at_button(panel,Rect2(366,380,232,44),"Reset board",func() -> void:
-			cart_board = Local.BOARD.duplicate(true)
-			cart_selected = 0
-			cart_moves = 0
-			draw_event_overlay()).focus_mode = Control.FOCUS_NONE
-		at_button(panel,Rect2(366,434,232,40),"Wait out the jam",end_event_game.bind(false)).focus_mode = Control.FOCUS_NONE
+		draw_cart_game(stage)
 	else:
-		abs_text(panel,Rect2(25,18,576,55),"Bo’s Bed Race",29,GOLD)
-		abs_text(panel,Rect2(25,85,576,48),"Tap rapidly or press Space. Push the bed across the finish line!",17)
-		race_clock = abs_text(panel,Rect2(25,131,576,44),"",24,TEAL)
-		pane(panel,Rect2(25,179,576,72),Color("#38303b"),EDGE)
-		pane(panel,Rect2(581,180,12,70),GOLD,GOLD)
-		race_bed = abs_text(panel,Rect2(30,180,80,32),"▰ BO",22,TEAL)
-		race_rival = abs_text(panel,Rect2(30,214,80,32),"▰ RIVAL",18,PINK)
-		race_meter = ProgressBar.new()
-		race_meter.position = Vector2(25,259)
-		race_meter.size = Vector2(576,12)
-		race_meter.max_value = Local.BED_TAPS
-		race_meter.show_percentage = false
-		panel.add_child(race_meter)
-		at_button(panel,Rect2(25,284,576,112),"PUSH!",tap_race,true).focus_mode = Control.FOCUS_NONE
-		at_button(panel,Rect2(25,421,576,43),"Drop out",end_event_game.bind(false)).focus_mode = Control.FOCUS_NONE
-		update_race()
+		draw_bed_game(stage)
+
+func draw_cart_game(stage: Panel) -> void:
+	abs_text(stage,Rect2(50,13,480,47),"Cart Jam",33,GOLD)
+	abs_text(stage,Rect2(50,64,815,30),"Drag the food carts along their lanes. Get Bo’s mint van to the exit.",16)
+	var cell := CART_CELL
+	cart_tiles.clear()
+	var origin := Vector2(54,111)
+	pane(stage,Rect2(origin-Vector2(8,8),Vector2(412,412)),Color("#58414c"),Color("#9f735d"))
+	for y in 6:
+		for x in 6:
+			var tile := origin+Vector2(x,y)*cell
+			pane(stage,Rect2(tile,Vector2(cell,cell)),Color("#332b3e") if (x+y)%2==0 else Color("#393144"),Color("#55475a"))
+			pane(stage,Rect2(tile+Vector2(29,31),Vector2(9,3)),Color("#705966"),Color("#705966"))
+	pane(stage,Rect2(450,245,75,62),Color("#24565b"),Color("#71f9d2"))
+	abs_text(stage,Rect2(462,255,62,43),"EXIT →",15,TEAL)
+	for i in cart_board.size():
+		var car: Array = cart_board[i]
+		var top_left := origin+Vector2(car[0],car[1])*cell+Vector2(2,2)
+		var span := Vector2(car[2],1) if car[3] else Vector2(1,car[2])
+		var vehicle := pane(stage,Rect2(top_left,span*cell-Vector2(4,4)),DARK)
+		vehicle.mouse_default_cursor_shape = Control.CURSOR_DRAG
+		vehicle.tooltip_text = "Bo’s delivery van" if i==0 else ["Noodle cart","Skewer cart","Fruit cart"][(i-1)%3]
+		style_cart_tile(vehicle,i==cart_selected)
+		cart_tiles.append(vehicle)
+		cart_art(vehicle,i,car[3],cart_slide_offset if i==cart_selected else Vector2.ZERO)
+	cart_slide_offset = Vector2.ZERO
+	abs_text(stage,Rect2(569,117,310,28),"SOI 6 · DELIVERY ROUTE",14,GOLD)
+	abs_text(stage,Rect2(569,151,310,46),"%d moves" % cart_moves,25,TEAL)
+	var legend := pane(stage,Rect2(569,218,148,68),Color("#253b42"),TEAL)
+	cart_art(legend,0,true,Vector2.ZERO)
+	abs_text(stage,Rect2(730,220,155,62),"BO’S VAN  →",18,TEAL)
+	abs_text(stage,Rect2(569,298,316,32),"Desktop: select a cart and use arrows.",13,MUTED)
+	at_button(stage,Rect2(569,350,316,49),"Reset board",func() -> void:
+		cart_board = Local.BOARD.duplicate(true)
+		cart_selected = 0
+		cart_moves = 0
+		draw_event_overlay()).focus_mode = Control.FOCUS_NONE
+	at_button(stage,Rect2(569,428,316,49),"Wait out the jam",end_event_game.bind(false)).focus_mode = Control.FOCUS_NONE
+
+func style_cart_tile(tile: Panel, selected: bool) -> void:
+	tile.add_theme_stylebox_override("panel",box(Color("#253b42") if selected else Color("#322738"),TEAL if selected else Color("#5a4349"),2))
+
+func draw_bed_game(stage: Panel) -> void:
+	abs_text(stage,Rect2(26,9,650,42),"Bo’s Bed Race",32,GOLD)
+	abs_text(stage,Rect2(28,52,660,24),"BEACH ROAD · PATTAYA",13,TEAL)
+	race_clock = abs_text(stage,Rect2(675,29,265,37),"",18,WHITE)
+	race_course = BedRaceCourse.new()
+	race_course.position = Vector2(0,80)
+	race_course.size = Vector2(960,320)
+	stage.add_child(race_course)
+	race_meter = ProgressBar.new()
+	race_meter.position = Vector2(26,418)
+	race_meter.size = Vector2(909,10)
+	race_meter.max_value = Local.BED_TAPS
+	race_meter.show_percentage = false
+	race_meter.add_theme_stylebox_override("fill",box(TEAL,TEAL,0))
+	race_meter.add_theme_stylebox_override("background",box(Color("#493a50"),Color("#493a50"),0))
+	stage.add_child(race_meter)
+	at_button(stage,Rect2(26,447,711,67),"PUSH!   ·   Tap or press Space",tap_race,true).focus_mode = Control.FOCUS_NONE
+	at_button(stage,Rect2(754,447,181,67),"Drop out",end_event_game.bind(false)).focus_mode = Control.FOCUS_NONE
+	update_race()
 
 func start_tuning() -> void:
 	if campaign_before_tuning != null or campaign_before_tutorial != null or model.s.phase!="plan": return
@@ -1801,9 +1919,13 @@ func _process(delta: float) -> void:
 	service_animation = maxf(0,service_animation-delta)
 	if event_game>=0:
 		if event_game==Local.BED:
-			race_left = maxf(0,race_left-delta)
-			if race_left<=0: end_event_game(false)
-			else: update_race()
+			if race_finish_left>=0:
+				race_finish_left = maxf(0,race_finish_left-delta)
+				if race_finish_left==0: end_event_game(true)
+			else:
+				race_left = maxf(0,race_left-delta)
+				if race_left<=0: end_event_game(false)
+				else: update_race()
 		return
 	if not news_issue.is_empty(): return
 	if campaign_before_tutorial == null:
