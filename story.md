@@ -151,7 +151,7 @@ stay a little longer, give the team more patience and may buy a third drink.
 Pim's purchased music brings the next round forward again. Nobody conjures
 stock, customers still have budgets, and serving the room earns the night's money.
 A crowded party can expose a slow bar; Chat, a colleague and a prepared fridge
-still matter. Nida earns her usual commission, not a birthday surcharge.
+still matter. Nida works for her usual ten-day contract fee; there is no drink commission or birthday surcharge.
 
 At closing, the player sees the actual party trading: visitors, drinks, costs,
 contribution, new regulars and people lost to queues. There is no extra envelope
@@ -177,7 +177,7 @@ past the first birthday get the next scheduled gathering without a cash handout.
 | A bigger local | Seating, fans, pool and screens give real visitors space and reasons to stay. The compact stage-one beer bar fits twelve even with its pool table and fans. |
 | Pool and promotions | Pool charges ฿50 once per game per table. Free pool swaps fees for appeal; promotions still need space, service and stock. |
 | A colleague behind the bar | Bartenders cost ฿1,200 for ten days, plus wages. They serve every 25/20/15 seconds, with training costing ฿400 then ฿800. Stage two adds 12/10-second service for ฿1,200/1,600; skills stay through rehire. A ready colleague serves immediately, then recovers. |
-| Nida at the door | Her ฿1,200 ten-day contract plus 10% drink commission replaces welcoming while she works. Owner Welcome upgrades only help during her absence. |
+| Nida at the door | Her ฿1,200 ten-day contract replaces welcoming while she works, with no commission or hourly wage. Owner Welcome upgrades only help during her absence. |
 | Bo's bulk terms | Six drinks initially cost ฿228. Supplier level two requires twelve spaces and ฿432, with later twelve-drink bills of ฿408/384/360. Old stock keeps its paid cost. |
 | Music and automatic pouring | Music costs ฿1,200 and normally brings repeat orders forward from 35 to 25 seconds; stage-two better sound costs ฿2,400 and reaches 18 seconds. ฿3,000 auto-serve uses the owner's existing cooldown; the stage-two pouring tier can reduce it to two seconds. |
 | Management | ฿8,000/36,000/72,000 incremental appointments earn separate ฿10/20/40 per trading second and enable bounded offline estimates. They do not fabricate customer visits. |
@@ -462,3 +462,13 @@ At zero, completed cleaning is retained and the existing skip moves the clock
 to noon. Stock is not bought, no income is awarded, and contracts age through the
 skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
 The date already advanced at midnight, so the jump does not add another day.
+
+## One less cut of the till
+
+> **Anong:** “Nida has her contract. The drinks stay in the till. And tell the
+> pool regulars: thirty seconds, then give someone else a turn.”
+
+Nida's ten-day fee remains ฿1,200, but drink commission is gone, including unpaid
+commitments on old visits. Past payments are history, not a new refund. New pool
+games run thirty seconds for the same ฿50 per table; Free Pool Night remains free.
+Shorter games free the table sooner, but still need two real customers.

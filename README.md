@@ -50,7 +50,7 @@ Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
 House beers cost **฿80 at beer bars, ฿100 at Soi bars and ฿120 at gogos**.
 Renovation does not raise these prices. House lager stock starts at ฿38 per drink, leaving
-฿42/62/82 before wages, overhead and commission. Happy Hour takes 20% off new
+฿42/62/82 before wages and overhead. Happy Hour takes 20% off new
 orders; the purchased premium menu unlocks mango cocktails at ฿30 above house lager.
 
 Stock starts in **six-drink packs for ฿228**. Supplier level 2 switches both manual
@@ -61,7 +61,7 @@ Each fridge tier adds +1 reputation per ten satisfied visits, on top of the base
 for ฿1,200**, reaching twelve customers even with pool and fans installed.
 
 Save for signage, seating and a pool table, then invest in staff contracts. Pool is available at
-beer-bar stage 1: **฿50 per table per 45-second game**, charged once. Free Pool
+beer-bar stage 1: **฿50 per table per 30-second game**, charged once. Free Pool
 Night attracts visitors but gives up pool fees; Happy Hour, Pool Tournament and
 Sports Night have their own costs and trade-offs. Promotions last two minutes,
 then have a two-minute cooldown.
@@ -75,12 +75,10 @@ and 10-second training for ฿1,200 and ฿1,600 per bartender. Help serve durin
 stays with them when rehired. Service shows the remaining term and rehire controls.
 Closed hours, skipped nights and offline time count toward contracts.
 
-In **Service → Frontage promoter**, hire **Nida for ฿1,200 per ten game days plus
-10% of drink receipts**. She replaces Welcome taps, uses a separate roster slot
-and never serves drinks. Her preview shows estimated demand, commission and net
+In **Service → Frontage promoter**, hire **Nida for ฿1,200 per ten game days, with no commission**. She replaces Welcome taps, uses a separate roster slot
+and never serves drinks. Her preview shows estimated demand and net
 profit with and without owner service. Bringing more customers to an already
-slow bar can lose money. Existing visit/order commissions remain due after she
-goes off duty. Promoters and dancers unlock separate audience training at stages
+slow bar can lose money. Old unpaid commission commitments are cancelled; historical payments remain recorded. Promoters and dancers unlock separate audience training at stages
 2 and 3 for ฿800 and ฿1,600; their skills survive rehire.
 
 A two-note bell alerts you to waiting orders at the selected venue, repeating at
@@ -267,7 +265,7 @@ and offline projections stop crediting staff service at contract expiry. See the
 
 ## More room and a face out front
 
-The compact layout, whole-pack stocking and Nida's commission now use the shared
+The compact layout, whole-pack stocking and Nida's contract now use the shared
 economy, including guided shifts, save migration and managed estimates. Her four
 production poses and portrait join the existing art; compact benches visibly mark
 the third seating purchase. This update also brings the earlier TV installation
@@ -293,7 +291,7 @@ advertised beforehand in Service, Events and the street banner. The Blue Hour
 gets extra appeal, +40% shared street traffic, quicker repeat orders and up to
 three drinks per visitor if their budget permits. New party visitors stay and
 wait a little longer. Fill the fridge and prepare your service; normal prices,
-costs, capacity and Nida's commission still apply.
+costs and capacity still apply.
 
 Regulars' reunions, Pim's mixtape parties and Bo's thank-you nights follow every
 seven game days. Events and Journal show actual party trading and new regulars;
@@ -386,3 +384,11 @@ recovery delivery · 6 drinks** beside the stock control. It costs nothing upfro
 overhead. Existing orders remain. That gets a ฿39 till trading again immediately;
 nightly tips help fund the next opening. Normal deliveries still require the full
 pack price and room. See the [tip/recovery design](docs/design/NIGHTLY_TIPS.md).
+
+## Contract-only promotion and quicker pool
+
+Nida now keeps only her ฿1,200 ten-day contract fee: no drink commission and no
+hourly wage. Existing waiting orders and offline sales are also commission-free;
+previously paid commission stays in historical reports without a refund.
+New pool games take **30 seconds**, still **฿50 per table once at the start**.
+Free Pool remains free. Games already underway retain their saved remaining time.

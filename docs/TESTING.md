@@ -3,7 +3,31 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current stage-two income verification — 26 November 2026
+## Current commission/pool verification — 26 November 2026
+
+The isolated Godot 4.7.2 wrapper passes gameplay/save/UI regressions, 48 fresh
+campaigns, 60 paired celebration scenarios and 80 stage-two income scenarios.
+Promoter checks cover commission-free ordinary/premium/Happy Hour/offline sales,
+old quoted orders and fractional carry, retained historical payments, no refunds,
+repeat claims, unchanged contracts and renewal. Pool checks require thirty-second
+paid and free games, once-only ฿50 settlement, saved timers, and free-game identity
+after a promotion ends. A legacy 45-second game reloads and completes without a
+second fee. New games and forecast throughput use thirty seconds.
+
+Active baseline runs reach stage two in 29.9–32.9 minutes, management in
+70.5–73.2, property two in 86.2–89.0 and stage three in 121.2–126.1. Nearest-minute
+milestone comparisons remain unchanged. The manager-saving gap is 17.4–20.48
+minutes; the user explicitly approved a **21-minute** ceiling instead of 20,
+keeping all prices unchanged. The longest investment gap remains 31.9–34.9
+minutes, below the unchanged exact 38-minute ceiling. No unrelated price or
+progression-gate adjustment was made to accommodate the shorter pool timer.
+
+The Nida hire forecast/contract and active pool presentation were inspected at
+960×540 against production artwork: no 10% fee on the hire controls, and a new
+paid pool game showing 29 seconds after one tick. Android device play remains
+unverified. Prior measurements below describe their respective source versions.
+
+## Previous stage-two income verification — 26 November 2026
 
 Godot 4.7.2 `tools/test.sh` passes gameplay/save/UI regressions, **48 fresh
 campaigns**, **60 paired celebration scenarios** and **80 stage-two scenarios**.

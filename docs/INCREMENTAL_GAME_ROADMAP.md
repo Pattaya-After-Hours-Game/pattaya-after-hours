@@ -22,14 +22,14 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Stage-two income: club, music, training and first management |
-| Status | DONE; based on main `0b00fc8`; verified for integration into main |
+| Active feature | Nida contract-only pay and thirty-second pool |
+| Status | DONE; based on main `f1cc217`; verified for main release |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Codex verified tests and layout; independent device play pending |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/stage-two-regulars`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Regulars Club, requested music/training tiers, manager price, saves, UI, balance tests and docs |
-| Next handoff / blocker | Regressions, 48 campaigns, 60 party pairs, 80 income scenarios and previews passed; main release workflow publishes; device play pending |
+| Working branch / chat / PR | `main`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Promoter commission, pool duration, legacy save compatibility, UI, tests and docs |
+| Next handoff / blocker | Full suite passed; Nida/pool previews inspected; main workflow publishes, device play pending |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-26 |
 

@@ -89,7 +89,7 @@ const AUDIENCE_AFFINITY = [[1.5,1.0,.5],[.6,1.0,1.6],[.3,1.3,1.5]]
 const TIP_PER_VISIT = 10
 const DRINK_TIP_BONUS = 5
 const POOL_FEE = 50
-const POOL_SECONDS = 45
+const POOL_SECONDS = 30
 const ACTION_COOLDOWNS = [10,8,6,4,2]
 const ACTION_UPGRADE_COSTS = [900,1400,2800,5600]
 const ACTION_UPGRADES = [
@@ -103,7 +103,7 @@ const EQUIPMENT = [
 	{"id":"sign", "name":"Better frontage", "cost":900, "max":1, "help":"More passersby consider entering; no extra service speed."},
 	{"id":"comfort", "name":"Fans & comfortable seats", "cost":900, "max":1, "help":"Guests stay longer and wait more patiently; uses one seat and adds ฿4/min overhead."},
 	{"id":"fridge", "name":"Better fridge", "cost":800, "max":2, "help":"Store 40 more drinks. Each fridge tier adds +1 reputation per ten satisfied visits: colder beer, happier regulars."},
-	{"id":"pool", "name":"Pool table", "cost":2000, "max":2, "help":"฿50 per 45-second game; replaces two seats. Beer bars only."},
+	{"id":"pool", "name":"Pool table", "cost":2000, "max":2, "help":"฿50 per 30-second game; replaces two seats. Beer bars only."},
 	{"id":"seating", "name":"Extra seating", "cost":400, "max":3, "help":"Two more seats. Beer bars gain a third compact layout, recovering up to three furniture places."},
 	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
 	# Legacy slot retained for save/action indices; training is now per person.
@@ -151,7 +151,7 @@ const PROMOTER_CONTRACT_COST = 1200
 const PROMOTER_BONUS = [4.8,6.0,7.2]
 const AUDIENCE_TRAINING_COST = 800
 const DANCER_TRAINING = [1.0,1.25,1.5]
-const COMMISSION_PERCENT = 10
+const COMMISSION_PERCENT = 0 # Nida is paid by contract only; legacy ledgers stay readable.
 
 const AUTO_SERVE_URGENT_SECONDS = 10
 const AUTO_SERVE_COST = 3000

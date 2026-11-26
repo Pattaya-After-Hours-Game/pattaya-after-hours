@@ -35,6 +35,9 @@ Manager income stays separate, with no refund for an appointment already bought.
 
 ## Balance and limits
 
+The following measurements describe v1.0.31, before thirty-second pool and
+commission removal. Current checks are recorded in [testing](../TESTING.md).
+
 Ten matched 600-second day-eight scenarios per club level use two 15-second
 bartenders, four-second owner relief, music level one, supplier four and two pool
 tables. Aggregate contribution, including stock consumed and operating costs,
@@ -57,7 +60,8 @@ orders. Ten slow-service controls remain capped by a single base bartender.
 
 Fresh-campaign acceptance deliberately brings the second property to 75–115
 minutes and stage three to 110–210 for baseline active policies; stage two stays
-30–45. First-manager saving gaps cap at twenty minutes, and longest investment
+30–45. First-manager saving gaps originally capped at twenty minutes (now twenty-one,
+by user decision with the later thirty-second pool update), and longest investment
 gaps at 38. These are simulation checks, not timers imposed on the player.
 Baseline, club-first and full stage-two-bundle routes are recorded in
 [testing](../TESTING.md). Full-festival pacing and human retention remain unverified.

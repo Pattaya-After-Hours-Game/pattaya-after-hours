@@ -415,3 +415,12 @@ the existing equipment level and leaves current repeat timers intact.
 The normal isolated test wrapper includes `regulars_club_check.gd`, two new
 fresh-campaign routes and `regulars_club_balance.gd`. Render `club-*` states with
 the economy preview runner for the offers on the production artwork.
+
+## Commission removal and shorter pool
+
+Schema 12 stays compatible. On load, clear uncharged promoter carry and visit/
+order flags; preserve all paid commission and historical ledger costs. Zero-rate
+settlement also ignores commitments still present in a live dictionary. Forecasts,
+offline estimates and hiring break-even calculations must not apply the former
+10% deduction. `POOL_SECONDS` is 30 for new games and forecast throughput; never
+replace a saved game's remaining time or fee on load.

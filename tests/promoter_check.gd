@@ -50,30 +50,40 @@ func run(test: SceneTree) -> void:
 	var snapshot := JSON.stringify(m.s)
 	eco.promoter_forecast(bar,true)
 	test.check(JSON.stringify(m.s)==snapshot,"Hire forecasts cannot mutate the live campaign or RNG")
-	# Hiring commits already-waiting orders; turning off before serving cannot
-	# avoid commission. Two beers carry their half-baht into an exact eleven.
+	# Current sales are commission-free, including old queued commitments.
 	m.street.action("rota",0)
 	money = m.s.cash
 	for customer in bar.customers: customer.quoted = 55
 	eco.serve(bar,1)
-	test.check(m.s.cash==money+50 and bar.commission_paid==5 and bar.commission_carry==50,"First beer settles gross receipt and commission with fractional carry")
+	test.check(m.s.cash==money+55 and bar.commission_paid==0 and bar.commission_carry==0,"Nida takes no commission from an ordinary sale")
+	# Simulate a pre-update save with paid history and uncharged fractional carry.
+	bar.commission_paid = 11
+	bar.shift.commission = 11
+	bar.commission_carry = 50
+	for customer in bar.customers:
+		customer.commission_visit = true
+		customer.commission_order = true
 	m.save_game()
 	var loaded = Campaign.new(4)
-	test.check(loaded.load_game() and loaded.s.version==12,"Schema twelve reloads promoter commission state")
-	loaded.street.economy.serve(loaded.street.selected(),1)
-	test.check(loaded.street.selected().commission_paid==11 and loaded.street.selected().commission_carry==0,"Reload cannot erase half-baht carry or pending commission")
-	test.check(loaded.street.selected().shift.commission==11,"Commission is visible in the actual shift ledger")
-	# A recruited visit retains commission on repeat orders after expiry.
+	test.check(loaded.load_game() and loaded.s.version==12 and loaded.s.cash==m.s.cash,"Commission removal loads existing saves without a cash refund")
+	var old_bar: Dictionary = loaded.street.selected()
+	test.check(old_bar.commission_carry==0 and not old_bar.customers[1].commission_order and not old_bar.customers[1].commission_visit,"Old pending commission and fractional carry are cancelled")
+	money = loaded.s.cash
+	loaded.street.economy.serve(old_bar,1)
+	test.check(loaded.s.cash==money+55 and old_bar.commission_paid==11 and old_bar.shift.commission==11,"Queued old quotes settle commission-free while historical payments remain")
+	loaded.save_game()
+	var again = Campaign.new(4)
+	test.check(again.load_game() and again.s.cash==loaded.s.cash and again.street.selected().commission_paid==11,"Repeated reload cannot refund historical commission")
 	m.street.action("rota",0)
 	bar.equipment.seating = 3
 	eco.admit(bar)
 	var guest: Dictionary = bar.customers.back()
-	test.check(guest.commission_visit,"Visits arriving during promotion retain their entitlement")
+	test.check(not guest.commission_visit,"New arrivals never incur a commission commitment")
 	bar.team[0].contract_left = 1
 	eco.advance_contracts(1)
 	guest.order = false
 	eco.order(bar,guest)
-	test.check(guest.commission_order and eco.promoter_bonus(bar)==0,"Expired promoter stops attracting without cancelling existing visit commission")
+	test.check(not guest.commission_order and eco.promoter_bonus(bar)==0,"Expiry stops attraction without creating commission")
 	bar.stage = 2
 	m.street.action("rehire",0)
 	m.street.action("train_audience",0)
@@ -94,11 +104,11 @@ func run(test: SceneTree) -> void:
 	eco.admit(bar,true)
 	test.check(bar.customers[0].quoted==64,"Happy Hour quotes the discounted price")
 	eco.serve(bar,1)
-	test.check(bar.commission_paid==6 and bar.commission_carry==40 and bar.promo.commission==6,"Discount commission is based on actual drinks and enters promotion costs")
+	test.check(bar.commission_paid==0 and bar.commission_carry==0 and bar.promo.commission==0,"Happy Hour receipts incur no commission")
 	bar.customers.clear()
 	money = m.s.cash
 	eco.serve(bar,1)
-	test.check(m.s.cash==money and bar.commission_paid==6,"No order creates neither sale nor commission")
+	test.check(m.s.cash==money and bar.commission_paid==0,"No order creates neither sale nor commission")
 	# Offline consumes complete packs using newly generated cash only.
 	m = Campaign.new(72)
 	m.s.cash = 20000
@@ -114,7 +124,7 @@ func run(test: SceneTree) -> void:
 	var old_sold: int = bar.sold
 	var gain: int = m.street.claim_offline(1120)
 	test.check(gain>=0 and m.s.cash==money+gain and bar.sold==old_sold,"Offline credits estimates without changing live sale counters or starting cash")
-	test.check(bar.stock<old_stock and bar.commission_paid>0,"Offline consumes owned stock and pays promoter commission")
+	test.check(bar.stock<old_stock and bar.commission_paid==0,"Offline consumes owned stock without promoter commission")
 	var once := [m.s.cash,bar.stock,bar.commission_carry,bar.commission_paid,bar.team.duplicate(true),bar.offline_sales_credit,bar.offline_cost_pending]
 	m.street.claim_offline(1120)
 	test.check([m.s.cash,bar.stock,bar.commission_carry,bar.commission_paid,bar.team,bar.offline_sales_credit,bar.offline_cost_pending]==once,"Repeated offline claim does not duplicate pack or commission settlement")
@@ -132,7 +142,7 @@ func run(test: SceneTree) -> void:
 	test.check(not eco.restock(bar,true) and bar.stock==0 and m.s.cash==228,"Supplier keeps operating reserve rather than buying an unaffordable pack")
 	m.s.cash = 229
 	test.check(eco.restock(bar,true) and bar.stock==6 and m.s.cash==1,"Supplier buys exactly six once with sufficient working cash")
-	# Premium drinks pay commission; paid pool never does.
+	# Premium drinks and paid pool have no commission.
 	m = Campaign.new(72)
 	m.s.cash = 100000
 	bar = m.street.selected()
@@ -140,11 +150,18 @@ func run(test: SceneTree) -> void:
 	m.street.action("hire",3)
 	bar.customers[0].quoted = 120
 	eco.serve(bar,1)
-	test.check(bar.commission_paid==12,"Commission uses the actual premium drink receipt")
+	test.check(bar.commission_paid==0,"Premium drinks have no commission")
 	bar.equipment.pool = 1
 	for customer in bar.customers: customer.pool = true
 	eco.pool_tick(bar)
-	test.check(bar.shift.pool_income==50 and bar.commission_paid==12,"A paid pool game charges once and owes no drink commission")
+	test.check(bar.shift.pool_income==50 and bar.commission_paid==0,"A paid pool game charges once and owes no drink commission")
+	bar.games[0].remaining = 45
+	m.save_game()
+	loaded = Campaign.new(1)
+	test.check(loaded.load_game() and loaded.street.selected().games[0].remaining==45,"An already-running legacy pool game retains its saved time")
+	money = loaded.s.cash
+	for second in 45: loaded.street.economy.pool_tick(loaded.street.selected())
+	test.check(loaded.street.selected().games.is_empty() and loaded.s.cash==money,"Legacy pool completion never charges its fee twice")
 	# Seven-person roster survives saves: six floor workers plus frontage.
 	bar.stage = 3
 	for i in 6: m.street.action("hire",0)
@@ -189,7 +206,7 @@ func run(test: SceneTree) -> void:
 	whole.street.claim_offline(1700)
 	var report: Dictionary = whole.s.street.offline_report
 	test.check(whole.s.cash>=initial_cash and report.net==report.income-report.costs and bar.stock>=0 and bar.stock<6,"Offline pack purchases preserve cash and reconcile the projected ledger")
-	test.check(str(report.notes).contains("deliveries of 6") and bar.commission_paid>0,"Offline report discloses packs and settled commission")
+	test.check(str(report.notes).contains("deliveries of 6") and bar.commission_paid==0,"Offline report discloses packs with zero commission")
 	whole = offline_model()
 	split = offline_model()
 	whole.street.selected().consignment = 6

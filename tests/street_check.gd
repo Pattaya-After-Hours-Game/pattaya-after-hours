@@ -86,8 +86,8 @@ func run(test: SceneTree) -> void:
 		bar.customers.back().pool = true
 	var cash_start := int(m.s.cash)
 	eco.pool_tick(bar)
-	test.check(m.s.cash==cash_start+50 and bar.games.size()==1 and bar.pool_games==1,"A two-player game pays exactly ฿50 once")
-	for _i in 44: eco.pool_tick(bar)
+	test.check(m.s.cash==cash_start+50 and bar.games.size()==1 and bar.pool_games==1 and bar.games[0].remaining==30,"A two-player thirty-second game pays exactly ฿50 once")
+	for _i in 29: eco.pool_tick(bar)
 	test.check(m.s.cash==cash_start+50 and bar.games.size()==1,"An occupied table cannot collect another fee")
 	m.save_game()
 	var loaded = Campaign.new(9)
@@ -102,7 +102,7 @@ func run(test: SceneTree) -> void:
 	m.street.action("promotion",0)
 	cash_start = m.s.cash
 	eco.pool_tick(bar)
-	test.check(m.s.cash==cash_start and bar.games[0].fee==0 and bar.free_games==1,"Free pool charges zero at game start")
+	test.check(m.s.cash==cash_start and bar.games[0].fee==0 and bar.games[0].remaining==30 and bar.free_games==1,"Free pool charges zero at game start")
 	bar.promo.remaining = 1
 	m.street.tick(1)
 	cash_start = m.s.cash

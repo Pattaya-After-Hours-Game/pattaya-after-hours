@@ -110,8 +110,7 @@ serving. Anong covers overhead for two minutes. Bo takes ฿14 per consignment
 drink when sold. Repeated clicks cannot add more stock or restart that cover.
 
 At ฿39, three ordinary ฿80 beers leave ฿237 after repaying Bo: enough for a normal
-฿228 six-pack. Outstanding Nida commissions can reduce this; existing commissions
-remain due. Budget room and cash for the whole pack as usual. Closed venues also
+฿228 six-pack. Nida no longer charges commission on these or other drinks. Budget room and cash for the whole pack as usual. Closed venues also
 retain Owner-run recovery; raids/closed hours must finish before reopening.
 
 **Nightly tips:** one served visit adds ฿10 pending, regardless of how many rounds
@@ -210,7 +209,7 @@ current in-game campaign day, starting at **Day 1** and continuing across saves.
 Offline estimates and skipping from closing to noon do not add extra days.
 Every venue type opens at
 12pm and normally shuts at 1am. Dates change at midnight; two-minute business
-reports and the 45-second pool timer still use real seconds. Financial rates
+reports and the 30-second pool timer still use real seconds. Financial rates
 are shown per real minute.
 
 Check the peak indicator in Service when planning staffing and stock:
@@ -278,7 +277,7 @@ Forecasts are estimates of automatic operation, not money already in the till.
 ## Pool and promotions
 
 The first beer-bar pool table costs ฿2,000. Two customers pay **฿50 total** when a
-45-second game starts. You do not click the table to collect another fee. Pool
+30-second game starts. You do not click the table to collect another fee. Pool
 players remain customers and can order drinks. A table uses space that could
 otherwise seat visitors, and players stay longer.
 
@@ -388,8 +387,7 @@ Beer bars offer three seating purchases: ฿400, ฿800 and **Compact layout · 
 At stage one, the last purchase holds **twelve customers with pool and fans**.
 The wall benches show the new arrangement. It increases room, not demand or speed.
 
-Find **Frontage promoter** in Service. **Nida** costs ฿1,200 for ten days plus
-10% of all venue drink receipts while working. She welcomes automatically and
+Find **Frontage promoter** in Service. **Nida** costs ฿1,200 for ten days with no drink commission. She welcomes automatically and
 has no hourly wage, but she never pours drinks. Her slot does not consume a
 bartender position. Compare the hire preview's unattended net with its estimate
 when you serve whenever ready. If service is already limiting sales, improve it
@@ -399,9 +397,9 @@ Welcome reads **Nida is welcoming** while she works; you can still Serve and Cha
 Faster Welcome does nothing extra during her shift. Buy it only if you want faster
 manual welcoming while she is off duty or out of contract. It does not improve
 her attraction or shorten Chat’s twenty-second recovery.
-Her rota stops new attraction, but commission committed to existing visits/orders
-still settles. Pool games and bar fines do not pay drink commission. The card
-shows commission paid and fractional carry; it is not another fee. At expiry,
+Her rota stops new attraction. She takes no commission, including on old waiting
+orders or offline sales. Previously paid commission remains historical; unpaid
+commitments and fractional carry are cancelled without a cash refund. At expiry,
 rehire the same person for ฿1,200. Find **Rehire Nida** directly under Frontage
 promoter. Keep the displayed payroll and one-pack reserve after the fee; the
 control shows exactly how much cash is missing. If her contract is active but

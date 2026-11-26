@@ -176,7 +176,7 @@ func test_ui() -> void:
 	app.render()
 	use_button(app,"Rehire Bartender 1 · ฿1,200")
 	check(app.model.street.selected().team[0].training==1 and app.model.street.selected().team[0].on,"Rehire control retains training")
-	use_button(app,"Hire Nida · ฿1,200 + 10% drinks")
+	use_button(app,"Hire Nida · ฿1,200")
 	var nida: Dictionary = app.model.street.selected().team.back()
 	nida.contract_left = 1
 	nida.audience_training = 1

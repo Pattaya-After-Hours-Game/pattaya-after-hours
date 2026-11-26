@@ -40,7 +40,8 @@ claiming behaviour exists; update the relevant documentation when it changes.
   levels 0–5; premium orders and promotions retain their separate rules. Fresh
   campaigns start with ฿228 and twelve drinks. Preserve saved quotes, budgets
   and paid inventory costs; never revalue an existing fridge or grant cash on update.
-- Pool costs **฿50 per game per table**, charged once at game start. Free Pool
+- Pool costs **฿50 per game per table**, charged once at game start; new games last 30 seconds.
+  Preserve saved remaining time for games already underway, including older 45-second games. Free Pool
   Night trades fees for attraction. Timers, capacity, customer budgets and
   promotion cooldowns still apply. Reloading must not duplicate rewards.
 - Keep all three venue types useful, with three stages each. Renovation earns
@@ -65,9 +66,10 @@ claiming behaviour exists; update the relevant documentation when it changes.
   timer loops or offline estimates.
   Quiet trading still has costs. Preserve rotas, temporary closure and recovery
   instead of forcing idle-mode debt or an unrecoverable failure.
-- Nida uses one separate frontage slot: ฿1,200/ten days plus 10% of actual drink
-  receipts, no hourly wage and no serving. Preserve existing visit/order commission
-  commitments after rota/expiry and the saved fractional carry; exclude pool fees.
+- Nida uses one separate frontage slot: ฿1,200/ten days, no drink commission,
+  no hourly wage and no serving. Cancel old unpaid visit/order commitments and
+  fractional carry; retain historical payments/reports without refunds. Live,
+  premium, discounted and offline sales must all remain commission-free.
   Welcome and promoter attraction never stack. Faster Welcome only helps while
   the promoter is off duty/expired; it does not speed Chat or boost her appeal. Audience training is stage-gated,
   separate from service training, and persists after rehire. Keep renewal visible
@@ -178,7 +180,7 @@ state. Navigation may select a venue/tab and scroll, never purchase, pay rewards
 advance chapters/time, or run RNG. Retain the shared chapter predicates and
 existing gates. Current active pacing bounds keep stage two at 30–45 minutes,
 second property at 75–115 and stage three at 110–210. Measure the saving gaps as
-well: first-manager wait at most 20 minutes and longest between-investment gap
+well: first-manager wait at most 21 minutes and longest between-investment gap
 at most 38 in baseline active policies. These are balance checks, not wait timers.
 
 Nightly street closure starts a free 15-second clean-up/countdown for all venues.

@@ -32,7 +32,12 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			if bar.stock_lots.is_empty() and bar.stock>0:
 				bar.stock_lots = [{"units":int(bar.stock),"cost":C.LEGACY_STOCK_COST}]
 		ensure_stock_lots(bar)
-		for customer in bar.customers: customer.merge(customer_action_fields())
+		# Retain historical payments, but cancel all uncharged promoter commission.
+		bar.commission_carry = 0
+		for customer in bar.customers:
+			customer.merge(customer_action_fields())
+			customer.commission_visit = false
+			customer.commission_order = false
 		for report in [bar.shift,bar.last_shift]+bar.recent:
 			if not report.is_empty(): report.merge({"drink_requests":{},"drink_misses":{},"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.LEGACY_STOCK_COST,"manager_income":0})
 		for table in bar.games.size():
@@ -318,12 +323,15 @@ func promoter_bonus(bar: Dictionary, offset: int = 0) -> float:
 	return C.PROMOTER_BONUS[int(bar.team[index].get("audience_training",0))]
 
 static func commission_charge(bar: Dictionary, amount: int) -> int:
+	if C.COMMISSION_PERCENT==0:
+		bar.commission_carry = 0
+		return 0
 	var credit := int(bar.commission_carry)+amount*C.COMMISSION_PERCENT
 	bar.commission_carry = credit%100
 	return credit/100
 
 func commit_orders(bar: Dictionary) -> void:
-	if promoter_bonus(bar)<=0: return
+	if C.COMMISSION_PERCENT==0 or promoter_bonus(bar)<=0: return
 	for guest in bar.customers:
 		if guest.order: guest.commission_order = true
 
@@ -773,7 +781,7 @@ func order(bar: Dictionary, customer: Dictionary) -> void:
 	var key: String = C.DRINKS[drink].id
 	bar.shift.drink_requests[key] = int(bar.shift.drink_requests.get(key,0))+1
 	customer.order = true
-	customer.commission_order = customer.get("commission_visit",false) or promoter_bonus(bar)>0
+	customer.commission_order = C.COMMISSION_PERCENT>0 and (customer.get("commission_visit",false) or promoter_bonus(bar)>0)
 	customer.quoted = amount
 	customer.wait = 0
 	bar.orders += 1
@@ -798,7 +806,7 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 		customer.life += C.CLUB_EXTRA_STAY
 		customer.budget += int(C.TYPES[int(bar.type)].drink)
 	customer.party_patience = C.CELEBRATION_PATIENCE if celebrating(bar) else 0
-	customer.commission_visit = promoter_bonus(bar)>0
+	customer.commission_visit = C.COMMISSION_PERCENT>0 and promoter_bonus(bar)>0
 	s.street.next_customer += 1
 	bar.customers.append(customer)
 	bar.arrivals += 1
@@ -1199,7 +1207,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			bar.team[index].service_clock = 0
 			bar.team[index].on = not bar.team[index].on
 			commit_orders(bar)
-			return "Rota updated. Existing visits/orders retain commission commitments." if bar.team[index].role==3 else "Rota updated. Off-duty staff do not incur wages."
+			return "Rota updated. Nida earns no commission or hourly wages." if bar.team[index].role==3 else "Rota updated. Off-duty staff do not incur wages."
 		"role":
 			if bar.type==0 or index<0 or index>=bar.team.size(): return "Choose a team member at a Soi bar or gogo."
 			if index in bar.away: return "Wait until this team member returns."
@@ -1231,7 +1239,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			ensure_staff_service(bar.team.back())
 			bar.crew = bar.team.size()
 			commit_orders(bar)
-			return "Nida hired: ten days, ฿1,200 plus 10% drink commission. She welcomes; you serve." if index==3 else "%s hired for ten game days (฿%d). Wages: ฿%d/real min while trading on duty." % [C.ROLE_NAMES[index],amount,C.ROLE_WAGES[index]]
+			return "Nida hired: ten days, ฿1,200, no commission. She welcomes; you serve." if index==3 else "%s hired for ten game days (฿%d). Wages: ฿%d/real min while trading on duty." % [C.ROLE_NAMES[index],amount,C.ROLE_WAGES[index]]
 		"rehire":
 			if index<0 or index>=bar.team.size(): return "Unknown team member."
 			var person: Dictionary = bar.team[index]

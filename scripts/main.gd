@@ -1237,12 +1237,12 @@ func street_panel() -> void:
 		for role in 3:
 			if role>0 and role!=bar.type: continue
 			row_button("Hire %s · %s" % [StreetContent.ROLE_NAMES[role].to_lower(),cash(eco.contract_cost(role))],street_action.bind("hire",role))
-			body("Adds ฿%d/real min. Forecast break-even after hire: %.1f drinks/real min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool-eco.forecast(bar).manager)/maxf(1,eco.price(bar)*(0.9 if eco.promoter_bonus(bar)>0 else 1.0)-eco.stock_unit_cost(bar))),"One drink every 25s; help with the rush." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
+			body("Adds ฿%d/real min. Forecast break-even after hire: %.1f drinks/real min. %s" % [StreetContent.ROLE_WAGES[role],maxf(0,(eco.operating_rate(bar)+int(StreetContent.ROLE_WAGES[role])-eco.forecast(bar).pool-eco.forecast(bar).manager)/maxf(1,eco.price(bar)-eco.stock_unit_cost(bar))),"One drink every 25s; help with the rush." if role==0 else "Attracts visitors; does not serve drinks."],MUTED,12)
 	body("FRONTAGE PROMOTER",GOLD,14)
-	body("Nida · adult promoter · ฿1,200 / ten days + 10% of drink receipts. No hourly wage. One frontage slot; never serves drinks.",MUTED,12)
-	live_body(func() -> String: return "Commission paid %s · carry %d/100 baht. Existing visits/orders retain commission when she goes off duty." % [cash(bar.commission_paid),bar.commission_carry],MUTED,12)
+	body("Nida · adult promoter · ฿1,200 / ten days. No commission or hourly wage. One frontage slot; never serves drinks.",MUTED,12)
+	if bar.commission_paid>0: body("Historical commission paid: %s. No further commission is charged." % cash(bar.commission_paid),MUTED,12)
 	if eco.promoter_index(bar)<0:
-		row_button("Hire Nida · ฿1,200 + 10% drinks",street_action.bind("hire",3))
+		row_button("Hire Nida · ฿1,200",street_action.bind("hire",3))
 		row_button("Hide forecast" if nida_forecast_open else "Show Nida forecast",func() -> void:
 			nida_forecast_open = not nida_forecast_open
 			render(true))
@@ -1250,7 +1250,7 @@ func street_panel() -> void:
 			live_body(func() -> String:
 				var auto: Dictionary = eco.promoter_forecast(bar)
 				var active: Dictionary = eco.promoter_forecast(bar,true)
-				return "Estimate after hire · cash %s; retain %s plus %s stock.\nArrivals %.1f → %.1f/min · staff service %.1f/min\nUnattended net %s → %s/min · commission %s/min\nOwner serving whenever ready: net %s → %s/min\nStreet net change: %s/min unattended; %s/min owner-active.\n%s" % [cash(int(model.s.cash)-1200),cash(eco.operating_rate(bar)*2),cash(eco.pack_price(bar)),auto.before.arrivals,auto.after.arrivals,auto.after.service,cash(auto.before.net),cash(auto.after.net),cash(auto.after.commission),cash(active.before.net),cash(active.after.net),cash(auto.street_delta),cash(active.street_delta),"Service is limiting sales; improve pouring/staff first." if auto.after.service<auto.after.demand else "Requires stock and spare seats; estimates are not actual income."],MUTED,12)
+				return "Estimate after hire · cash %s; retain %s plus %s stock.\nArrivals %.1f → %.1f/min · staff service %.1f/min\nUnattended net %s → %s/min\nOwner serving whenever ready: net %s → %s/min\nStreet net change: %s/min unattended; %s/min owner-active.\n%s" % [cash(int(model.s.cash)-1200),cash(eco.operating_rate(bar)*2),cash(eco.pack_price(bar)),auto.before.arrivals,auto.after.arrivals,auto.after.service,cash(auto.before.net),cash(auto.after.net),cash(active.before.net),cash(active.after.net),cash(auto.street_delta),cash(active.street_delta),"Service is limiting sales; improve pouring/staff first." if auto.after.service<auto.after.demand else "Requires stock and spare seats; estimates are not actual income."],MUTED,12)
 	else:
 		var nida_index: int = eco.promoter_index(bar)
 		var renew := row_button("Rehire Nida · ฿1,200",street_action.bind("rehire",nida_index))
@@ -1316,7 +1316,7 @@ func celebration_panel() -> void:
 		var current: Dictionary = model.street.celebration_info()
 		return "LIVE until 1am · day %d opening" % current.day if current.active else "Day %d at noon · %s" % [current.day,"today" if current.days_left==0 else "tomorrow" if current.days_left==1 else "%d game days to go" % current.days_left],GOLD,14)
 	body(StreetContent.CELEBRATIONS[model.street.Economy.celebration_index(int(info.day))][1],WHITE,14)
-	body("+40% shared street traffic and extra Blue Hour appeal. Up to 3 drinks per visit if budgets allow; next round in 26s, 19s with music, or 14s with better sound. Visitors stay 15s longer and wait 10s longer. Traffic boosts cap at 2.4× normal. Normal prices, pool fees, wages and Nida's commission still apply.",MUTED,13)
+	body("+40% shared street traffic and extra Blue Hour appeal. Up to 3 drinks per visit if budgets allow; next round in 26s, 19s with music, or 14s with better sound. Visitors stay 15s longer and wait 10s longer. Traffic boosts cap at 2.4× normal. Normal prices, pool fees and wages still apply.",MUTED,13)
 	body("Prepare: clean the bar, fill the fridge, check staff contracts and leave room for deliveries. Serve the queue or use Chat before advertising harder. No entry fee or paid preparation; offline time cannot use up the party.",WHITE,13)
 	var report: Dictionary = model.s.street.celebration.report
 	if report.is_empty(): report = model.s.street.celebration.last_report

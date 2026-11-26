@@ -10,7 +10,20 @@ The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
 
-## Current stage-two income rules — 26 November 2026
+## Current promoter and pool update — 26 November 2026
+
+Nida's ฿1,200 ten-day contract is her entire fee; commission is removed. New
+pool games last **30 seconds**, still costing **฿50 once per table at start**.
+Free games still cost zero and keep that identity after the promotion ends.
+Already-running games retain their saved remaining time, even if longer than
+thirty seconds. Forecast throughput uses the new duration; real games still
+require two customers, available table capacity and sufficient budgets.
+Prices and progression gates are unchanged. The user approved a **21-minute**
+first-manager saving-gap ceiling after a baseline run measured 20m29s with faster
+pool; the 38-minute longest-gap ceiling stays exact. Older balance measurements
+below describe their stated versions; current verification is in [TESTING](TESTING.md).
+
+## Previous stage-two income rules — 26 November 2026
 
 See the [stage-two design and measured trade-offs](design/STAGE_TWO_INCOME.md).
 Regulars Club tiers cost **฿600/1,200/2,400**, require stage two and **10/20/35
@@ -38,7 +51,7 @@ entitlement, free training or retroactive manager refund. Ordinary receipts and
 offline estimates remain limited by demand, service, supply and operating costs.
 
 Current active pacing acceptance: stage two **30–45 min**, second property
-**75–115**, stage three **110–210**; manager saving gap **≤20 min**, longest
+**75–115**, stage three **110–210**; manager saving gap **≤21 min**, longest
 investment gap **≤38 min**. Milestones use nearest-minute comparisons; gaps use
 exact seconds. The following dated pricing/bonus/balance sections document prior
 passes; their historical timings do not override these targets.
@@ -262,7 +275,7 @@ Local, tourist and nightlife groups choose among the venues and outside options.
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.
-A bartender contract costs ฿1,200, matching Nida’s upfront fee without her commission. Base service is one drink
+A bartender contract costs ฿1,200, matching Nida’s contract fee. Base service is one drink
 per 25 real seconds (2.4/min); individual training costs ฿400 then ฿800 and
 reduces this to 20s (3/min) then 15s (4/min). Stage two adds 12s (5/min) for
 ฿1,200 and 10s (6/min) for ฿1,600. Each bartender has a saved cooldown deadline. She starts ready, serves one
@@ -330,8 +343,7 @@ tier also adds +1 to the base +1 reputation earned per ten satisfied departures
 at that venue, capped at 100 street reputation. Purchases grant no immediate
 reputation; already-owned fridges benefit on future milestones.
 
-Nida costs ฿1,200 for ten game days plus 10% of drink receipts, with no additional
-hourly wage. One frontage slot is separate from seats and floor staffing. While
+Nida costs ฿1,200 for ten game days, with no drink commission or hourly wage. One frontage slot is separate from seats and floor staffing. While
 contracted/on duty, her attraction weight is +4.8; the model uses the greater of
 her bonus and owner Welcome, never their sum. Welcome is disabled while she
 works; Chat retains its existing social timer. Welcome upgrades only benefit
@@ -345,17 +357,14 @@ individual's existing attraction/show contribution by ×1.25/×1.5, with no extr
 service or drink commission. This track is distinct from bartender training and
 persists across expiry/rehire. Stage alone grants no training.
 
-Commission settles once per actual drink, including premium and discounted
-orders, excluding pool and host fees. Add `receipt × 10` to a saved percentage
-remainder, pay integer baht divided by 100, retain modulo 100. Two ฿55 beers pay
-฿11 total across reloads. Every sale while the promoter works qualifies. Visits
-admitted on duty retain eligibility for the visit; existing orders committed
-while she works remain eligible after rota changes or expiry. Abandoned orders
-cost nothing. Flags never stack two commissions on one sale.
+Nida's commission is zero for ordinary, premium and discounted drinks, both live
+and offline. Existing queued commissions and fractional carry are cancelled on
+load. The settlement guard also prevents charges from old commitment flags.
+Past `commission_paid` and report costs remain unchanged: no refund, cash gift
+or rewriting of historical profitability. Schema 12 remains compatible; legacy
+commission fields stay in the save and validators for historical reporting.
 
-Gross drink income and commission are separate ledger entries. Weekly costs,
-shift net/healthy margin, promotion contribution, forecasts and offline estimates
-include commission once. Hire previews show post-hire cash and the required
+Hire previews show post-hire cash and the required
 one-shift payroll plus one current-price pack reserve, arrivals, unattended and owner-active net,
 and whole-street impact. These are capacity estimates, not promises of revenue;
 they account for other properties losing some shared visitors. Hiring more
@@ -484,7 +493,7 @@ toward zero. Decisions, boot menu and offline time do not run the sampler.
 ## Pool and promotions
 
 A first pool table costs ฿2,000 and is available at beer-bar stage 1. Each table
-uses two seats. Two real customers start a 45-second game for **฿50 total**, paid
+uses two seats. Two real customers start a 30-second game for **฿50 total**, paid
 once at the start. Guests retain their drink orders and stay thirty seconds
 longer. The waiting list shows up to four players; unresolved interest expires
 after thirty seconds. Installing furniture never evicts existing guests; new

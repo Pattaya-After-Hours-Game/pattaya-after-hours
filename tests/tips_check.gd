@@ -99,7 +99,7 @@ func run(test: SceneTree) -> void:
 	money = m.s.cash
 	m.street.tick(1)
 	test.check(b.tips_total==10 and other.tips_total==10 and m.s.cash==money+19,"After the ordinary baht of overhead, each venue's real customers contribute once at final closure")
-	# All service paths contribute visits, while Nida's commission stays drink-only.
+	# All service paths contribute visits; tips never change historical commission.
 	m = Campaign.new(72)
 	m.s.cash = 10000
 	b = m.street.selected()
@@ -111,7 +111,7 @@ func run(test: SceneTree) -> void:
 	test.check(b.tip_visits==2 and b.team[0].drinks_served==1 and b.sold==2,"Staff and owner automation bank the same first-serve tips")
 	var commission: int = b.commission_paid
 	close_night(m)
-	test.check(b.tips_total==20 and b.commission_paid==commission,"Nida's commission excludes the tip jar")
+	test.check(b.tips_total==20 and b.commission_paid==commission,"The tip jar does not change historical commission")
 	# Reproduce the screenshot without awarding money or deleting waiting orders.
 	m = Campaign.new(72)
 	m.s.cash = 39

@@ -1,5 +1,23 @@
 # Current implementation and release handoff
 
+## Nida and pool update — 26 November 2026
+
+Based on main `f1cc217`, published as v1.0.31. Nida's ฿1,200 ten-day fee remains,
+with drink commission removed from live/offline settlement and forecasts. Old
+uncharged commitments/carry are cancelled, while historical payments stay recorded
+without refunds. Pool now starts thirty-second games for the same ฿50 per table;
+Free Pool remains free, and already-running games retain their saved time/fee.
+Schema remains 12 and existing progress is retained.
+
+The user approved a 21-minute first-manager saving-gap target after the new pool
+timing produced a 20m29s run. Prices and other pacing thresholds are unchanged.
+The combined isolated suite and relevant Nida/pool previews are recorded in
+[testing](TESTING.md). Main's workflow retests and publishes signed downloads;
+verify its completion and the release tag before claiming a build is available.
+Device play remains unverified; other worktrees and attachments are untouched.
+
+## Previous stage-two income handoff
+
 Updated **26 November 2026**. This work starts from main `0b00fc8` (published as
 v1.0.30), retaining Ryan's drink inventory, tutorial, capybara, rainbow duo/dog,
 rat event, tuning sandbox, upgraded UI and mobile sparring. Branch

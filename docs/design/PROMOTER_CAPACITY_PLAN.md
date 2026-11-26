@@ -1,7 +1,8 @@
 # More room, six-packs and a face out front
 
 > Historical implementation plan. Later tuning makes bartender contracts ฿1,200
-> and supplier levels 2+ deliver twelve units. See [current economy rules](../ECONOMY.md)
+> and supplier levels 2+ deliver twelve units. Nida now charges no commission;
+> new pool games last thirty seconds. See [current economy rules](../ECONOMY.md)
 > for authoritative quantities, prices and fridge reputation.
 
 **Status: implemented in `codex/promoter-implementation`, including schema-six

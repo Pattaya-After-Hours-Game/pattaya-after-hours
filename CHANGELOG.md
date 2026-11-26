@@ -1,5 +1,14 @@
 # Changelog
 
+## Source update — No promoter commission, faster pool
+
+- Nida keeps her ฿1,200 ten-day contract fee; all new live/offline drink commission
+  is removed, including uncharged old orders. Past payments remain historical.
+- New pool games last 30 seconds instead of 45, still ฿50 per table once.
+  Existing game timers and paid/free identities survive reload unchanged.
+- Updated forecasts, hire controls, save compatibility tests and documentation.
+  User approved a 21-minute manager-saving pacing target; prices are unchanged.
+
 ## Source update — Stage-two income bridge
 
 - Added Regulars Club tiers for ฿600/1,200/2,400 at stage two, gated by local
