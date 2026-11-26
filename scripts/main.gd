@@ -508,6 +508,13 @@ func render(keep_scroll: bool = false) -> void:
 		var tour_style := box(TEAL if tours>0 else Color("#b8293d"),DARK,2)
 		tour_style.set_corner_radius_all(10)
 		for state in ["normal","hover","pressed"]: tour_badge.add_theme_stylebox_override(state,tour_style)
+		if tours==0:
+			var refresh_tour_warning := func() -> String:
+				var bar: Dictionary = model.street.selected()
+				tour_badge.visible = bar.customers.size()<model.street.economy.seats(bar)
+				return "!"
+			tour_badge.text = refresh_tour_warning.call()
+			live_labels.append([tour_badge,refresh_tour_warning])
 		upgrade_badge = at_button(root_ui,Rect2(56,478,21,21),"",open_upgrades,true)
 		upgrade_badge.name = "UpgradeBadge"
 		upgrade_badge.custom_minimum_size = Vector2.ZERO

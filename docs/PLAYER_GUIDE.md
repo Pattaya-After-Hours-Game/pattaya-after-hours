@@ -97,9 +97,9 @@ Bed Race take over the game screen until you finish or leave.
 Open **Tours**, choose a guide, then assign a route. The guide recommends your
 street for the current trading shift. Use **Back** to return to the guide list.
 When a referral gets a seat, the top-left update names the guide and venue.
-The badge above **Tours** counts active agreements and shows a red **!** when
-there are none. The guide list shows each agreement's remaining trading time
-or its **Expired** status.
+The badge above **Tours** counts active agreements. A red **!** appears when
+there are no active tours and the selected venue has a free seat. The guide list
+shows each agreement's remaining trading time or its **Expired** status.
 
 ## When the rats come out
 

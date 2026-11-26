@@ -345,6 +345,18 @@ func test_tour_update(app: Control) -> void:
 	check(app.root_ui.get_node("TourBadge").text=="2","The Tours badge counts agreements across guides")
 	app.model.booking(2,0)
 	check(app.tour_agreement_text(2)=="Available","Cancelling a renewed agreement returns the guide to Available")
+	var selected: Dictionary = app.model.street.selected()
+	var eco = app.model.street.economy
+	while selected.customers.size()<eco.seats(selected): eco.admit(selected)
+	app.render()
+	check(app.root_ui.get_node("TourBadge").visible and app.root_ui.get_node("TourBadge").text=="1","A full venue keeps its active tour count")
+	app.model.booking(3,1)
+	app.render()
+	check(not app.root_ui.get_node("TourBadge").visible,"A full venue hides the empty tour warning")
+	selected.customers.pop_back()
+	app.live_seconds = 1.0
+	app._process(0.0)
+	check(app.root_ui.get_node("TourBadge").visible and app.root_ui.get_node("TourBadge").text=="!","The tour warning returns when a seat opens during play")
 
 	for fixture in [[5,false],[48,true]]:
 		var m = Campaign.new(fixture[0])
