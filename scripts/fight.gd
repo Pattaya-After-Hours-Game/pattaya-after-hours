@@ -13,6 +13,14 @@ const ATTACKS = {
 const RIVALS = [["JUNO",Color("#ab8bfa"),Color("#ef947b"),0.39],["VEGA",Color("#ff6a93"),Color("#c88570"),0.30],["ORCHID",Color("#ffc474"),Color("#cda086"),0.25]]
 const BUTTONS = [["left","◀",22],["right","▶",98],["jump","JUMP",174],["guard","GUARD",250],
 	["jab","JAB",636],["kick","KICK",712],["super","BURST",788]]
+const MOBILE_BUTTONS = [["jab","JAB",Rect2(732,450,68,64)],
+	["kick","KICK",Rect2(807,408,68,64)],["super","BURST",Rect2(878,454,68,64)]]
+const PAD_CELL = 60
+const PAD = Rect2(24,346,PAD_CELL*3,PAD_CELL*3)
+const PAD_BUTTONS = [[Vector2i.LEFT,"left","◀"],[Vector2i.RIGHT,"right","▶"],
+	[Vector2i.UP,"jump","▲"],[Vector2i.DOWN,"guard","▼"]]
+const MOUSE_POINTER = -1
+const NO_PAD_POINTER = -2
 const KEYS = {KEY_A:"left", KEY_LEFT:"left", KEY_D:"right", KEY_RIGHT:"right", KEY_W:"jump", KEY_UP:"jump",
 	KEY_S:"guard", KEY_DOWN:"guard", KEY_J:"jab", KEY_K:"kick", KEY_L:"super"}
 var fighters: Array[Dictionary] = []
@@ -30,7 +38,9 @@ var result := false
 var announced := ""
 var held := {}
 var touches := {}
-var mouse_action := ""
+var mobile_controls := OS.has_feature("mobile")
+var pad_pointer := NO_PAD_POINTER
+var pad_direction := Vector2i.ZERO
 var sparks: Array[Dictionary] = []
 var flash := 0.0
 var buffered := {}
@@ -59,7 +69,9 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		held.clear()
 		touches.clear()
-		mouse_action = ""
+		buffered.clear()
+		pad_pointer = NO_PAD_POINTER
+		pad_direction = Vector2i.ZERO
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and KEYS.has(event.physical_keycode):
@@ -77,29 +89,63 @@ func _input(event: InputEvent) -> void:
 		finished.emit(result if over else false)
 	elif event is InputEventScreenTouch:
 		get_viewport().set_input_as_handled()
-		if event.pressed:
+		if event.pressed and not event.canceled:
 			activate(event.position,event.index)
-		else: touches.erase(event.index)
+		else:
+			release_pointer(event.index)
 	elif event is InputEventScreenDrag:
-		if touches.has(event.index):
-			touches[event.index] = action_at(event.position)
+		drag_pointer(event.position,event.index)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION:
 		get_viewport().set_input_as_handled()
-		mouse_action = action_at(event.position) if event.pressed else ""
 		if event.pressed:
-			buffer(mouse_action)
-			activate(event.position,-1)
+			activate(event.position,MOUSE_POINTER)
+		else:
+			release_pointer(MOUSE_POINTER)
+	elif mobile_controls and event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION:
+		drag_pointer(event.position,MOUSE_POINTER)
 
 func activate(point: Vector2, index: int) -> void:
 	point = to_canvas(point)
-	if Rect2(880,465,72,61).has_point(point):
+	if exit_rect().has_point(point):
 		finished.emit(result if over else false)
 	elif over:
 		if Rect2(345,281,270,82).has_point(point): finished.emit(result)
-	elif index != -1:
-		touches[index] = _action_at_canvas(point)
-		buffer(touches[index])
+	elif mobile_controls and PAD.has_point(point):
+		if pad_pointer == NO_PAD_POINTER:
+			pad_pointer = index
+			update_pad(point)
+	else:
+		var action := _action_at_canvas(point)
+		if not mobile_controls or not action.is_empty():
+			touches[index] = action
+			buffer(action)
+
+func drag_pointer(point: Vector2, index: int) -> void:
+	if index == pad_pointer:
+		update_pad(to_canvas(point))
+	elif touches.has(index):
+		var action := action_at(point)
+		if mobile_controls and action != touches[index]:
+			buffer(action)
+		touches[index] = action
+
+func release_pointer(index: int) -> void:
+	if pad_pointer == index:
+		pad_pointer = NO_PAD_POINTER
+		pad_direction = Vector2i.ZERO
+	touches.erase(index)
+
+func update_pad(point: Vector2) -> void:
+	var direction := Vector2i.ZERO
+	if PAD.has_point(point):
+		direction = Vector2i((point-PAD.position)/PAD_CELL)-Vector2i.ONE
+	if direction.y < 0 and pad_direction.y >= 0:
+		buffer("jump")
+	pad_direction = direction
+
+func exit_rect() -> Rect2:
+	return Rect2(864,84,72,44) if mobile_controls else Rect2(880,465,72,61)
 
 func to_canvas(point: Vector2) -> Vector2:
 	return (point-global_position)/(size/Vector2(960,540))
@@ -108,8 +154,9 @@ func action_at(point: Vector2) -> String:
 	return _action_at_canvas(to_canvas(point))
 
 func _action_at_canvas(point: Vector2) -> String:
-	for item in BUTTONS:
-		if Rect2(item[2],464,68,60).has_point(point): return item[0]
+	for item in MOBILE_BUTTONS if mobile_controls else BUTTONS:
+		var rect: Rect2 = item[2] if mobile_controls else Rect2(item[2],464,68,60)
+		if rect.has_point(point): return item[0]
 	return ""
 
 func buffer(key: String) -> void:
@@ -117,7 +164,14 @@ func buffer(key: String) -> void:
 		buffered[key] = elapsed + 0.17
 
 func pressed(key: String) -> bool:
-	return float(buffered.get(key,-1.0)) >= elapsed or mouse_action == key or key in held.values() or key in touches.values()
+	if float(buffered.get(key,-1.0)) >= elapsed or key in held.values() or key in touches.values():
+		return true
+	match key:
+		"left": return pad_direction.x < 0
+		"right": return pad_direction.x > 0
+		"jump": return pad_direction.y < 0
+		"guard": return pad_direction.y > 0
+	return false
 
 func _physics_process(delta: float) -> void:
 	elapsed += delta
@@ -270,6 +324,29 @@ func centered(x: float,y: float,value: String,px: int,tint: Color) -> void:
 	var width := font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,px).x
 	label_at(x-width/2,y,value,px,tint)
 
+func draw_mobile_controls(neon: Color, gold: Color) -> void:
+	var hub := PAD.get_center()
+	var fill := Color("#21161fe0")
+	var edge := gold.darkened(.45)
+	panel(Rect2(hub-Vector2.ONE*PAD_CELL/2,Vector2.ONE*PAD_CELL),fill,edge)
+	draw_circle(hub,5,edge)
+	for item in PAD_BUTTONS:
+		var direction: Vector2i = item[0]
+		var center := hub + Vector2(direction)*PAD_CELL
+		var active := pressed(item[1])
+		panel(Rect2(center-Vector2.ONE*PAD_CELL/2,Vector2.ONE*PAD_CELL),Color("#4d3941") if active else fill,neon if active else edge)
+		centered(center.x,center.y+(0 if direction.y else 8),item[2],22,neon)
+		if direction.y:
+			centered(center.x,center.y+18,str(item[1]).to_upper(),11,gold)
+	for item in MOBILE_BUTTONS:
+		var rect: Rect2 = item[2]
+		var center := rect.get_center()
+		var active := pressed(item[0])
+		var tint := gold if item[0] == "super" else neon
+		draw_circle(center,32,Color("#4d3941") if active else fill,true,-1,true)
+		draw_circle(center,31,tint if active else edge,false,2,true)
+		centered(center.x,center.y+5,item[1],15,tint)
+
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
 	var neon := Color("#73f5dc")
@@ -315,13 +392,18 @@ func _draw() -> void:
 		var width: float = fighters[i].hp*3.08
 		draw_rect(Rect2(x+1 if i==0 else x+309-width,35,width,14),neon if i==0 else pink)
 		draw_rect(Rect2(x,57,fighters[i].meter*3.1,5),gold)
-	panel(Rect2(0,456,960,84),Color("#21161ff8"))
-	for item in BUTTONS:
-		var rect := Rect2(item[2],464,68,60)
-		panel(rect,Color("#4d3941") if pressed(item[0]) else Color("#30212c"),neon if pressed(item[0]) else gold.darkened(.45))
-		centered(rect.get_center().x,500,item[1],14,gold if item[0]=="super" else neon)
-	panel(Rect2(880,465,72,61),Color("#392630"))
-	centered(916,501,"EXIT",15,gold)
+	if mobile_controls:
+		if not over:
+			draw_mobile_controls(neon,gold)
+	else:
+		panel(Rect2(0,456,960,84),Color("#21161ff8"))
+		for item in BUTTONS:
+			var rect := Rect2(item[2],464,68,60)
+			panel(rect,Color("#4d3941") if pressed(item[0]) else Color("#30212c"),neon if pressed(item[0]) else gold.darkened(.45))
+			centered(rect.get_center().x,500,item[1],14,gold if item[0]=="super" else neon)
+	var exit := exit_rect()
+	panel(exit,Color("#392630"))
+	centered(exit.get_center().x,exit.get_center().y+6,"EXIT",15,gold)
 	if countdown>0:
 		centered(480,270,"READY" if countdown>.4 else "FIGHT!",44,gold)
 	elif next_round>0:
@@ -331,6 +413,6 @@ func _draw() -> void:
 		centered(480,251,("TOYBOX CHAMPION" if circuit else "MALI WINS") if result else "CORNER CALLED IT",26,neon if result else pink)
 		panel(Rect2(345,281,270,82),Color("#49303a"))
 		centered(480,329,"CONTINUE",22,gold)
-	elif elapsed<5 and not OS.has_feature("mobile"):
+	elif elapsed<5 and not mobile_controls:
 		panel(Rect2(255,426,450,23),Color("#21161fe8"))
 		centered(480,443,"A/D MOVE   W JUMP   S GUARD   J/K/L ATTACK",13,gold)

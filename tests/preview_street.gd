@@ -273,6 +273,12 @@ func run() -> void:
 		app.fight.queue_redraw()
 		await capture(app,"fight-%d-mali-victory" % rival,false)
 		app.leave_fight(false)
+	app.enter_fight(true)
+	app.fight.set_physics_process(false)
+	app.fight.mobile_controls = true
+	pose(app.fight,0)
+	await capture(app,"fight-mobile-controls",false)
+	app.leave_fight(false)
 	fresh(app)
 	populate(app,app.model.street.selected(),3)
 	for n in 24:
