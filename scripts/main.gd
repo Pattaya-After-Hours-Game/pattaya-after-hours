@@ -510,8 +510,7 @@ func render(keep_scroll: bool = false) -> void:
 	abs_text(drawer,Rect2(16,5,290,30),drawer_title,16,GOLD)
 	if not practicing and model.s.phase in ["plan","guided"]:
 		drawer_close_button = at_button(drawer,Rect2(313,4,59,36),"×",close_drawer_layer)
-		drawer_close_button.tooltip_text = "Close drawer"
-		drawer_close_button.visible = model.s.phase=="plan"
+		update_drawer_navigation()
 	scroll = ScrollContainer.new()
 	scroll.position = Vector2(14,44)
 	scroll.size = Vector2(352,366)
@@ -1240,7 +1239,6 @@ func open_fridge() -> void:
 	render()
 
 func fridge_panel() -> void:
-	row_button("‹  Service",change_tab.bind(0))
 	var deal: Dictionary = model.street.supplier_deal_offer()
 	if not deal.is_empty():
 		var special := row_button("Bo’s special · save "+cash(deal.normal-deal.price),open_supplier_special)
@@ -1482,7 +1480,7 @@ func open_upgrades(ready_only: bool) -> void:
 
 func upgrades_panel() -> void:
 	var offers := upgrade_offers()
-	row_pair("‹  Service",change_tab.bind(0),"Show all" if upgrades_ready_only else "Ready only",open_upgrades.bind(not upgrades_ready_only))
+	row_button("Show all" if upgrades_ready_only else "Ready only",open_upgrades.bind(not upgrades_ready_only))
 	var bar: Dictionary = model.street.selected()
 	body("Stage %d/3 · Supplier %d/5 · Manager %d/3" % [bar.stage,bar.supplier_level,bar.manager_level],MUTED,12)
 	var ready: Array[Dictionary] = []
@@ -1531,7 +1529,6 @@ func street_panel() -> void:
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
 	if not service_section.is_empty():
-		row_button("‹  Service",change_tab.bind(0))
 		match service_section:
 			"team": service_team(bar)
 			"reports": service_reports(bar)
@@ -1574,10 +1571,7 @@ func show_service_help(heading: String, detail: String) -> void:
 	service_help_panel.z_index = 4
 	var heading_label := abs_text(service_help_panel,Rect2(16,10,320,48),heading,17,GOLD)
 	heading_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	if is_instance_valid(drawer_close_button):
-		drawer_close_button.text = "Back"
-		drawer_close_button.tooltip_text = "Back to the service view"
-		drawer_close_button.show()
+	update_drawer_navigation()
 	var copy := abs_text(service_help_panel,Rect2(16,72,320,265),detail,15,WHITE)
 	copy.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	copy.vertical_alignment = VERTICAL_ALIGNMENT_TOP
@@ -1588,13 +1582,22 @@ func close_service_help() -> void:
 		service_help_panel.hide()
 		service_help_panel.queue_free()
 	service_help_panel = null
-	if is_instance_valid(drawer_close_button):
-		drawer_close_button.text = "×"
-		drawer_close_button.tooltip_text = "Close drawer"
-		drawer_close_button.visible = model.s.phase=="plan"
+	update_drawer_navigation()
+
+func service_subview_open() -> bool:
+	return tab==0 and (fridge_open or upgrades_open or not service_section.is_empty())
+
+func update_drawer_navigation() -> void:
+	if not is_instance_valid(drawer_close_button): return
+	var help_open := is_instance_valid(service_help_panel)
+	var subview := service_subview_open()
+	drawer_close_button.text = "Back" if help_open or subview else "×"
+	drawer_close_button.tooltip_text = "Back to the service view" if help_open else "Back to Service" if subview else "Close drawer"
+	drawer_close_button.visible = help_open or subview or model.s.phase=="plan"
 
 func close_drawer_layer() -> void:
 	if is_instance_valid(service_help_panel): close_service_help()
+	elif service_subview_open(): change_tab(0)
 	else: close_drawer()
 
 func service_option(label: String, action: Callable, icon: String, help: Callable) -> Button:
@@ -2487,9 +2490,9 @@ func _notification(what: int) -> void:
 		elif is_instance_valid(district): close_district()
 		elif is_instance_valid(fight): leave_fight(fight.result if fight.over else false)
 		elif campaign_before_tutorial != null: finish_tutorial()
-		elif is_instance_valid(service_help_panel): close_service_help()
 		elif offline_notice > 0 and model.s.phase == "plan": dismiss_offline()
-		elif drawer_open and model.s.phase == "plan": close_drawer()
+		elif (drawer_open or model.s.phase=="guided") and model.s.phase in ["plan","guided"] and is_instance_valid(drawer_close_button) and drawer_close_button.visible:
+			close_drawer_layer()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if boot_menu:
@@ -2507,10 +2510,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_cancel") and offline_notice > 0 and model.s.phase == "plan":
 		get_viewport().set_input_as_handled()
 		dismiss_offline()
-	elif event.is_action_pressed("ui_cancel") and drawer_open and model.s.phase == "plan":
+	elif event.is_action_pressed("ui_cancel") and (drawer_open or model.s.phase=="guided") and model.s.phase in ["plan","guided"] and is_instance_valid(drawer_close_button) and drawer_close_button.visible:
 		get_viewport().set_input_as_handled()
-		if is_instance_valid(service_help_panel): close_service_help()
-		else: close_drawer()
+		close_drawer_layer()
 
 func _exit_tree() -> void:
 	# Release active playback before the audio server shuts down.
