@@ -57,7 +57,7 @@ func run(test: SceneTree) -> void:
 	test.check(0 in b.away and b.team[0].host_return==30.5,"A report boundary cannot return a host before her booking deadline")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==14 and loaded.street.selected().team[0].host_return==30.5,"Schema fourteen round-trips an active booking without rounding or repayment")
+	test.check(loaded.load_game() and loaded.s.version==15 and loaded.street.selected().team[0].host_return==30.5,"Schema fourteen round-trips an active booking without rounding or repayment")
 	loaded.street.advance(29.5)
 	test.check(0 in loaded.street.selected().away,"Host remains away before the saved deadline")
 	loaded.street.advance(0.5)

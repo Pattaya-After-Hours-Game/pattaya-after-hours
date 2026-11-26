@@ -464,5 +464,28 @@
       192
     ],
     "height": 180
+  },
+  "daisy": {
+    "frames": [
+      "daisy-0.png",
+      "daisy-1.png",
+      "daisy-2.png",
+      "daisy-3.png",
+      "daisy-4.png",
+      "daisy-5.png"
+    ],
+    "cell": [
+      160,
+      256
+    ],
+    "height": 180,
+    "frame_heights": [
+      180,
+      180,
+      196,
+      196,
+      180,
+      180
+    ]
   }
 }

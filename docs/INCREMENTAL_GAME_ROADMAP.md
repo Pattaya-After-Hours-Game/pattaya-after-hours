@@ -22,15 +22,15 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Hostess naming and expansion prices, integrating completed host controls/HUD |
-| Status | DONE; pricing `f85afc0` and host/HUD `ef17ddc` pass combined verification |
+| Active feature | Hosted drinks: guest-topic matching, real service and Room Buzz |
+| Status | DONE in shared working tree from `7c28019`; verified, unpublished |
 | Implementer | Codex in the shared checkout |
 | Reviewer / playtester | Codex automated and visual checks; device play pending |
 | Shared claim location | This table in `/home/zak/projects/pattaya-after-hours` |
-| Working branch / chat / PR | `codex/venue-pricing` isolated integration |
+| Working branch / chat / PR | Shared `main` working tree; hosted-drinks follow-up |
 | Scope and owned files | Economy, street/content, saves, main UI, barfine tests/previews and docs |
-| Acceptance | Real willing-host requests; ฿500 base fee; 30-second absence and appeal loss; paid auto-accept; retained host training; repeat-safe saves |
-| Next handoff / blocker | Combined tests and previews pass; main release workflow publishes; see [handover](MERGE_HANDOFF.md); device play remains pending |
+| Acceptance | One sponsored round per real guest; stock/budget/service gates; topic matching; bounded Buzz; distinct barfine choice; repeat-safe saves |
+| Next handoff / blocker | Full suite, final regressions, thirty comparisons and previews pass; local unpublished work; see [handover](MERGE_HANDOFF.md); device play pending |
 | Recommended next, when free | Await user direction; do not start another roadmap feature |
 | Last updated | 2026-11-26 |
 

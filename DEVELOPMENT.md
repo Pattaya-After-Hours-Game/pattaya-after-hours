@@ -161,7 +161,7 @@ per-customer chat state. Action deadlines are fractional foreground seconds;
 Do not run both `advance` and `tick` for the same elapsed interval.
 
 Changes to the save dictionary need compatibility handling; the current schema
-version is 14. Promoter roster/commission fields and fractional offline accounting
+version is 15. Promoter roster/commission fields and fractional offline accounting
 are migrated without granting purchases. Keep whole-pack delivery and commission
 settlement inside `economy.gd`; UI/animation code must not mint receipts.
 Manager income is a separate model-owned receipt, not a drink. Stock lots retain
@@ -428,6 +428,16 @@ offline estimates and hiring break-even calculations must not apply the former
 10% deduction. `POOL_SECONDS` is 30 for new games and forecast throughput; never
 replace a saved game's remaining time or fee on load.
 
+## Named entertainer Daisy
+
+`hire_daisy` uses the ordinary host hire and then assigns the appended
+`StreetContent.DAISY_HOST` ID. Existing host IDs and Gabby's optional identity
+stay unchanged. The action is restricted to Hostess bars and one roster place
+across the street, including expired contracts. Daisy keeps the host role;
+normal rota, training, booking, contract-ageing and renewal paths own her state.
+`tests/daisy_check.gd` covers the model and visible hire/renewal controls.
+Her art and dedicated economy previews use the shared catalog and city renderer.
+
 ## Named bartender Gabby
 
 `hire_gabby` delegates to the existing bartender hire before attaching the
@@ -492,3 +502,18 @@ availability, thirty-second return/reload, stage/reserve gates, upgrades,
 automation, expiry/rehire, offline exclusion, old-save migration, validation,
 UI acceptance and compatibility with the bed-race runner. Use `barfine-*` with
 the economy preview runner for the room card, Service and upgrade controls.
+
+## Hosted rounds and schema fifteen
+
+`economy.gd` owns `hosted_offer`, `invite_hosted`, `serve_hosted`, `hosted_tick`
+and `auto_hosted`. Sponsored orders share pending/stock/service and owner-relief
+checks. `street.advance` settles fractional hosting completions; only real service
+settles receipts. `hosted_fields` supplies defaults; old guests get interest -1.
+Schema 15 preserves `host_deadline`/`host_buzz_until` fractions and validates
+unique active pairings and dedicated receipt counters.
+
+Good Company and Service share model offers. City draws POUR/CHEERS from actual
+activity and keeps the host on the floor. `hosted_drinks_check.gd` covers payment,
+stock, matching, saved quotes, limits, cooldowns, timeouts, Buzz, automation,
+offline exclusion, migration and visible controls. Preview with `hosted-*` in
+the economy runner. Forecasts remain ordinary-trade estimates.

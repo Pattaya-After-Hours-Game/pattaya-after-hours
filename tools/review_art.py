@@ -36,7 +36,7 @@ for name,spec in json.loads((ROOT/'art/packing.json').read_text()).items():
     if name.startswith('patrons'): continue
     # A filmstrip is also produced; timing in the engine remains authoritative.
     if name.startswith('fight-'): states={'walk':[1,2],'attack':[0,5,6,5,0,5,7,5,0,5,8,5,0]}
-    elif name in ['bee','may','june','lek','fah','nan']: states={'dance':[2,3],'walk':[4,5]}
+    elif name in ['bee','may','june','lek','fah','nan','daisy']: states={'dance':[2,3],'walk':[4,5]}
     elif name=='monster': states={'encounter':[0,1,2,1,2,3]}
     else: states={'walk':[1,2],'service':[0,3,0]}
     for state,indices in states.items():

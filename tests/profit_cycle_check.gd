@@ -151,7 +151,7 @@ func run(test: SceneTree) -> void:
 	b.erase("completed")
 	m.save_game()
 	loaded = Campaign.new(4)
-	test.check(loaded.load_game() and loaded.s.version==14 and loaded.s.cash==m.s.cash,"Schema-twelve campaign migrates with no cash or inventory gift")
+	test.check(loaded.load_game() and loaded.s.version==15 and loaded.s.cash==m.s.cash,"Schema-twelve campaign migrates with no cash or inventory gift")
 	var old: Dictionary = loaded.street.selected().customers[0]
 	test.check(old.visit_phase=="legacy" and old.next==35 and old.drinks==1 and old.budget==g.budget and old.quoted==g.quoted,"Legacy visit retains quote, budget, drink and departure commitments")
 	for audience in 3:

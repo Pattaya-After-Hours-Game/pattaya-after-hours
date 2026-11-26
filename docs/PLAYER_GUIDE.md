@@ -33,6 +33,17 @@ do not earn her bonus. Existing matched-drink bonuses still apply. Gabby keeps
 her identity and training through expiry and renewal; renew her at her assigned
 venue. There is one Gabby across the street, and she works as a bartender.
 
+## Hire Daisy
+
+At a **Hostess bar**, open **Service → Team & Payroll → Hire Daisy · ฿4,500**.
+Daisy is a separate adult entertainer with a ten-day host contract, normal host
+wages and one floor position. Keep the next shift's payroll after hiring.
+She attracts visitors and uses the existing host training and booking controls;
+she does not pour drinks or earn Gabby's service bonus. Her rota, expiry and
+bookings control whether she appears in the room. Only one Daisy can be hired
+across the street. Renew her existing slot with **Rehire Daisy · ฿4,500**;
+her training and any pending return time remain intact.
+
 ## Find the next useful step
 
 At the top of **Service**, **Anong's Next Step** shows the current story objective,
@@ -367,7 +378,31 @@ At Hostess bars and gogos, role reassignment changes service and payroll. Switch
 a bartender to a host/dancer charges the contract-price difference for the
 remaining term, keeping training and requiring the next shift’s reserve. Switching
 back does not refund it.
-At a Hostess bar, the **BAR FINES** card in the room shows each host's availability.
+The **Good Company** card lets hosts earn from guests who want conversation,
+music or pool. An interested guest who has bought a first drink can sponsor one
+hosted round per visit. **Match** means she shares the guest's favourite topic,
+adding **฿40** to the quoted price. Base prices are **฿180/220/260** at host levels
+1/2/3, so May and Fah benefit from training without changing their preferences.
+
+Choose **Host round / Match**, then use the normal **Serve** button or let a
+bartender pour one stocked house lager. No service means no sale. The order waits
+at most thirty seconds; once served, the host spends twenty seconds with the
+guest while keeping her appeal. **POUR** and **CHEERS** markers show the activity.
+Host and guest cannot take a barfine booking during that round.
+
+Three finished rounds fill the **Room Buzz** meter for thirty seconds of **+2
+appeal**. It attracts a larger share of existing street traffic, not guaranteed
+new customers. There is no extra cash reward. Interrupted company and unserved
+orders do not fill the meter. The guest's personal drink plan is unchanged.
+
+**Auto-host rounds · ฿1,500** finds matches automatically. It gives hosted-drinks-only
+colleagues first choice in a tie, and has an on/off toggle in Service. If automatic
+barfines are also on, eligible bookings run first. Someone must still serve every
+drink. Hosted drinks spend the same finite entertainment budget as barfines;
+a smaller round can leave a guest unable to afford a booking. Ordinary-trade
+forecasts exclude these additional live rounds and temporary Buzz.
+
+At a Hostess bar, the **Good Company** card in the room shows each host's availability.
 Tap **Accept · ฿500** for an affordable request from a real customer. The fee goes
 to the till once; the host leaves for **30 foreground seconds**, and her appeal
 is removed until she returns. The card shows the countdown. Up to one/two/three
@@ -557,7 +592,8 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Current schema 14 also retains host training, auto-accept and fractional booking
+Current schema 15 retains sponsored orders, paid rounds, guest interests and Buzz.
+Schema 14 also retains host training, auto-accept and fractional booking
 return deadlines. Schema 13 visit plans/phases, beer-bar tiers and personal
 training are preserved. Existing visitors finish their old saved visit rules; new arrivals use
 the new plans. Older campaigns receive no free upgrades or refunds; existing

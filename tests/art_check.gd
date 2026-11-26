@@ -51,7 +51,7 @@ func run(test: SceneTree) -> void:
 				test.check(Art.venue(kind,stage,has_fan,false).get_image().get_data()==plain.get_data(),"Switching properties cannot leak purchased TV artwork to another room")
 	for id in ["district","toybox","counter","event-inspection","compact-bench"]:
 		test.check(Art.texture(id) != null,"Scene/prop artwork exists: "+id)
-	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid","nida","gabby"]:
+	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid","nida","gabby","daisy"]:
 		var tex := Art.texture("portrait-"+id)
 		test.check(tex != null,"Portrait exists: "+id)
 		if tex: test.check(tex.get_size()==Vector2(96,96),"Portrait dimensions: "+id)

@@ -36,7 +36,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	elif not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("barfine-") or name_text.begins_with("lease-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("hosted-") or name_text.begins_with("barfine-") or name_text.begins_with("lease-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 			if name_text=="gabby-hire": app.scroll.scroll_vertical = maxi(0,app.scroll.scroll_vertical-100)
 		await process_frame
@@ -80,6 +80,33 @@ func run() -> void:
 	await capture(app,"lease-retirement-offer","Lease Hostess bar")
 	app.change_tab(0)
 
+	var hosted_fixtures = load("res://tests/hosted_drinks_check.gd").new()
+	var company_fixtures = load("res://tests/bar_fine_check.gd").new()
+	app.model = company_fixtures.fixture(3)
+	app.drawer_open = false
+	app.show_tutorial_hint = false
+	var toast_guest: Dictionary = hosted_fixtures.guest(app.model)
+	await capture(app,"hosted-match")
+	app.model.street.action("host_drink",1)
+	await capture(app,"hosted-waiting")
+	app.model.street.action("serve")
+	await capture(app,"hosted-cheers")
+	app.model.street.advance(20)
+	for i in [0,2]:
+		hosted_fixtures.guest(app.model,app.StreetContent.HOST_TOPICS[int(app.model.street.selected().team[i].host)])
+		app.model.street.action("host_drink",i)
+		app.model.street.economy.serve(app.model.street.selected())
+	app.model.street.advance(20)
+	await capture(app,"hosted-buzz")
+	app.drawer_open = true
+	await capture(app,"hosted-service","GOOD COMPANY")
+	app.model.street.action("train_host",1)
+	app.model.street.action("auto_host_drinks")
+	await capture(app,"hosted-upgraded","GOOD COMPANY")
+	app.drawer_open = false
+	app.model.street.selected().open = false
+	await capture(app,"hosted-closed")
+	app.model = Campaign.new(72)
 	var barfine_fixtures = load("res://tests/bar_fine_check.gd").new()
 	app.model = barfine_fixtures.fixture()
 	app.show_tutorial_hint = false

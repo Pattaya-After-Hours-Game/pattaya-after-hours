@@ -103,6 +103,14 @@
     ],
     "sha256": "9b29fba9d5b58345d61bf3d28d715c16583e359555b8342bad42461bcf2463be"
   },
+  "daisy": {
+    "file": "res://assets/art/daisy.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "154fe70710e96d3867b8bb893fabedcc35030ee11d6ffbc9d719b31c2a08bf73"
+  },
   "dao": {
     "file": "res://assets/art/dao.png",
     "size": [
@@ -462,6 +470,14 @@
       96
     ],
     "sha256": "fb73d6c2a017c799ceefffa77cd8b7f0bb78ff9c0fa0d80c6409069d84f3e8c1"
+  },
+  "portrait-daisy": {
+    "file": "res://assets/art/portrait-daisy.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "0b4d25721a401f0cda8e7beccdff499b998e56aab0d4c44e80155edd574e17f2"
   },
   "portrait-dao": {
     "file": "res://assets/art/portrait-dao.png",

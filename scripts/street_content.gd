@@ -54,8 +54,10 @@ const HOSTS = [
 	["June", "Saving for a cafe; accepts bar-fine requests", true],
 	["Lek", "Experienced host; accepts bar-fine requests", true],
 	["Fah", "Runs the music; prefers hosted drinks", false],
-	["Nan", "Wants predictable hours; accepts bar-fine requests", true]
+	["Nan", "Wants predictable hours; accepts bar-fine requests", true],
+	["Daisy", "Adult entertainer; quick wit, red bikini and a strict finish time. Accepts bar-fine requests", true]
 ]
+const DAISY_HOST = 6
 
 # Host development changes future booking quotes, never an already-paid booking.
 const BAR_FINE_SECONDS = 30
@@ -63,6 +65,17 @@ const BAR_FINE_FEES = [500,750,1000]
 const HOST_APPEAL = [0.6,1.2,1.8]
 const HOST_TRAINING_PRICES = [1500,3000]
 const AUTO_BAR_FINE_COST = 3000
+const HOST_DRINK_PRICES = [180,220,260]
+const HOST_DRINK_MATCH_BONUS = 40
+const HOST_DRINK_SECONDS = 20
+const HOST_DRINK_WAIT = 30
+const AUTO_HOST_DRINK_COST = 1500
+const HOST_TOPICS = [0,0,2,2,1,1,0] # Bee/May/Daisy: chat; June/Lek: pool; Fah/Nan: music.
+const HOST_TOPIC_NAMES = ["Chat", "Music", "Pool"]
+const HOST_DRINK_CHANCE = [40,60,80]
+const HOST_BUZZ_SECONDS = 30
+const HOST_BUZZ_APPEAL = 2.0
+const HOST_ROUND_LINES = ["The guest laughs at the same story twice.", "The table has chosen its next karaoke anthem.", "The pool argument ends with a toast."]
 
 # Game minutes advance once per foreground second. Economy timers use real seconds.
 const OPEN_MINUTE = 12 * 60

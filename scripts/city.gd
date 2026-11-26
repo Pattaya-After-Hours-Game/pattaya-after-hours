@@ -84,6 +84,10 @@ func _draw() -> void:
 			var mask := order_position(person)+Vector2(0,19)
 			draw_rect(Rect2(mask-Vector2(7,2),Vector2(14,5)),Color("#71975b"))
 			for x in [-4,3]: draw_rect(Rect2(mask+Vector2(x,0),Vector2(2,2)),INK)
+		if person.get("hosted_state","")!="":
+			var marker := order_position(person)+Vector2(0,-8)
+			draw_style_box(_sign_box(),Rect2(marker-Vector2(23,14),Vector2(46,20)))
+			draw_string(font,marker+Vector2(-19,0),"POUR" if person.hosted_state=="waiting" else "CHEERS",HORIZONTAL_ALIGNMENT_LEFT,44,10,GOLD if person.hosted_state=="waiting" else TEAL)
 		if person.order:
 			var marker := order_position(person)
 			draw_circle(marker,6,INK)
@@ -261,6 +265,12 @@ func scene_people(bar: Dictionary) -> Array:
 				state = "walk"
 				flip = cycle>=2
 		people.append({"who":who,"pose":Art.animation_frame(who,state,clock+i,2),"foot":foot,"flip":flip,"order":false,"customer":false,"behind_bar":role==0})
+		for round in bar.get("host_rounds",[]):
+			if int(round.host)==i:
+				people.back().foot.x = 565+((floor_index-1)%3)*66
+				people.back().hosted_state = str(round.state)
+				people.back().pose = Art.animation_frame(who,"idle",clock,2)
+
 	var crowd: int = bar.customers.size() if bar.has("customers") else mini(8,guests)
 	for i in crowd:
 		# Fill spaced positions first; busy venues add staggered rows. All slots

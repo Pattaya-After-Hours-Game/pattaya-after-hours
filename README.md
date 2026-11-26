@@ -92,6 +92,24 @@ cash for the next shift—not just a large bank balance.
 Tap **Stock** or **Restock fridge** to compare popularity with profit per sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
 Mango cocktails.
 
+## Good company earns its keep
+
+Hostess-bar guests can buy a host a drink after their first round. The **Good
+Company** card shows their interest: **chat, music or pool**. Match it to a host's
+speciality for **฿40 more**. Hosted drinks start at **฿180**, rising to ฿220/260
+with host training. The normal **Serve** button or a bartender must pour one
+real house lager before money changes hands.
+
+Hosts keep their appeal during twenty seconds of company. Three finished rounds
+fill **Room Buzz**, adding +2 appeal for thirty seconds. **Auto-host rounds** costs
+฿1,500; it finds matches while the same bartenders still handle service. May and
+Fah now earn directly through hosted drinks while keeping their booking preferences.
+
+Each guest can sponsor only one round, using the same finite entertainment budget
+as barfines. More company earns drink margins and keeps the room lively; accepting
+a barfine pays more immediately and takes the host away. Busy service can miss
+both opportunities. Neither hosted rounds nor Buzz produce offline payouts.
+
 ## Host bookings without the hunt through menus
 
 Hostess bars show a **BAR FINES** card in the room. Accept a real customer's
@@ -226,7 +244,9 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 14.
+retain money, staff, venues and owned stages when migrated to save schema 15.
+Schema 15 retains sponsored orders, paid rounds and Room Buzz. Old visitors keep
+their budgets and plans and receive no new hosted-drink invitation.
 Schema 14 saves host training, auto-accept and thirty-second booking deadlines.
 Existing paid bookings retain their old shift return without another fee.
 Schema 13 retains individual visit plans and expanded beer-bar tiers. Existing
@@ -308,6 +328,11 @@ The streets, businesses, characters, artwork, and arcade moves are original fict
 Gabby is available in **Service → Team & Payroll → Hire Gabby**. Her ฿1,200
 ten-day bartender contract uses a normal team slot. Each drink she actually
 serves adds ฿5 to the nightly tip jar, alongside existing visit and drink bonuses.
+
+Daisy is a separate fictional adult entertainer in a red bikini, available at
+Hostess bars through **Service → Team & Payroll → Hire Daisy · ฿4,500**.
+Her ten-day contract uses a normal host slot, wages, training and availability.
+She attracts visitors; bartenders serve their orders.
 
 ## Staff contracts and waiting-order alerts
 

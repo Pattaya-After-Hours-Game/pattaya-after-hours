@@ -37,11 +37,12 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		bar.commission_carry = 0
 		for customer in bar.customers:
 			customer.merge(customer_action_fields())
+			customer.merge({"host_interest":-1,"hosted":false})
 			customer.commission_visit = false
 			customer.commission_order = false
 			customer.merge(visit_fields(),int(s.get("version",1))<13)
 		for report in [bar.shift,bar.last_shift]+bar.recent:
-			if not report.is_empty(): report.merge({"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"drink_requests":{},"drink_misses":{},"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.LEGACY_STOCK_COST,"manager_income":0})
+			if not report.is_empty(): report.merge({"hosted_drinks":0,"hosted_income":0,"hosted_matches":0,"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"drink_requests":{},"drink_misses":{},"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.LEGACY_STOCK_COST,"manager_income":0})
 		for table in bar.games.size():
 			if not bar.games[table].has("table"): bar.games[table].table = table
 		if migrated:
@@ -106,6 +107,8 @@ func clear_visits(bar: Dictionary) -> void:
 	bar.customers.clear()
 	bar.games.clear()
 	bar.host_requests.clear()
+	bar.get("host_rounds",[]).clear()
+	bar.host_buzz_until = 0.0
 
 func close_customers(bar: Dictionary) -> void:
 	clear_visits(bar)
@@ -144,6 +147,7 @@ static func new_fields() -> Dictionary:
 		"welcome":0,"welcome_until":0.0,"welcome_ready":0.0,"serve_ready":0.0,"service_clock":0,"cost_credit":0,
 		"completed":0,"club_level":0,"regulars":0,"happy":0,"healthy":0,"shift":ledger(),"last_shift":{},"recent":[],"recent_sales":[],"recent_orders":[],
 		"pool_games":0,"pool_income":0,"free_games":0,"arrivals":0,"orders":0,"sold":0,"lost_full":0,"lost_service":0,"lost_stock":0,"host_requests":[],"drink_stock":{}}
+	fields.merge(hosted_fields())
 	fields.merge(bar_fine_fields())
 	fields.merge(tip_fields())
 	fields.merge(automation_fields())
@@ -151,6 +155,9 @@ static func new_fields() -> Dictionary:
 	fields.merge(clock_fields())
 	fields.merge(action_fields())
 	return fields
+
+static func hosted_fields() -> Dictionary:
+	return {"host_rounds":[],"host_cheers":0,"host_buzz_until":0.0,"host_last_line":"","auto_host_drinks":false,"auto_host_drinks_on":true}
 
 static func bar_fine_fields() -> Dictionary:
 	return {"auto_bar_fine":false,"auto_bar_fine_on":true}
@@ -243,6 +250,8 @@ func owner_relief_needed(bar: Dictionary) -> bool:
 		var person: Dictionary = bar.team[i]
 		if contracted(person) and person.on and person.role==0 and not i in bar.away:
 			next = minf(next,maxf(0.0,float(person.get("service_ready",0))-action_time()))
+	for round in bar.get("host_rounds",[]):
+		if round.state=="waiting" and float(round.host_deadline)-action_time()<=C.AUTO_SERVE_URGENT_SECONDS and next>=float(round.host_deadline)-action_time(): return true
 	for guest in bar.customers:
 		if guest.order and order_seconds_left(bar,guest)<=C.AUTO_SERVE_URGENT_SECONDS and next>=order_seconds_left(bar,guest): return true
 	return false
@@ -336,6 +345,12 @@ func gabby_venue() -> String:
 			if person.get("identity","")=="gabby": return str(venue.name)
 	return ""
 
+func daisy_venue() -> String:
+	for venue in s.street.bars:
+		for person in venue.team:
+			if person.role==1 and int(person.host)==C.DAISY_HOST: return str(venue.name)
+	return ""
+
 func role_change_fee(bar: Dictionary, index: int) -> int:
 	var person: Dictionary = bar.team[index]
 	var next_role := int(bar.type) if person.role==0 else 0
@@ -373,7 +388,7 @@ func stock_offer(bar: Dictionary, automatic: bool = false, drink: int = 0) -> Di
 	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"quantity":pack_quantity(bar),"room":room,"remaining_cash":int(s.cash)-amount}
 
 static func ledger() -> Dictionary:
-	return {"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"revenue":0,"stock_cost":0,"drink_requests":{},"drink_misses":{},"operating":0,"promo_cost":0,"fines":0,"commission":0,"consumed_stock":0,"manager_income":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}
+	return {"hosted_drinks":0,"hosted_income":0,"hosted_matches":0,"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"revenue":0,"stock_cost":0,"drink_requests":{},"drink_misses":{},"operating":0,"promo_cost":0,"fines":0,"commission":0,"consumed_stock":0,"manager_income":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}
 
 func roll(limit: int) -> int:
 	s.street.economy_seed = (int(s.street.economy_seed)*48271) % 2147483647
@@ -653,6 +668,7 @@ func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minu
 			value += (.9+performance)*C.DANCER_TRAINING[int(person.get("audience_training",0))]
 	value += maxf(0.0 if offline else int(bar.welcome)*.4,promoter_bonus(bar,offset))
 	if not offline:
+		if float(bar.get("host_buzz_until",0))>action_time(): value += C.HOST_BUZZ_APPEAL
 		if celebrating(bar): value += C.CELEBRATION_ATTRACTION
 		if not bar.promo.is_empty(): value += float(C.PROMOTIONS[int(bar.promo.kind)].boost)/int(bar.promo.repetition)
 		if event_id() == 6: value *= .95 if bar.type == 0 else .55
@@ -782,6 +798,8 @@ func pending(bar: Dictionary) -> int:
 	var count := 0
 	for customer in bar.customers:
 		if customer.order: count += 1
+	for round in bar.get("host_rounds",[]):
+		if round.state=="waiting": count += 1
 	return count
 
 func cost(bar: Dictionary, amount: int, category: String) -> bool:
@@ -890,6 +908,11 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 		"audience":audience,"fine_budget":600*int(bar.stage) if audience==2 else 0,"budget":int(C.TYPES[int(bar.type)].drink)*2+100,"taste_roll":roll(100),"pool":roll(100)<(85 if bar.promo.get("kind",-1) in [0,2] else 40),
 		"pool_wait":0,"played":false,"playing":false,"missed":false,"opening":opening,"promo":int(bar.promo.get("id",0)) if promoted else 0}
 	customer.merge(customer_action_fields())
+	customer.hosted = false
+	customer.host_interest = -1
+	if bar.type==1 and posmod(hash(Vector2i(int(customer.id),-81)),100)<C.HOST_DRINK_CHANCE[audience]:
+		customer.host_interest = posmod(hash(Vector2i(int(customer.id),-83)),3)
+		if audience!=2: customer.fine_budget = 340 if audience==0 else 380
 	customer.club = posmod(hash(Vector2i(int(customer.id),-31)),100)<C.CLUB_CHANCE[int(bar.club_level)]
 	customer.merge(visit_fields())
 	# Stable per-visitor choice leaves shared arrival RNG alone. Opening rush stays forgiving.
@@ -929,6 +952,9 @@ func stock_waiting(bar: Dictionary, drink: int = -1) -> int:
 	var total := 0
 	for customer in bar.customers:
 		if customer.order and (drink<0 or customer.drink==drink) and serving_choice(bar,customer)<0: total += 1
+	if drink in [-1,0] and not can_supply(bar,0):
+		for round in bar.get("host_rounds",[]):
+			if round.state=="waiting": total += 1
 	return total
 
 # A single sellable order keeps Serve available, including accepted substitutes.
@@ -938,6 +964,10 @@ func blocking_drink(bar: Dictionary) -> int:
 		if not customer.order: continue
 		if serving_choice(bar,customer)>=0: return -1
 		if first<0: first = int(customer.get("drink",0))
+	for round in bar.get("host_rounds",[]):
+		if round.state=="waiting":
+			if can_supply(bar,0): return -1
+			if first<0: first = 0
 	return first
 
 func record_stock_miss(bar: Dictionary, drink: int) -> void:
@@ -945,10 +975,15 @@ func record_stock_miss(bar: Dictionary, drink: int) -> void:
 	bar.shift.drink_misses[key] = int(bar.shift.drink_misses.get(key,0))+1
 
 func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
-	if not is_trading(bar): return 0
+	if count<=0 or not is_trading(bar): return 0
 	if manual and not action_status(bar,"serve").enabled: return 0
 	if manual: count = 1
 	var sold := 0
+	# An urgent sponsored order shares the same service slot as ordinary orders.
+	for round in bar.get("host_rounds",[]):
+		if round.state=="waiting" and float(round.host_deadline)-action_time()<=10:
+			sold = serve_hosted(bar,manual)
+			break
 	for customer in bar.customers:
 		if sold >= count: break
 		if not customer.order: continue
@@ -1004,6 +1039,9 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 		if manual:
 			last_sale = "%s sold · ฿%d margin%s" % [C.DRINKS[drink].name,quote-consumed-commission," · substitute" if substituted else ""]
 			if tip_bonus>0: last_sale += " · +฿%d tip" % tip_bonus
+	while sold<count:
+		if serve_hosted(bar,manual)==0: break
+		sold += 1
 	if manual and sold > 0: start_cooldown(bar,"serve",action_cooldown(bar,"serve"))
 	return sold
 
@@ -1099,6 +1137,8 @@ func depart(bar: Dictionary, customer: Dictionary) -> void:
 			s.regulars += 1
 			var report := promotion_record(bar,int(customer.promo))
 			if not report.is_empty(): report.regulars += 1
+	for round in bar.get("host_rounds",[]).duplicate():
+		if int(round.guest)==int(customer.id): bar.host_rounds.erase(round)
 	bar.host_requests.erase(int(customer.id))
 	bar.customers.erase(customer)
 
@@ -1324,9 +1364,10 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			return "Rota updated. Nida earns no commission or hourly wages." if bar.team[index].role==3 else "Rota updated. Off-duty staff do not incur wages."
 		"role":
 			if bar.type==0 or index<0 or index>=bar.team.size(): return "Choose a team member at a Hostess bar or gogo."
-			if index in bar.away: return "Wait until this team member returns."
+			if index in bar.away or not hosted_round(bar,index).is_empty(): return "Wait until this team member returns or finishes hosting."
 			var person: Dictionary = bar.team[index]
 			if person.get("identity","")=="gabby": return "Gabby works as a bartender."
+			if person.role==1 and int(person.host)==C.DAISY_HOST: return "Daisy works as a Hostess bar entertainer."
 			if not contracted(person): return "Rehire this team member first."
 			if person.role==3: return "Promoters have their own frontage contract and cannot change role."
 			var fee := role_change_fee(bar,index)
@@ -1339,6 +1380,15 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			person.role = int(bar.type) if person.role==0 else 0
 			person.host = free_host(bar) if person.role==1 else -1
 			return "Role changed to %s. Contract adjustment ฿%d; remaining term and training retained." % [C.ROLE_NAMES[int(person.role)],fee]
+		"hire_daisy":
+			if bar.type!=1: return "Daisy works in Hostess bars."
+			var venue := daisy_venue()
+			if not venue.is_empty(): return "Daisy already has a roster place at %s. Renew her existing contract there." % venue
+			var before: int = bar.team.size()
+			var result := action(bar,"hire",1)
+			if bar.team.size()==before: return result
+			bar.team.back().host = C.DAISY_HOST
+			return "Daisy hired for ten days (฿4,500). She attracts visitors; bartenders serve their orders."
 		"hire_gabby":
 			var venue := gabby_venue()
 			if not venue.is_empty(): return "Gabby already has a roster place at %s. Renew her existing contract there." % venue
@@ -1408,6 +1458,19 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			bar.auto_bar_fine = true
 			bar.auto_bar_fine_on = true
 			return "Auto-accept installed. Willing, available hosts accept affordable requests on live ticks."
+		"host_drink":
+			return invite_hosted(bar,index)
+		"auto_host_drinks":
+			if bar.get("auto_host_drinks",false):
+				bar.auto_host_drinks_on = not bar.auto_host_drinks_on
+				return "Auto-host rounds " + ("on." if bar.auto_host_drinks_on else "off.")
+			var offer := auto_hosted_offer(bar)
+			if not offer.enabled: return offer.reason
+			s.cash -= offer.price
+			s.weekly.costs += offer.price
+			bar.auto_host_drinks = true
+			bar.auto_host_drinks_on = true
+			return "Auto-host rounds installed. Hosts find guests; bartenders still pour."
 		"bar_fine":
 			return accept_bar_fine(bar,index)
 	return ""
@@ -1450,7 +1513,7 @@ func bar_fine_offer(bar: Dictionary, index: int) -> Dictionary:
 	# Inspect real, still-present customers without consuming requests or RNG.
 	for id in bar.host_requests:
 		for customer in bar.customers:
-			if int(customer.id)==int(id) and customer.fine_budget>=fee:
+			if int(customer.id)==int(id) and customer.fine_budget>=fee and not hosted_guest_busy(bar,int(id)):
 				request = int(id)
 				break
 		if request>=0: break
@@ -1460,6 +1523,7 @@ func bar_fine_offer(bar: Dictionary, index: int) -> Dictionary:
 	var reason := ""
 	if bar.type!=1 or person.get("role",-1)!=1: reason = "Choose an adult Soi host."
 	elif not C.HOSTS[int(person.host)][2]: reason = "Declines bookings · hosted drinks only"
+	elif not hosted_round(bar,index).is_empty(): reason = "Finishing a hosted round"
 	elif remaining>0: reason = "Away · back in %ds" % ceili(remaining)
 	elif not contracted(person): reason = "Contract finished"
 	elif not person.on: reason = "Off duty"
@@ -1548,7 +1612,9 @@ func settle_shift(bar: Dictionary) -> void:
 
 func tick() -> void:
 	s.street.elapsed += 1
-	for bar in s.street.bars: return_hosts(bar)
+	for bar in s.street.bars:
+		return_hosts(bar)
+		hosted_tick(bar)
 	# Create a bounded supply of potential visitors shared by every property.
 	s.street.pass_credit += roundi(traffic_rate()*1000)
 	while s.street.pass_credit>=int(s.street.next_group)*60000:
@@ -1628,13 +1694,14 @@ func tick() -> void:
 					var pool_report := promotion_record(bar,int(customer.promo))
 					if not pool_report.is_empty(): pool_report.lost += 1
 			var pool_waiting: bool = customer.pool and not customer.played and bar.equipment.pool>0 and customer.pool_wait<C.POOL_PATIENCE and customer.budget>=25
-			if not customer.playing and (((legacy or customer.missed) and customer.life<=0) or (not legacy and customer.visit_phase=="finished" and not pool_waiting)): depart(bar,customer)
+			if not customer.playing and not hosted_guest_busy(bar,int(customer.id)) and (((legacy or customer.missed) and customer.life<=0) or (not legacy and customer.visit_phase=="finished" and not pool_waiting)): depart(bar,customer)
 		if bar.restock and bar.drink_stock.is_empty() and bar.stock<pack_quantity(bar) and pending(bar)>0: restock(bar,true)
 		staff_service(bar)
 		if local_event(bar,C.Local.ENCORE) and s.street.event.prepared and int(s.street.event.remaining)%8==0:
 			serve(bar)
 		if automatic_service(bar) and owner_relief_needed(bar): serve(bar,1,true)
 		auto_bar_fines(bar)
+		auto_hosted(bar)
 		pool_tick(bar)
 
 func offline_drink(bar: Dictionary, mix: Array, sample: int) -> int:
@@ -1834,3 +1901,145 @@ func contract_windows(start: int, duration: int) -> Array:
 			windows.append({"minute":(start+cursor)%C.DAY_MINUTES,"seconds":expiry-cursor,"offset":cursor})
 			cursor = expiry
 	return windows
+
+# Sponsored rounds are real orders, paid from the guest's entertainment budget.
+# They share stock and service with the rest of the bar, never create a visitor.
+func hosted_round(bar: Dictionary, index: int) -> Dictionary:
+	for round in bar.get("host_rounds",[]):
+		if int(round.host)==index: return round
+	return {}
+
+func hosted_guest_busy(bar: Dictionary, guest: int) -> bool:
+	for round in bar.get("host_rounds",[]):
+		if int(round.guest)==guest: return true
+	return false
+
+func hosted_guest(bar: Dictionary, id: int) -> Dictionary:
+	for guest in bar.customers:
+		if int(guest.id)==id: return guest
+	return {}
+
+static func hosted_price(person: Dictionary) -> int:
+	return C.HOST_DRINK_PRICES[int(person.get("host_training",0))]
+
+func hosted_offer(bar: Dictionary, index: int) -> Dictionary:
+	var person: Dictionary = bar.team[index] if index>=0 and index<bar.team.size() else {}
+	var round := hosted_round(bar,index)
+	var candidate: Dictionary = {}
+	var matched := false
+	var price := int(round.quote) if not round.is_empty() else hosted_price(person)
+	if not round.is_empty(): matched = bool(round.matched)
+	var reason := ""
+	if bar.type!=1 or person.get("role",-1)!=1: reason = "Choose an adult host."
+	elif not contracted(person): reason = "Contract finished"
+	elif not person.on: reason = "Off duty"
+	elif index in bar.away: reason = "Away on a booking"
+	elif not is_trading(bar): reason = "Venue closed"
+	elif not round.is_empty(): reason = "%s · %ds" % ["Pour the host's drink" if round.state=="waiting" else "Good company",ceili(maxf(0,float(round.host_deadline)-action_time()))]
+	else:
+		for guest in bar.customers:
+			if guest.get("host_interest",-1)<0 or guest.get("hosted",false) or guest.drinks<1 or guest.missed or hosted_guest_busy(bar,int(guest.id)): continue
+			if guest.get("visit_phase","") in ["legacy","finished"]: continue
+			var match_topic: bool = int(guest.host_interest)==int(C.HOST_TOPICS[int(person.host)])
+			var quote := hosted_price(person)+(C.HOST_DRINK_MATCH_BONUS if match_topic else 0)
+			if guest.fine_budget<quote: continue
+			if candidate.is_empty() or (match_topic and not matched):
+				candidate = guest
+				matched = match_topic
+				price = quote
+		if candidate.is_empty(): reason = "No hosted-drink request"
+	return {"enabled":reason.is_empty(),"reason":reason,"price":price,"guest":int(candidate.get("id",-1)),"matched":matched,"topic":int(candidate.get("host_interest",-1)),"busy":not round.is_empty()}
+
+func invite_hosted(bar: Dictionary, index: int) -> String:
+	var offer := hosted_offer(bar,index)
+	if not offer.enabled: return offer.reason
+	var guest := hosted_guest(bar,int(offer.guest))
+	guest.hosted = true
+	bar.host_rounds.append({"host":index,"guest":int(guest.id),"quote":int(offer.price),"matched":bool(offer.matched),"state":"waiting","host_deadline":action_time()+C.HOST_DRINK_WAIT})
+	bar.orders += 1
+	bar.shift.orders += 1
+	s.street.orders += 1
+	bar.recent_orders.append(int(s.street.elapsed))
+	return "%s joins guest %d. Pour her drink to earn ฿%d%s." % [C.HOSTS[int(bar.team[index].host)][0],guest.id,offer.price," · perfect topic match" if offer.matched else ""]
+
+func serve_hosted(bar: Dictionary, manual: bool = false) -> int:
+	if not is_trading(bar): return 0
+	for round in bar.get("host_rounds",[]):
+		if round.state!="waiting" or float(round.host_deadline)<=action_time(): continue
+		var person: Dictionary = bar.team[int(round.host)]
+		var guest := hosted_guest(bar,int(round.guest))
+		if guest.is_empty() or guest.fine_budget<int(round.quote) or not contracted(person) or not person.on or int(round.host) in bar.away: continue
+		if not can_supply(bar,0): continue
+		if stock_of(bar,0)<pack_quantity(bar) and auto_drink(bar,0): restock(bar,true,0)
+		if stock_of(bar,0)<=0: continue
+		var quote := int(round.quote)
+		income(bar,quote)
+		guest.fine_budget -= quote
+		if int(bar.get("consignment",0))>0:
+			cost(bar,C.CONSIGNMENT_COST,"stock_cost")
+			bar.consignment -= 1
+		var consumed := consume_stock(bar,0)
+		bar.shift.consumed_stock += consumed
+		bar.shift.hosted_drinks += 1
+		bar.shift.hosted_income += quote
+		if round.matched: bar.shift.hosted_matches += 1
+		bar.sold += 1
+		bar.shift.sales += 1
+		s.street.served += 1
+		bar.recent_sales.append(int(s.street.elapsed))
+		bar.dirt = mini(C.DIRT_LIMIT,int(bar.dirt)+(C.PEAK_DIRT_PER_DRINK if peak(int(bar.type),int(s.street.minute)) else 1))
+		party_add(bar,"sales")
+		party_add(bar,"drink_income",quote)
+		party_add(bar,"drink_cost",consumed)
+		round.state = "drinking"
+		round.host_deadline = action_time()+C.HOST_DRINK_SECONDS
+		bar.host_last_line = "%s · ฿%d%s" % [C.HOSTS[int(person.host)][0],quote," · topic matched!" if round.matched else " · cheers!"]
+		if manual: last_sale = "%s · ฿%d margin" % [bar.host_last_line,quote-consumed]
+		return 1
+	return 0
+
+func hosted_tick(bar: Dictionary) -> void:
+	for round in bar.get("host_rounds",[]).duplicate():
+		var guest := hosted_guest(bar,int(round.guest))
+		var person: Dictionary = bar.team[int(round.host)]
+		var valid: bool = not guest.is_empty() and is_trading(bar) and contracted(person) and person.on and not int(round.host) in bar.away
+		if not valid:
+			bar.host_rounds.erase(round)
+			continue
+		if float(round.host_deadline)>action_time(): continue
+		if round.state=="drinking":
+			bar.host_cheers += 1
+			bar.host_last_line = C.HOST_ROUND_LINES[int(C.HOST_TOPICS[int(person.host)])]
+			if bar.host_cheers>=3:
+				bar.host_cheers = 0
+				bar.host_buzz_until = action_time()+C.HOST_BUZZ_SECONDS
+				bar.host_last_line = "Room Buzz! The next table wants in. +2 appeal for 30s."
+		else:
+			bar.host_last_line = "The toast waited too long. Serve the next round before it goes flat."
+			var lost := "lost_stock" if not can_supply(bar,0) else "lost_service"
+			bar[lost] += 1
+			bar.shift[lost] += 1
+		bar.host_rounds.erase(round)
+
+func auto_hosted_offer(bar: Dictionary) -> Dictionary:
+	var reason := ""
+	if bar.type!=1: reason = "Hosted rounds belong to hostess bars."
+	elif bar.get("auto_host_drinks",false): reason = "Already installed."
+	elif on_duty(bar,1)==0: reason = "Put a contracted host on duty first."
+	elif s.cash<C.AUTO_HOST_DRINK_COST+operating_rate(bar)*2: reason = "Keep the next shift's operating reserve."
+	return {"enabled":reason.is_empty(),"reason":reason,"price":C.AUTO_HOST_DRINK_COST}
+
+func auto_hosted(bar: Dictionary) -> void:
+	if not bar.get("auto_host_drinks",false) or not bar.get("auto_host_drinks_on",true) or not is_trading(bar): return
+	# Prefer matches; give hosted-drinks-only colleagues first choice in a tie.
+	for matched_only in [true,false]:
+		for drinks_only in [true,false]:
+			for i in bar.team.size():
+				var person: Dictionary = bar.team[i]
+				if person.role!=1 or bool(C.HOSTS[int(person.host)][2])==drinks_only: continue
+				var offer := hosted_offer(bar,i)
+				if offer.enabled and (not matched_only or offer.matched): invite_hosted(bar,i)
+
+func hosted_buzz_text(bar: Dictionary) -> String:
+	var left := maxf(0,float(bar.get("host_buzz_until",0))-action_time())
+	return "ROOM BUZZ · +2 appeal · %ds" % ceili(left) if left>0 and is_trading(bar) else "Room Buzz · %d/3 rounds finished" % int(bar.get("host_cheers",0))

@@ -76,6 +76,12 @@ for i in range(4):
     x,y=i%2,i//2
     gabby.crop((round(x*gabby.width/2),round(y*gabby.height/2),round((x+1)*gabby.width/2),round((y+1)*gabby.height/2))).save(SRC/f'gabby-{i}.png')
 groups['gabby']=[f'gabby-{i}.png' for i in range(4)]
+# Daisy shares the host animation layout; preserve Gabby's original sources.
+daisy=Image.open(SRC/'daisy-sheet.png').convert('RGBA')
+for i in range(6):
+    x,y=i%3,i//3
+    daisy.crop((round(x*daisy.width/3),round(y*daisy.height/2),round((x+1)*daisy.width/3),round((y+1)*daisy.height/2))).save(SRC/f'daisy-{i}.png')
+groups['daisy']=[f'daisy-{i}.png' for i in range(6)]
 packing={}
 for kind in ['beer','soi','gogo']:
     for stage in range(1,4):
@@ -85,7 +91,7 @@ for kind in ['beer','soi','gogo']:
 for name,frames in groups.items():
     if not all((SRC/f).exists() for f in frames): continue
     spec={'frames':frames,'cell':[160,192],'height':180}
-    if name in ['bee','may','june','lek','fah','nan']:
+    if name in ['bee','may','june','lek','fah','nan','daisy']:
         spec.update(cell=[160,256],frame_heights=[180,180,196,196,180,180])
     if name.startswith('fight-'):
         spec.update(cell=[320,256],height=200,frame_heights=[200,200,200,160,185,185,200,190,185,195,52,235])
@@ -125,7 +131,7 @@ if recipe.exists():
             atlas=Image.new('RGBA',(cell[0]*len(frames),cell[1]))
             for i,frame in enumerate(frames): atlas.alpha_composite(frame,(i*cell[0],0))
             atlas.save(OUT/(name+'.png'))
-        if name in ['bee','may','june','lek','fah','nan','fight-juno','fight-vega','fight-orchid']:
+        if name in ['bee','may','june','lek','fah','nan','daisy','fight-juno','fight-vega','fight-orchid']:
             original=Image.open(SRC/spec['frames'][0]).convert('RGBA')
             alpha=original.getchannel('A').point(lambda a:255 if a>=160 else 0)
             bbox=alpha.getbbox()

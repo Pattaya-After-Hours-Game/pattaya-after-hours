@@ -749,18 +749,29 @@ func bar_fine_hud() -> void:
 	for i in bar.team.size():
 		if bar.team[i].role==1: hosts.append(i)
 	if hosts.is_empty(): return
-	var height := mini(hosts.size(),2)*64
-	var panel := pane(root_ui,Rect2(14,182,320,height+62),Color("#21161ff2"))
+	var height := mini(hosts.size(),2)*84
+	var panel := pane(root_ui,Rect2(14,182,356,height+62),Color("#21161ff2"))
 	panel.name = "BarFineHUD"
-	abs_text(panel,Rect2(10,3,210,24),"BAR FINES · 30s away",14,GOLD)
-	var manage := at_button(panel,Rect2(270,2,40,28),"›",change_tab.bind(0))
+	abs_text(panel,Rect2(10,3,210,24),"GOOD COMPANY",14,GOLD)
+	var buzz := ColorRect.new()
+	buzz.position = Vector2(222,12)
+	buzz.size = Vector2(72,8)
+	buzz.color = EDGE.darkened(0.5)
+	buzz.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(buzz)
+	var buzz_fill := ColorRect.new()
+	buzz_fill.size = Vector2(0,8)
+	buzz_fill.color = GOLD
+	buzz_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	buzz.add_child(buzz_fill)
+	var manage := at_button(panel,Rect2(306,2,40,28),"›",change_tab.bind(0))
 	manage.custom_minimum_size = Vector2.ZERO
 	manage.size = Vector2(40,28)
 	manage.tooltip_text = "Host training and auto-accept in Service"
 	var list := ScrollContainer.new()
 	list.name = "HostList"
 	list.position = Vector2(8,30)
-	list.size = Vector2(304,height)
+	list.size = Vector2(340,height)
 	list.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	list.follow_focus = true
 	panel.add_child(list)
@@ -771,7 +782,7 @@ func bar_fine_hud() -> void:
 	for i in hosts:
 		var person: Dictionary = bar.team[i]
 		var row := Control.new()
-		row.custom_minimum_size = Vector2(0,62)
+		row.custom_minimum_size = Vector2(0,82)
 		rows.add_child(row)
 		var portrait := TextureRect.new()
 		portrait.texture = Art.texture("portrait-"+Art.worker_id(bar,i))
@@ -782,30 +793,57 @@ func bar_fine_hud() -> void:
 		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(portrait)
 		abs_text(row,Rect2(45,0,130,22),"%s · Lv %d" % [StreetContent.HOSTS[int(person.host)][0],int(person.get("host_training",0))+1],14)
-		var state := abs_text(row,Rect2(45,23,132,34),"",11,MUTED)
+		var state := abs_text(row,Rect2(45,24,145,54),"",11,MUTED)
 		state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		var accept := at_button(row,Rect2(181,5,105,48),"",street_action.bind("bar_fine",i),true)
+		var host_drink := at_button(row,Rect2(197,1,127,38),"",street_action.bind("host_drink",i),true)
+		host_drink.name = "HostDrink%d" % i
+		host_drink.add_theme_font_size_override("font_size",12)
+		var accept := at_button(row,Rect2(197,42,127,38),"",street_action.bind("bar_fine",i),true)
 		accept.name = "AcceptBarFine%d" % i
 		accept.add_theme_font_size_override("font_size",13)
-		bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":true})
-	var auto := abs_text(panel,Rect2(10,32+height,300,24),"",12,TEAL)
-	var summary := func() -> String: return "%d requests · Auto-accept %s" % [bar.host_requests.size(),"ON" if bar.get("auto_bar_fine",false) and bar.get("auto_bar_fine_on",true) else "OFF" if bar.get("auto_bar_fine",false) else "available in Service"]
+		bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":true,"host_button":host_drink})
+	var auto := abs_text(panel,Rect2(10,32+height,336,24),"",12,TEAL)
+	var summary := func() -> String:
+		buzz_fill.size.x = 72 if float(bar.get("host_buzz_until",0))>model.street.economy.action_time() else 24*int(bar.get("host_cheers",0))
+		return model.street.economy.hosted_buzz_text(bar)
 	auto.text = summary.call()
 	live_labels.append([auto,summary])
 	update_bar_fine_controls()
 
 func update_bar_fine_controls() -> void:
 	var bar: Dictionary = model.street.selected()
+	var eco = model.street.economy
 	for entry in bar_fine_controls:
-		var offer: Dictionary = model.street.economy.bar_fine_offer(bar,entry.index)
+		var offer: Dictionary = eco.bar_fine_offer(bar,entry.index)
+		var hosted: Dictionary = eco.hosted_offer(bar,entry.index)
+		var willing: bool = StreetContent.HOSTS[int(bar.team[entry.index].host)][2]
 		entry.button.disabled = not offer.enabled
-		entry.button.text = "Accept\n%s" % cash(offer.fee) if entry.compact else "Accept bar fine · %s" % cash(offer.fee)
-		entry.status.text = "−%.1f appeal\nfor %ds" % [offer.appeal,StreetContent.BAR_FINE_SECONDS] if offer.enabled else offer.reason
+		entry.button.text = ("Accept · %s" % cash(offer.fee) if entry.compact else "Accept bar fine · %s" % cash(offer.fee)) if willing else "Hosted drinks only"
 		entry.button.tooltip_text = "%s received once; away for %ds; loses %.1f base appeal while away." % [cash(offer.fee),StreetContent.BAR_FINE_SECONDS,offer.appeal] if offer.enabled else offer.reason
+		entry.host_button.disabled = not hosted.enabled
+		entry.host_button.text = ("Match" if hosted.matched else "Host round")+" · "+cash(hosted.price)
+		if hosted.busy: entry.host_button.text = ("Pour" if eco.hosted_round(bar,entry.index).state=="waiting" else "Cheers")+" · "+cash(hosted.price)
+		entry.host_button.tooltip_text = "Guest %d buys a drink for the host. Serve one house lager; she keeps her appeal. %s" % [hosted.guest,"Matching topic adds ฿40 to the paid order." if hosted.matched else "A matching host earns ฿40 more."] if hosted.enabled else hosted.reason
+		var topic: String = StreetContent.HOST_TOPIC_NAMES[int(StreetContent.HOST_TOPICS[int(bar.team[entry.index].host)])]
+		var detail: String = "%s fan · guest %d" % [StreetContent.HOST_TOPIC_NAMES[int(hosted.topic)],hosted.guest] if hosted.enabled else hosted.reason
+		if float(offer.remaining)>0: detail = offer.reason
+		entry.status.text = topic+" specialist\n"+detail
+
 
 func bar_fine_panel(bar: Dictionary) -> void:
 	if bar.type!=1: return
 	var eco = model.street.economy
+	body("GOOD COMPANY · HOSTED DRINKS",GOLD,14)
+	body("Match a chat, music or pool fan to her favourite topic for +฿40. One sponsored round per guest; pour a real house lager, then enjoy 20 seconds of company. Hosts keep their appeal. Three finished rounds earn 30 seconds of Room Buzz (+2 appeal).",MUTED,12)
+	live_body(func() -> String: return eco.hosted_buzz_text(bar)+"\n"+str(bar.get("host_last_line","")),TEAL,13)
+	if bar.get("auto_host_drinks",false):
+		row_button("Auto-host rounds · "+("On" if bar.auto_host_drinks_on else "Off"),street_action.bind("auto_host_drinks"))
+	else:
+		var auto_rounds := row_button("Auto-host rounds · ฿1,500",street_action.bind("auto_host_drinks"))
+		live_body(func() -> String:
+			var offer: Dictionary = eco.auto_hosted_offer(bar)
+			auto_rounds.disabled = not offer.enabled
+			return offer.reason if not offer.enabled else "Finds topic matches automatically. Bartenders still need to serve. Hosted-drinks-only colleagues get first choice in a tie.",MUTED,12)
 	body("BAR FINES",GOLD,14)
 	body("Accept a real customer's request: the host leaves for 30 seconds, removing her appeal until she returns. Adult hosts choose whether to accept; private activity stays off-screen.",MUTED,12)
 	if bar.get("auto_bar_fine",false):
@@ -822,9 +860,11 @@ func bar_fine_panel(bar: Dictionary) -> void:
 		var name_text: String = StreetContent.HOSTS[int(person.host)][0]
 		character_card(Art.worker_id(bar,i),"%s · Host level %d" % [name_text,int(person.get("host_training",0))+1],"+%.1f appeal · %s bar fine" % [eco.host_appeal(person),cash(eco.host_fee(person))] if StreetContent.HOSTS[int(person.host)][2] else "+%.1f appeal · hosted drinks only" % eco.host_appeal(person))
 		var state := body("",TEAL,13)
+		var host_drink := row_button("",street_action.bind("host_drink",i),true)
+		host_drink.name = "ServiceHostDrink%d" % i
 		var accept := row_button("",street_action.bind("bar_fine",i),true)
 		accept.name = "ServiceBarFine%d" % i
-		bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":false})
+		bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":false,"host_button":host_drink})
 		var training: Dictionary = eco.host_training_offer(bar,i)
 		if not training.maxed:
 			var level: int = training.level
@@ -832,7 +872,7 @@ func bar_fine_panel(bar: Dictionary) -> void:
 			live_body(func() -> String:
 				var offer: Dictionary = eco.host_training_offer(bar,i)
 				upgrade.disabled = not offer.enabled
-				return "+%.1f → +%.1f appeal%s. %s" % [StreetContent.HOST_APPEAL[level],StreetContent.HOST_APPEAL[level+1]," · %s → %s fee" % [cash(StreetContent.BAR_FINE_FEES[level]),cash(StreetContent.BAR_FINE_FEES[level+1])] if StreetContent.HOSTS[int(person.host)][2] else "",offer.reason],MUTED,12)
+				return "+%.1f → +%.1f appeal%s. %s" % [StreetContent.HOST_APPEAL[level],StreetContent.HOST_APPEAL[level+1]," · hosted drink %s → %s" % [cash(StreetContent.HOST_DRINK_PRICES[level]),cash(StreetContent.HOST_DRINK_PRICES[level+1])]+(" · bar fine %s → %s" % [cash(StreetContent.BAR_FINE_FEES[level]),cash(StreetContent.BAR_FINE_FEES[level+1])] if StreetContent.HOSTS[int(person.host)][2] else ""),offer.reason],MUTED,12)
 	live_body(func() -> String: return "%d requests · %d accepted this shift · %s bar-fine receipts" % [bar.host_requests.size(),bar.shift.get("bar_fines",0),cash(bar.shift.get("bar_fine_income",0))],TEAL,12)
 	update_bar_fine_controls()
 
@@ -1325,6 +1365,8 @@ func upgrade_offers() -> Array[Dictionary]:
 	if not bar.auto_serve:
 		offers.append(upgrade_offer("auto","Auto-serve","Owner helps automatically","Staff serve first. Auto-serve helps the rush or fills in when no bartender is on duty.","auto_serve",0,eco.auto_serve_offer(bar)))
 	if bar.type==1:
+		if not bar.get("auto_host_drinks",false):
+			offers.append(upgrade_offer("auto","Auto-host rounds","Find guest topic matches","Hosts stay in the room; the shared service queue pours real stock for paying guests.","auto_host_drinks",0,eco.auto_hosted_offer(bar)))
 		if not bar.get("auto_bar_fine",false):
 			offers.append(upgrade_offer("auto","Auto-accept bar fines","Automatic eligible bookings","Willing hosts only; real requests, budgets and booking space still apply. Hosts return after 30 seconds.","auto_bar_fine",0,eco.auto_bar_fine_offer(bar)))
 		for i in bar.team.size():
@@ -1333,6 +1375,7 @@ func upgrade_offers() -> Array[Dictionary]:
 			if status.maxed: continue
 			var level: int = status.level
 			var caption := "+%.1f → +%.1f appeal" % [StreetContent.HOST_APPEAL[level],StreetContent.HOST_APPEAL[level+1]]
+			caption += " · hosted %s" % cash(StreetContent.HOST_DRINK_PRICES[level+1])
 			if StreetContent.HOSTS[int(bar.team[i].host)][2]: caption += " · %s fee" % cash(StreetContent.BAR_FINE_FEES[level+1])
 			offers.append(upgrade_offer("audience","Train "+str(StreetContent.HOSTS[int(bar.team[i].host)][0]),caption,"More appeal competes for shared street customers; no guaranteed arrivals. Training stays after rehire.","train_host",i,status))
 	for i in StreetContent.EQUIPMENT.size():
@@ -1435,7 +1478,7 @@ func upgrade_card(offer: Dictionary) -> void:
 		caption += "\nNeeds venue stage %d" % status.required_stage
 	var purchase := button("%s\n%s" % [offer.name,caption],street_action.bind(offer.action,offer.index))
 	purchase.name = "Upgrade_"+offer.icon if not offer.action.begins_with("train_") else "Upgrade_%s_%d" % [offer.icon,offer.index]
-	if offer.action=="auto_bar_fine": purchase.name = "Upgrade_auto_bar_fine"
+	if offer.action in ["auto_bar_fine","auto_host_drinks"]: purchase.name = "Upgrade_"+offer.action
 	purchase.icon = UpgradeIcons.get_icon(offer.icon)
 	purchase.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	purchase.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1537,6 +1580,10 @@ func street_panel() -> void:
 		character_card("gabby","Gabby · adult bartender","Red dress, quick wit, generous regulars")
 		row_button("Hire Gabby · ฿1,200",street_action.bind("hire_gabby"))
 		body("10 days · normal bartender wages and training. +฿%d per drink she serves, counted at closing. Uses one team position." % StreetContent.GABBY_TIP_PER_DRINK,MUTED,12)
+	if bar.type==1 and eco.floor_staff(bar)<model.street.staff_limit(bar) and eco.daisy_venue().is_empty():
+		character_card("daisy","Daisy · adult entertainer","Red bikini, quick wit, knows when to call last orders")
+		row_button("Hire Daisy · ฿4,500",street_action.bind("hire_daisy"))
+		body("10 days · normal host wages and training. Attracts visitors; does not serve drinks. Uses one team position.",MUTED,12)
 	body("FRONTAGE PROMOTER",GOLD,14)
 	body("Nida · adult promoter · ฿1,200 / ten days. No commission or hourly wage. One frontage slot; never serves drinks.",MUTED,12)
 	if bar.commission_paid>0: body("Historical commission paid: %s. No further commission is charged." % cash(bar.commission_paid),MUTED,12)
@@ -1591,7 +1638,7 @@ func street_panel() -> void:
 				var training_button := row_button("Train %s · %s · needs stage %d" % [name_text,cash(StreetContent.AUDIENCE_TRAINING_COST*(audience_level+1)),audience_level+2],street_action.bind("train_audience",i))
 				training_button.icon = UpgradeIcons.get_icon("audience")
 		row_button("%s · %s" % [name_text,"On duty" if person.on else "Off duty"],street_action.bind("rota",i))
-		if bar.type>0 and person.role!=3 and person.get("identity","")!="gabby": row_button("Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))],street_action.bind("role",i))
+		if bar.type>0 and person.role!=3 and person.get("identity","")!="gabby" and not (person.role==1 and int(person.host)==StreetContent.DAISY_HOST): row_button("Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))],street_action.bind("role",i))
 		if person.role==1:
 			body(StreetContent.HOSTS[int(person.host)][1],MUTED,12)
 
@@ -1607,6 +1654,7 @@ func shift_report(bar: Dictionary) -> void:
 	if bar.last_shift.is_empty(): return
 	var report: Dictionary = bar.last_shift
 	body("LAST SHIFT",GOLD,14)
+	if int(report.get("hosted_drinks",0))>0: body("Hosted rounds: %d · %s · %d topic matches (included in sales/revenue)" % [report.hosted_drinks,cash(report.hosted_income),report.hosted_matches],TEAL,13)
 	if int(report.get("bar_fines",0))>0: body("Bar fines: %d accepted · %s (included in revenue)" % [report.bar_fines,cash(report.bar_fine_income)],TEAL,13)
 	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s · fines %s · commission %s\nManager income %s (included in revenue)\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.get("fines",0)),cash(report.get("commission",0)),cash(report.get("manager_income",0)),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
 

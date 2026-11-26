@@ -65,7 +65,7 @@ func run(test: SceneTree) -> void:
 		customer.commission_order = true
 	m.save_game()
 	var loaded = Campaign.new(4)
-	test.check(loaded.load_game() and loaded.s.version==14 and loaded.s.cash==m.s.cash,"Commission removal loads existing saves without a cash refund")
+	test.check(loaded.load_game() and loaded.s.version==15 and loaded.s.cash==m.s.cash,"Commission removal loads existing saves without a cash refund")
 	var old_bar: Dictionary = loaded.street.selected()
 	test.check(old_bar.commission_carry==0 and not old_bar.customers[1].commission_order and not old_bar.customers[1].commission_visit,"Old pending commission and fractional carry are cancelled")
 	money = loaded.s.cash

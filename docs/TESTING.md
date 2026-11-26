@@ -1,5 +1,61 @@
 # Testing and release checks
 
+## Hosted drinks / Good Company — 26 November 2026
+
+Started from synced main `7c28019`, preserving concurrent Daisy roster/art work.
+Godot 4.7.2 `tools/test.sh` passes the combined gameplay/save/UI/art checks, 66
+fresh campaigns, 60 celebration scenarios, 80 club scenarios and 120 paired
+profit-cycle scenarios. A final isolated regression run passed after UI polish,
+fractional-hosting and duplicate-order save checks; focused hosted-model checks
+also pass after the zero-sized service guard.
+
+`hosted_drinks_check.gd` covers pure topic/price offers, one real sponsor per round,
+stock and entertainment-budget settlement, no extra visit tips/personal rounds,
+unchanged accepted quotes, normal bartender clocks, fractional paid-round reload,
+bounded stockouts/timeouts, once-only Buzz, finite shared traffic, automation
+priority/toggles, booking conflicts, offline exclusion, closure and schema-14
+migration. Actual HUD invitation, Serve and automation purchase are exercised.
+
+Seven `hosted-*` economy states were reviewed at 960×540 and 1280×720: matching,
+waiting, paid company, Buzz, Service, upgrades and closure. Final small-meter
+polish was recaptured at 960×540. Existing production art is retained, alongside
+the separate Daisy addition. Local links and `git diff --check` pass.
+
+Thirty controlled ten-minute scenarios compare ten identical seeds for each
+policy, with a stage-three hostess bar, three hosts, one twice-trained bartender,
+stock delivery, owner auto-serve and auto-barfines. The other venue is closed and
+random events are suppressed equally. Starting setup purchases are excluded;
+these are operating comparisons, not fresh-campaign pacing or guaranteed returns.
+
+| Policy | Total net cashflow | Hosted sales | Hosted receipts | Service misses |
+| --- | ---: | ---: | ---: | ---: |
+| Barfines only | ฿72,708 | 0 | ฿0 | 37 |
+| Also auto-host | ฿79,492 | 175 | ฿35,620 | 64 |
+| Also train each host once | ฿96,302 | 188 | ฿45,320 | 86 |
+
+Extra company improves aggregate net by about 9%; adding training reaches about
+32% over barfines alone, but increases service pressure. Every scenario keeps
+sales bounded by orders and arrivals bounded by offered traffic. Device play,
+long-run human balance/retention and publication remain unverified.
+
+## Daisy verification — 26 November 2026
+
+Godot 4.7.2 `tools/test.sh` completed with zero failures in the shared checkout.
+An additional isolated `tests/check.gd` run passed after the concurrent hosted-drink
+checks joined the runner. Daisy regressions cover venue/affordability gates,
+paid hiring, one street-wide roster place, coexistence with Gabby, no bartender
+sales or bonus, rota attraction, host training, actual booking fees, save/load,
+retained return deadlines and the visible hire/renewal controls.
+
+`PATTAYA_PREVIEW_SCRIPT=tests/preview_daisy.gd tools/preview-art.sh` produced ten
+960×540 captures, visually reviewed for hiring, roster, all three hostess stages,
+off-duty/away/closed states, expiry and renewal. The hire view was recaptured to
+include its button. Atlas and portrait were inspected directly. All 79 pre-existing
+runtime manifest entries remain identical; only Daisy's atlas and portrait were
+added. Local documentation links and `git diff --check` pass. Device play and
+release publication were not performed for this addition. These checks cover the
+checkout at verification time; further concurrent changes need their own checks.
+
 ## Lease ladder and Hostess Bar verification — 26 November 2026
 
 Godot 4.7.2 `tools/test.sh` passes with zero failures on the isolated pricing

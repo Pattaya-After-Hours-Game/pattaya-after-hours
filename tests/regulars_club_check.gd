@@ -102,7 +102,7 @@ func run(test: SceneTree) -> void:
 	test.check(person.training==4 and person.service_ready==17.25,"Advanced training and deadline survive rehire")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==14 and loaded.street.selected().club_level==3 and loaded.street.selected().customers[0].club,"Club level and visit entitlement survive reload")
+	test.check(loaded.load_game() and loaded.s.version==15 and loaded.street.selected().club_level==3 and loaded.street.selected().customers[0].club,"Club level and visit entitlement survive reload")
 	test.check(loaded.street.selected().equipment.music==2 and loaded.street.selected().team[0].training==4 and loaded.street.selected().team[0].service_ready==17.25,"Schema thirteen retains better sound and advanced training")
 	guest.order = true
 	guest.budget = 300

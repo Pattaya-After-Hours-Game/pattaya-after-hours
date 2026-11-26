@@ -68,7 +68,7 @@ func run(test: SceneTree) -> void:
 	p.service_clock = 9
 	m.save_game()
 	loaded = Campaign.new(11)
-	test.check(loaded.load_game() and loaded.s.version==14,"V8 staff records migrate without changing owned progress")
+	test.check(loaded.load_game() and loaded.s.version==15,"V8 staff records migrate without changing owned progress")
 	lb = loaded.street.selected()
 	test.check(lb.team[0].service_ready==loaded.s.street.elapsed+16 and lb.team[0].drinks_served==0,"Legacy partial work retains its remaining sixteen seconds; historical sales are not invented")
 

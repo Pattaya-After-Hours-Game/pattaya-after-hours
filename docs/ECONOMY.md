@@ -432,6 +432,55 @@ deadlines and counters; old nonzero `service_clock` progress becomes its remaini
 cooldown once. An idle old bartender becomes ready. Old training, contracts,
 stock, cash and purchased auto-serve remain; the lower price grants no refund.
 
+## Hosted drinks and Room Buzz
+
+New hostess-bar visits have a stable 40/60/80% local/tourist/nightlife chance of
+interest in one sponsored drink, with saved chat/music/pool preferences. Offers
+need a real first drink, an available on-duty contracted host, a trading venue,
+an affordable quote and neither participant already hosting/booked. UI reads
+consume no RNG. Old visits migrate without an invitation or extra money.
+
+Interested new locals/tourists have ฿340/380 of entertainment money; nightlife
+guests retain `600 × stage`. This is the existing `fine_budget`, shared with
+bookings; personal drink money and planned rounds stay unchanged. Host levels
+quote **฿180/220/260**, plus **฿40** for a topic match. Acceptance saves the quote
+and marks this visit's sole invitation used. Training never reprices it.
+
+Acceptance reserves a host and creates one order, without income. Normal service
+consumes one paid house lager, spends the sponsor's entertainment budget and
+records actual revenue, FIFO stock cost and a twenty-second hosted round. It
+shares pending/stock checks, bartender and owner cooldowns, supplier pack rules,
+consignment cost and owner relief. A queued sponsored order gets priority in its
+last ten seconds and expires at thirty seconds if unserved, recording the actual
+stock/service loss. The sponsor can stay to finish this bounded activity after
+finishing personal drinks; no personal round or drinking deadline is replaced.
+
+Hosted orders/sales count in ordinary totals, with `hosted_drinks`, `hosted_income`
+and `hosted_matches` as report breakdowns. They grant no extra first-visit tip or
+matched-menu tip and do not increment the sponsor's `drinks`. Gabby's existing
+bonus still applies to an actual hosted drink she serves. Customer contribution
+and the five-second sample include normal receipts and costs. The host stays in
+the room and keeps appeal, but neither participant can take a barfine meanwhile.
+Rota/contract loss, closure or departure cancels activity. A served drink stays
+paid; interrupted company earns no completion. Role reassignment waits.
+
+Three paid, uninterrupted completions reset `host_cheers` and set
+`host_buzz_until = action_time + 30`. Buzz adds **+2 base appeal** while open,
+competing for bounded shared traffic. It grants no cash/reputation. Further trios
+refresh rather than stack duration. Fractional foreground deadlines, quotes,
+progress and guest flags survive reload; menu/offline time cannot advance them.
+Ordinary forecasts/offline estimates exclude hosted transactions and Buzz.
+
+**฿1,500 auto-host rounds** needs an on-duty host and the next shift's reserve.
+It prefers matches and gives hosted-drinks-only colleagues first choice in ties.
+Auto-barfines, if enabled, run first; auto-hosting then invites remaining guests.
+Purchasing/toggling pays no receipt. The saved toggle affects future invitations.
+
+Schema **15** validates unique host/guest pairings, order states, saved quotes,
+flags, interests, fractional deadlines and report counters. Existing visits keep
+their budgets/plans and receive no invitation. Migration grants no purchases or
+retroactive income and preserves schema-14 bookings and paid receipts.
+
 ## Bar-fine requests, host appeal and automation
 
 Soi hosts use the existing request source: a real nightlife guest with a separate
@@ -818,3 +867,14 @@ no bonus. Owner/other staff sales, offline estimates and manager/pool income ear
 none of her tips. Normal once-nightly settlement pays the jar; no separate sales,
 commission, healthy-margin or five-second trading entry is created. Existing
 campaigns receive no hire, identity replacement or retroactive tips.
+
+## Daisy's host contract
+
+Daisy is an optional named adult entertainer available only in Hostess bars.
+Her ฿4,500 ten-day contract delegates to normal host hiring: one floor slot,
+host wages and the same payroll reserve. She uses existing host attraction,
+training, consent and booking rules, with Chat as her hosted-drink topic.
+She never serves orders or earns Gabby's bartender bonus. Only one roster place
+across the street belongs to Daisy, including expired contracts. Renewal retains
+her training and any booking deadline. Her appended host ID preserves the six
+existing host identities; no saved employee is replaced or granted for free.

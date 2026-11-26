@@ -268,6 +268,19 @@ control presence. Use the economy preview filter `gabby-*` for hiring, roster,
 all three venue types, serving, tips, off-duty and renewal states.
 
 
+## Daisy — 26 November 2026
+
+Daisy is a separate fictional adult entertainer based on the generated Gabby
+design. The user confirmed that the original reference photos were AI-generated.
+She has pale skin, tied-back brown hair, a fuller bust, a small opaque red bikini
+top and matching thong bottoms. The built-in image tool created a six-pose 3×2
+sheet; [prompts and receipt](recipes/daisy.json) record generation and cutout.
+The existing packer splits `sources/daisy-sheet.png`, normalizes six 160×256
+host cells into `assets/art/daisy.png`, and creates `assets/art/portrait-daisy.png`.
+All existing character PNGs remain unchanged. Inspect her hiring, roster,
+three venue stages, off-duty/away/closed states and renewal using
+`PATTAYA_PREVIEW_SCRIPT=tests/preview_daisy.gd tools/preview-art.sh`.
+
 ## Street-event mini-games
 
 Cart Jam uses a directly overhead atlas of a delivery van and three decorated
@@ -282,3 +295,12 @@ room card with model-owned acceptance and return countdowns, plus Service and
 training offers. The existing `away` state removes only the booked host from
 the production scene. Returning, expiry and closure use the same availability
 rules as attraction. No portraits, room plates or character atlases are replaced.
+
+## Good Company feedback
+
+The `hosted-*` economy previews show matches, queued/paid drinks, Room Buzz,
+training and closure. Existing portraits appear in the shared Good Company card.
+Engine-drawn POUR/CHEERS markers represent real orders; hosts keep their appeal
+and use a stationary existing pose while entertaining. The meter reads saved
+completion progress. This feature adds no image assets; concurrent cast artwork
+is preserved.

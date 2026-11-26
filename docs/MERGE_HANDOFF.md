@@ -1,5 +1,43 @@
 # Current implementation and release handoff
 
+## Hosted drinks / Good Company — local source, 26 November 2026
+
+Built from synced `7c28019`; concurrent Daisy work was preserved. The Good Company
+card adds genuine sponsored drinks alongside barfines. New interested guests
+have one invitation per visit, topic matches add ฿40, and host training raises
+base prices ฿180→220→260. Real stock, guest entertainment budgets and shared
+service clocks settle every sale. Hosts keep appeal through twenty seconds of
+company; three completions create thirty seconds of +2 appeal Room Buzz.
+
+Paid auto-host rounds (฿1,500) finds matches and prioritises hosted-drinks-only
+colleagues in a tie. Barfine automation goes first if both are enabled. No paid
+rounds or Buzz are replayed offline. Schema 15 saves orders, quotes, activity,
+flags and fractional timers; existing visitors keep their budgets/plans and
+receive no invitations or grants. Production host art is reused.
+
+Combined tests, final regressions, thirty comparison scenarios and two-resolution
+previews pass; see [verification](TESTING.md#hosted-drinks--good-company--26-november-2026).
+This chat has not committed or published the shared working tree. Daisy remains
+a separate concurrent addition; verify the combined state before any release.
+Device play and player feedback remain pending.
+
+## Daisy entertainer — local source, 26 November 2026
+
+Adds the requested fictional adult counterpart to Gabby with pale skin, a fuller
+bust, a red bikini/thong outfit, six-pose atlas and portrait. User clarified that
+Gabby's references were AI-generated. Gabby and all existing runtime art remain
+unchanged. Hostess bars offer **Hire Daisy · ฿4,500** under normal ten-day host
+contracts, wages, reserves, training and availability. Appended host ID 6 is
+stable across renewal/save/load and has the Chat topic; only one Daisy can hold
+a roster place across the street. Existing host IDs are unchanged.
+
+This addition was made in shared `main` at `7c28019` while the hosted-drinks task
+edited economy/UI/save files. Those edits and attachments were preserved. No
+commit or release was made by the Daisy task. The combined wrapper and final
+regression run passed; ten Daisy previews were reviewed. See
+[verification](TESTING.md#daisy-verification--26-november-2026). Further concurrent
+edits must be verified before release; Android device play remains untested.
+
 ## Hostess naming and expansion prices — 26 November 2026
 
 User-approved follow-up in `codex/venue-pricing`, isolated at

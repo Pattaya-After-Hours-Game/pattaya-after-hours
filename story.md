@@ -163,6 +163,21 @@ reserve after paying her fee.
 
 > **Anong:** “She's ready. Give her an order, not another stopwatch.”
 
+## May has a better story
+
+May remembers which guest wanted to talk, which wanted karaoke and which still
+insists the pool table slopes. Fah turns a song request into a small event.
+A guest can offer to buy a host a drink, and the owner can match the company
+to the conversation.
+
+> **Anong:** “She sold a drink and settled an argument. I was only going to do one of those.”
+
+Someone must pour stocked lager and the guest must afford the quote. A topic
+match earns ฿40 more. Twenty seconds of company keeps the host's appeal in the
+room; three completed rounds start a brief Room Buzz. A big booking fee is
+tempting, but a lively bar has its own value. May and Fah keep their preferences,
+and training makes their hosted drinks worth more too.
+
 ## A booking is a trade-off
 
 At a Hostess bar, a customer can ask and a willing adult host can accept. The
@@ -310,6 +325,7 @@ has a new sign.
 | **Dao** | Shift lead and the face of trusted management | Wants predictable hours and a venue she can run properly. Her progression is from dependable colleague to someone the player trusts with the keys. |
 | **Mali** | Bartender and Toybox regular | Likes a contest with clear rules. Wants fight nights that pay their way, not endless promises of exposure. |
 | **Gabby** | Adult bartender in a very short red dress, with pale skin and tied-back brown hair | Quick wit and a good memory for orders; her regulars leave an extra ฿5 for each drink she serves, counted in the nightly jar. |
+| **Daisy** | Fictional adult hostess-bar entertainer, with pale skin, tied-back brown hair and a red bikini | Quick with a joke and strict about finishing on time. Attracts guests under the normal host contract; a separate character from bartender Gabby. |
 | **Pim** | Bartender with a music programme in mind | Saves for a sound studio. Distinguishes a booked performer from Bo arriving with a karaoke machine. |
 | **Fern** | Guide who knows the market | Connects the business to life outside its frontage. Her knowledge and time have value. |
 | **Nok** | Cook building a night-market menu | Has plans of her own. Food is part of her character background, not a mandatory live-economy upgrade path. |

@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-26",
+  "tool": "built-in image_gen",
+  "reference": "art/sources/gabby-sheet.png",
+  "reference_note": "User confirmed Gabby's reference photos were AI-generated; Daisy is a separate fictional adult.",
+  "prompts": [
+    "Use case: stylized-concept. Asset: production character sprite sheet for Pattaya After Hours. Use the attached AI-generated fictional adult Gabby character as the character-design and rendering reference. Create her separate fictional adult counterpart named Daisy, clearly aged 28 or older, with the same pale fair skin, brown tied-back wavy hair and friendly confident face, a larger full bust and curvy adult build. Outfit: opaque small red triangle bikini top with secure coverage, matching red thong bikini bottoms, simple black low shoes. Non-explicit game character presentation. Match the reference's detailed illustrated pixel-art rendering, plum outlines and clustered shading. True transparent background. SIX full-body poses in an exactly equal 3-column by 2-row grid, generous padding in every cell: top-left relaxed standing idle hands at waist; top-middle friendly greeting with one hand raised; top-right upright casual dance step with left arm raised; bottom-left upright casual dance step with right arm raised; bottom-middle walking left foot forward; bottom-right walking right foot forward. Every pose at same scale, front three-quarter view facing RIGHT, entire head and feet within each cell. Neutral game animation poses, no sexual acts, no nudity, no anatomical closeups, no scenery, no text, no shadows, no props, no grid lines. Keep all six silhouettes separate with transparent gaps.",
+    "Edit this six-pose sprite sheet of fictional adult Daisy. Remove ONLY all background haze, gradients, backlights and ground shadows, giving a completely transparent alpha=0 background outside the six character silhouettes, including gaps between legs and arms. Preserve the characters' faces, pale skin, red bikini and thong bottoms, proportions, poses, black shoes, pixel-art style and exact 3-column 2-row layout. Characters themselves must be fully opaque alpha=255. Do not add anything. This is a clean production cutout, with genuine transparency, not a black or checkerboard background."
+  ],
+  "source": "art/sources/daisy-sheet.png",
+  "generated_source": "/home/zak/.codex/generated_images/01a217b3-f5e4-78b2-84b7-054a7efef896/exec-b5cf614f-2d7a-4dca-9ec0-48300e1cdf24.png",
+  "grid": [
+    3,
+    2
+  ],
+  "poses": [
+    "idle",
+    "greeting",
+    "dance-left",
+    "dance-right",
+    "walk-left",
+    "walk-right"
+  ],
+  "runtime": [
+    "assets/art/daisy.png",
+    "assets/art/portrait-daisy.png"
+  ]
+}

@@ -676,7 +676,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -710,6 +710,8 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)<15:
+					for key in Street.Economy.hosted_fields(): defaults.erase(key)
 				if int(parsed.version)<14:
 					for key in Street.Economy.bar_fine_fields(): defaults.erase(key)
 				if int(parsed.version)<13: defaults.erase("completed")
@@ -822,6 +824,34 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=15:
+			for bar in parsed.street.bars:
+				for flag in ["auto_host_drinks","auto_host_drinks_on"]:
+					if not bar.get(flag) is bool: return null
+				if not _finite_number(bar.host_cheers,0,2) or float(bar.host_cheers)!=floorf(bar.host_cheers): return null
+				if not _finite_number(bar.host_buzz_until,0,1e15) or not bar.host_last_line is String: return null
+				var hosts: Array[int] = []
+				var guests: Array[int] = []
+				for round in bar.host_rounds:
+					if not round is Dictionary or bar.type!=1: return null
+					if not _finite_number(round.get("host"),0,bar.team.size()-1) or float(round.host)!=floorf(round.host): return null
+					if int(bar.team[int(round.host)].role)!=1 or int(round.host) in hosts: return null
+					if not _finite_number(round.get("guest"),0,1e15) or float(round.guest)!=floorf(round.guest) or int(round.guest) in guests: return null
+					var sponsor := false
+					for guest in bar.customers:
+						if int(guest.id)==int(round.guest) and guest.get("hosted",false): sponsor = true
+					if not sponsor: return null
+					if not round.get("matched") is bool or not round.get("state") in ["waiting","drinking"]: return null
+					if not _finite_number(round.get("host_deadline"),0,1e15): return null
+					if not _finite_number(round.get("quote"),180,300) or float(round.quote)!=floorf(round.quote): return null
+					hosts.append(int(round.host))
+					guests.append(int(round.guest))
+				for guest in bar.customers:
+					if not _finite_number(guest.get("host_interest"),-1,2) or float(guest.host_interest)!=floorf(guest.host_interest) or not guest.get("hosted") is bool: return null
+				for report in [bar.shift,bar.last_shift]+bar.recent:
+					if report.is_empty(): continue
+					for key in ["hosted_drinks","hosted_income","hosted_matches"]:
+						if not _finite_number(report.get(key),0,1e15) or float(report[key])!=floorf(report[key]): return null
 		if int(parsed.version)>=14:
 			for bar in parsed.street.bars:
 				for flag in ["auto_bar_fine","auto_bar_fine_on"]:
@@ -900,7 +930,7 @@ func _restore_numbers(value: Variant, field: String = "") -> Variant:
 	# Preserve explicit fractional action clocks; legacy numeric fields stay integers.
 	match typeof(value):
 		TYPE_FLOAT:
-			if field in ["host_return","tick_fraction","service_ready","last_served","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
+			if field in ["host_deadline","host_buzz_until","host_return","tick_fraction","service_ready","last_served","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
 			return int(value)
 		TYPE_ARRAY:
 			for i in value.size(): value[i] = _restore_numbers(value[i])
