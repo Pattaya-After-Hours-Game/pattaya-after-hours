@@ -17,6 +17,13 @@ func click(tree: SceneTree, control: Control) -> void:
 		tree.root.push_input(event,true)
 	await tree.process_frame
 
+func touch(fight: Control, point: Vector2, index: int, down: bool) -> void:
+	var event := InputEventScreenTouch.new()
+	event.position = point
+	event.index = index
+	event.pressed = down
+	fight._input(event)
+
 func run(test: SceneTree) -> void:
 	var app = load("res://main.tscn").instantiate()
 	test.root.add_child(app)
@@ -37,11 +44,23 @@ func run(test: SceneTree) -> void:
 	test.check(not app.drawer.visible,"Management starts dismissed")
 	await click(test,test.find_button(app,"Service"))
 	test.check(app.drawer_open and app.drawer.visible,"Pointer opens Service drawer")
+	await click(test,test.find_button(app,"Drinks & margins"))
+	test.check(app.drink_list_open and test.find_button(app,"Buy 6 · ฿19 ea")!=null,"Drink list exposes individual wholesale prices")
+	await click(test,test.find_button(app,"Hide drink list"))
+	test.check(not app.drink_list_open,"Fridge details can be collapsed")
 	await click(test,test.find_button(app,"×"))
 	test.check(not app.drawer.visible,"Pointer dismisses management")
 	var before := int(app.model.s.street.served)
 	await click(test,test.find_button(app,"Serve a drink"))
 	test.check(app.model.s.street.served==before+1,"Serve remains accessible with drawer closed")
+	app.model.s.cash = 1000
+	app.sync_upgrade_badge(true)
+	await click(test,app.upgrade_badge)
+	test.check(app.upgrades_open and app.upgrades_ready_only,"The Service notification opens the ready list with a pointer tap")
+	var pouring := app.column.find_child("Upgrade_pouring",true,false) as Button
+	await click(test,pouring)
+	test.check(app.model.s.cash==100 and app.model.street.selected().action_levels.pouring==1 and not app.upgrade_badge.visible,"Buying from the upgrade card updates cash, speed and the badge")
+	app.close_drawer()
 	app.model.s.cash = 999999
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 4
@@ -55,6 +74,10 @@ func run(test: SceneTree) -> void:
 		test.check(thumb.size==Vector2(56,32),"Property thumbnail stays inside card")
 		await click(test,card)
 		test.check(app.model.s.street.selected==i,"Pointer selects property %d" % i)
+		var heading: Label = app.root_ui.get_node("VenueName")
+		test.check(heading.text==app.model.street.selected().name,"Header shows the selected venue's full name")
+		var label_width := heading.get_theme_font("font").get_string_size(heading.text,HORIZONTAL_ALIGNMENT_LEFT,-1,heading.get_theme_font_size("font_size")).x
+		test.check(label_width<=170,"Venue name fits beside the Windows update button")
 	app.model.street.announce(2)
 	app.close_drawer()
 	await click(test,app.event_banner)
@@ -108,6 +131,7 @@ func run(test: SceneTree) -> void:
 	var fight := Fight.new()
 	fight.position = Vector2(32,19)
 	fight.size = Vector2(768,432)
+	fight.mobile_controls = false
 	test.root.add_child(fight)
 	fight.set_physics_process(false)
 	for item in Fight.BUTTONS:
@@ -115,6 +139,47 @@ func run(test: SceneTree) -> void:
 		test.check(fight.action_at(point)==item[0],"Scaled combat hit region: "+item[0])
 		fight.activate(point,0)
 		test.check(fight.touches.get(0)==item[0],"Scaled touch dispatch: "+item[0])
+	fight._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	fight.mobile_controls = true
+	var pad_center := Fight.PAD.get_center()
+	var right := fight.global_position+(pad_center+Vector2(Fight.PAD_CELL,0))*.8
+	var up := fight.global_position+(pad_center+Vector2(0,-Fight.PAD_CELL))*.8
+	var down := fight.global_position+(pad_center+Vector2(0,Fight.PAD_CELL))*.8
+	var left := fight.global_position+(pad_center-Vector2(Fight.PAD_CELL,0))*.8
+	var jab := fight.global_position+Vector2(766,482)*.8
+	fight.countdown = 0
+	var player_start: float = fight.fighters[0].x
+	touch(fight,right,0,true)
+	fight._physics_process(.1)
+	fight._physics_process(.1)
+	test.check(fight.fighters[0].x>player_start+15,"Held mobile D-pad moves across frames")
+	touch(fight,jab,1,true)
+	fight._physics_process(.02)
+	test.check(fight.pressed("right") and fight.fighters[0].move=="jab","Second finger attacks while holding movement")
+	touch(fight,jab,1,false)
+	test.check(fight.pressed("right") and not fight.pressed("jab"),"Releasing attack keeps direction held")
+	var drag := InputEventScreenDrag.new()
+	drag.index = 0
+	drag.position = Vector2(left.x,up.y)
+	fight._input(drag)
+	test.check(fight.pressed("left") and fight.pressed("jump") and not fight.pressed("right"),"Sliding to a diagonal combines jump and movement")
+	drag.position = down
+	fight._input(drag)
+	test.check(fight.pressed("guard") and not fight.pressed("left"),"Sliding down guards")
+	drag.position = jab
+	fight._input(drag)
+	test.check(not fight.pressed("guard") and not fight.pressed("jab"),"D-pad finger releases direction outside the pad without attacking")
+	drag.position = right
+	fight._input(drag)
+	touch(fight,right,0,false)
+	test.check(not fight.pressed("right"),"Releasing D-pad finger stops movement")
+	for item in Fight.MOBILE_BUTTONS:
+		var rect: Rect2 = item[2]
+		var point := fight.global_position+rect.get_center()*.8
+		test.check(fight.action_at(point)==item[0],"Scaled mobile attack hit region: "+item[0])
+	touch(fight,jab,1,true)
+	fight._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	test.check(not fight.pressed("jab") and not fight.pressed("jump"),"Focus loss clears held and buffered mobile input")
 	for name in Fight.ATTACKS:
 		fight.reset_round()
 		var f: Dictionary = fight.fighters[0]

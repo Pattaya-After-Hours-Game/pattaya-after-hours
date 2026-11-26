@@ -8,7 +8,7 @@ func run(test: SceneTree) -> void:
 		var e = m.street.economy
 		b.type = kind
 		b.customers.clear()
-		e.admit(b)
+		e.admit(b,false,true)
 		var guest: Dictionary = b.customers[0]
 		var quote: int = [80,100,120][kind]
 		test.check(guest.quoted==quote,"Venue price ladder quotes each real customer's first order")
@@ -18,7 +18,7 @@ func run(test: SceneTree) -> void:
 		b.stage = 3
 		test.check(e.price(b)==quote,"Renovation does not multiply the venue's standard drink price")
 		b.equipment.menu = 1
-		test.check(e.price(b,true)==quote+30,"Premium menu surcharge stays separate from standard prices")
+		test.check(e.price(b,3)==quote+30,"Premium menu surcharge stays separate from standard prices")
 		b.promo = {"kind":1}
 		test.check(e.price(b)==[64,80,96][kind],"Happy Hour discounts new quotes across all venue types")
 	# Updating prices must neither revalue old inventory nor rewrite waiting tabs.
@@ -37,6 +37,6 @@ func run(test: SceneTree) -> void:
 	e.serve(b)
 	test.check(loaded.s.cash==1042 and b.shift.consumed_stock==6,"An old tab settles once at its saved price using its original paid stock cost")
 	e.order(b,b.customers[0])
-	test.check(b.customers[0].quoted==80 and b.customers[0].budget==155,"Only the next round adopts the new price; old customer budgets are preserved")
+	test.check(b.customers[0].quoted==e.price(b,int(b.customers[0].drink)) and b.customers[0].budget==155,"Only the next round adopts the new price; old customer budgets are preserved")
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)

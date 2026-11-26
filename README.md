@@ -1,6 +1,6 @@
 # Pattaya After Hours
 
-Start with six stools, a warm fridge and a sign that reads **BLUE HO**. Build the Blue Hour into a thriving beer bar, then own a mixed street of Soi-style bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
+Start with six stools and a warm fridge. Build the Blue Hour into a thriving beer bar, then own a mixed street of Soi-style bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
 
 **[Get it on Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522io.github.rknell.pattayaafterhours%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FPattaya-After-Hours-Game%252Fpattaya-after-hours%2522%252C%2522author%2522%253A%2522Pattaya-After-Hours-Game%2522%252C%2522name%2522%253A%2522Pattaya%2520After%2520Hours%2522%257D)** · **[Android APK](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest/download/PattayaAfterHours.apk)** · **[Desktop downloads](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)**
 
@@ -48,10 +48,10 @@ the property thumbnail; renovation alone does not install them.
 Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.
 Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
-Standard drinks cost **฿80 at beer bars, ฿100 at Soi bars and ฿120 at gogos**.
-Renovation does not raise these prices. Stock starts at ฿38 per drink, leaving
+House beers cost **฿80 at beer bars, ฿100 at Soi bars and ฿120 at gogos**.
+Renovation does not raise these prices. House lager stock starts at ฿38 per drink, leaving
 ฿42/62/82 before wages, overhead and commission. Happy Hour takes 20% off new
-orders; the purchased premium menu still adds ฿30 to eligible orders.
+orders; the purchased premium menu unlocks mango cocktails at ฿30 above house lager.
 
 Stock starts in **six-drink packs for ฿228**. Supplier level 2 switches both manual
 and automatic deliveries to **twelve drinks for ฿432** (฿36 each). Levels 3–5
@@ -88,6 +88,9 @@ Staff cost money while on duty, even when the bar is quiet. Use the rota or temp
 costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
 cash for the next shift—not just a large bank balance.
+
+Tap **Stock** or **Restock fridge** to compare popularity with profit per sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
+Mango cocktails.
 
 ## Music, automation and management income
 
@@ -164,7 +167,7 @@ Toybox sparring. Tours and legacy mining investments are not progression gates.
 | Street | **Serve a drink**, **Welcome customers**, **Have a chat**, property cards and the scrollable management tabs |
 | Events | Pink warning banner or **Events**; prepare before the countdown, then **Face Godzilla** for a monster challenge |
 | District | WASD/arrows to walk, E to enter, Esc to return; touch a destination on mobile |
-| Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J/K/L to jab/kick/Burst; mobile touch controls |
+| Toybox | A/D or arrows to move, W/Up to jump, S/Down to guard, J/K/L to jab/kick/Burst. On mobile, hold or slide on the left D-pad and tap attacks with your right thumb. |
 | Godzilla | **Serve a shot** or Space; ten shots before the timer ends |
 
 Each launch opens a **New Game / Resume** menu. **Resume** continues your saved
@@ -192,8 +195,9 @@ an estimate for up to eight real hours away, counting only projected noon–1am
 windows and limited by demand, stock, service, cleanliness, venue peak hours and costs. Offline time
 does not advance the live clock, cleaning, heat, raids or disasters. See **Journal**
 for the estimate. Optional **Open managed shift** guidance uses the same live
-customers and clock. **Tutorial** runs the older decision lessons in an isolated
-practice campaign and never overwrites your campaign.
+customers and clock. **Tutorial** lets you practise stock deliveries, serving,
+welcoming, Chat, hiring and closing in a separate practice shift. Tap or hover
+over a top-bar stat for a quick explanation.
 
 ## Documentation
 
@@ -217,8 +221,8 @@ The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
 are checked together with 42 fresh-campaign simulations plus 60 paired celebration scenarios. Baseline active
-runs with the revised drink prices reach stage 2 in 32–34 minutes, a second venue in 94–100 minutes and stage 3
-in 130–138 minutes. Optional promoter-first investment takes longer to repay;
+runs with the revised drink prices reach stage 2 in 32–34 minutes, a second venue in 93–98 minutes and stage 3
+in approximately 130–136 minutes. Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
@@ -366,9 +370,9 @@ The date already advanced at midnight, so the jump does not add another day.
 ## Anong counts the tip jar
 
 Each customer visit earns **฿10 on its first successfully served drink**. Extra
-rounds do not tip again. At nightly street closure, Anong counts the jars and adds
-the money to your till before the fifteen-second clean-up. Service and Journal
-show pending visits, the last payout and total tips. Cancelling the jump, reloading
+rounds do not tip again. Serving a guest’s requested specialty drink on their first round can add a **฿5 bonus**.
+Anong counts the jars at nightly closure before the fifteen-second clean-up.
+The fridge, Service and Journal show the pending amount and payout history. Cancelling the jump, reloading
 or reopening the report cannot pay twice. Offline estimates earn no tips.
 
 For **zero stock and too little cash for a pack**, Service now shows **Bo's

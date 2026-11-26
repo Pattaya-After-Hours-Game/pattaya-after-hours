@@ -103,12 +103,6 @@ func _draw() -> void:
 	Art.frame(self,"anong-service",idle,Vector2(817,418),person_scale(418),false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
 	# Foreground bar layer occludes the bartender's legs, never the interface.
 	Art.image(self,"counter",Rect2(650,344,310,92))
-	# Exact signage is live text, not lettering baked into generated artwork.
-	var sign_name: String = "BLUE HO" if selected_bar == 0 and stage == 1 else str(bar.name).to_upper()
-	draw_style_box(_sign_box(),Rect2(665,73,230,40))
-	var neon: Color = [TEAL,PINK,GOLD][kind]
-	neon = neon.darkened(.025+.025*sin(clock*2.3))
-	draw_string(font,Vector2(676,101),sign_name,HORIZONTAL_ALIGNMENT_CENTER,208,24,neon)
 	# Owned fans stay installed when closed, but only spin during trading.
 	if fan_owned(bar) and not closed:
 		var fan := Vector2(502,122) if kind==0 else Vector2(266,92)

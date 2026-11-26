@@ -70,7 +70,19 @@ const STARTING_CASH = 228
 const STOCK_COST = 38
 const CONSIGNMENT_COST = 14
 const LEGACY_STOCK_COST = 14 # Backfill only for saves predating paid inventory lots.
+const DRINKS = [
+	{"id":"lager","name":"House lager","tier":"House","cost":STOCK_COST,"offset":0,"substitute":100},
+	{"id":"soda","name":"Lime soda","tier":"Value","cost":6,"offset":-10,"substitute":80},
+	{"id":"rum","name":"Rum & cola","tier":"Select","cost":19,"offset":18,"substitute":90},
+	{"id":"mango","name":"Mango cocktail","tier":"Premium","cost":25,"offset":30,"substitute":75},
+]
+# The audience order is locals, visitors, and big spenders.
+const DRINK_TASTES = [[63,24,11,2],[46,10,32,12],[27,8,38,27]]
+const DRINK_PRICE_HEADROOM = [8,22,50]
+const DRINK_TIP_CHANCE = [[0,60,20,8],[0,22,50,20],[0,10,42,75]]
+const AUDIENCE_AFFINITY = [[1.5,1.0,.5],[.6,1.0,1.6],[.3,1.3,1.5]]
 const TIP_PER_VISIT = 10
+const DRINK_TIP_BONUS = 5
 const POOL_FEE = 50
 const POOL_SECONDS = 45
 const ACTION_COOLDOWNS = [10,8,6,4,2]
@@ -91,7 +103,7 @@ const EQUIPMENT = [
 	{"id":"screen", "name":"Sports screen", "cost":1200, "max":1, "help":"Unlocks sports nights; idle screens do not attract a crowd."},
 	# Legacy slot retained for save/action indices; training is now per person.
 	{"id":"training", "name":"Service training", "cost":800, "max":2, "help":"Bartenders serve faster; does not generate orders."},
-	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Adds premium orders for customers with the budget. Stage 2+."},
+	{"id":"menu", "name":"Premium drinks menu", "cost":2200, "max":1, "help":"Lets you stock Mango cocktails. Stage 2+."},
 	{"id":"music", "name":"Music system", "cost":1200, "max":1, "help":"Repeat drink orders arrive after 25s instead of 35s. Budgets, two-drink limit and service still apply."}
 ]
 const PROMOTIONS = [

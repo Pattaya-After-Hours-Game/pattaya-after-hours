@@ -430,5 +430,16 @@
       192
     ],
     "height": 180
+  },
+  "patrons-capybara": {
+    "frames": [
+      "customer-capybara.png"
+    ],
+    "cell": [
+      224,
+      192
+    ],
+    "height": 180,
+    "foot_x_fraction": 0.26
   }
 }

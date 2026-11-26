@@ -15,7 +15,7 @@ missing_plates=[name for name in required if not (SRC/(name+'.png')).exists()]
 if missing_plates and '--partial' not in sys.argv:
     raise SystemExit('Missing source artwork: '+', '.join(missing_plates))
 
-def normalize(im, cell=(128,192), height=180, foot_pivot=True):
+def normalize(im, cell=(128,192), height=180, foot_pivot=True, foot_x_fraction=None):
     im=im.convert('RGBA')
     # Remove near-transparent fringes before measuring the silhouette.
     im.putalpha(im.getchannel('A').point(lambda a: 0 if a < 160 else 255))
@@ -28,6 +28,7 @@ def normalize(im, cell=(128,192), height=180, foot_pivot=True):
     # Anchor the feet rather than the full silhouette (a tray/punch extends it).
     foot_region=im.getchannel('A').crop((0,max(0,im.height-12),im.width,im.height)).getbbox()
     foot_x=(foot_region[0]+foot_region[2])/2 if foot_region and foot_pivot else im.width/2
+    if foot_x_fraction is not None: foot_x=im.width*foot_x_fraction
     paste_x=round(cell[0]/2-foot_x)
     # Never crop extended limbs: packer selects sufficiently wide cells.
     paste_x=max(2,min(cell[0]-im.width-2,paste_x))
@@ -63,7 +64,7 @@ recipe=ROOT/'art/packing.json'
 # allowed only during the art pass; final preparation fails closed.
 groups={}
 missing=[]
-for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json','frontage-jobs.json','customer-jobs.json','nida-jobs.json']:
+for filename in ['service-jobs.json','remaining-jobs.json','extra-jobs.json','locomotion-jobs.json','frontage-jobs.json','customer-jobs.json','nida-jobs.json','customer-capybara.json']:
     for job in json.loads((ROOT/'art/recipes'/filename).read_text()):
         if not (SRC/(job['id']+'.png')).exists(): missing.append(job['id'])
         if 'group' in job: groups.setdefault(job['group'],[]).append(job['id']+'.png')
@@ -83,6 +84,7 @@ for name,frames in groups.items():
     if name.startswith('fight-'):
         spec.update(cell=[320,256],height=200,frame_heights=[200,200,200,160,185,185,200,190,185,195,52,235])
     if name=='monster': spec.update(cell=[320,320],height=290,frame_heights=[290,290,290,210])
+    if name=='patrons-capybara': spec.update(cell=[224,192],foot_x_fraction=0.26)
     packing[name]=spec
 normalize(Image.open(SRC/'compact-bench.png'),(240,128),120,False).save(OUT/'compact-bench.png')
 Image.open(SRC/'portrait-nida.png').convert('RGBA').resize((96,96),NEAREST).save(OUT/'portrait-nida.png')
@@ -113,7 +115,7 @@ if recipe.exists():
             frames=[]
             for index,path in enumerate(spec['frames']):
                 height=spec.get('frame_heights',[spec.get('height',180)]*len(spec['frames']))[index]
-                frames.append(normalize(Image.open(SRC/path),cell,height,not (name.startswith('fight-') and index==10)))
+                frames.append(normalize(Image.open(SRC/path),cell,height,not (name.startswith('fight-') and index==10),spec.get('foot_x_fraction')))
             atlas=Image.new('RGBA',(cell[0]*len(frames),cell[1]))
             for i,frame in enumerate(frames): atlas.alpha_composite(frame,(i*cell[0],0))
             atlas.save(OUT/(name+'.png'))

@@ -658,6 +658,9 @@ func save_game(replace_campaign: bool = false) -> int:
 		if error != OK: return error
 	return DirAccess.rename_absolute(temporary,SAVE)
 
+func _valid_tip_bonus(value: Variant, visits: Variant) -> bool:
+	return _finite_number(value,0,float(visits)*Street.C.DRINK_TIP_BONUS) and fmod(float(value),Street.C.DRINK_TIP_BONUS)==0
+
 func _finite_number(value: Variant, minimum: float, maximum: float) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value)>=minimum and float(value)<=maximum
 
@@ -704,12 +707,15 @@ func _read(path: String) -> Variant:
 				if int(parsed.version)==3:
 					for key in Street.Economy.clock_fields(): defaults.erase(key)
 				for key in defaults:
+					if key in ["drink_stock","bonus_tips"] and not bar.has(key): continue
 					if not bar.has(key): return null
 					if defaults[key] is Array and not bar[key] is Array: return null
 					if defaults[key] is Dictionary and not bar[key] is Dictionary: return null
 				for key in defaults.equipment:
 					if key=="music" and int(parsed.version)<7: continue
 					if not bar.equipment.get(key) is float and not bar.equipment.get(key) is int: return null
+				for key in ["drink_requests","drink_misses"]:
+					if bar.shift.has(key) and not bar.shift[key] is Dictionary: return null
 				for person in bar.team:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
 					if not int(person.role) in ([0,1,2,3] if int(parsed.version)>=6 else [0,1,2]) or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
@@ -718,8 +724,15 @@ func _read(path: String) -> Variant:
 					if int(person.get("training",0))>=Street.C.STAFF_SERVICE_SECONDS.size() or int(person.get("contract_left",0))>Street.C.STAFF_CONTRACT_MINUTES: return null
 				for customer in bar.customers:
 					if not customer is Dictionary: return null
-					for key in ["id","life","order","wait","quoted","drinks","next","budget","premium","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
+					for key in ["id","life","order","wait","quoted","drinks","next","budget","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
 						if not customer.has(key): return null
+					if customer.has("drink") and not int(customer.drink) in range(Street.C.DRINKS.size()): return null
+				for sku in bar.get("drink_stock",{}):
+					if bar.drink_stock[sku]!=true: return null
+					var known := false
+					for drink in range(1,Street.C.DRINKS.size()):
+						if Street.C.DRINKS[drink].id==sku: known = true
+					if not known: return null
 				for game in bar.games:
 					if not game is Dictionary or not game.get("players") is Array or not game.has("remaining") or not game.has("fee"): return null
 		if int(parsed.version)>=4:
@@ -773,7 +786,8 @@ func _read(path: String) -> Variant:
 				if not _finite_number(bar.supplier_level,0,5) or float(bar.supplier_level)!=floorf(bar.supplier_level): return null
 				if not _finite_number(bar.equipment.get("music"),0,1): return null
 				for lot in bar.stock_lots:
-					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),6,Street.C.STOCK_COST): return null
+					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),1,Street.C.STOCK_COST): return null
+					if not _finite_number(lot.get("drink",0),0,Street.C.DRINKS.size()-1): return null
 		if int(parsed.version)>=8:
 			for bar in parsed.street.bars:
 				for customer in bar.customers:
@@ -794,10 +808,13 @@ func _read(path: String) -> Variant:
 			for bar in parsed.street.bars:
 				for key in ["tip_visits","tips_total"]:
 					if not _finite_number(bar.get(key),0,1e15) or float(bar[key])!=floorf(float(bar[key])): return null
+				if not _valid_tip_bonus(bar.get("bonus_tips",0),bar.tip_visits): return null
 				if not bar.last_tips.is_empty():
 					for key in ["day","visits","amount"]:
 						if not _finite_number(bar.last_tips.get(key),0,1e15) or float(bar.last_tips[key])!=floorf(float(bar.last_tips[key])): return null
-					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT: return null
+					var bonus: Variant = bar.last_tips.get("bonus",0)
+					if not _valid_tip_bonus(bonus,bar.last_tips.visits): return null
+					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT+bonus: return null
 		if int(parsed.version)>=10:
 			var prep: Variant = parsed.street.get("night_prep")
 			if not prep is Dictionary: return null

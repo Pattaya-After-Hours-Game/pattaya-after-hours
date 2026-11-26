@@ -113,8 +113,9 @@ only serve real orders. Hosts and dancers attract customers. The UI reports
 actual net separately from forecast automatic income. See [the economy guide](docs/ECONOMY.md).
 
 Guided shifts share the same customers, stock and ledger, with decisions at 0,
-40 and 80 seconds. The original incident-based shift is retained only for isolated
-tutorial practice and completing older in-progress saves. Godzilla is announced
+40 and 80 seconds. The tutorial runs the live economy in a separate model and
+steps the clock at specific lessons. Older in-progress saves can still finish
+their original incident-based shift. Godzilla is announced
 through the street event system, including the repeatable festival.
 
 Milestone chapters replace the day-based story schedule. The old story cards

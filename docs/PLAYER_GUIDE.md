@@ -6,17 +6,19 @@ build. On the startup menu, choose **New Game** to open your first bar or
 to confirm erasing the previous campaign, including its backup; **Cancel** keeps
 it. Resume is disabled when no readable save is available.
 
-The main street is the live business. **Tutorial** is an optional practice
-campaign using the original decision lessons; it does not spend your real till.
+The selected bar’s name appears at the top left. Open **Tutorial** for a short practice shift.
+Buy a pack, serve an order, help an impatient guest, hire a bartender and close
+for the night. Practice uses its own till and does not change your save.
+Tap a top-bar stat on mobile or hover over it on desktop for a quick explanation.
 
 ## Drink prices and restocking money
 
-Standard drinks are ฿80 in beer bars, ฿100 in Soi bars and ฿120 in gogos.
+House beers are ฿80 in beer bars, ฿100 in Soi bars and ฿120 in gogos.
 Service shows the current standard quote and the cost of your next delivery.
 Happy Hour discounts new orders by 20%; already-waiting orders keep their quote.
-The premium-menu upgrade adds ฿30 for eligible orders; renovation alone adds none.
+The premium-menu upgrade unlocks mango cocktails at ฿30 above house lager; renovation alone adds none.
 
-Ordinary stock begins at ฿38 each: ฿228 for six. Supplier upgrades switch to
+House lager stock begins at ฿38 each: ฿228 for six. Supplier upgrades switch to
 12 for ฿432, then ฿408/384/360. Set aside the whole delivery bill before spending
 on improvements. A new game starts with twelve drinks and ฿228; updating an
 existing campaign does not change its cash, stock, waiting tabs or paid stock costs.
@@ -132,7 +134,25 @@ The first useful purchase depends on the bar: frontage helps quiet trade,
 seating helps a full room, and a bartender helps unattended orders. More service
 capacity cannot sell drinks to customers who are not there.
 
+## Pick what to stock
+
+Tap **Stock** or **Restock fridge** to open the drink list. Look for how many
+orders are waiting, the expected popularity and the gross margin per sale.
+A short note flags when the crowd or Happy Hour makes a drink more popular.
+
+Locals lean toward house lager and budget lime soda. Visitors order more Rum &
+cola. Big spenders are likelier to order Mango cocktails once you unlock the
+stage-2 premium menu. Happy Hour can put pricier drinks within a guest’s budget.
+Serve a guest’s requested specialty drink on their first round for a chance at a **฿5 tip**.
+
+Mixed delivery follows the expected order mix. Return slow stock at half its
+purchase cost to free space.
+
 ## Give yourself a faster shift
+
+Open **Service → Upgrades** to see what you can buy. The number badge on Service
+jumps to ready upgrades for the selected venue. **Show all** lists locked options,
+and **?** explains what an upgrade does and what it needs.
 
 The Serve and Welcome buttons fill back up as foreground time passes. The label
 shows seconds remaining, Ready, or why the action is unavailable. Each venue has
@@ -430,6 +450,9 @@ first if you want to keep it. [Developer setup](../DEVELOPMENT.md) lists save pa
 The source branch and a published release may be different builds. Use the
 checkout containing the changes you want to play, and avoid running two versions
 against the same campaign at once.
+
+The build version is in the lower-right corner. Include that corner when sharing
+a screenshot for a bug report.
 
 ## Cold beer and bulk terms
 

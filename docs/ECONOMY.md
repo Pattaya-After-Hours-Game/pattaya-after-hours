@@ -20,8 +20,15 @@ campaign outcomes appear below.
 
 These are game balance values, not promised real-world supplier terms. The
 requested ladder replaces ฿55/85/140. Supplier levels 0–5 cost ฿38/38/36/34/32/30
-per unit; upgrade fees stay unchanged. The premium menu retains its ฿30
+per unit; upgrade fees stay unchanged. The premium menu unlocks mango cocktails at a ฿30
 surcharge and Happy Hour its 20% discount. Renovation never adds a price bump.
+
+Ryan's concurrent drink-inventory work is retained. The ladder is the house-lager
+base. Lime soda stays ฿10 below it, rum and cola ฿18 above it, mango cocktails
+฿30 above it. Those products retain base supply costs ฿6/19/25; supplier discounts
+still apply to each. Single-drink packs, partial mixed deliveries, paid-cost
+returns, audience preferences, lager substitutions and matched-drink tip bonuses
+use the merged model. These are distinct products, not cheaper beer stock.
 
 Fresh games start with ฿228 and twelve drinks, plus the same three opening
 customers. The float covers one complete pack; the smaller starter fridge avoids
@@ -32,14 +39,17 @@ Normal purchases and old saves do not grant a free cash adjustment.
 Save schema remains 11. Existing waiting quotes and budgets, inventory quantities
 and paid FIFO lot costs survive; only future orders and deliveries use new prices.
 Pre-lot saves backfill inventory/report costs at the historical ฿14, not today's
-price. Validation accepts historical ฿6–14 lots and new costs up to ฿38. Consignment
+price. Validation accepts paid drink costs from ฿1 to ฿38, including old lots. Consignment
 uses a separate fixed ฿14 repayment in live/offline settlement. It is explicitly
 a recovery concession, never the normal supplier price. Tips remain ฿10 per visit.
 
 The first ฿35 supply candidate accelerated some milestones outside current
 bounds; ฿39 introduced a long manager-saving gap in one baseline seed. ฿38 keeps
 beer gross contribution near the old ฿41 while passing the existing baseline
-bounds. No renovation/staff/manager prices or pacing thresholds were changed.
+bounds. No renovation/staff/manager prices or minute-based pacing targets were changed.
+After integration with the new drink inventory, milestone assertions round to
+the nearest minute: a 129m51s result meets the 130-minute target. Exact times
+remain in output; the 30/38-minute saving-gap ceilings still use exact seconds.
 Current verification and timing results are in [TESTING](TESTING.md); older
 measurements below describe earlier price versions.
 
@@ -49,7 +59,10 @@ Each real visit's first successful drink sale increments `bar.tip_visits`; the
 saved `customer.drinks` counter prevents repeat tips for further rounds. Manual,
 staff and owner automation share settlement. Tips are an additional house bonus
 of ฿10 per served visit, outside the existing drink budget and Nida's commission.
-They are never earned by arrivals alone, pool, managers or offline estimates.
+Serving the requested specialty drink on the first round can also add ฿5 to the same nightly jar.
+The odds depend on drink and audience. The roll is stable per guest and drink,
+independent of traffic RNG. Substitutes earn the base tip only.
+Tips are never earned by arrivals alone, pool, managers or offline estimates.
 
 The street counts all jars at final nightly closure, or an explicit legal night
 skip. Daytime close/open toggles and short business reports do not count them.
@@ -224,7 +237,7 @@ serving remains useful alongside staff. Hosts and dancers attract
 visitors instead. Gogos perform between seconds 40 and 80 of each shift; drinks
 and premium-menu orders are priced independently of renovation stage.
 
-Stock starts at ฿38 per drink when delivered; supplier levels reduce future
+House lager stock starts at ฿38 per drink when delivered; supplier levels reduce future
 unit costs to ฿36/34/32/30. Inventory lots retain paid unit costs and are consumed
 first-in, first-out for promotion contribution and healthy-shift margins. Wages and premises overhead are charged
 throughout open time, including quiet periods. Schedule staff off or close a venue
@@ -232,6 +245,24 @@ to reduce charges. An unaffordable operating charge closes the venue before debt
 is created. Staff records and equipment remain; contracts continue to expire. Anong's owner-run recovery shift
 covers two minutes of overhead; if the fridge is empty, six consignment drinks
 are paid for only when a real customer buys them. No buyer means no income.
+
+## Drink demand and inventory
+
+Patron audience affects drink preferences. The fridge shares capacity across
+house lager, lime soda, rum and cola, and premium mango cocktails. Guests may
+accept house lager at its order-time quote if their preferred drink is unavailable.
+Unfilled requests and substitutions appear in the drink list. Locals, visitors
+and big spenders have different willingness to pay. Guests can trade down to
+lager or soda if an order exceeds their price ceiling or remaining budget.
+Popularity and mixed delivery use the audience and current menu prices, including
+Happy Hour. Pending orders keep their original quotes.
+
+Manual orders can buy a full pack of a single drink or a mixed selection based on
+current demand. Supplier terms apply to each product. Automatic deliveries cover
+drinks already stocked at that bar. Stock lots retain their paid prices for FIFO
+service and half-cost returns. Old stock becomes house lager and pending orders
+keep their saved quote. Offline trading estimates a drink mix within stock and
+working-capital limits.
 
 ## Compact layout, deliveries and the frontage promoter
 
@@ -459,8 +490,8 @@ backup; it starts with the ordinary opening cash, stock and customers.
 Managed-shift guidance has three decisions at the ordinary shift boundaries
 (start, 40s and 80s). Decision screens pause the model. Continuing resumes the
 same visitors, games, inventory and ledger. Repeated choices cannot skip time,
-create customers or settle another report. The original tutorial is a separate
-practice campaign. Old saves interrupted inside a legacy shift finish that shift
+create customers or settle another report. The tutorial practises the live service
+loop and closing in a separate campaign. Old saves interrupted inside a legacy shift finish that shift
 once, then enter the live economy.
 
 Version-seven saves add music, owner automation, manager/supplier levels, stock

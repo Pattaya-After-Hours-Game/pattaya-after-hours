@@ -35,8 +35,8 @@ claiming behaviour exists; update the relevant documentation when it changes.
 
 - Demand, space, service and supply are separate limits. A drink sale needs a
   real order, stock and service. Clicking or hiring must not manufacture buyers.
-  Venues compete for bounded shared street traffic. Standard drinks cost ฿80/100/120
-  in beer/Soi/gogo venues. Ordinary stock costs ฿38/38/36/34/32/30 at supplier
+  Venues compete for bounded shared street traffic. House beers cost ฿80/100/120
+  in beer/Soi/gogo venues. House lager stock costs ฿38/38/36/34/32/30 at supplier
   levels 0–5; premium orders and promotions retain their separate rules. Fresh
   campaigns start with ฿228 and twelve drinks. Preserve saved quotes, budgets
   and paid inventory costs; never revalue an existing fridge or grant cash on update.
@@ -147,9 +147,10 @@ player selects an option; no contract ageing, offline claim or autosave on the m
 
 Inspect `git status`, the current branch and relevant worktrees first. Preserve
 other work. The merge handover records a historical integration state; do not
-assume its branch names or paths describe every future checkout. Unless the user
-asks otherwise, work on a feature branch and leave merging to `main` and release
-publication to the maintainer. Follow the user's explicit task and scope.
+assume its branch names or paths describe every future checkout. For requests
+from Ryan (`rknell`), sync `main`, verify the change, then commit and push
+directly to `main` unless he asks for a branch or pull request. For other
+maintainers, follow their instructions. The release workflow runs on `main`.
 
 For gameplay, save, integration or asset changes, run `tools/test.sh`. It isolates
 saves and editor settings and includes the pacing suite. Never run destructive
@@ -188,3 +189,8 @@ Keep tip receipts out of commission, drink counters, healthy-service margins and
 the five-second trading sample. Older saves get no retroactive tips. Expose the
 existing six-drink consignment recovery beside unaffordable empty stock; preserve
 orders/cooldowns, staff-off rota and ฿14 per sale, with no cover/stock stacking.
+
+Milestone pacing targets use nearest-minute comparisons; exact run times remain
+reported. Saving-gap ceilings remain exact. Preserve Ryan's per-drink stock,
+audience/price choices, paid-cost returns and matched-drink bonus tips alongside
+the standard house-beer price ladder. Other drinks retain their own supply costs.

@@ -1,10 +1,13 @@
 # Current implementation and release handoff
 
 Updated **26 November 2026**. Main `9d35018` shipped as **v1.0.22** with nightly
-tips and visible consignment recovery. **`codex/venue-drink-prices`** implements
+tips and visible consignment recovery. This branch also merges Ryan’s main
+through `6003191`: per-drink inventory/fridge, demand hints, matched-drink bonus
+tips, live tutorial, capybara regular, upgrade UI, version/name HUD and mobile
+sparring controls. **`codex/venue-drink-prices`** implements
 the requested standard price ladder: beer ฿80, Soi ฿100, gogo ฿120.
 
-Normal stock now costs ฿38/38/36/34/32/30 at supplier levels 0–5. Packs remain
+House lager stock now costs ฿38/38/36/34/32/30 at supplier levels 0–5. Packs remain
 six, then twelve; fees for upgrades, staff and managers are unchanged. Fresh
 campaigns have twelve drinks and ฿228, while existing cash, stock lots, queued
 quotes and budgets survive unchanged. Opening a property retains a full base
@@ -12,7 +15,8 @@ pack in its reserve. Schema stays 11 with expanded paid-cost validation.
 Bo's recovery consignment stays a separate ฿14 per sale, including offline.
 
 The full test wrapper passes regressions, 42 fresh campaigns and sixty paired
-party scenarios. All existing pacing thresholds pass unchanged. A focused party
+party scenarios. Existing minute targets pass with nearest-minute comparison; saving-gap
+ceilings remain exact. A focused party
 rerun corrects its old fixed-cost inventory valuation. Three venue price previews
 at 960 × 540 and the gogo price at 1280 × 720 are inspected. See
 [testing](TESTING.md) for measured times and compatibility coverage.

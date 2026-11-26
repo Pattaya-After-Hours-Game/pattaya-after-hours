@@ -29,7 +29,7 @@ must not independently start two roadmap items.
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
 | Working branch / chat / PR | `codex/venue-drink-prices`; see [handover](MERGE_HANDOFF.md) |
 | Scope and owned files | Standard drink prices, wholesale packs, reserves, balance tests and docs |
-| Next handoff / blocker | Regressions, 42 campaigns and previews passed; current thresholds unchanged; device play pending |
+| Next handoff / blocker | Regressions, 42 campaigns and previews passed; minute targets retained with rounding; main through `6003191` integrated; device play pending |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-26 |
 

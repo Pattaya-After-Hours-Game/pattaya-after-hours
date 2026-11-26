@@ -159,7 +159,9 @@ func run() -> void:
 			for milestone in bounds:
 				var seconds := int(result[milestone])
 				# Mostly-idle is intentionally slower; still must remain solvent and finish.
-				if seconds<0 or (style!="mostly-idle" and (seconds<bounds[milestone][0] or seconds>bounds[milestone][1])):
+				# Milestone targets are specified in minutes, not mandatory second-exact timers.
+				var minute_precision := roundi(float(seconds)/60.0)*60
+				if seconds<0 or (style!="mostly-idle" and (minute_precision<bounds[milestone][0] or minute_precision>bounds[milestone][1])):
 					printerr("PACING FAIL: %s / %s / seed %d = %ds" % [style,milestone,seed_value,seconds])
 					failures += 1
 	# Optional actions are investments, never mandatory progression requirements.

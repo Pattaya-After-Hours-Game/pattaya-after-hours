@@ -375,6 +375,14 @@
     ],
     "sha256": "01186e811dde64fccd45bb561f791697ca5fccbd265506554ce4822dd33ff80c"
   },
+  "patrons-capybara": {
+    "file": "res://assets/art/patrons-capybara.png",
+    "size": [
+      224,
+      192
+    ],
+    "sha256": "1b8bfccd551315446b89c362afd1516a433bc45732d5bffbeb101bf1fab57914"
+  },
   "patrons-men": {
     "file": "res://assets/art/patrons-men.png",
     "size": [
