@@ -469,12 +469,16 @@ func race_staff(bar: Dictionary) -> int:
 		if worker.role==0 and worker.on and economy.contracted(worker) and i not in bar.away: return i
 	return -1
 
-func begin_event_game() -> int:
+func available_event_game() -> int:
 	var event: Dictionary = s.street.event
 	var id := int(event.get("id",-1))
 	if s.phase!="plan" or event.get("phase","")!="active" or event.get("attempted",false): return -1
 	if not ((id==C.Local.CART and not event.prepared) or (id==C.Local.BED and event.prepared)): return -1
-	event.attempted = true
+	return id
+
+func begin_event_game() -> int:
+	var id := available_event_game()
+	if id>=0: s.street.event.attempted = true
 	return id
 
 func settle_event_game(id: int, won: bool) -> String:

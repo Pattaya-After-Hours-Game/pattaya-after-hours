@@ -241,7 +241,7 @@ Toybox sparring. Tours and legacy mining investments are not progression gates.
 | Where | Controls |
 | --- | --- |
 | Street | **Serve a drink**, **Welcome customers**, **Have a chat**, property cards and the scrollable management tabs |
-| Events | Pink warning banner or **Events**; prepare before the countdown, then **Face Godzilla** for a monster challenge |
+| Events | Open **Events** or the pink warning banner. A yellow **!** flags a ready promotion or challenge when the selected bar has room. Select **?** for details. |
 | District | WASD/arrows to walk, E to enter, Esc to return; touch a destination on mobile |
 | Toybox | A/D or Left/Right to move, W/Up to jump, S/Down to crouch and guard. J punches, K kicks, L uses Burst at full meter. Hold crouch with J for an uppercut or K for a roundhouse. On mobile, hold Down on the D-pad and tap Punch or Kick for the same moves. |
 | Godzilla | **Serve a shot** or Space; ten shots before the timer ends |

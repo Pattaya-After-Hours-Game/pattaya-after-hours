@@ -378,7 +378,10 @@ The first beer-bar pool table costs ฿2,000. Two customers pay **฿50 total** 
 players remain customers and can order drinks. A table uses space that could
 otherwise seat visitors, and players stay longer.
 
-Open **Events** for venue promotions:
+Open **Events** for venue promotions. A yellow **!** appears above the tab when
+the selected venue has room and a promotion or street challenge is ready to
+start. Use **?** to expand rules, forecasts or reports. Hover over a promotion
+for its effect and any reason it is locked.
 
 | Promotion | What changes |
 | --- | --- |

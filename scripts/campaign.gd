@@ -267,10 +267,12 @@ func start() -> String:
 	s.card = _draw_card()
 	return ""
 
-func start_street_boss() -> String:
+func can_start_street_boss() -> bool:
 	var event: Dictionary = s.street.event
-	if s.phase != "plan" or event.get("phase","") != "active" or not int(event.get("id",-1)) in [8,9]:
-		return "Wait for the announced monster event."
+	return s.phase=="plan" and event.get("phase","")=="active" and int(event.get("id",-1)) in [8,9]
+
+func start_street_boss() -> String:
+	if not can_start_street_boss(): return "Wait for the announced monster event."
 	s.night = {"godzilla":"attack", "street_boss":true}
 	s.phase = "godzilla"
 	return ""

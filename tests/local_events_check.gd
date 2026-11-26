@@ -56,8 +56,32 @@ func run_ui(test: SceneTree) -> void:
 	app.boot_menu = false
 	app.model = Campaign.new(72)
 	app.model.s.cash = 5000
+	var bar: Dictionary = app.model.street.selected()
+	var eco = app.model.street.economy
+	app.render()
+	test.check(app.event_badge.visible and app.event_badge.text=="!","A runnable promotion shows the Events badge")
+	while bar.customers.size()<eco.seats(bar): eco.admit(bar)
+	app.live_seconds = 1.0
+	app._process(0.0)
+	test.check(not app.event_badge.visible,"Filling the bar hides the Events badge during play")
+	bar.customers.pop_back()
+	app.live_seconds = 1.0
+	app._process(0.0)
+	test.check(app.event_badge.visible,"A free seat brings the Events badge back during play")
+	app.event_badge.pressed.emit()
+	test.check(app.tab==1 and app.drawer_open and bar.promo.is_empty(),"The badge opens Events without starting a promotion")
+	var promo: Button = test.find_button(app,"Sports Night · ฿100")
+	var info: Button = promo.get_parent().get_child(1)
+	var detail: Label = app.column.get_child(promo.get_parent().get_index()+1)
+	test.check(promo.disabled and promo.tooltip_text.contains("Buy the screen first") and promo.tooltip_text.contains("fixture") and not detail.visible,"Promotion tooltips retain both the effect and lock reason")
+	info.pressed.emit()
+	test.check(detail.visible and detail.text.contains("break-even") and detail.text.contains("Buy the screen first"),"Promotion help reveals the forecast and lock reason")
+	info.pressed.emit()
+	test.check(not detail.visible,"Promotion help collapses again")
+	bar.promo_cooldown = 120
 	app.model.street.announce(Local.CART)
 	app.render()
+	test.check(not app.event_badge.visible,"Cooldown and a waiting minigame leave the badge hidden")
 	app._process(1.0)
 	test.check(app.news_issue.headline=="Cart Jam" and app.model.s.street.elapsed==0,"Newspaper pops up and pauses the street")
 	test.check(test.find_button(app,"Read the original · The Pattaya News")!=null,"Newspaper includes the original reporting link")
@@ -65,7 +89,9 @@ func run_ui(test: SceneTree) -> void:
 	test.check(app.tab==1 and app.news_issue.is_empty(),"Newspaper routes to the current event")
 	app.model.street.start_event()
 	app.render()
+	test.check(app.event_badge.visible,"A runnable street minigame lights the badge during promotion cooldown")
 	test.use_button(app,"Clear traffic · Play")
+	test.check(not app.event_badge.visible,"Using the only minigame attempt clears the badge")
 	test.check(app.event_game==Local.CART and app.cart_board.size()==11,"Events opens the sliding puzzle")
 	test.check(app.event_overlay.size==Vector2(960,540) and app.event_overlay.z_index>0,"Cart Jam covers the game view and its HUD")
 	await test.process_frame
@@ -98,6 +124,7 @@ func run_ui(test: SceneTree) -> void:
 	test.root.push_input(touch,true)
 	test.check(app.cart_board[5][0]==0 and app.cart_moves==1 and app.cart_held<0,"A touch release snaps a multi-cell drag into place")
 	app.end_event_game(false)
+	test.check(not app.event_badge.visible,"An attempted street challenge leaves the badge hidden")
 	app.model.street.finish_event()
 	app.model.street.action("hire",0)
 	app.model.street.announce(Local.BED)

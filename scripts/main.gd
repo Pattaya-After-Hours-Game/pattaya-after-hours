@@ -69,6 +69,7 @@ var service_help_panel: Panel
 var drawer_close_button: Button
 var drawer: Control
 var event_banner: Button
+var event_badge: Button
 var news_issue := {}
 var supplier_special_open := false
 var seen_news := {}
@@ -384,6 +385,7 @@ func render(keep_scroll: bool = false) -> void:
 	bar_fine_controls.clear()
 	lease_controls.clear()
 	upgrade_badge = null
+	event_badge = null
 	upgrades_entry = null
 	upgrade_quotes.clear()
 	stock_controls.clear()
@@ -497,6 +499,20 @@ func render(keep_scroll: bool = false) -> void:
 		b.add_theme_font_size_override("font_size",12)
 		b.disabled = model.s.phase != "plan" or practicing
 	if not practicing and model.s.phase=="plan":
+		event_badge = at_button(root_ui,Rect2(112,478,21,21),"!",change_tab.bind(1))
+		event_badge.name = "EventBadge"
+		event_badge.custom_minimum_size = Vector2.ZERO
+		event_badge.size = Vector2(21,21)
+		event_badge.tooltip_text = "Open Events · An event is ready"
+		event_badge.add_theme_font_size_override("font_size",14)
+		var event_yellow := Color("#ffe45c")
+		var event_style := box(DARK,event_yellow)
+		event_style.set_corner_radius_all(10)
+		for state in ["normal","hover","pressed"]:
+			event_badge.add_theme_stylebox_override(state,event_style)
+		for color in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:
+			event_badge.add_theme_color_override(color,event_yellow)
+		sync_event_badge()
 		var tours: int = model.s.bookings.size()
 		var tour_badge := at_button(root_ui,Rect2(180,478,21,21),str(tours) if tours>0 else "!",toggle_drawer.bind(2),tours>0)
 		tour_badge.name = "TourBadge"
@@ -1095,8 +1111,13 @@ func purchase_text(control: Button, caption: String, quote: Dictionary, compact:
 	control.tooltip_text = funding if control.tooltip_text.is_empty() else funding+" "+control.tooltip_text
 	return caption+"\n"+("%s short" % cash(missing) if compact else shortfall)
 
-func watch_purchase(control: Button, caption: String, quote: Callable) -> void:
-	var refresh := func() -> String: return purchase_text(control,caption,quote.call())
+func watch_purchase(control: Button, caption: String, quote: Callable, hint: String = "") -> void:
+	var refresh := func() -> String:
+		var label := purchase_text(control,caption,quote.call())
+		if not hint.is_empty():
+			if not control.tooltip_text.is_empty(): control.tooltip_text += "\n\n"
+			control.tooltip_text += hint
+		return label
 	control.text = refresh.call()
 	live_labels.append([control,refresh])
 
@@ -1210,32 +1231,70 @@ func open_service_section(section: String) -> void:
 	message = ""
 	render()
 
+func promotion_available(bar: Dictionary) -> bool:
+	for i in StreetContent.PROMOTIONS.size():
+		if model.street.economy.promotion_offer(bar,i).enabled: return true
+	return false
+
+func sync_event_badge() -> void:
+	if not is_instance_valid(event_badge): return
+	var bar: Dictionary = model.street.selected()
+	var room: bool = bar.customers.size()<model.street.economy.seats(bar)
+	event_badge.visible = room and (model.street.available_event_game()>=0 or model.can_start_street_boss() or promotion_available(bar))
+
+func event_detail(control: Control, heading: String, detail: Callable) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation",6)
+	column.add_child(row)
+	control.reparent(row,false)
+	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var copy := body("",MUTED,13)
+	copy.hide()
+	var refresh := func() -> String: return detail.call() if copy.visible else ""
+	var info := button("?",func() -> void:
+		copy.visible = not copy.visible
+		copy.text = refresh.call()
+		if not copy.visible: return
+		await get_tree().process_frame
+		if is_instance_valid(copy) and copy.is_visible_in_tree(): scroll.ensure_control_visible(copy))
+	info.custom_minimum_size.x = 38
+	info.tooltip_text = "About "+heading
+	row.add_child(info)
+	live_labels.append([copy,refresh])
+
 func events_panel() -> void:
 	street_event_panel()
-	celebration_panel()
-	title("Venue promotions")
 	var bar: Dictionary = model.street.selected()
-	body("One promotion for two minutes, then a two-minute cooldown. Repeated promotions have less pull. Check your seats and service first.")
-	live_body(func() -> String: return "Operating costs: ฿%d/real min · break-even %.1f drinks/real min" % [model.street.economy.forecast(bar).costs,model.street.economy.forecast(bar).break_even],GOLD,13)
+	var eco = model.street.economy
+	event_detail(body("Venue promotions",TEAL,18),"venue promotions",func() -> String:
+		var baseline: Dictionary = eco.forecast(bar)
+		return "Promotions last two minutes with a two-minute cooldown. Repeating the same offer has less pull. Check your seats and service first.\n\nOperating costs: %s/real min · Break-even: %.1f drinks/real min." % [cash(baseline.costs),baseline.break_even])
+	live_body(func() -> String:
+		if not bar.promo.is_empty(): return "%s · %ds left · attraction ÷ %d" % [StreetContent.PROMOTIONS[int(bar.promo.kind)].name,bar.promo.remaining,bar.promo.repetition]
+		if bar.promo_cooldown>0: return "Promotion cooldown · %ds" % bar.promo_cooldown
+		return "%s · %s" % [bar.name,"Ready to promote" if promotion_available(bar) else "No promotion available"],GOLD,13)
 	for i in StreetContent.PROMOTIONS.size():
 		var offer: Dictionary = StreetContent.PROMOTIONS[i]
-		var caption := "%s · %s" % [offer.name,cash(offer.fee)]
-		watch_purchase(row_button(caption,street_action.bind("promotion",i)),caption,model.street.economy.promotion_offer.bind(bar,i))
-		body(offer.help,MUTED,13)
-		var estimate: Dictionary = model.street.economy.forecast(bar,false,i)
-		body("With promotion fee: break-even %.1f drinks/real min · estimated staff-only net %s/real min." % [estimate.break_even,cash(estimate.net)],MUTED,12)
+		var caption := "%s · %s" % [offer.name,cash(offer.fee) if offer.fee>0 else "Free"]
+		var control := row_button(caption,street_action.bind("promotion",i))
+		control.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		watch_purchase(control,caption,eco.promotion_offer.bind(bar,i),offer.help)
+		event_detail(control,offer.name,func() -> String:
+			var estimate: Dictionary = eco.forecast(bar,false,i)
+			var quote: Dictionary = eco.promotion_offer(bar,i)
+			var reason := "" if quote.enabled else "\n\n"+str(quote.reason)
+			return "%s\n\nWith promotion fee: break-even %.1f drinks/real min · estimated staff-only net %s/real min.%s" % [offer.help,estimate.break_even,cash(estimate.net),reason])
 	promotion_report(bar)
+	celebration_panel(true)
 	body("TOYBOX ARCADE",GOLD,12)
 	row_pair("Quick spar",enter_fight.bind(true),"Run the circuit",enter_fight.bind(true,true))
 
 func promotion_report(bar: Dictionary) -> void:
-	live_body(func() -> String:
-		if not bar.promo.is_empty(): return "%s · %ds remaining · attraction ÷ %d" % [StreetContent.PROMOTIONS[int(bar.promo.kind)].name,bar.promo.remaining,bar.promo.repetition]
-		return "Promotion cooldown: %ds" % bar.promo_cooldown if bar.promo_cooldown>0 else "Ready to promote.",TEAL,14)
 	if bar.promo_report.is_empty(): return
 	var report: Dictionary = bar.promo_report
-	body("LAST PROMOTION · "+StreetContent.PROMOTIONS[int(report.kind)].name,GOLD,13)
-	live_body(func() -> String: return "Pool revenue %s · %d free games\nFees forgone %s\nAttributed customers %d · regulars %d · lost to queues %d\nAttributed drinks %s · stock %s · commission %s\nShift operating costs %s · promotion fee %s\nAttributed contribution after these costs %s\nBaseline visitors without promotion: %.1f (estimate)" % [cash(report.pool_revenue),report.free_games,cash(int(report.free_games)*50),report.customers,report.regulars,report.lost,cash(report.drink_revenue),cash(report.drink_cost),cash(report.get("commission",0)),cash(report.operating),cash(report.fee),cash(int(report.drink_revenue)+int(report.pool_revenue)-int(report.drink_cost)-int(report.operating)-int(report.fee)-int(report.get("commission",0))),float(report.baseline)],WHITE,13)
+	var heading := "LAST PROMOTION · "+str(StreetContent.PROMOTIONS[int(report.kind)].name)
+	event_detail(body(heading,GOLD,13),"the promotion report",func() -> String:
+		return "Pool revenue %s · %d free games\nFees forgone %s\nAttributed customers %d · regulars %d · lost to queues %d\nAttributed drinks %s · stock %s · commission %s\nShift operating costs %s · promotion fee %s\nAttributed contribution after these costs %s\nBaseline visitors without promotion: %.1f (estimate)" % [cash(report.pool_revenue),report.free_games,cash(int(report.free_games)*50),report.customers,report.regulars,report.lost,cash(report.drink_revenue),cash(report.drink_cost),cash(report.get("commission",0)),cash(report.operating),cash(report.fee),cash(int(report.drink_revenue)+int(report.pool_revenue)-int(report.drink_cost)-int(report.operating)-int(report.fee)-int(report.get("commission",0))),float(report.baseline)])
 
 func tours_panel() -> void:
 	var crew: Array = model.s.staff
@@ -2138,29 +2197,42 @@ func shift_report(bar: Dictionary) -> void:
 	if int(report.get("bar_fines",0))>0: body("Bar fines: %d accepted · %s (included in revenue)" % [report.bar_fines,cash(report.bar_fine_income)],TEAL,13)
 	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s · fines %s · commission %s\nManager income %s (included in revenue)\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.get("fines",0)),cash(report.get("commission",0)),cash(report.get("manager_income",0)),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
 
-func celebration_panel() -> void:
+func celebration_panel(compact: bool = false) -> void:
 	var info: Dictionary = model.street.celebration_info()
-	title(info.name,PINK)
-	body("FREE neighbourhood celebration · Blue Hour",TEAL,14)
+	var story_copy: String = StreetContent.CELEBRATIONS[model.street.Economy.celebration_index(int(info.day))][1]
+	var effects := "+40% shared street traffic and extra Blue Hour appeal. One extra planned round, up to 3 if budgets allow. Drinking takes 26/19/14/11/8s by music tier, including the final round. Visitors wait 10s longer for orders. Traffic boosts cap at 2.4× normal. Normal prices, pool fees and wages still apply."
+	var prep := "Prepare: clean the bar, fill the fridge, check staff contracts and leave room for deliveries. Serve the queue or use Chat before advertising harder. No entry fee or paid preparation; offline time cannot use up the party."
+	if compact:
+		var heading := body(info.name,PINK,18)
+		event_detail(heading,info.name,func() -> String: return story_copy+"\n\n"+effects+"\n\n"+prep)
+	else:
+		title(info.name,PINK)
+		body("FREE neighbourhood celebration · Blue Hour",TEAL,14)
 	live_body(func() -> String:
 		var current: Dictionary = model.street.celebration_info()
-		return "LIVE until 1am · day %d opening" % current.day if current.active else "Day %d at noon · %s" % [current.day,"today" if current.days_left==0 else "tomorrow" if current.days_left==1 else "%d game days to go" % current.days_left],GOLD,14)
-	body(StreetContent.CELEBRATIONS[model.street.Economy.celebration_index(int(info.day))][1],WHITE,14)
-	body("+40% shared street traffic and extra Blue Hour appeal. One extra planned round, up to 3 if budgets allow. Drinking takes 26/19/14/11/8s by music tier, including the final round. Visitors wait 10s longer for orders. Traffic boosts cap at 2.4× normal. Normal prices, pool fees and wages still apply.",MUTED,13)
-	body("Prepare: clean the bar, fill the fridge, check staff contracts and leave room for deliveries. Serve the queue or use Chat before advertising harder. No entry fee or paid preparation; offline time cannot use up the party.",WHITE,13)
+		var timing := "LIVE until 1am · day %d opening" % current.day if current.active else "Day %d at noon · %s" % [current.day,"today" if current.days_left==0 else "tomorrow" if current.days_left==1 else "%d game days to go" % current.days_left]
+		return "Free · Blue Hour · "+timing if compact else timing,GOLD,13 if compact else 14)
+	if not compact:
+		body(story_copy,WHITE,14)
+		body(effects,MUTED,13)
+		body(prep,WHITE,13)
 	var report: Dictionary = model.s.street.celebration.report
 	if report.is_empty(): report = model.s.street.celebration.last_report
 	if not report.is_empty():
-		body("PARTY TRADING · "+model.street.Economy.celebration_name(int(report.day)),GOLD,14)
-		live_body(func() -> String: return "%d visitors · %d drinks · %d happy visits · %d new regulars\nDrinks %s · pool %s\nStock consumed %s · commission %s\nOperating %s · promotions %s · fines %s\nTrading contribution %s\nLost: full %d · slow %d · stock %d" % [report.arrivals,report.sales,report.happy,report.regulars,cash(report.drink_income),cash(report.pool_income),cash(report.drink_cost),cash(report.commission),cash(report.operating),cash(report.promo_cost),cash(report.fines),cash(model.street.Economy.celebration_contribution(report)),report.lost_full,report.lost_service,report.lost_stock],WHITE,13)
-		body("Actual Blue Hour trading during the celebration, not estimated extra income. Contribution deducts consumed stock and venue trading costs; excludes managers, street-wide charges, investments and unused deliveries. No bonus is paid again when this report opens.",MUTED,12)
+		var heading := body("PARTY TRADING · "+model.street.Economy.celebration_name(int(report.day)),GOLD,14)
+		var report_copy := func() -> String:
+			return "%d visitors · %d drinks · %d happy visits · %d new regulars\nDrinks %s · pool %s\nStock consumed %s · commission %s\nOperating %s · promotions %s · fines %s\nTrading contribution %s\nLost: full %d · slow %d · stock %d" % [report.arrivals,report.sales,report.happy,report.regulars,cash(report.drink_income),cash(report.pool_income),cash(report.drink_cost),cash(report.commission),cash(report.operating),cash(report.promo_cost),cash(report.fines),cash(model.street.Economy.celebration_contribution(report)),report.lost_full,report.lost_service,report.lost_stock]
+		var scope := "Actual Blue Hour trading during the celebration, not estimated extra income. Contribution deducts consumed stock and venue trading costs; excludes managers, street-wide charges, investments and unused deliveries. No bonus is paid again when this report opens."
+		if compact:
+			event_detail(heading,"the party report",func() -> String: return str(report_copy.call())+"\n\n"+scope)
+		else:
+			live_body(report_copy,WHITE,13)
+			body(scope,MUTED,12)
 
 func street_event_panel() -> void:
 	var event: Dictionary = model.s.street.event
 	if event.is_empty(): return
 	var info: Array = StreetContent.EVENTS[int(event.id)]
-	title(info[0],PINK)
-	body(info[1],WHITE,14)
 	var rules := [
 		"Without a generator: a 20-second closure.",
 		"More shore-leave customers; stock, seats and service still limit sales.",
@@ -2174,21 +2246,24 @@ func street_event_panel() -> void:
 		"Double street traffic during the festival. Preparation adds four seconds against Godzilla.",
 		"Guests bolt and walk-ins dry up for 45 seconds. Bo keeps seated guests inside and helps save some trade."
 	]
-	body(Local.RULES[int(event.id)] if Local.RULES.has(int(event.id)) else rules[int(event.id)],MUTED,12)
-	if event.has("venue"): body(model.s.street.bars[int(event.venue)].name,GOLD,12)
-	row_button("Read the Dispatch",func() -> void: show_news(street_issue()))
-	live_body(func() -> String: return "%s · %ds · %s" % ["Starts in" if event.phase == "warning" else "Time remaining",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,14)
+	var event_rules: String = Local.RULES[int(event.id)] if Local.RULES.has(int(event.id)) else rules[int(event.id)]
+	var dispatch := row_button(str(info[0])+"  ›",func() -> void: show_news(street_issue()))
+	dispatch.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	dispatch.tooltip_text = "Read the Dispatch · "+str(info[1])
+	event_detail(dispatch,info[0],func() -> String: return str(info[1])+"\n\n"+event_rules)
+	var venue_name := str(model.s.street.bars[int(event.venue)].name)+" · " if event.has("venue") else ""
+	live_body(func() -> String: return "%s%s %ds · %s" % [venue_name,"Starts in" if event.phase == "warning" else "Time left",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,13)
 	if event.phase == "warning" and not event.prepared:
 		if event.id==Local.ENCORE and not event.get("solo",false): row_button("Work the rush solo",street_action.bind("encore_solo"))
 		var caption: String = "%s · %s" % [info[2],cash(info[3])] if info[3]>0 else info[2]
-		watch_purchase(row_button(caption,street_action.bind("prepare")),caption,model.street.preparation_offer)
-	if event.phase=="active" and not event.get("attempted",false):
-		if event.id==Local.CART and not event.prepared: row_button("Clear traffic · Play",start_event_game,true)
-		if event.id==Local.BED and event.prepared: row_button("Race the bed · Play",start_event_game,true)
-	if event.phase == "active" and int(event.id) in [8,9]:
+		watch_purchase(row_button(caption,street_action.bind("prepare")),caption,model.street.preparation_offer,event_rules)
+	match model.street.available_event_game():
+		Local.CART: row_button("Clear traffic · Play",start_event_game,true).tooltip_text = event_rules
+		Local.BED: row_button("Race the bed · Play",start_event_game,true).tooltip_text = event_rules
+	if model.can_start_street_boss():
 		row_button("Face Godzilla",func():
 			message = model.start_street_boss()
-			commit(),true)
+			commit(),true).tooltip_text = event_rules
 
 func street_issue() -> Dictionary:
 	var event: Dictionary = model.s.street.event
@@ -2336,6 +2411,7 @@ func draw_newspaper() -> void:
 func start_event_game() -> void:
 	event_game = model.street.begin_event_game()
 	if event_game<0: return
+	if is_instance_valid(event_badge): event_badge.hide()
 	save_state()
 	cart_board = Local.BOARD.duplicate(true)
 	cart_selected = 0
@@ -2748,6 +2824,7 @@ func _process(delta: float) -> void:
 		if live_seconds >= 1.0:
 			live_seconds -= 1.0
 			update_lease_controls()
+			sync_event_badge()
 			if not is_instance_valid(fight) and not is_instance_valid(district): sync_upgrade_badge(true)
 			if refresh_street and model.s.phase in ["plan","guided","guided_choice","guided_report"] and not is_instance_valid(fight) and not is_instance_valid(district) and not is_instance_valid(service_help_panel): render(true)
 			for entry in live_labels:
