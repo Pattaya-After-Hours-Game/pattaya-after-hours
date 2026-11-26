@@ -111,6 +111,7 @@ func run() -> void:
 	test_windows_updates()
 	load("res://tests/boot_menu_check.gd").new().run(self)
 	await load("res://tests/action_check.gd").new().run_ui(self)
+	await load("res://tests/celebration_check.gd").new().run_ui(self)
 	await load("res://tests/tips_check.gd").new().run_ui(self)
 	await load("res://tests/gabby_check.gd").new().run_ui(self)
 	await load("res://tests/daisy_check.gd").new().run_ui(self)

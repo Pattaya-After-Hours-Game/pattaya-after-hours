@@ -449,17 +449,24 @@ func render(keep_scroll: bool = false) -> void:
 	tutorial_button.disabled = model.s.phase == "godzilla" or campaign_before_tuning != null
 	at_button(root_ui,Rect2(848,5,98,37),"Muted" if muted else "Sound",set_sound)
 	event_banner = null
-	if not practicing and (not model.s.street.event.is_empty() or model.street.celebration_info().days_left<=2 or model.street.celebration_info().active):
-		event_banner = at_button(root_ui,Rect2(14,56,540,36),"",change_tab.bind(1))
+	var party: Dictionary = model.street.celebration_info()
+	var show_party: bool = not practicing and (party.active or party.days_left<=1)
+	var show_street_event: bool = not practicing and not model.s.street.event.is_empty()
+	if show_street_event:
+		event_banner = at_button(root_ui,Rect2(14,56,290 if show_party else 540,36),"",change_tab.bind(1))
 		event_banner.add_theme_color_override("font_color",PINK)
+		if show_party: event_banner.add_theme_font_size_override("font_size",13)
 		var banner_text := func() -> String:
 			var e: Dictionary = model.s.street.event
-			if e.is_empty():
-				var party: Dictionary = model.street.celebration_info()
-				return "%s · %s · FREE  ›" % ["TONIGHT" if party.active else "DAY %d" % party.day,party.name]
+			if e.is_empty(): return ""
 			return "%s · %s · %ds  ›" % ["SOON" if e.phase == "warning" else "LIVE",StreetContent.EVENTS[int(e.id)][0],e.remaining]
 		event_banner.text = banner_text.call()
 		live_labels.append([event_banner,banner_text])
+	if show_party:
+		var party_banner := at_button(root_ui,Rect2(310,56,244,36) if show_street_event else Rect2(14,56,540,36),celebration_title(party)+"  ›",change_tab.bind(1))
+		party_banner.name = "CelebrationBanner"
+		party_banner.add_theme_color_override("font_color",PINK)
+		if show_street_event: party_banner.add_theme_font_size_override("font_size",13)
 	# Property cards remain selectable without opening management.
 	if not practicing:
 		for i in 8:
@@ -487,7 +494,7 @@ func render(keep_scroll: bool = false) -> void:
 		if int(model.s.street.elapsed)<model.street.tour_update_until: return model.street.tour_update
 		if not message.is_empty(): return message
 		return "Serve → upgrade → hire → grow" if first_shift else str(model.s.log.front())
-	var note_y := 148 if event_banner != null else 56
+	var note_y := 148 if show_street_event or show_party else 56
 	pane(root_ui,Rect2(14,note_y,540,27),Color("#21161fdd"))
 	var note := abs_text(root_ui,Rect2(20,note_y+3,530,22),update_text.call(),13,GOLD)
 	note.name = "StreetUpdate"
@@ -1264,6 +1271,7 @@ func event_detail(control: Control, heading: String, detail: Callable) -> void:
 
 func events_panel() -> void:
 	street_event_panel()
+	celebration_panel(true)
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
 	event_detail(body("Venue promotions",TEAL,18),"venue promotions",func() -> String:
@@ -1285,7 +1293,6 @@ func events_panel() -> void:
 			var reason := "" if quote.enabled else "\n\n"+str(quote.reason)
 			return "%s\n\nWith promotion fee: break-even %.1f drinks/real min · estimated staff-only net %s/real min.%s" % [offer.help,estimate.break_even,cash(estimate.net),reason])
 	promotion_report(bar)
-	celebration_panel(true)
 	body("TOYBOX ARCADE",GOLD,12)
 	row_pair("Quick spar",enter_fight.bind(true),"Run the circuit",enter_fight.bind(true,true))
 
@@ -2197,25 +2204,29 @@ func shift_report(bar: Dictionary) -> void:
 	if int(report.get("bar_fines",0))>0: body("Bar fines: %d accepted · %s (included in revenue)" % [report.bar_fines,cash(report.bar_fine_income)],TEAL,13)
 	body("%d arrivals · %d orders · %d drinks sold\nRevenue %s · inventory %s · operating %s · promotions %s · fines %s · commission %s\nManager income %s (included in revenue)\nNet %s\nLost: full %d · slow %d · out of stock %d\n%s" % [report.arrivals,report.orders,report.sales,cash(report.revenue),cash(report.stock_cost),cash(report.operating),cash(report.promo_cost),cash(report.get("fines",0)),cash(report.get("commission",0)),cash(report.get("manager_income",0)),cash(report.net),report.lost_full,report.lost_service,report.lost_stock,report.reason],WHITE,13)
 
-func celebration_panel(compact: bool = false) -> void:
-	var info: Dictionary = model.street.celebration_info()
+func celebration_title(info: Dictionary) -> String:
+	if info.active: return info.name
+	return "%s: %s" % ["Tomorrow" if info.days_left==1 else "Today",info.name]
+
+func celebration_details(info: Dictionary, compact: bool) -> void:
 	var story_copy: String = StreetContent.CELEBRATIONS[model.street.Economy.celebration_index(int(info.day))][1]
 	var effects := "+40% shared street traffic and extra Blue Hour appeal. One extra planned round, up to 3 if budgets allow. Drinking takes 26/19/14/11/8s by music tier, including the final round. Visitors wait 10s longer for orders. Traffic boosts cap at 2.4× normal. Normal prices, pool fees and wages still apply."
 	var prep := "Prepare: clean the bar, fill the fridge, check staff contracts and leave room for deliveries. Serve the queue or use Chat before advertising harder. No entry fee or paid preparation; offline time cannot use up the party."
 	if compact:
-		var heading := body(info.name,PINK,18)
+		var heading := body(celebration_title(info),PINK,18)
 		event_detail(heading,info.name,func() -> String: return story_copy+"\n\n"+effects+"\n\n"+prep)
 	else:
-		title(info.name,PINK)
-		body("FREE neighbourhood celebration · Blue Hour",TEAL,14)
-	live_body(func() -> String:
-		var current: Dictionary = model.street.celebration_info()
-		var timing := "LIVE until 1am · day %d opening" % current.day if current.active else "Day %d at noon · %s" % [current.day,"today" if current.days_left==0 else "tomorrow" if current.days_left==1 else "%d game days to go" % current.days_left]
-		return "Free · Blue Hour · "+timing if compact else timing,GOLD,13 if compact else 14)
+		title(celebration_title(info),PINK)
+	var timing := "Live until 1am" if info.active else "Opens at noon"
+	body("Free · Blue Hour · "+timing,GOLD,13 if compact else 14)
 	if not compact:
 		body(story_copy,WHITE,14)
 		body(effects,MUTED,13)
 		body(prep,WHITE,13)
+
+func celebration_panel(compact: bool = false) -> void:
+	var info: Dictionary = model.street.celebration_info()
+	if info.active or info.days_left<=1: celebration_details(info,compact)
 	var report: Dictionary = model.s.street.celebration.report
 	if report.is_empty(): report = model.s.street.celebration.last_report
 	if not report.is_empty():

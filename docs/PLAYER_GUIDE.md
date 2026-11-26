@@ -110,10 +110,10 @@ guests inside and save some passing trade.
 
 ## Look ahead to day seven
 
-Open **Events** to see the next free neighbourhood celebration. **Anong's
-Birthday** starts at noon on day seven and ends at the normal 1am close the
-following calendar day. A banner appears two game days ahead. No hire, manager,
-entry fee or paid preparation is required.
+On day six, **Tomorrow: Anong's Birthday** appears in **Events** and on the
+street banner. The free party starts at noon on day seven and ends at the
+normal 1am close the following calendar day. You can join with your existing
+setup.
 
 Clean the Blue Hour, fill its fridge, check contracts and prepare to serve. The
 party adds 40% shared street traffic and more appeal for the host bar. Visitors

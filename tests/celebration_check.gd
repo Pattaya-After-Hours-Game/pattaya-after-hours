@@ -9,8 +9,10 @@ func run(test: SceneTree) -> void:
 	m.s.day = 4
 	m.s.street.minute = 1439
 	m.street.tick(1)
-	test.check(str(m.s.street.history.front()).contains("SAVE THE DATE"),"Two-day warning records the next celebration before the day-six lull")
-	m.s.day = 6
+	test.check(not m.s.street.history.any(func(line: String) -> bool: return line.contains("Anong's Birthday")),"Day five has no birthday reminder")
+	m.s.street.minute = 1439
+	m.street.tick(1)
+	test.check(m.s.day==6 and m.s.street.history.front()=="Tomorrow: Anong's Birthday at the Blue Hour.","The calendar announces the birthday one day ahead")
 	m.s.street.minute = 1439
 	var original: int = m.s.cash
 	m.street.tick(1)
@@ -76,8 +78,8 @@ func run(test: SceneTree) -> void:
 	m.street.celebration_tick()
 	test.check(m.s.cash==original and m.street.celebration_info().day==14,"Reading or finishing the party never pays a duplicate bonus")
 	m.s.day = 14
-	m.s.street.minute = 720
-	m.street.celebration_tick()
+	m.s.street.minute = 60
+	m.street.action("skip")
 	test.check(e.celebrating(b) and m.street.celebration_info().name=="The Regulars' Reunion","Later weeks rotate neighbourhood stories instead of weekly birthdays")
 	b.open = false
 	test.check(not e.celebrating(b) and e.traffic_rate()==e.traffic_rate(true),"A closed host venue cannot manufacture party traffic")
@@ -114,3 +116,37 @@ func run(test: SceneTree) -> void:
 	loaded.s.street.celebration = {"day":7,"report":{"day":7},"last_report":{}}
 	loaded.save_game()
 	test.check(loaded._read(Campaign.SAVE)==null,"Incomplete celebration ledgers are rejected instead of crashing the live game")
+
+func run_ui(test: SceneTree) -> void:
+	var app = load("res://main.tscn").instantiate()
+	test.root.add_child(app)
+	await test.process_frame
+	app.set_process(false)
+	app.boot_menu = false
+	app.model = Campaign.new(72)
+	app.tab = 1
+	app.drawer_open = true
+	var party_name := "Anong's Birthday"
+	for day in [5,6,7]:
+		app.model.s.day = day
+		app.model.s.street.minute = 719
+		app.render()
+		var banner := app.root_ui.find_child("CelebrationBanner",false,false) as Button
+		var headings: Array[Node] = app.column.find_children("*","Label",true,false)
+		if day==5:
+			test.check(banner==null and not headings.any(func(label: Label) -> bool: return label.text.contains(party_name)),"Day five shows no birthday promotion in the street or Events")
+		else:
+			var title := ("Tomorrow: " if day==6 else "Today: ")+party_name
+			test.check(banner!=null and banner.text.begins_with(title) and headings.any(func(label: Label) -> bool: return label.text==title),"Street and Events show the expected celebration heading on day %d" % day)
+	app.model.street.announce(1)
+	app.model.street.tick(1)
+	app.render()
+	var live_banner := app.root_ui.find_child("CelebrationBanner",false,false) as Button
+	test.check(live_banner!=null and live_banner.text.begins_with(party_name) and app.event_banner!=null,"The live birthday and an existing street alert each have a banner")
+	app.model.s.day = 8
+	app.model.s.street.minute = 60
+	app.model.street.celebration_tick()
+	app.render()
+	test.check(app.root_ui.find_child("CelebrationBanner",false,false)==null and app.column.find_children("*","Label",true,false).any(func(label: Label) -> bool: return label.text=="PARTY TRADING · "+party_name),"The street banner clears at close and Events keeps the report")
+	app.queue_free()
+	await test.process_frame

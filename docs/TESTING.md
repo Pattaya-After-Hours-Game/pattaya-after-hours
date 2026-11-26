@@ -1,5 +1,13 @@
 # Testing and release checks
 
+## Celebration notices — 27 November 2026
+
+Celebration checks cover no day-five notice, **Tomorrow** on day six, **Today**
+before noon, live details at opening, and the report after the 1am close. They
+also cover opening via the overnight skip and keeping a separate street alert
+visible during the celebration. The `party-*` economy previews cover these
+states at 960 × 540 and 1280 × 720.
+
 ## Cobalt-shirt sunglasses — 27 November 2026
 
 The art check covers raising the sunglasses, fitting them, wearing them, removing

@@ -376,8 +376,9 @@ seconds. Service now explains this beside the upgrade.
 
 ## A reason to reach day seven
 
-**Anong's Birthday** is free, runs from noon on day seven until 1am, and is
-advertised beforehand in Service, Events and the street banner. The Blue Hour
+**Anong's Birthday** is free and runs from noon on day seven until 1am. Events
+and the street banner announce it on day six as **Tomorrow: Anong's Birthday**
+and show the live event when it opens. The Blue Hour
 gets extra appeal, +40% shared street traffic, quicker repeat orders and up to
 three drinks per visitor if their budget permits. New party visitors stay and
 wait a little longer. Fill the fridge and prepare your service; normal prices,

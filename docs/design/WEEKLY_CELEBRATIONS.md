@@ -7,9 +7,9 @@ change of pace. It does not add a login streak or a compulsory chore.
 
 ## Anticipation, preparation, payoff
 
-- **Anticipation:** Events and Service show the next date from the opening.
-  Two game days beforehand, a street banner and Anong's calendar reminder make
-  it hard to miss. Day seven is Anong's Birthday.
+- **Anticipation:** The street banner, Events and Journal announce each
+  celebration one day ahead. Day six shows **Tomorrow: Anong's Birthday**,
+  followed by the live event from noon on day seven.
 - **Preparation:** No entry or event fee. Use the existing choices: stock, cold
   storage, seating, staff, music and serving upgrades. These are useful after
   the party too. A simple bar can participate without a specific hire or manager.

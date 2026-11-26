@@ -203,6 +203,7 @@ func action(id: String, index: int = 0) -> String:
 			economy.advance_contracts(C.OPEN_MINUTE-int(s.street.minute))
 			s.street.minute = C.OPEN_MINUTE
 			reopen_noon()
+			celebration_tick()
 			s.street.offline_cursor = C.OPEN_MINUTE
 			result = "12pm. Check cleanliness, stock and the rota."
 		"supplier_deal": result = buy_supplier_deal()
@@ -603,9 +604,8 @@ func next_calendar_day() -> void:
 		s.last_week = s.weekly.duplicate()
 		s.weekly = {"revenue":0,"costs":0,"guests":0,"tours":0,"nights":0,"weeks":int(s.day/7.0)+1}
 	s.day += 1
-	if int(s.day)%C.CELEBRATION_INTERVAL==5:
-		var party_day := int(s.day)+2
-		record("SAVE THE DATE · Day %d: %s at the Blue Hour. Anong: Two days to fill the fridge and sort the rota. The invitations are on us." % [party_day,Economy.celebration_name(party_day)])
+	if int(s.day)%C.CELEBRATION_INTERVAL==C.CELEBRATION_INTERVAL-1:
+		record("Tomorrow: %s at the Blue Hour." % Economy.celebration_name(int(s.day)+1))
 
 func reconcile_closures() -> void:
 	for bar in s.street.bars:

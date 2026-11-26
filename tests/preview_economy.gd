@@ -550,13 +550,19 @@ func run() -> void:
 	app.drawer_open = true
 	await capture(app,"tips-paid","PREP FOR OPENING")
 	app.model = Campaign.new(72)
+	app.model.s.day = 5
+	app.tab = 1
+	app.drawer_open = true
+	await capture(app,"party-before-announcement")
 	app.model.s.day = 6
 	app.drawer_open = false
 	await capture(app,"party-tomorrow-scene")
-	app.tab = 1
 	app.drawer_open = true
-	await capture(app,"party-countdown")
+	await capture(app,"party-tomorrow-panel")
 	app.model.s.day = 7
+	app.model.s.street.minute = 719
+	await capture(app,"party-opening-day")
+	app.model.s.street.minute = 720
 	app.model.s.cash = 10000
 	app.model.street.action("equipment",2)
 	app.model.street.action("equipment",8)
@@ -580,6 +586,10 @@ func run() -> void:
 	app.model.s.street.minute = 720
 	app.model.street.celebration_tick()
 	await capture(app,"party-next-week")
+	app.drawer_open = false
+	app.model.street.announce(9)
+	await capture(app,"party-with-street-event")
+	app.drawer_open = true
 	app.model = Campaign.new(72)
 	app.tab = 0
 	app.model.s.cash = 10000

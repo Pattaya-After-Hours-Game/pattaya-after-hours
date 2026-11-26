@@ -168,9 +168,9 @@ No prices or customer/regular/healthy-shift thresholds were reduced for this bon
 
 Day seven is Anong's Birthday at the flagship Blue Hour. Day fourteen/twenty-one/
 twenty-eight are the Regulars' Reunion, Pim's Mixtape Party and Bo's Thank-You
-Night; these last three rotate afterward. Countdown reads are pure. A day-five
-calendar reminder and a banner in the final two days provide anticipation. The
-party runs from noon on the opening's date until normal 1am close, crossing
+Night; these last three rotate afterward. The calendar reminder, Events and
+street banner announce each celebration one day ahead. The party runs from
+noon on the opening's date until normal 1am close, crossing
 midnight correctly. Late-opening permission does not extend the party.
 
 The event has no fee and requires no specific purchase or staff member. Only

@@ -205,9 +205,9 @@ anyone's preferences or invent a customer who can afford the booking.
 ## Something to look forward to: Anong's birthday
 
 By day six, the Blue Hour should feel like a place the player knows. The next
-reason to open is personal: **Anong's Birthday on day seven**. From the start,
-Events lists the date; two game days beforehand the street banner and Anong's
-reminder ask the owner to fill the fridge and sort the rota.
+reason to open is personal: **Anong's Birthday on day seven**. One day ahead,
+the street banner, Events and the Journal announce **Tomorrow: Anong's Birthday**.
+The celebration goes live at noon.
 
 > **Anong:** “No presents. Bring your friends. And please, this year, cold beer.”
 
