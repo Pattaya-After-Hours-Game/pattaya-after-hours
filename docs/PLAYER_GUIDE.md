@@ -238,17 +238,18 @@ reopen the deal from **Fridge** until 3:15pm.
 
 ## Give yourself a faster shift
 
-Open **Service → Upgrades** or tap the number badge on Service to see the
-selected venue’s upgrades, cheapest first. Locked cards are greyed out, with
-requirements that update while you play. Choose **Ready only** to see what
-you can buy now, or **Show all** to restore the full list. **?** explains each
-purchase.
+Open **Service → Upgrades** or tap the number badge on Service. Current-stage
+upgrades within budget come first, followed by those that need more cash.
+Below the divider, the renovation shows what the next stage requires.
+Its upgrades are previewed in the same budget order, greyed out until
+the venue reaches that stage and meets each purchase’s other requirements.
+Choose **Ready only** to filter purchases, or **Show all** to restore the list.
 
-The progress block at the top belongs to the **selected venue**, including in
-**Ready only**. Stage 2 needs **70 happy visits, 10 regulars and 8 healthy shifts**;
-stage 3 needs **450, 70 and 40**. **Cash ready** means you can cover the renovation
-plus its operating reserve, not that local milestones are met. **View renovation**
-jumps to the purchase without spending anything.
+Tap **Unlock stage** near the top to jump to the selected venue’s renovation.
+Stage 2 expands the venue and opens new upgrades. It needs **70 happy visits,
+10 regulars and 8 healthy shifts** there, plus the renovation price and an operating
+reserve. Stage 3 needs **450 happy visits, 70 regulars and 40 healthy shifts**.
+The panel shows live progress and the cash shortfall.
 
 **What counts?** explains the local gates. A healthy report needs at least four
 sales, 80% of orders fulfilled and positive customer profit after consumed stock

@@ -53,11 +53,11 @@ func capture(app: Control, name_text: String, scroll_to: String = "", refresh: b
 					break
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("hosted-") or name_text.begins_with("barfine-") or name_text.begins_with("lease-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text=="renovation-future-upgrades" or name_text.begins_with("hosted-") or name_text.begins_with("barfine-") or name_text.begins_with("lease-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 			if name_text=="gabby-hire": app.scroll.scroll_vertical = maxi(0,app.scroll.scroll_vertical-100)
 		await process_frame
-	if name_text=="renovation-blocked":
+	if name_text in ["renovation-blocked","renovation-cash-reserve"]:
 		await app.open_upgrades(false,"Upgrade_renovate")
 		await process_frame
 	if name_text=="renovation-help":
@@ -164,6 +164,8 @@ func run() -> void:
 		app.model.s.cash = app.model.street.economy.upgrade_required_cash(venue)-1
 		app.open_upgrades(false)
 		await capture(app,"renovation-cash-reserve")
+		app.model.s.cash = 1800
+		await capture(app,"renovation-future-upgrades","STAGE 2 UPGRADES")
 		quit()
 		return
 

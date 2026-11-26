@@ -263,13 +263,28 @@ func run_ui(test: SceneTree) -> void:
 	app.sync_upgrade_badge(true)
 	pouring = app.column.find_child("Upgrade_pouring",true,false) as Button
 	test.check(not app.upgrade_badge.visible and pouring!=null and pouring.disabled and pouring.icon!=null and pouring.text.contains("Need"),"An upgrade that becomes unaffordable stays visible with its cash shortfall")
-	app.model.s.cash = 10000
+	app.model.s.cash = 1800
 	app.change_tab(0)
 	app.upgrades_entry.pressed.emit()
 	var ready_seating: Button = app.column.find_child("Upgrade_seating",true,false)
 	locked_club = app.column.find_child("Upgrade_club",true,false)
 	pouring = app.column.find_child("Upgrade_pouring",true,false)
-	test.check(not app.upgrades_ready_only and not ready_seating.disabled and locked_club!=null and locked_club.disabled and not pouring.disabled and ready_seating.get_parent().get_index()<locked_club.get_parent().get_index() and locked_club.get_parent().get_index()<pouring.get_parent().get_index(),"The Service tile defaults to the full price-sorted list")
+	var unaffordable_auto: Button = app.column.find_child("Upgrade_auto",true,false)
+	var renovation: Control = app.column.find_child("RenovationSection",true,false)
+	var future_manager: Button = app.column.find_child("Upgrade_manager",true,false)
+	test.check(not app.upgrades_ready_only and not ready_seating.disabled and not pouring.disabled and unaffordable_auto.disabled and locked_club.disabled and future_manager.disabled,"Current purchases follow their quotes and stage previews stay disabled")
+	var positions := [ready_seating.get_parent().get_index(),pouring.get_parent().get_index(),unaffordable_auto.get_parent().get_index(),renovation.get_index(),locked_club.get_parent().get_index(),future_manager.get_parent().get_index()]
+	var expected := positions.duplicate()
+	expected.sort()
+	test.check(positions==expected and app.column.get_child(renovation.get_index()-1) is HSeparator,"Current upgrades, renovation and future upgrades appear in budget order")
+	app.model.s.cash = 7999
+	app.sync_upgrade_badge(true)
+	future_manager = app.column.find_child("Upgrade_manager",true,false)
+	var ready_before: Array = app.upgrade_ready.duplicate()
+	app.model.s.cash = 10000
+	app.sync_upgrade_badge(true)
+	var funded_manager: Button = app.column.find_child("Upgrade_manager",true,false)
+	test.check(app.upgrade_ready==ready_before and funded_manager!=future_manager and funded_manager.disabled and not funded_manager.text.contains("Need"),"Crossing a future upgrade's cash threshold refreshes its group while the venue stage still locks it")
 	test.use_button(app,"Ready only")
 	ready_seating = app.column.find_child("Upgrade_seating",true,false)
 	pouring = app.column.find_child("Upgrade_pouring",true,false)

@@ -269,15 +269,16 @@ static func manager_rate(bar: Dictionary) -> int:
 
 func manager_offer(bar: Dictionary) -> Dictionary:
 	var level := int(bar.manager_level)
+	var required_stage: int = C.MANAGER_STAGES[mini(level,C.MANAGER_STAGES.size()-1)]
 	var reason := ""
 	var amount := int(C.MANAGER_PRICES[level]) if level<C.MANAGER_PRICES.size() else 0
 	var required := amount+(operating_rate(bar)+(12 if not bar.manager else 0))*2
 	if level>=3: reason = "Manager fully developed."
 	else:
-		if bar.stage<C.MANAGER_STAGES[level]: reason = "Needs venue stage %d." % C.MANAGER_STAGES[level]
+		if bar.stage<required_stage: reason = "Needs venue stage %d." % required_stage
 		elif level==0 and (on_duty(bar,0)<1 or not bar.restock or bar.healthy<8): reason = "Needs a bartender, deliveries and eight healthy shifts."
 		elif s.cash<required: reason = "Keep the next shift's operating reserve."
-	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"rate":C.MANAGER_INCOME[mini(level+1,3)]}
+	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"rate":C.MANAGER_INCOME[mini(level+1,3)]}
 
 func buy_manager(bar: Dictionary) -> String:
 	var offer := manager_offer(bar)
@@ -290,14 +291,15 @@ func buy_manager(bar: Dictionary) -> String:
 
 func supplier_offer(bar: Dictionary) -> Dictionary:
 	var level := int(bar.supplier_level)
+	var required_stage: int = C.SUPPLIER_STAGES[mini(level,C.SUPPLIER_STAGES.size()-1)]
 	var reason := ""
 	var amount := int(C.SUPPLIER_PRICES[level]) if level<C.SUPPLIER_PRICES.size() else 0
 	var required := amount+operating_rate(bar)*2
 	if level>=C.SUPPLIER_PRICES.size(): reason = "Best supplier agreement reached."
 	else:
-		if bar.stage<C.SUPPLIER_STAGES[level]: reason = "Needs venue stage %d." % C.SUPPLIER_STAGES[level]
+		if bar.stage<required_stage: reason = "Needs venue stage %d." % required_stage
 		elif s.cash<required: reason = "Keep the next shift's operating reserve."
-	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"quantity":12 if level>=1 else 6,"pack":(12 if level>=1 else 6)*C.SUPPLIER_UNIT_COSTS[mini(level+1,5)]}
+	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"quantity":12 if level>=1 else 6,"pack":(12 if level>=1 else 6)*C.SUPPLIER_UNIT_COSTS[mini(level+1,5)]}
 
 func buy_supplier(bar: Dictionary) -> String:
 	ensure_stock_lots(bar)
@@ -772,16 +774,17 @@ func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minut
 	return {"arrivals":arrivals,"rounds":rounds,"visit_seconds":duration,"demand":demand,"service":service,"sales":sales,"costs":costs,"net":net,"break_even":maxf(0,(costs-pool-management)/maxf(1,unit_margin)),"pool":pool,"manager":management,"commission":commission,"margin":unit_margin,"drink_mix":drinks,"reason":reason}
 
 func club_offer(bar: Dictionary) -> Dictionary:
+	var required_stage := 2
 	var level := int(bar.club_level)
 	var amount := 0 if level==3 else int(C.CLUB_PRICES[level])
 	var reserve := operating_rate(bar)*2+pack_price(bar)
 	var required := amount+reserve
 	var reason := ""
 	if level==3: reason = "Regulars Club fully established."
-	elif bar.stage<2: reason = "Needs venue stage 2."
+	elif bar.stage<required_stage: reason = "Needs venue stage %d." % required_stage
 	elif bar.regulars<C.CLUB_REGULARS[level]: reason = "Needs %d local regulars; you have %d." % [C.CLUB_REGULARS[level],bar.regulars]
 	elif s.cash<required: reason = "Need ฿%d more, keeping ฿%d for stock and the next shift." % [amount+reserve-int(s.cash),reserve]
-	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"reserve":reserve,"chance":C.CLUB_CHANCE[mini(3,level+1)]}
+	return {"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"reserve":reserve,"chance":C.CLUB_CHANCE[mini(3,level+1)]}
 
 func club_forecast(bar: Dictionary) -> Dictionary:
 	var proposed := bar.duplicate(true)
@@ -1105,10 +1108,11 @@ func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var level := int(bar.action_levels[item.id])
 	var cap := 4 if index==0 else 3
 	var price := 0 if level==cap else int(C.ACTION_UPGRADE_COSTS[level])
-	var stage_ok: bool = not (index==0 and level==3 and bar.stage<2)
+	var required_stage := 2 if index==0 and level==3 else 1
+	var stage_ok: bool = bar.stage>=required_stage
 	var required := price+operating_rate(bar)*2
 	var shortfall := maxi(0,required-int(s.cash))
-	return {"level":level,"price":price,"required":required,"shortfall":shortfall,"enabled":level<cap and shortfall==0 and stage_ok,"maxed":level==cap,"stage_ok":stage_ok,
+	return {"level":level,"price":price,"required":required,"shortfall":shortfall,"enabled":level<cap and shortfall==0 and stage_ok,"maxed":level==cap,"stage_ok":stage_ok,"required_stage":required_stage,
 		"current":C.ACTION_COOLDOWNS[level],"next":C.ACTION_COOLDOWNS[mini(cap,level+1)]}
 
 func buy_action_upgrade(bar: Dictionary, index: int) -> String:

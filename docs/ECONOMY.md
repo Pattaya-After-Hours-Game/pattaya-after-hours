@@ -650,10 +650,11 @@ has positive operating margin after stock consumed, payroll, promotion costs, fi
 The cash report separately records inventory purchases when paid. Manager
 income and nightly tips do not qualify a healthy shift.
 
-Upgrades presents live local milestone counts and renovation cash/reserve status
-above the price-sorted list, including in Ready only. The default list includes
-greyed-out locked cards with the model’s current reasons. View renovation
-navigates to the renovation card.
+Upgrades groups each stage’s offers by whether the till can cover the price and
+reserve. The next renovation separates current-stage purchases from later-stage
+previews and shows the selected venue’s live milestone counts and cash target.
+The top shortcut jumps to that section. Ready only keeps renovation progress
+visible while filtering purchase cards.
 
 Milestones belong to the venue. Renovation also requires its fee and the next
 shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿40,000. New

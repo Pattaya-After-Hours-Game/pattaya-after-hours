@@ -15,6 +15,11 @@ individual regression checks. The
 [release workflow](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/actions/workflows/release.yml)
 publishes signed downloads from main. Device play remains unverified.
 
+The Upgrades follow-up groups cards by venue stage and budget, with a shortcut
+from the stage summary to the live renovation requirements. Ready only still
+shows local progress. The combined isolated suite passed again, and the
+renovation and budget views were reviewed at both resolutions.
+
 ## Upgrade blocker visibility — 27 November 2026
 
 User's wealthy Neon Mango screenshot exposed stage-locked training with no

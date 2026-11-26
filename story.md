@@ -114,9 +114,9 @@ systems, not new personal quests or promises of an endless customer stream.
 
 The shared till can fund a renovation, but each venue earns its own happy
 visits, regulars and healthy shifts. Manager takings make expansion affordable;
-they do not prove that the new room serves its customers well. Upgrades shows
-that venue's progress and explains what still needs work. This is clearer
-bookkeeping for the existing milestones, not another fee or story quest.
+they do not prove that the new room serves its customers well. The renovation
+in Upgrades shows that venue's progress and what still needs work. The cards
+below it show what the next stage will let you buy.
 
 ## A shift has a rhythm
 

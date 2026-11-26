@@ -1741,16 +1741,20 @@ func upgrade_offers() -> Array[Dictionary]:
 	return offers
 
 func upgrade_offer(icon: String, name_text: String, caption: String, help: String, action_id: String, index: int, status: Dictionary) -> Dictionary:
+	status.affordable = model.s.cash>=status.required
 	return {"icon":icon,"name":name_text,"caption":caption,"help":help,"action":action_id,"index":index,"status":status}
 
 func sync_upgrade_badge(rebuild: bool = false) -> void:
 	if not is_instance_valid(upgrade_badge): return
 	var offers := upgrade_offers()
 	var ready: Array[String] = []
+	var budget_changed := false
 	for offer in offers:
 		var key := "%s/%d" % [offer.action,offer.index]
 		if offer.status.enabled: ready.append(key)
-		if rebuild and upgrade_quotes.has(key): upgrade_quotes[key].merge(offer.status,true)
+		if rebuild and upgrade_quotes.has(key):
+			if upgrade_quotes[key].affordable!=offer.status.affordable: budget_changed = true
+			upgrade_quotes[key].merge(offer.status,true)
 	var changed := upgrade_ready != ready
 	upgrade_ready = ready
 	upgrade_badge.visible = not ready.is_empty()
@@ -1758,7 +1762,7 @@ func sync_upgrade_badge(rebuild: bool = false) -> void:
 	upgrade_badge.tooltip_text = "%d upgrades ready at this venue" % ready.size()
 	if is_instance_valid(upgrades_entry):
 		upgrades_entry.text = "Upgrades" if ready.is_empty() else "Upgrades   ·   %d ready" % ready.size()
-	if changed and rebuild and drawer_open and upgrades_open: render(true)
+	if rebuild and drawer_open and upgrades_open and (changed or (budget_changed and not upgrades_ready_only)): render(true)
 
 func open_upgrades(ready_only: bool = false, focus: String = "") -> void:
 	service_section = ""
@@ -1771,6 +1775,10 @@ func open_upgrades(ready_only: bool = false, focus: String = "") -> void:
 	if focus.is_empty(): return
 	await get_tree().process_frame
 	if not upgrades_open: return
+	if focus=="Upgrade_renovate":
+		var section := column.find_child("RenovationSection",true,false) as Control
+		if section: scroll.scroll_vertical = maxi(0,int(section.position.y)-8)
+		return
 	var card := column.find_child(focus,true,false) as Control
 	if card != null:
 		var reason := column.find_child(focus+"_reason",true,false) as Control
@@ -1778,34 +1786,81 @@ func open_upgrades(ready_only: bool = false, focus: String = "") -> void:
 
 func upgrades_panel() -> void:
 	var offers := upgrade_offers()
-	renovation_progress_panel()
-	row_button("Show all" if upgrades_ready_only else "Ready only",open_upgrades.bind(not upgrades_ready_only))
 	var bar: Dictionary = model.street.selected()
-	body("Stage %d/3 · Supplier %d/5 · Manager %d/3" % [bar.stage,bar.supplier_level,bar.manager_level],MUTED,12)
-	var visible_offers := offers.filter(func(offer: Dictionary) -> bool: return offer.status.enabled) if upgrades_ready_only else offers
-	if visible_offers.is_empty():
-		body("All upgrades installed" if offers.is_empty() else "No upgrades ready",MUTED,13)
+	var stage := int(bar.stage)
+	body("Venue stage %d of 3 · %s" % [stage,bar.name],GOLD,13)
+	var renovation: Dictionary = {}
+	var visible_offers: Array[Dictionary] = []
+	for offer in offers:
+		if offer.action=="upgrade": renovation = offer
+		elif not upgrades_ready_only or offer.status.enabled: visible_offers.append(offer)
+	if not renovation.is_empty():
+		if upgrades_ready_only:
+			renovation_progress_panel(renovation,renovation.status.enabled)
+		else:
+			var link := row_button("",open_upgrades.bind(false,"Upgrade_renovate"))
+			var goal: Dictionary = StreetContent.STAGE_GOALS[stage-1]
+			var caption := func() -> String:
+				var met := [bar.happy>=goal.happy,bar.regulars>=goal.regulars,bar.healthy>=goal.healthy,model.s.cash>=renovation.status.required].count(true)
+				return "Unlock stage %d · %d/4 requirements met  ›" % [stage+1,met]
+			link.text = caption.call()
+			live_labels.append([link,caption])
+	row_button("Show all" if upgrades_ready_only else "Ready only",open_upgrades.bind(not upgrades_ready_only))
+	if offers.is_empty():
+		body("All upgrades installed",MUTED,13)
 		return
 	visible_offers.sort_custom(func(a: Dictionary,b: Dictionary) -> bool:
+		if a.status.enabled!=b.status.enabled: return a.status.enabled
 		if a.status.price==b.status.price: return String(a.name).naturalnocasecmp_to(b.name)<0
 		return a.status.price<b.status.price)
-	for offer in visible_offers: upgrade_card(offer)
+	if upgrades_ready_only:
+		if visible_offers.is_empty() and (renovation.is_empty() or not renovation.status.enabled):
+			body("No upgrades ready",MUTED,13)
+		for offer in visible_offers: upgrade_card(offer)
+		return
+	var current := visible_offers.filter(func(offer: Dictionary) -> bool: return int(offer.status.get("required_stage",1))<=stage)
+	upgrade_budget_groups(current)
+	if renovation.is_empty(): return
+	column.add_child(HSeparator.new())
+	renovation_progress_panel(renovation,true)
+	for future_stage in range(stage+1,4):
+		var future := visible_offers.filter(func(offer: Dictionary) -> bool: return offer.status.get("required_stage",1)==future_stage)
+		if future.is_empty(): continue
+		body("STAGE %d UPGRADES" % future_stage,GOLD,13)
+		upgrade_budget_groups(future)
 
-func renovation_progress_panel() -> void:
+func upgrade_budget_groups(offers: Array[Dictionary]) -> void:
+	for affordable in [true,false]:
+		var group := offers.filter(func(offer: Dictionary) -> bool: return offer.status.affordable==affordable)
+		if group.is_empty(): continue
+		body("Within budget" if affordable else "Need more cash",MUTED,12)
+		for offer in group: upgrade_card(offer)
+
+func renovation_progress_panel(offer: Dictionary, show_card: bool) -> void:
 	var bar: Dictionary = model.street.selected()
-	if bar.stage>=3: return
 	var eco = model.street.economy
 	var goal: Dictionary = StreetContent.STAGE_GOALS[int(bar.stage)-1]
-	body("STAGE %d PROGRESS · %s" % [bar.stage+1,bar.name],GOLD,12)
+	var section := VBoxContainer.new()
+	section.name = "RenovationSection"
+	column.add_child(section)
+	var previous := column
+	column = section
+	body("UNLOCK VENUE STAGE %d" % (bar.stage+1),GOLD,13)
 	var progress := body("",WHITE,13)
 	progress.name = "RenovationProgress"
 	var summary := func() -> String:
-		var missing := maxi(0,eco.upgrade_required_cash(bar)-int(model.s.cash))
-		return "Happy visits %d/%d · Regulars %d/%d\nHealthy shifts %d/%d · %s" % [mini(bar.happy,goal.happy),goal.happy,mini(bar.regulars,goal.regulars),goal.regulars,mini(bar.healthy,goal.healthy),goal.healthy,"Cash ready" if missing==0 else "Need %s more" % cash(missing)]
+		var required: int = eco.upgrade_required_cash(bar)
+		var funding := "Cash ready" if model.s.cash>=required else "Cash target %s incl. reserve" % cash(required)
+		if not show_card and model.s.cash<required: funding = "Need %s more incl. reserve" % cash(required-int(model.s.cash))
+		return "Happy visits %d/%d · Regulars %d/%d\nHealthy shifts %d/%d · %s" % [mini(bar.happy,goal.happy),goal.happy,mini(bar.regulars,goal.regulars),goal.regulars,mini(bar.healthy,goal.healthy),goal.healthy,funding]
 	progress.text = summary.call()
 	live_labels.append([progress,summary])
-	row_pair("View renovation  ›",open_upgrades.bind(false,"Upgrade_renovate"),"What counts?",func() -> void:
-		show_service_help("Earn the next stage here","Earn progress here, not at other bars.\nHappy guests can become regulars.\n\nHealthy: 4+ sales, 80%+ orders served, profit after stock and costs. Checked every 2 minutes and at closing.\n\nManager income and tips do not count."))
+	if show_card: upgrade_card(offer)
+	var explain := func() -> void:
+		show_service_help("Earn the next stage here","Earn the milestones at this venue. Happy guests can become regulars.\n\nHealthy shifts need 4+ sales, 80%+ orders served and profit after stock and costs. Checked every 2 minutes and at closing.\n\nManager income and tips do not count.")
+	if show_card: row_button("What counts?",explain)
+	else: row_pair("View renovation  ›",open_upgrades.bind(false,"Upgrade_renovate"),"What counts?",explain)
+	column = previous
 
 func upgrade_card(offer: Dictionary) -> void:
 	var status: Dictionary = offer.status
@@ -1828,13 +1883,14 @@ func upgrade_card(offer: Dictionary) -> void:
 	purchase.add_theme_color_override("font_disabled_color",MUTED)
 	row.add_child(purchase)
 	watch_purchase(purchase,purchase.text,func() -> Dictionary: return status)
-	var blocker := body("",GOLD,12)
-	blocker.name = purchase.name+"_reason"
-	var explain := func() -> String:
-		blocker.visible = not status.enabled and not str(status.reason).is_empty()
-		return status.reason
-	blocker.text = explain.call()
-	live_labels.append([blocker,explain])
+	if offer.action!="upgrade":
+		var blocker := body("",GOLD,12)
+		blocker.name = purchase.name+"_reason"
+		var explain := func() -> String:
+			blocker.visible = not status.enabled and not str(status.reason).is_empty()
+			return status.reason
+		blocker.text = explain.call()
+		live_labels.append([blocker,explain])
 	var details := body(offer.help,MUTED,12)
 	details.hide()
 	var info := button("?",func() -> void: details.visible = not details.visible)

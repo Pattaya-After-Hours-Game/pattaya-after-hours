@@ -119,6 +119,8 @@ func run_ui(test: SceneTree) -> void:
 	var renovate: Button = app.column.find_child("Upgrade_renovate",true,false)
 	var reason: Label = app.column.find_child("Upgrade_club_reason",true,false)
 	test.check(renovate!=null and renovate.disabled and not app.upgrades_ready_only and reason!=null and reason.visible and reason.text.contains("stage 2"),"Renovation link reveals the disabled card; stage-locked club explains itself without a question-mark tap")
+	progress = app.column.find_child("RenovationProgress",true,false)
+	test.check(app.scroll.get_global_rect().encloses(progress.get_global_rect()) and app.scroll.get_global_rect().encloses(renovate.get_global_rect()),"The renovation shortcut brings its local targets and purchase into view together")
 	test.check(JSON.stringify(app.model.s)==before and app.model.rng.state==rng_before,"Progress and renovation navigation cannot buy, simulate, reward or roll RNG")
 	bar.happy = 69
 	app.sync_upgrade_badge(true)
@@ -135,7 +137,7 @@ func run_ui(test: SceneTree) -> void:
 		if is_instance_valid(entry[0]): entry[0].text = entry[1].call()
 	progress = app.column.find_child("RenovationProgress",true,false)
 	renovate = app.column.find_child("Upgrade_renovate",true,false)
-	test.check(progress.text.contains("Need ฿1 more") and renovate.disabled,"Cash progress includes the operating reserve, even when local milestones are complete")
+	test.check(progress.text.contains("incl. reserve") and renovate.text.contains("Need ฿1 more") and renovate.disabled,"Cash progress includes the operating reserve, even when local milestones are complete")
 	app.model.s.cash += 1
 	app.sync_upgrade_badge(true)
 	renovate = app.column.find_child("Upgrade_renovate",true,false)
