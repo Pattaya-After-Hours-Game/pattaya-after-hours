@@ -9,6 +9,18 @@ it. Resume is disabled when no readable save is available.
 The main street is the live business. **Tutorial** is an optional practice
 campaign using the original decision lessons; it does not spend your real till.
 
+## Drink prices and restocking money
+
+Standard drinks are ฿80 in beer bars, ฿100 in Soi bars and ฿120 in gogos.
+Service shows the current standard quote and the cost of your next delivery.
+Happy Hour discounts new orders by 20%; already-waiting orders keep their quote.
+The premium-menu upgrade adds ฿30 for eligible orders; renovation alone adds none.
+
+Ordinary stock begins at ฿38 each: ฿228 for six. Supplier upgrades switch to
+12 for ฿432, then ฿408/384/360. Set aside the whole delivery bill before spending
+on improvements. A new game starts with twelve drinks and ฿228; updating an
+existing campaign does not change its cash, stock, waiting tabs or paid stock costs.
+
 ## Find the next useful step
 
 At the top of **Service**, **Anong's Next Step** shows the current story objective,
@@ -81,8 +93,8 @@ use it while open: waiting orders stay, staff go off duty, and you take over
 serving. Anong covers overhead for two minutes. Bo takes ฿14 per consignment
 drink when sold. Repeated clicks cannot add more stock or restart that cover.
 
-At ฿39, two ordinary ฿55 beers leave ฿121 after repaying Bo: enough for a normal
-฿84 six-pack. Outstanding Nida commissions can reduce this; existing commissions
+At ฿39, three ordinary ฿80 beers leave ฿237 after repaying Bo: enough for a normal
+฿228 six-pack. Outstanding Nida commissions can reduce this; existing commissions
 remain due. Budget room and cash for the whole pack as usual. Closed venues also
 retain Owner-run recovery; raids/closed hours must finish before reopening.
 
@@ -103,8 +115,8 @@ The pending jar is not spendable until counted. Keep stock money aside meanwhile
 3. Open **Service**. Read demand, staff service, occupied seats and stock together.
    Manual serving helps when staff are absent or cannot keep up. “Forecast automatic net” is
    not a prediction that you will earn nothing while actively serving.
-4. Restock before the fridge empties. **Buy 6 drinks** starts at ฿84 and requires room for all
-   six and the full price. Supplier level 2 changes this to **Buy 12 drinks for ฿144**:
+4. Restock before the fridge empties. **Buy 6 drinks** starts at ฿228 and requires room for all
+   six and the full price. Supplier level 2 changes this to **Buy 12 drinks for ฿432**:
    cheaper per drink, but you need twelve free spaces and the entire bill. Failed purchases change nothing. Stock costs money when delivered, while
    wages and overhead accrue during open trading.
 5. Buy the improvement that addresses your current limit. Keep money for the
@@ -194,7 +206,7 @@ it. Reopening buttons cannot override a raid.
 When closed, Service shows **Prep for opening**. Start a fifteen-second clean,
 buy stock, and check the rota. Nightly clean-up now starts automatically for everyone. Each drink
 sold adds dirt; a completely dirty bar loses 25% of its attraction. Cleaning
-costs no cash. Stock still costs ฿14 per drink, subject to fridge capacity.
+costs no cash. Normal stock follows the current supplier pack price and fridge capacity.
 
 After 1am, when all venues have stopped trading, **Skip to 12pm** is available.
 The list shows unfinished prep across the street. You can skip anyway: incomplete
@@ -380,7 +392,7 @@ from four seconds to two. Current refills finish normally. Welcome still caps
 at four seconds and Chat still takes twenty.
 
 Supplier upgrades cost ฿900/1,200/2,400/4,800/9,600 for levels 1–5. Packs then
-cost ฿84 for six, then ฿144/120/96/72 for twelve. Levels three/four need venue stage two; level five needs
+cost ฿228 for six, then ฿432/408/384/360 for twelve. Levels three/four need venue stage two; level five needs
 stage three. Discounts affect new stock, including manual purchases. Previously
 bought drinks keep their paid cost in profit reports.
 
@@ -426,9 +438,9 @@ per ten satisfied visits at that bar. With no upgrade that milestone earns +1;
 with fridge levels one/two it earns +2/+3, up to 100 reputation. Buying the fridge
 alone grants no reputation. Existing fridges benefit from future happy visits.
 
-Supplier levels 0/1 buy six drinks for ฿84. Levels 2/3/4/5 buy twelve for
-฿144/120/96/72. The button shows the current quantity and total bill. Eleven empty
-spaces or ฿143 cannot buy a level-two delivery. Auto-stock also keeps cash for
+Supplier levels 0/1 buy six drinks for ฿228. Levels 2/3/4/5 buy twelve for
+฿432/408/384/360. The button shows the current quantity and total bill. Eleven empty
+spaces or ฿431 cannot buy a level-two delivery. Auto-stock also keeps cash for
 the next operating charge; managed offline deliveries use their own earned funds.
 
 ## Closing clean-up and tomorrow's opening

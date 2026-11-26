@@ -104,7 +104,7 @@ func run(test: SceneTree) -> void:
 	first.healthy = 8
 	m.street.action("upgrade")
 	test.check(first.stage==2,"A healthy established bar can renovate")
-	test.check(m.street.drink_value(first)==55,"Renovating does not automatically raise beer prices")
+	test.check(m.street.drink_value(first)==80,"Renovating does not automatically raise beer prices")
 	m.street.action("buy",2)
 	bar = m.street.selected()
 	m.street.action("hire",2)
@@ -166,7 +166,7 @@ func run(test: SceneTree) -> void:
 	test.check(bar.open and bar.stock==6 and m.s.cash==0,"Recovery supplies are charged only when sold")
 	m.street.economy.admit(bar)
 	m.street.action("serve")
-	test.check(m.s.cash==41 and bar.consignment==5,"Recovery still needs a buyer and pays the stock cost")
+	test.check(m.s.cash==66 and bar.consignment==5,"Recovery still needs a buyer and pays the stock cost")
 	# Guided shifts cannot accelerate time or create parallel sales.
 	m = Campaign.new(72)
 	m.start()
@@ -195,7 +195,7 @@ func run(test: SceneTree) -> void:
 	test.check(estimate.costs==m.street.economy.operating_rate(bar)+40 and bar==unchanged,"Promotion forecast includes its fee without changing live state")
 	m.street.action("promotion",1)
 	m.street.economy.admit(bar)
-	test.check(bar.customers[0].quoted==55 and bar.customers.back().quoted==44,"Happy Hour discounts new orders, not existing quotes")
+	test.check(bar.customers[0].quoted==80 and bar.customers.back().quoted==64,"Happy Hour discounts new orders, not existing quotes")
 	m.street.tick(20)
 	m.save_game()
 	loaded = Campaign.new(1)
@@ -279,7 +279,7 @@ func pool_scenario(seed_value: int, free_pool: bool, full: bool) -> int:
 	for _i in 120:
 		eco.serve(bar,1,true)
 		m.street.tick(1)
-	return int(m.s.cash)-10000-int(90-bar.stock)*14
+	return int(m.s.cash)-10000-int(90-bar.stock)*38
 
 func test_promotions(test: SceneTree) -> void:
 	var quiet_gain := 0

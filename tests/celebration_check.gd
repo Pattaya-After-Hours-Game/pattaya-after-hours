@@ -29,7 +29,7 @@ func run(test: SceneTree) -> void:
 	test.check(guest.next==26,"Party repeat order is faster at normal drink prices")
 	guest.order = false
 	guest.drinks = 2
-	guest.budget = 55
+	guest.budget = 80
 	e.order(b,guest)
 	test.check(guest.order,"Party guests can request a third drink if they can afford it")
 	e.serve(b)
@@ -39,7 +39,7 @@ func run(test: SceneTree) -> void:
 	b.equipment.music = 1
 	test.check(e.repeat_order_seconds(b)==19,"Music remains useful during celebrations")
 	var report: Dictionary = m.s.street.celebration.report
-	test.check(report.arrivals==1 and report.sales==2 and report.drink_income==110 and report.drink_cost==28,"Party report counts actual transactions and paid inventory costs")
+	test.check(report.arrivals==1 and report.sales==2 and report.drink_income==160 and report.drink_cost==76,"Party report counts actual transactions and paid inventory costs")
 	b.customers.clear()
 	snapshot = JSON.stringify(report)
 	e.serve(b,100)

@@ -150,7 +150,7 @@ func cleaning(test: SceneTree) -> void:
 	var stock := int(bar.stock)
 	m.s.cash = 10000
 	m.street.action("stock")
-	test.check(bar.stock==stock+6 and m.s.cash==10000-84,"Closed-hour restocking pays the real stock cost")
+	test.check(bar.stock==stock+6 and m.s.cash==10000-228,"Closed-hour restocking pays the real stock cost")
 
 func raids(test: SceneTree) -> void:
 	var m = Campaign.new(72)

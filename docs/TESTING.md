@@ -3,7 +3,39 @@
 This document separates automated checks, visual review and platform testing.
 It is a handover checklist, not a claim that every platform has been played.
 
-## Current nightly tips and recovery verification — 26 November 2026
+## Current venue-price verification — 26 November 2026
+
+`tools/test.sh` passes on Godot 4.7.2: gameplay/save/UI regressions, 42 fresh
+campaigns and sixty paired celebration scenarios. Existing pacing bounds are
+unchanged. The added `drink_prices_check.gd` settles real ฿80/100/120 orders,
+checks renovation/premium/Happy Hour rules, then loads an old ฿55 waiting quote
+and mixed ฿6/14 inventory: both settle at their recorded values without revaluing
+cash, budgets or stock. Updated boundary tests cover ฿228 six-packs and
+฿432 bulk packs, supplier reserves, commission carry and three-sale recovery.
+
+Baseline active timings across three seeds and two play styles:
+
+| Milestone | Time |
+| --- | ---: |
+| First small purchase | 2.5–3.6 min |
+| Pool table | 13.8–16.4 min |
+| Beer-bar stage two | 31.7–33.7 min |
+| First manager | 78.9–83.2 min |
+| Second property | 93.7–99.3 min |
+| First stage three | 130.2–137.4 min |
+
+The manager-saving gap is 25.4–29.0 minutes and the longest between-investment
+gap 33.4–35.6, within the existing 30/38-minute ceilings. All alternate purchase
+routes and mostly-idle policies finish solvent. Celebration comparison inventory
+valuation now uses the current stock cost rather than the former fixed ฿14;
+that focused suite is rerun after correcting its reporting formula.
+
+Three `prices-*` previews at 960 × 540 verify the prices and delivery control
+against each production interior; the gogo state is also inspected at 1280 × 720.
+No production graphics changed. Android device play and full-festival pacing
+remain unverified; these tests establish the opening-arc balance and settlement.
+
+## Previous nightly tips and recovery verification — 26 November 2026
 
 Godot 4.7.2 `tools/test.sh` passes all gameplay/save/UI regressions, 42 fresh
 campaigns and sixty paired celebration scenarios. `tips_check.gd` covers real

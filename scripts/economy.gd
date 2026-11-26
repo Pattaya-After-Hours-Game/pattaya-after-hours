@@ -25,10 +25,12 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		if int(s.get("version",1))<7:
 			bar.supplier_level = 1 if bar.restock else 0
 			bar.manager_level = 1 if bar.manager else 0
+			if bar.stock_lots.is_empty() and bar.stock>0:
+				bar.stock_lots = [{"units":int(bar.stock),"cost":C.LEGACY_STOCK_COST}]
 		ensure_stock_lots(bar)
 		for customer in bar.customers: customer.merge(customer_action_fields())
 		for report in [bar.shift,bar.last_shift]+bar.recent:
-			if not report.is_empty(): report.merge({"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.STOCK_COST,"manager_income":0})
+			if not report.is_empty(): report.merge({"fines":0,"commission":0,"consumed_stock":int(report.get("sales",0))*C.LEGACY_STOCK_COST,"manager_income":0})
 		for table in bar.games.size():
 			if not bar.games[table].has("table"): bar.games[table].table = table
 		if migrated:
@@ -44,7 +46,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 			if person.contract_left<=0: person.on = false
 	if fresh:
 		s.cash = C.STARTING_CASH
-		st.bars[0].stock = 18
+		st.bars[0].stock = 12
 		ensure_stock_lots(st.bars[0])
 		# A small opening rush, not an endlessly replenished tutorial grant.
 		for _i in 3: admit(st.bars[0],false,true)
@@ -659,7 +661,7 @@ func serve(bar: Dictionary, count: int = 1, manual: bool = false) -> int:
 			bar.commission_paid += commission
 		customer.commission_order = false
 		if bar.get("consignment",0)>0:
-			cost(bar,C.STOCK_COST,"stock_cost")
+			cost(bar,C.CONSIGNMENT_COST,"stock_cost")
 			bar.consignment -= 1
 		var consumed := consume_stock(bar)
 		bar.shift.consumed_stock += consumed
@@ -928,7 +930,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if bar.stock==0:
 				bar.stock = 6
 				bar.consignment = 6
-				bar.stock_lots = [{"units":6,"cost":C.STOCK_COST}]
+				bar.stock_lots = [{"units":6,"cost":C.CONSIGNMENT_COST}]
 			return "Anong covers two minutes of overhead. Staff are off duty; Bo's six recovery drinks cost ฿14 only when sold. Serve and welcome manually."
 		"rota":
 			if index<0 or index>=bar.team.size(): return "Unknown team member."
@@ -1193,7 +1195,7 @@ func offline(now: int, cap_seconds: int) -> int:
 				if projection.offline_sales_credit<1.0: continue
 				var price_value := int(C.TYPES[int(bar.type)].drink)
 				var operating := floori(projection.offline_cost_pending)
-				var consignment_cost := C.STOCK_COST if projection.consignment>0 else 0
+				var consignment_cost := C.CONSIGNMENT_COST if projection.consignment>0 else 0
 				var pool := floori(projection.offline_pool_pending)
 				var old_carry := int(projection.commission_carry)
 				var commission := commission_charge(projection,price_value) if promoter_bonus(bar,int(window.offset))>0 else 0

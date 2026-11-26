@@ -22,14 +22,14 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Nightly tip jar and visible stockout recovery |
-| Status | REVIEW; implementation verified; previous feature shipped in v1.0.21 (`f345971`) |
+| Active feature | Venue drink prices and wholesale margins |
+| Status | REVIEW; implementation verified; previous feature shipped in v1.0.22 (`9d35018`) |
 | Implementer | Codex in Build out Pattaya bar game |
 | Reviewer / playtester | Codex verified tests and layout; independent device play pending |
 | Shared claim location | This table in the agreed shared checkout or coordinating branch |
-| Working branch / chat / PR | `codex/nightly-tips-recovery`; see [handover](MERGE_HANDOFF.md) |
-| Scope and owned files | Tip settlement, stockout recovery control, migration, balance tests and docs |
-| Next handoff / blocker | 42 campaigns, regressions and previews passed; ready for authorized main release; human play pending |
+| Working branch / chat / PR | `codex/venue-drink-prices`; see [handover](MERGE_HANDOFF.md) |
+| Scope and owned files | Standard drink prices, wholesale packs, reserves, balance tests and docs |
+| Next handoff / blocker | Regressions, 42 campaigns and previews passed; current thresholds unchanged; device play pending |
 | Recommended next, when free | **IF-01 — Guided next goal** |
 | Last updated | 2026-11-26 |
 

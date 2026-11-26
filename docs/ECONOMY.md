@@ -10,6 +10,39 @@ The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
 
+## Venue pricing pass — 26 November 2026
+
+| Venue | Standard receipt | Starting stock cost | Gross contribution | After Nida's 10%, before other costs |
+| --- | ---: | ---: | ---: | ---: |
+| Beer bar | ฿80 | ฿38 | ฿42 | ฿34 |
+| Soi bar | ฿100 | ฿38 | ฿62 | ฿52 |
+| Gogo | ฿120 | ฿38 | ฿82 | ฿70 |
+
+These are game balance values, not promised real-world supplier terms. The
+requested ladder replaces ฿55/85/140. Supplier levels 0–5 cost ฿38/38/36/34/32/30
+per unit; upgrade fees stay unchanged. The premium menu retains its ฿30
+surcharge and Happy Hour its 20% discount. Renovation never adds a price bump.
+
+Fresh games start with ฿228 and twelve drinks, plus the same three opening
+customers. The float covers one complete pack; the smaller starter fridge avoids
+a windfall from repricing eighteen free drinks. New-property opening reserves
+now use a full current base pack instead of the old fixed ฿140 stock allowance.
+Normal purchases and old saves do not grant a free cash adjustment.
+
+Save schema remains 11. Existing waiting quotes and budgets, inventory quantities
+and paid FIFO lot costs survive; only future orders and deliveries use new prices.
+Pre-lot saves backfill inventory/report costs at the historical ฿14, not today's
+price. Validation accepts historical ฿6–14 lots and new costs up to ฿38. Consignment
+uses a separate fixed ฿14 repayment in live/offline settlement. It is explicitly
+a recovery concession, never the normal supplier price. Tips remain ฿10 per visit.
+
+The first ฿35 supply candidate accelerated some milestones outside current
+bounds; ฿39 introduced a long manager-saving gap in one baseline seed. ฿38 keeps
+beer gross contribution near the old ฿41 while passing the existing baseline
+bounds. No renovation/staff/manager prices or pacing thresholds were changed.
+Current verification and timing results are in [TESTING](TESTING.md); older
+measurements below describe earlier price versions.
+
 ## Nightly tip settlement and recovery — 26 November 2026
 
 Each real visit's first successful drink sale increments `bar.tip_visits`; the
@@ -38,12 +71,12 @@ current pack. It uses the existing recovery terms: six consignment units, ฿14
 charged on each sale, staff off duty and 120 seconds of covered overhead. No cash
 is granted and existing orders/cooldowns remain. An active recovery period cannot
 be restarted; normal deliveries still use six/twelve units. The eligibility check
-uses the actual pack price, so a ฿130 till unable to buy a ฿144 bulk pack can recover.
+uses the actual pack price, so a ฿430 till unable to buy a ฿432 bulk pack can recover.
 
 The earned bonus intentionally brings active baseline stage three forward to
 130.7–135.9 minutes; its acceptance lower bound is now 130 rather than 135 minutes.
 First renovation remains within 30–45 minutes; second property within 90–125.
-Current baseline measurements: pool 14.4–17.1, stage two 31.6–34.0, manager
+At the v1.0.22 tip release, baseline measurements were: pool 14.4–17.1, stage two 31.6–34.0, manager
 79.2–82.9, second property 93.8–98.0 minutes. First purchase remains 2.5–4.4.
 Earlier measurements below describe the opening-arc pass before nightly tips.
 No prices or customer/regular/healthy-shift thresholds were reduced for this bonus.
@@ -139,7 +172,7 @@ save. Existing scheduled inspections retain their separate preparation mechanics
 
 ## Playing the first bar
 
-Start with ฿200, 18 drinks and three forgiving opening customers. Serve their
+Start with ฿228, 12 drinks and three forgiving opening customers. Serve their
 actual orders; welcome passersby when there are no orders. A yellow/gold dot marks a
 waiting order and turns red when the lesser of remaining order patience and
 visit time is ten seconds or less. The display uses the same remaining-time rule
@@ -191,8 +224,8 @@ serving remains useful alongside staff. Hosts and dancers attract
 visitors instead. Gogos perform between seconds 40 and 80 of each shift; drinks
 and premium-menu orders are priced independently of renovation stage.
 
-Stock starts at ฿14 per drink when delivered; supplier levels reduce future
-unit costs to ฿12/10/8/6. Inventory lots retain paid unit costs and are consumed
+Stock starts at ฿38 per drink when delivered; supplier levels reduce future
+unit costs to ฿36/34/32/30. Inventory lots retain paid unit costs and are consumed
 first-in, first-out for promotion contribution and healthy-shift margins. Wages and premises overhead are charged
 throughout open time, including quiet periods. Schedule staff off or close a venue
 to reduce charges. An unaffordable operating charge closes the venue before debt
@@ -209,8 +242,8 @@ stage-one combination holds twelve. Stage two holds eighteen with one table and
 comfort, sixteen with two. Other venue types retain two seating upgrades.
 Purchases preserve the next shift's operating reserve and show actual capacity.
 
-`pack_quantity`, `stock_offer` and `restock` settle six drinks for ฿84 at supplier
-levels 0/1, then twelve drinks at level 2 and above (initially ฿144). Neither
+`pack_quantity`, `stock_offer` and `restock` settle six drinks for ฿228 at supplier
+levels 0/1, then twelve drinks at level 2 and above (initially ฿432). Neither
 manual nor automatic delivery permits partial purchases. Manual buying needs
 room for the entire delivery and its full price;
 it shows cash afterward and the next operating charge. Supplier deliveries buy
@@ -333,17 +366,17 @@ actual timing and losses determine whether music improves sales.
 
 | Supplier level | Incremental purchase | Drinks per delivery | Unit / delivery cost | Minimum venue stage |
 | --- | ---: | ---: | ---: | ---: |
-| 1 | ฿900 | 6 | ฿14 / ฿84 | 1 |
-| 2 | ฿1,200 | 12 | ฿12 / ฿144 | 1 |
-| 3 | ฿2,400 | 12 | ฿10 / ฿120 | 2 |
-| 4 | ฿4,800 | 12 | ฿8 / ฿96 | 2 |
-| 5 | ฿9,600 | 12 | ฿6 / ฿72 | 3 |
+| 1 | ฿900 | 6 | ฿38 / ฿228 | 1 |
+| 2 | ฿1,200 | 12 | ฿36 / ฿432 | 1 |
+| 3 | ฿2,400 | 12 | ฿34 / ฿408 | 2 |
+| 4 | ฿4,800 | 12 | ฿32 / ฿384 | 2 |
+| 5 | ฿9,600 | 12 | ฿30 / ฿360 | 3 |
 
-Level zero has no automated deliveries and the same ฿14 unit cost as level one.
+Level zero has no automated deliveries and the same ฿38 unit cost as level one.
 Discounts apply to both manual and automatic future packs; no retroactive refund.
 Automatic deliveries still require waiting orders, stock below the current delivery quantity, space and
 cash for a complete pack plus the next operating charge. Supplier purchases
-preserve one shift's operating reserve. Old inventory migrates at ฿14 per unit.
+preserve one shift's operating reserve. Pre-lot inventory migrates at ฿14 per unit; recorded lots retain their paid costs.
 Consignment drinks retain Bo's original ฿14 repayment regardless of supplier tier.
 
 | Manager level | Incremental purchase | Separate income per real second | Minimum venue stage |

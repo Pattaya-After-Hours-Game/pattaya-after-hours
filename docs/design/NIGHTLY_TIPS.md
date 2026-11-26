@@ -1,7 +1,7 @@
 # Nightly tips and stockout recovery
 
 The reported failure is an open Blue Hour with ฿39 and no stock; a normal
-six-pack costs ฿84. Nightly tips improve tomorrow's float, while a visible
+six-pack cost ฿84 in v1.0.22 (now ฿228 after the venue-pricing pass). Nightly tips improve tomorrow's float, while a visible
 recovery action must solve today's lack of stock.
 
 ## Rules

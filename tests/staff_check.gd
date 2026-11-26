@@ -20,7 +20,7 @@ func run(test: SceneTree) -> void:
 	m.s.street.pass_credit = -10000000
 	eco.admit(bar,false,true)
 	advance(m,1)
-	test.check(bar.sold==1 and bar.stock==17 and is_equal_approx(eco.service_rate(bar),2.4),"Ready staff serves immediately; sustained forecast stays 2.4/min")
+	test.check(bar.sold==1 and bar.stock==11 and is_equal_approx(eco.service_rate(bar),2.4),"Ready staff serves immediately; sustained forecast stays 2.4/min")
 	eco.admit(bar,false,true)
 	advance(m,24)
 	test.check(bar.sold==1,"Base bartender cooldown cannot finish before 25 seconds")

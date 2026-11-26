@@ -19,12 +19,12 @@ func run(test: SceneTree) -> void:
 	m.street.action("equipment",4)
 	test.check(bar.equipment.seating==2,"Soi seating retains its two-level limit")
 	bar.type = 0
-	for item in [[24,84,true],[25,1000,false],[24,83,false],[23,85,true]]:
+	for item in [[24,228,true],[25,1000,false],[24,227,false],[23,229,true]]:
 		bar.stock = item[0]
 		m.s.cash = item[1]
 		var before := [bar.stock,m.s.cash]
 		m.street.action("stock")
-		test.check([bar.stock,m.s.cash]==([before[0]+6,before[1]-84] if item[2] else before),"Six-pack purchase is atomic at cash/space boundaries")
+		test.check([bar.stock,m.s.cash]==([before[0]+6,before[1]-228] if item[2] else before),"Six-pack purchase is atomic at cash/space boundaries")
 	bar.equipment.fridge = 1
 	bar.stock = 66
 	m.s.cash = 10000
@@ -54,6 +54,7 @@ func run(test: SceneTree) -> void:
 	# avoid commission. Two beers carry their half-baht into an exact eleven.
 	m.street.action("rota",0)
 	money = m.s.cash
+	for customer in bar.customers: customer.quoted = 55
 	eco.serve(bar,1)
 	test.check(m.s.cash==money+50 and bar.commission_paid==5 and bar.commission_carry==50,"First beer settles gross receipt and commission with fractional carry")
 	m.save_game()
@@ -91,13 +92,13 @@ func run(test: SceneTree) -> void:
 	bar.customers.clear()
 	m.street.action("promotion",1)
 	eco.admit(bar,true)
-	test.check(bar.customers[0].quoted==44,"Happy Hour quotes the discounted price")
+	test.check(bar.customers[0].quoted==64,"Happy Hour quotes the discounted price")
 	eco.serve(bar,1)
-	test.check(bar.commission_paid==4 and bar.commission_carry==40 and bar.promo.commission==4,"Discount commission is based on actual drinks and enters promotion costs")
+	test.check(bar.commission_paid==6 and bar.commission_carry==40 and bar.promo.commission==6,"Discount commission is based on actual drinks and enters promotion costs")
 	bar.customers.clear()
 	money = m.s.cash
 	eco.serve(bar,1)
-	test.check(m.s.cash==money and bar.commission_paid==4,"No order creates neither sale nor commission")
+	test.check(m.s.cash==money and bar.commission_paid==6,"No order creates neither sale nor commission")
 	# Offline consumes complete packs using newly generated cash only.
 	m = Campaign.new(72)
 	m.s.cash = 20000
@@ -127,9 +128,9 @@ func run(test: SceneTree) -> void:
 	eco = m.street.economy
 	bar.stock = 0
 	bar.restock = true
-	m.s.cash = 84
-	test.check(not eco.restock(bar,true) and bar.stock==0 and m.s.cash==84,"Supplier keeps operating reserve rather than buying an unaffordable pack")
-	m.s.cash = 85
+	m.s.cash = 228
+	test.check(not eco.restock(bar,true) and bar.stock==0 and m.s.cash==228,"Supplier keeps operating reserve rather than buying an unaffordable pack")
+	m.s.cash = 229
 	test.check(eco.restock(bar,true) and bar.stock==6 and m.s.cash==1,"Supplier buys exactly six once with sufficient working cash")
 	# Premium drinks pay commission; paid pool never does.
 	m = Campaign.new(72)
@@ -206,7 +207,7 @@ func run(test: SceneTree) -> void:
 		customer.erase("commission_visit")
 	m.save_game()
 	loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.street.selected().equipment.seating==2 and loaded.s.cash==200 and loaded.street.selected().team.is_empty(),"V5 migration preserves progress without free purchases or fees")
+	test.check(loaded.load_game() and loaded.street.selected().equipment.seating==2 and loaded.s.cash==228 and loaded.street.selected().team.is_empty(),"V5 migration preserves progress without free purchases or fees")
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 

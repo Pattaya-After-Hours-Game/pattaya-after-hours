@@ -1,5 +1,15 @@
 # Changelog
 
+## Standard drink prices and supplier balance — 26 November 2026
+
+- Beer/Soi/gogo standard drinks cost ฿80/100/120; premium menu and Happy Hour
+  rules remain separate. Service shows the standard quote beside delivery costs.
+- Supplier packs cost ฿228 for six, then ฿432/408/384/360 for twelve; a new game
+  has twelve drinks and ฿228. Property opening reserves include a full stock pack.
+- Old quotes, cash, stock and paid FIFO costs remain intact. Bo's recovery stock
+  remains ฿14 per sale. No staff, renovation or manager fees changed.
+
+
 These entries describe source development, not published release versions.
 Save-schema versions are not application release numbers. The current source's
 player-facing overview is in [README.md](README.md).

@@ -1,31 +1,27 @@
 # Current implementation and release handoff
 
-Updated **26 November 2026**. Main `f345971` shipped as **v1.0.21**. The follow-up
-**`codex/nightly-tips-recovery`** adds Anong's nightly tip jar and exposes Bo's
-existing consignment recovery beside an unaffordable stock purchase.
+Updated **26 November 2026**. Main `9d35018` shipped as **v1.0.22** with nightly
+tips and visible consignment recovery. **`codex/venue-drink-prices`** implements
+the requested standard price ladder: beer ฿80, Soi ฿100, gogo ฿120.
 
-Earn ฿10 once per visit with a real drink sale, regardless of server. Count all
-jars after the last nightly closure, before the fifteen-second clean-up; Stay,
-reload and manual skip cannot repeat the payout. Tips stay separate from drink
-sales, staff commission, healthy margins and the five-second trading rate.
-Schema 11 preserves pending/paid counts and the settled night; older saves retain
-owned progress with no retrospective tips. Offline estimates earn no tips.
+Normal stock now costs ฿38/38/36/34/32/30 at supplier levels 0–5. Packs remain
+six, then twelve; fees for upgrades, staff and managers are unchanged. Fresh
+campaigns have twelve drinks and ฿228, while existing cash, stock lots, queued
+quotes and budgets survive unchanged. Opening a property retains a full base
+pack in its reserve. Schema stays 11 with expanded paid-cost validation.
+Bo's recovery consignment stays a separate ฿14 per sale, including offline.
 
-An empty fridge with insufficient full-pack cash offers six consignment drinks:
-no upfront payment, ฿14 paid per drink sold, staff off duty and two minutes of
-Anong's overhead cover. Existing orders and cooldowns remain. Repeated clicks
-cannot stack stock or cover; legal opening and raid restrictions still apply.
+The full test wrapper passes regressions, 42 fresh campaigns and sixty paired
+party scenarios. All existing pacing thresholds pass unchanged. A focused party
+rerun corrects its old fixed-cost inventory valuation. Three venue price previews
+at 960 × 540 and the gogo price at 1280 × 720 are inspected. See
+[testing](TESTING.md) for measured times and compatibility coverage.
 
-Full regressions, 42 fresh campaigns and sixty paired party scenarios pass.
-The active stage-three lower bound moves explicitly from 135 to 130 minutes for
-this earned bonus; other acceptance bounds are unchanged. Five economy states
-are reviewed at 960 × 540 and 1280 × 720. See [testing](TESTING.md) and the
-[design](design/NIGHTLY_TIPS.md). No production art changed.
-
-Ready for the user-authorized main integration and signed release workflow.
-Verify its run and the [latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
-for the published source/tag. Device play remains unverified. Other worktrees and
-user attachments are preserved. The audit below is historical.
+Ready for the user-authorized commit and release workflow. Verify the run and
+[latest release](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)
+for published source/tag; this source note does not claim publication. Android
+device play remains unverified. Other worktrees and attachments are untouched.
+The audit below is historical.
 
 ## Historical consolidation audit
 

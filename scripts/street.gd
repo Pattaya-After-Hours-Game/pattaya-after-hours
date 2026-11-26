@@ -519,7 +519,7 @@ func claim_offline(now: int) -> int:
 	return earnings
 
 func opening_reserve(kind: int) -> int:
-	var amount := int(C.OVERHEAD[kind])*2+C.BARTENDER_CONTRACT_COST+140
+	var amount := int(C.OVERHEAD[kind])*2+C.BARTENDER_CONTRACT_COST+C.STOCK_PACK*C.STOCK_COST
 	for bar in s.street.bars:
 		if bar.open: amount += economy.operating_rate(bar)*2
 	return amount

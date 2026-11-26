@@ -90,6 +90,7 @@ func run() -> void:
 	load("res://tests/clock_check.gd").new().run(self)
 	load("res://tests/night_prep_check.gd").new().run(self)
 	load("res://tests/tips_check.gd").new().run(self)
+	load("res://tests/drink_prices_check.gd").new().run(self)
 	load("res://tests/action_check.gd").new().run(self)
 
 	load("res://tests/staff_check.gd").new().run(self)
@@ -258,7 +259,7 @@ func test_clock_ui(app: Control) -> void:
 	check(app.model.s.street.night_prep.cancelled,"Visible night countdown button cancels the jump")
 	app.model.street.tick(5)
 	var stock_before := int(bar.stock)
-	use_button(app,"Buy 6 drinks · ฿84")
+	use_button(app,"Buy 6 drinks · ฿228")
 	check(bar.stock==stock_before+6,"Prep restocking uses the live stock action")
 	use_button(app,"Skip to 12pm")
 	check(bar.dirt==80 and bar.clean_remaining==0 and app.model.s.street.minute==720,"Skip control cancels unfinished cleaning")

@@ -12,7 +12,7 @@ func run(test: SceneTree) -> void:
 	var e = m.street.economy
 	var money: int = m.s.cash
 	e.serve(b)
-	test.check(b.tip_visits==1 and m.s.cash==money+55 and b.tips_total==0,"First real sale banks one ten-baht tip without paying it early")
+	test.check(b.tip_visits==1 and m.s.cash==money+80 and b.tips_total==0,"First real sale banks one ten-baht tip without paying it early")
 	var guest: Dictionary = b.customers[0]
 	e.order(b,guest)
 	e.serve(b)
@@ -34,7 +34,7 @@ func run(test: SceneTree) -> void:
 	money = m.s.cash
 	close_night(m)
 	test.check(m.s.cash==money+10 and b.tip_visits==0 and b.tips_total==10 and b.last_tips.visits==1,"Night closure pays exactly ten per served visit and clears the jar")
-	test.check(b.last_shift.revenue==110 and b.last_tips.amount==10,"Tip receipts remain separate from drink/healthy-shift accounting")
+	test.check(b.last_shift.revenue==160 and b.last_tips.amount==10,"Tip receipts remain separate from drink/healthy-shift accounting")
 	m.street.action("stay")
 	m.street.night_prep_tick()
 	m.save_game()
@@ -84,17 +84,17 @@ func run(test: SceneTree) -> void:
 	test.check(b.stock==6 and b.consignment==6 and m.s.cash==39 and m.street.economy.pending(b)==orders,"Emergency delivery recovers the exact screenshot state without fake buyers or cash")
 	m.street.action("emergency_stock")
 	test.check(b.stock==6 and b.recovery==120,"Repeated emergency clicks cannot stack stock or cover")
-	m.street.economy.serve(b,2)
-	test.check(m.s.cash==121 and b.consignment==4 and b.tip_visits==2,"Two real recovery sales repay their stock costs and earn enough for a normal pack")
+	m.street.economy.serve(b,3)
+	test.check(m.s.cash==237 and b.consignment==3 and b.tip_visits==3,"Three real recovery sales repay their stock costs and earn enough for a normal pack")
 	m.street.action("stock")
-	test.check(b.stock==10 and m.s.cash==37,"Recovered business can purchase a normal full pack")
+	test.check(b.stock==9 and m.s.cash==9,"Recovered business can purchase a normal full pack")
 	m = Campaign.new(72)
 	b = m.street.selected()
 	b.stock = 0
 	b.supplier_level = 2
-	m.s.cash = 130
+	m.s.cash = 430
 	m.street.action("emergency_stock")
-	test.check(b.stock==6 and m.s.cash==130,"Bulk-pack affordability uses the actual 144-baht bill; recovery stays the six-drink exception")
+	test.check(b.stock==6 and m.s.cash==430,"Bulk-pack affordability uses the actual 432-baht bill; recovery stays the six-drink exception")
 	# Current customers already served before migration do not retroactively tip.
 	m = Campaign.new(72)
 	b = m.street.selected()

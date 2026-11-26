@@ -29,7 +29,7 @@ func cooldowns(test: SceneTree) -> void:
 	m.street.advance(0.01)
 	test.check(e.action_status(b,"serve").enabled,"Serve becomes ready exactly ten seconds after a fractional start")
 	m.street.action("serve")
-	test.check(b.sold==2 and b.stock==16,"Next serve consumes one stock unit")
+	test.check(b.sold==2 and b.stock==10,"Next serve consumes one stock unit")
 	m.street.action("welcome")
 	test.check(b.welcome==1 and not e.action_status(b,"chat").enabled,"Welcome starts the social cooldown independently of Serve")
 	var now: float = e.action_time()
@@ -80,7 +80,7 @@ func cooldowns(test: SceneTree) -> void:
 	m.street.action("recovery")
 	m.street.economy.admit(b)
 	m.street.action("serve")
-	test.check(m.s.cash==41 and b.consignment==5,"Recovery still earns only a real sale less its consignment cost")
+	test.check(m.s.cash==66 and b.consignment==5,"Recovery still earns only a real sale less its consignment cost")
 
 func chat(test: SceneTree) -> void:
 	var m = fresh()

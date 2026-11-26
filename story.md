@@ -44,6 +44,20 @@ than removing their agency.
 “Rent is due on Tuesday” expresses the opening pressure. It is not a mandatory
 real-time deadline or a separate Tuesday rent mechanic in the live economy.
 
+## Same beer, different night
+
+The Blue Hour charges ฿80 for a standard drink. A Soi venue charges ฿100;
+a gogo charges ฿120. The extra twenty baht belongs to the kind of night on offer,
+not an automatic price rise every time the owner buys new chairs.
+
+> **Anong:** “Eighty here. A hundred down the soi. A hundred and twenty under
+> the spotlights. Bo still wants his delivery paid.”
+
+Bo's ordinary supply starts at ฿38 per drink, reducing to ฿30 with the best
+agreement. A fresh Blue Hour opens with twelve drinks and ฿228 for a full
+six-pack. Existing owners keep their till and fridge. His emergency consignment
+remains a subsidised ฿14-per-sale favour, not an ordinary wholesale deal.
+
 ## A shift has a rhythm
 
 The owner can pour a drink, step outside to welcome passersby, or reassure a guest
@@ -140,7 +154,7 @@ past the first birthday get the next scheduled gathering without a cash handout.
 | Pool and promotions | Pool charges ฿50 once per game per table. Free pool swaps fees for appeal; promotions still need space, service and stock. |
 | A colleague behind the bar | Bartenders cost ฿1,200 for ten days, plus wages. They serve every 25/20/15 seconds, with training costing ฿400 then ฿800; skills stay through rehire. A ready colleague serves immediately, then recovers. |
 | Nida at the door | Her ฿1,200 ten-day contract plus 10% drink commission replaces welcoming while she works. Owner Welcome upgrades only help during her absence. |
-| Bo's bulk terms | Six drinks initially cost ฿84. Supplier level two requires twelve spaces and ฿144, with later twelve-drink bills of ฿120/96/72. Old stock keeps its paid cost. |
+| Bo's bulk terms | Six drinks initially cost ฿228. Supplier level two requires twelve spaces and ฿432, with later twelve-drink bills of ฿408/384/360. Old stock keeps its paid cost. |
 | Music and automatic pouring | Music costs ฿1,200 and normally brings repeat orders forward from 35 to 25 seconds. ฿3,000 auto-serve uses the owner's existing cooldown; the stage-two pouring tier can reduce it to two seconds. |
 | Management | ฿12,000/36,000/72,000 incremental appointments earn separate ฿10/20/40 per trading second and enable bounded offline estimates. They do not fabricate customer visits. |
 | The till and the books | The five-second ฿/s sample shows actual net trading. Shift, promotion and party reports explain why a busy room did or did not pay. |

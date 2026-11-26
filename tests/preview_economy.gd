@@ -23,7 +23,7 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	if not scroll_to.is_empty():
 		var target := find_text(app.column,scroll_to)
 		if target:
-			if name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
+			if name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
 		await process_frame
 	await RenderingServer.frame_post_draw
@@ -46,6 +46,13 @@ func run() -> void:
 	await capture(app,"opening")
 	app.show_tutorial_hint = false
 	app.drawer_open = true
+	for kind in 3:
+		app.model = Campaign.new(72)
+		app.model.street.selected().type = kind
+		app.model.street.selected().customers.clear()
+		app.model.street.economy.admit(app.model.street.selected())
+		await capture(app,"prices-"+str(kind),"Standard drink")
+	app.model = Campaign.new(72)
 	await capture(app,"economy-opening")
 	await capture(app,"actions-ready")
 	app.model.street.action("serve")
@@ -203,9 +210,9 @@ func run() -> void:
 	app.model.street.selected().stock = 19
 	await capture(app,"bulk-no-space","Buy 12 drinks")
 	app.model.street.selected().stock = 18
-	app.model.s.cash = 143
+	app.model.s.cash = 431
 	await capture(app,"bulk-no-cash","Buy 12 drinks")
-	app.model.s.cash = 144
+	app.model.s.cash = 432
 	await capture(app,"bulk-ready","Buy 12 drinks")
 	app.model.street.action("stock")
 	await capture(app,"bulk-delivered","Buy 12 drinks")

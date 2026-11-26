@@ -7,28 +7,28 @@ func run(test: SceneTree) -> void:
 	var e = m.street.economy
 	m.s.cash = 10000
 	m.street.action("restock")
-	test.check(e.pack_quantity(b)==6 and e.pack_price(b)==84,"Supplier level one keeps six-drink deliveries")
+	test.check(e.pack_quantity(b)==6 and e.pack_price(b)==228,"Supplier level one keeps six-drink deliveries")
 	m.street.action("restock")
-	for item in [[18,144,true],[19,1000,false],[18,143,false],[17,145,true]]:
+	for item in [[18,432,true],[19,1000,false],[18,431,false],[17,433,true]]:
 		b.stock = item[0]
 		m.s.cash = item[1]
 		var before := [b.stock,m.s.cash]
 		m.street.action("stock")
-		test.check([b.stock,m.s.cash]==([before[0]+12,before[1]-144] if item[2] else before),"Bulk delivery requires the whole price and twelve free spaces")
+		test.check([b.stock,m.s.cash]==([before[0]+12,before[1]-432] if item[2] else before),"Bulk delivery requires the whole price and twelve free spaces")
 	b.equipment.fridge = 1
 	b.stock = 59
 	m.s.cash = 10000
 	test.check(not e.restock(b,true) and b.stock==59,"Automatic bulk delivery also rejects eleven free fridge spaces")
 	b.stock = 58
-	m.s.cash = 144
+	m.s.cash = 432
 	test.check(not e.restock(b,true),"Bulk auto-stock retains the next operating charge")
-	m.s.cash = 145
+	m.s.cash = 433
 	test.check(e.restock(b,true) and b.stock==70 and m.s.cash==1,"Bulk auto-stock settles twelve units and leaves its reserve")
 	m.save_game()
 	var loaded = Campaign.new(11)
 	test.check(loaded.load_game(),"Bulk stock save reloads")
 	var restored: Dictionary = loaded.street.selected()
-	test.check(restored.stock==70 and restored.supplier_level==2 and loaded.s.cash==1 and loaded.street.economy.pack_price(restored)==144,"Reload retains inventory and terms without repeating the delivery")
+	test.check(restored.stock==70 and restored.supplier_level==2 and loaded.s.cash==1 and loaded.street.economy.pack_price(restored)==432,"Reload retains inventory and terms without repeating the delivery")
 	# Colder beer earns reputation through satisfied departures, never buying alone.
 	for fridge in 3:
 		m = Campaign.new(72)
@@ -86,7 +86,7 @@ func run(test: SceneTree) -> void:
 	var reserve: int = whole.s.cash
 	whole.street.claim_offline(1700)
 	for timestamp in range(1001,1701): split.street.claim_offline(timestamp)
-	test.check(split.s.cash+split.street.selected().stock*12<=whole.s.cash+whole.street.selected().stock*12 and whole.s.cash>=reserve and split.s.cash>=reserve,"Offline twelve-drink deliveries preserve reserves; shorter claims cannot mint extra value")
+	test.check(split.s.cash+split.street.selected().stock*36<=whole.s.cash+whole.street.selected().stock*36 and whole.s.cash>=reserve and split.s.cash>=reserve,"Offline twelve-drink deliveries preserve reserves; shorter claims cannot mint extra value")
 	test.check(str(whole.s.street.offline_report.notes).contains("deliveries of 12"),"Offline report names the actual bulk delivery size")
 	var settled := [whole.s.cash,whole.street.selected().stock]
 	whole.street.claim_offline(1700)

@@ -828,6 +828,10 @@ func update_action_controls() -> void:
 		entry[0].text = "%s · %ds · MAX" % [item.name,state.current] if state.maxed else "%s · %ds → %ds · %s%s" % [item.name,state.current,state.next,cash(state.price),"\nNeed %s more incl. reserve" % cash(state.shortfall) if state.shortfall>0 else "\nNeeds stage 2" if not state.stage_ok else ""]
 
 func stock_button() -> void:
+	live_body(func() -> String:
+		var bar: Dictionary = model.street.selected()
+		var eco = model.street.economy
+		return "Standard drink %s · next delivery %s per drink" % [cash(eco.price(bar)),cash(eco.stock_unit_cost(bar))],TEAL,12)
 	stock_controls.append(row_button("Buy drinks",street_action.bind("stock")))
 	var recovery := row_button("Bo's recovery delivery · 6 drinks",street_action.bind("emergency_stock"))
 	recovery.name = "EmergencyStock"

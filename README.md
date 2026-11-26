@@ -25,7 +25,7 @@ godot --path .
 ```
 
 **Attract customers → give them a reason to stay → fulfil orders → earn a profit
-→ reinvest.** You start with ฿200, eighteen drinks and three opening customers.
+→ reinvest.** You start with ฿228, twelve drinks and three opening customers.
 Tap **Serve a drink** for a waiting order; use **Welcome customers** when quiet.
 Both actions refill over ten seconds. In **Service**, buy **Faster pouring** and
 **Better welcoming** to reduce each venue’s cooldowns to eight, six, then four
@@ -48,9 +48,14 @@ the property thumbnail; renovation alone does not install them.
 Buying **Sports screen** installs a visible wall TV, also shown in the thumbnail.
 Beer-bar stages 2 and 3 have fitted screens that stay dark until purchased.
 
-Stock starts in **six-drink packs for ฿84**. Supplier level 2 switches both manual
-and automatic deliveries to **twelve drinks for ฿144** (฿12 each). Levels 3–5
-keep twelve-drink deliveries and lower the bill to ฿120/96/72. Every purchase
+Standard drinks cost **฿80 at beer bars, ฿100 at Soi bars and ฿120 at gogos**.
+Renovation does not raise these prices. Stock starts at ฿38 per drink, leaving
+฿42/62/82 before wages, overhead and commission. Happy Hour takes 20% off new
+orders; the purchased premium menu still adds ฿30 to eligible orders.
+
+Stock starts in **six-drink packs for ฿228**. Supplier level 2 switches both manual
+and automatic deliveries to **twelve drinks for ฿432** (฿36 each). Levels 3–5
+keep twelve-drink deliveries and lower the bill to ฿408/384/360. Every purchase
 needs room and cash for the whole delivery; the button explains any shortfall.
 Each fridge tier adds +1 reputation per ten satisfied visits, on top of the base +1. Stage-1 beer bars can buy a third seating level, **Compact layout
 for ฿1,200**, reaching twelve customers even with pool and fans installed.
@@ -92,7 +97,7 @@ cash for the next shift—not just a large bank balance.
 | Auto-serve | ฿3,000 per venue; uses the existing Serve timer as rush backup for bartenders, or covers the bar without them. Manual taps share it. |
 | Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
 | Manager levels 1 / 2 / 3 | ฿12,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
-| Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; delivery prices ฿84 for 6, then ฿144 / ฿120 / ฿96 / ฿72 for 12. |
+| Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; delivery prices ฿228 for 6, then ฿432 / ฿408 / ฿384 / ฿360 for 12. |
 
 Manager income is separate from drink/pool receipts, uses no stock and pays no
 drink commission. It stops on closure and does not grant satisfied customers.
@@ -212,8 +217,8 @@ The current source includes 72 runtime textures, twenty-two sprite atlases with
 149 frames, nine interiors and nine matching exterior illustrations. Gameplay,
 save migration, boot-menu isolation, action/staff timing and art/input regressions
 are checked together with 42 fresh-campaign simulations plus 60 paired celebration scenarios. Baseline active
-runs with nightly tips reach stage 2 in 32–34 minutes, a second venue in 94–98 minutes and stage 3
-in 131–136 minutes. Optional promoter-first investment takes longer to repay;
+runs with the revised drink prices reach stage 2 in 32–34 minutes, a second venue in 94–100 minutes and stage 3
+in 130–138 minutes. Optional promoter-first investment takes longer to repay;
 service-first and manual routes remain viable. Mostly-idle play takes longer.
 Device playtesting is still separate from tests and exports. See the
 [verification record](docs/TESTING.md).
@@ -265,7 +270,7 @@ Bartender contracts now match Nida’s ฿1,200 upfront price, including renewal
 Saving for the bartender first reaches the hire in 4.2–4.7 minutes in three fresh
 campaign tests. Existing training and contract time are preserved. Fridges earn extra reputation
 through satisfied visits. Supplier level 2 buys twelve drinks at a cheaper unit
-price, requiring all twelve spaces and the full ฿144 bill. Higher levels retain
+price, requiring all twelve spaces and the full ฿432 bill. Higher levels retain
 the twelve-unit minimum. Saved inventory keeps its original paid cost.
 
 Once Nida is on duty, faster Welcome offers no extra attraction. Those upgrades
@@ -316,7 +321,7 @@ remain available and share the owner's unchanged cooldown. The price stays
 Nida's **Rehire** button now sits directly under **Frontage promoter**, with the
 full cash requirement and exact shortfall. Her ฿1,200 renewal also requires a
 reserve for two minutes of payroll and one current-price delivery. For a basic
-bar without other staff this means ฿1,320 cash: ฿1,200 paid, ฿120 retained.
+bar without other staff this means ฿1,464 cash: ฿1,200 paid, ฿264 retained.
 Active contracts cannot be renewed early; use her rota if she is off duty.
 Expiry refreshes the controls, and rehiring retains her training and roster slot.
 

@@ -2,15 +2,15 @@ extends RefCounted
 
 # Fictional venues; adult nightlife remains off-screen.
 const TYPES = [
-	{"name":"Beer bar", "rep":0, "drink":55, "stages":[
+	{"name":"Beer bar", "rep":0, "drink":80, "stages":[
 		["Plastic Chairs & Big Dreams", "Bottled beers, basic spirits, six stools and a secondhand fridge.", "Anong: The last owner said this place practically runs itself. He's at the airport. You're on ice duty."],
 		["The Local Favourite", "More floor space for pool, cocktails and sports screens. Equipment is purchased separately.", "The new sign works. The reopening party trips the power. Bo offers a generator with only one previous flood."],
 		["Soi Institution", "Live music and a packed terrace. Regulars keep this bar earning in low season.", "Mali's fight night finally pays. A regular asks for his own stool. Anong suggests he start by paying his tab."]]},
-	{"name":"Soi 6-style bar", "rep":20, "drink":85, "stages":[
+	{"name":"Soi 6-style bar", "rep":20, "drink":100, "stages":[
 		["Something Upstairs", "Lady drinks, bar fines and one upstairs room. Adult hosts choose their own bookings.", "The previous owner retires for the fourth time. Dao checks the stairs before anyone checks the till."],
 		["The Busy Staircase", "Two rooms, a larger team and better music. Room for more hosted-drink customers.", "Pim has a music programme. Bo has delivered a karaoke machine. Neither considers this the same thing."],
 		["Soi Royalty", "Three rooms, experienced hosts and a recognisable neon frontage.", "Dao can now run both floors without you. Your new job is to stop offering advice during the rush."]]},
-	{"name":"Gogo bar", "rep":45, "drink":140, "stages":[
+	{"name":"Gogo bar", "rep":45, "drink":120, "stages":[
 		["First Spotlight", "One pole stage, an adult dance team and a very enthusiastic DJ.", "Anton sends flowers from Lantern House. The card includes the dimensions of his bigger LED screen."],
 		["Neon Showroom", "Multiple poles, coordinated shows and bottle-service booths.", "Pim books the headline set. Anton announces a grand re-reopening on exactly the same night."],
 		["Walking Street Headliner", "A spectacular three-pole stage, VIP service and queues around the block.", "The opening crowd blocks the street. Anong buys another fridge. Anton orders a screen visible from the moon."]]}
@@ -66,8 +66,10 @@ const RAID_INTERVAL = 15
 const RAID_BASE_CHANCE = 2.0
 const RAID_HEAT_CHANCE = 0.2
 const RAID_FINE_PER_STAGE = 300
-const STARTING_CASH = 200
-const STOCK_COST = 14
+const STARTING_CASH = 228
+const STOCK_COST = 38
+const CONSIGNMENT_COST = 14
+const LEGACY_STOCK_COST = 14 # Backfill only for saves predating paid inventory lots.
 const TIP_PER_VISIT = 10
 const POOL_FEE = 50
 const POOL_SECONDS = 45
@@ -138,7 +140,7 @@ const AUTO_SERVE_URGENT_SECONDS = 10
 const AUTO_SERVE_COST = 3000
 const MUSIC_ORDER_SECONDS = 25
 const SUPPLIER_PRICES = [900,1200,2400,4800,9600]
-const SUPPLIER_UNIT_COSTS = [14,14,12,10,8,6]
+const SUPPLIER_UNIT_COSTS = [38,38,36,34,32,30]
 const SUPPLIER_STAGES = [1,1,2,2,3]
 const MANAGER_PRICES = [12000,36000,72000]
 const MANAGER_INCOME = [0,10,20,40]

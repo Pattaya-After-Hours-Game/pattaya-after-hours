@@ -773,7 +773,7 @@ func _read(path: String) -> Variant:
 				if not _finite_number(bar.supplier_level,0,5) or float(bar.supplier_level)!=floorf(bar.supplier_level): return null
 				if not _finite_number(bar.equipment.get("music"),0,1): return null
 				for lot in bar.stock_lots:
-					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),6,14): return null
+					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),6,Street.C.STOCK_COST): return null
 		if int(parsed.version)>=8:
 			for bar in parsed.street.bars:
 				for customer in bar.customers:

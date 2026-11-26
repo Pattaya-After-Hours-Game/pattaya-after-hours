@@ -35,7 +35,11 @@ claiming behaviour exists; update the relevant documentation when it changes.
 
 - Demand, space, service and supply are separate limits. A drink sale needs a
   real order, stock and service. Clicking or hiring must not manufacture buyers.
-  Venues compete for bounded shared street traffic.
+  Venues compete for bounded shared street traffic. Standard drinks cost ฿80/100/120
+  in beer/Soi/gogo venues. Ordinary stock costs ฿38/38/36/34/32/30 at supplier
+  levels 0–5; premium orders and promotions retain their separate rules. Fresh
+  campaigns start with ฿228 and twelve drinks. Preserve saved quotes, budgets
+  and paid inventory costs; never revalue an existing fridge or grant cash on update.
 - Pool costs **฿50 per game per table**, charged once at game start. Free Pool
   Night trades fees for attraction. Timers, capacity, customer budgets and
   promotion cooldowns still apply. Reloading must not duplicate rewards.
@@ -68,8 +72,8 @@ claiming behaviour exists; update the relevant documentation when it changes.
   separate from service training, and persists after rehire. Keep renewal visible
   in the frontage section, with exact payroll/stock reserve and shortfall. Expiry
   must refresh controls independently of history text; never duplicate her slot.
-- Buy stock in complete packs requiring cash and room: six for ฿84 at supplier
-  levels 0/1, twelve for ฿144/120/96/72 at levels 2/3/4/5. Supplier upgrades
+- Buy stock in complete packs requiring cash and room: six for ฿228 at supplier
+  levels 0/1, twelve for ฿432/408/384/360 at levels 2/3/4/5. Supplier upgrades
   cost ฿900/1,200/2,400/4,800/9,600. Preserve inventory purchase costs; discounts never refund old stock. Supplier
   automation retains its next operating charge. Bo’s consignment remains the
   recovery exception. Each fridge tier earns +1 extra reputation per ten happy

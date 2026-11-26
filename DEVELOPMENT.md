@@ -160,7 +160,7 @@ per-customer chat state. Action deadlines are fractional foreground seconds;
 Do not run both `advance` and `tick` for the same elapsed interval.
 
 Changes to the save dictionary need compatibility handling; the current schema
-version is 7. Promoter roster/commission fields and fractional offline accounting
+version is 11. Promoter roster/commission fields and fractional offline accounting
 are migrated without granting purchases. Keep whole-pack delivery and commission
 settlement inside `economy.gd`; UI/animation code must not mint receipts.
 Manager income is a separate model-owned receipt, not a drink. Stock lots retain
@@ -386,3 +386,13 @@ earns tips only on a first served drink and settles them outside normal sales
 ledgers; `street.gd` triggers counting at nightly closure or legal manual skip.
 The shared recovery action accepts `emergency_stock` for an eligible open venue,
 so UI does not perform an independent cash grant or discard existing orders.
+
+## Standard drink price update
+
+Venue base prices now use ฿80/100/120 and supplier units ฿38/38/36/34/32/30.
+This requires no new save fields: schema 11 retains saved quotes and FIFO costs,
+with validation extended to the new maximum stock cost. `LEGACY_STOCK_COST`
+backfills pre-lot inventory/reports; `CONSIGNMENT_COST` stays ฿14 for live and
+offline recovery. Do not use the ordinary purchase cost for old consignment.
+`drink_prices_check.gd` verifies settlement across venue types and old-tab/lot
+preservation; current pricing and balance evidence live in the economy/testing docs.
