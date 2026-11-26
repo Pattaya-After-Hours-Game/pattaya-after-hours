@@ -89,6 +89,9 @@ func run() -> void:
 	await capture(app,"service-overview")
 	await capture(app,"service-team","TEAM & PAYROLL")
 	await capture(app,"service-team-help","TEAM & PAYROLL")
+	app.open_fridge()
+	await capture(app,"service-pinned-back","Mixed delivery")
+	app.change_tab(0)
 	await capture(app,"service-reports","YOUR PROFIT CYCLE")
 	app.model.s.street.minute = 60
 	await capture(app,"service-closed")

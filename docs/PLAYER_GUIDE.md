@@ -50,7 +50,7 @@ her training and any pending return time remain intact.
 **Fridge** for drinks, **Team** for staff, **Upgrades** for equipment and
 automation, **Reports** for finances and tips, and **Hours** for cleaning,
 closing and guided shifts. Tap **?** beside a goal or hiring choice for a
-slide-out explanation. The highlighted goal button takes you to the
+slide-out explanation. **Back** stays in the title bar as you scroll. The highlighted goal button takes you to the
 matching control or tab. It does not buy anything. Early steps cover real drink
 sales and regulars; later ones explain renovation, reopening preparations,
 deliveries and the first manager. The guide follows the Blue Hour and then the

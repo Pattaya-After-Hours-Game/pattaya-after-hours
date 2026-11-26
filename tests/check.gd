@@ -153,7 +153,7 @@ func test_ui() -> void:
 	check(not find_button(app,"STOCK").tooltip_text.is_empty(),"Stock header still has a hover explanation")
 	use_button(app,"STOCK")
 	check(app.fridge_open and app.drawer_open and app.column.get_child_count()>4,"Tapping Stock opens the drink list")
-	use_button(app,"‹  Service")
+	use_button(app,"Back")
 	var bar: Dictionary = app.model.street.selected()
 	var original_stock: int = bar.stock
 	var original_cash: int = app.model.s.cash
@@ -169,10 +169,10 @@ func test_ui() -> void:
 	app.update_action_controls()
 	use_button(app,"Need Rum & cola")
 	check(app.fridge_open and panel_has_text(app,"Orders need Rum & cola. Return spare stock to free 6 slots."),"Wrong-stock shortcut names the missing drink and explains how to make space")
-	check(app.column.get_child(2).text.begins_with("Rum & cola") and bar.stock==30 and app.model.s.cash==original_cash,"The needed drink is first even with a full fridge, and opening it is free")
+	check(app.column.get_child(1).text.begins_with("Rum & cola") and bar.stock==30 and app.model.s.cash==original_cash,"The needed drink is first even with a full fridge, and opening it is free")
 	bar.stock = original_stock
 	bar.customers = original_customers
-	use_button(app,"‹  Service")
+	use_button(app,"Back")
 	var initial_save := FileAccess.get_file_as_string(Campaign.SAVE)
 	use_button(app,"Tutorial")
 	check(FileAccess.get_file_as_string(Campaign.SAVE)==initial_save,"Opening a tutorial leaves the new campaign save untouched")
@@ -312,12 +312,12 @@ func test_clock_ui(app: Control) -> void:
 	check(app.model.s.street.night_prep.cancelled,"Visible night countdown button cancels the jump")
 	app.model.street.tick(5)
 	var stock_before := int(bar.stock)
-	use_button(app,"‹  Service")
+	use_button(app,"Back")
 	check(not find_button(app,"Open Hours  ›").disabled,"Closed overview guides players to prep instead of serving")
 	use_button(app,"Fridge")
 	use_button(app,"Buy 6 House lager · ฿228")
 	check(bar.stock==stock_before+6,"Prep restocking uses the live stock action in Fridge")
-	use_button(app,"‹  Service")
+	use_button(app,"Back")
 	use_button(app,"Skip to 12pm")
 	check(bar.dirt==80 and bar.clean_remaining==0 and app.model.s.street.minute==720,"Skip control cancels unfinished cleaning")
 	check(find_button(app,"Serve a drink").disabled and not find_button(app,"Welcome customers").disabled,"Noon allows welcoming; service waits for a real order")
