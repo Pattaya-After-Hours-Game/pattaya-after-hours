@@ -839,6 +839,7 @@ func street_action(id: String,index: int = 0) -> void:
 func cooldown_button(rect: Rect2, label: String, id: String) -> void:
 	var button := at_button(root_ui,rect,"",street_action.bind(id),id=="serve")
 	button.add_theme_font_size_override("font_size",13)
+	button.add_theme_stylebox_override("disabled",box(DARK,EDGE.darkened(.5)))
 	var fill := ColorRect.new()
 	fill.color = Color(0.44,0.98,0.82,0.24)
 	fill.position = Vector2(2,2)
@@ -862,22 +863,24 @@ func update_action_controls() -> void:
 		var state: Dictionary = eco.action_status(bar,entry[4])
 		var practice_action: bool = campaign_before_tutorial == null or (tutorial_step<TUTORIAL_ACTIONS.size() and entry[4]==TUTORIAL_ACTIONS[tutorial_step])
 		entry[0].disabled = not state.enabled or not practice_action
-		entry[0].tooltip_text = "Ready" if state.enabled else state.reason
+		entry[0].tooltip_text = "Follow the current lesson." if not practice_action else "Ready" if state.enabled else state.reason
 		# Keep native button text for keyboard/accessibility; a child draws the caption over the fill.
 		entry[0].text = entry[3]
 		for color_name in ["font_color","font_disabled_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
 			entry[0].add_theme_color_override(color_name,Color.TRANSPARENT)
-		entry[1].size.x = (entry[0].size.x-4)*state.fill
-		entry[1].color.a = 0.24 if state.remaining>0 or state.enabled else 0.07
+		entry[1].size.x = 0 if state.no_orders else (entry[0].size.x-4)*state.fill
+		var refilling: bool = state.remaining>0.000001 and not state.no_orders
+		entry[1].color.a = 0.24 if refilling or not entry[0].disabled else 0.07
 		var detail := "Ready" if state.enabled else "Unavailable"
 		if not eco.is_trading(bar): detail = "Venue closed"
-		elif state.remaining>0.000001: detail = "Refilling · %ds" % ceili(state.remaining)
-		elif not state.enabled and entry[4]=="serve": detail = "No orders" if eco.pending(bar)==0 else "Restock fridge"
+		elif state.no_orders: detail = "Waiting for orders"
+		elif refilling: detail = "Refilling · %ds" % ceili(state.remaining)
+		elif not state.enabled and entry[4]=="serve": detail = "Restock fridge"
 		elif not state.enabled and entry[4]=="chat": detail = "No guest needs chat"
 		elif not state.enabled and entry[4]=="welcome" and eco.promoter_bonus(bar)>0: detail = "Nida is welcoming"
 		elif not practice_action: detail = "Practice step"
 		entry[2].text = ("Auto-serve" if entry[4]=="serve" and eco.automatic_service(bar) else entry[3])+"\n"+detail
-		entry[2].modulate = DARK if state.enabled and entry[4]=="serve" else WHITE if state.enabled or state.remaining>0 else MUTED
+		entry[2].modulate = DARK if not entry[0].disabled and entry[4]=="serve" else WHITE if not entry[0].disabled or refilling else MUTED
 	for button in stock_controls:
 		if not is_instance_valid(button): continue
 		var offer: Dictionary = eco.stock_offer(bar)
