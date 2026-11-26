@@ -167,7 +167,7 @@ func action(id: String, index: int = 0) -> String:
 			if int(s.street.night_prep.remaining)<=0: return "No automatic jump is pending."
 			s.street.night_prep.remaining = 0
 			s.street.night_prep.cancelled = true
-			result = "Staying for prep. Cleaning continues; use Skip to 12pm when ready."
+			result = "Staying for prep. Cleaning continues; use Skip to open when ready."
 		"skip":
 			if not can_skip(): return "Skip is available after 1am when every venue has stopped trading."
 			count_tips()

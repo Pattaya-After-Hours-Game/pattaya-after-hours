@@ -839,7 +839,7 @@ blocks her separate frontage renewal. No schema change or new rehire reward.
 After the last venue closes for the night, a free **15-second clean-up** starts
 for all dirty venues, including those without a manager. A visible street button
 counts down to noon. **Stay here** cancels the automatic jump for that night;
-cleaning continues, and **Skip to 12pm** remains available when you are ready.
+cleaning continues, and **Skip to open** stays on the bottom bar until noon.
 Even an already-clean street gives you the full fifteen-second choice.
 
 The countdown waits for late-trading venues to finish. Daytime closure and a

@@ -116,6 +116,7 @@ var arcade_circuit := false
 
 var live_labels: Array = []
 var action_controls: Array = []
+var skip_to_open: Button
 var bartender_controls: Array = []
 var bar_fine_controls: Array = []
 var lease_controls: Array = []
@@ -369,6 +370,7 @@ func render(keep_scroll: bool = false) -> void:
 	stat_tip = null
 	stat_tip_key = ""
 	action_controls.clear()
+	skip_to_open = null
 	bartender_controls.clear()
 	bar_fine_controls.clear()
 	lease_controls.clear()
@@ -592,6 +594,9 @@ func render(keep_scroll: bool = false) -> void:
 	var live_service: bool = not practicing and model.s.phase in ["plan","guided"]
 	if not live_service and not practicing:
 		at_button(root_ui,Rect2(594,490,352,40),action_label,action,true)
+	if live_service:
+		skip_to_open = at_button(root_ui,Rect2(504,490,352,40),"Skip to open",street_action.bind("skip"),true)
+		skip_to_open.tooltip_text = "Jump to the noon opening."
 	if live_service or practicing:
 		cooldown_button(Rect2(414,490,170,40),"Serve a drink","serve")
 		cooldown_button(Rect2(594,490,172,40),"Welcome customers","welcome")
@@ -1217,8 +1222,12 @@ func cooldown_button(rect: Rect2, label: String, id: String) -> void:
 func update_action_controls() -> void:
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
+	var skipping: bool = is_instance_valid(skip_to_open) and model.street.can_skip()
+	if is_instance_valid(skip_to_open): skip_to_open.visible = skipping
 	for entry in action_controls:
 		if not is_instance_valid(entry[0]): continue
+		entry[0].visible = not skipping
+		if skipping: continue
 		var state: Dictionary = eco.action_status(bar,entry[4])
 		var practice_action: bool = campaign_before_tutorial == null or (tutorial_step<TUTORIAL_ACTIONS.size() and entry[4]==TUTORIAL_ACTIONS[tutorial_step])
 		var stock_shortcut: bool = state.needs_stock and campaign_before_tutorial==null
@@ -1638,11 +1647,8 @@ func street_panel() -> void:
 			"hours": service_hours(bar)
 		return
 	next_goal_panel()
-	if not eco.is_trading(bar):
-		if model.street.can_skip():
-			row_button("Skip to 12pm",street_action.bind("skip"))
-		elif not bar.open:
-			row_button("Enable opening",street_action.bind("open"),true)
+	if not eco.is_trading(bar) and not model.street.can_skip() and not bar.open:
+		row_button("Enable opening",street_action.bind("open"),true)
 	service_tiles("Fridge","fridge",open_fridge,"Team","manager",open_service_section.bind("team"))
 	if model.s.phase=="plan":
 		var growth := func() -> void: open_upgrades(not upgrade_ready.is_empty())
@@ -1733,7 +1739,6 @@ func service_hours(bar: Dictionary) -> void:
 				body("Auto-open paused for tonight.",TEAL,13)
 			for venue in model.s.street.bars:
 				live_body(func() -> String: return "%s · %s · stock %d/%d" % [venue.name,"clean" if venue.dirt==0 else "needs cleaning",venue.stock,model.street.capacity(venue)],MUTED,12)
-			row_button("Skip to 12pm",street_action.bind("skip"),true)
 	if model.s.phase=="plan" and eco.is_trading(bar):
 		row_button("Open managed shift",begin)
 	if not bar.raided and (bar.late_open or model.s.street.minute>=StreetContent.OPEN_MINUTE or model.s.street.minute<StreetContent.CLOSE_MINUTE):

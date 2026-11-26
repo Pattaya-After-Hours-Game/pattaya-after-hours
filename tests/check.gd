@@ -302,14 +302,21 @@ func test_clock_ui(app: Control) -> void:
 	use_button(app,"Hours")
 	use_button(app,"Stay open until 3am tonight")
 	check(bar.late_open,"Nightly extension works through Service")
+	app.model.s.street.minute = 120
+	app.update_action_controls()
+	check(not find_button(app,"Skip to open").visible,"Skip to open is hidden while a late venue is trading")
+	app.model.s.street.minute = 59
 	use_button(app,"Cancel late opening tonight")
 	check(not bar.late_open,"Nightly extension can be cancelled through Service")
 	bar.dirt = 80
 	app.model.s.street.minute = 59
 	app.model.street.tick(1)
 	app.render()
-	check(find_button(app,"Serve a drink").disabled and find_button(app,"Welcome customers").disabled,"Closed-hours UI disables customer actions")
-	check(panel_has_text(app,"PREP FOR OPENING") and find_button(app,"Skip to 12pm")!=null,"Hours exposes prep and skipping")
+	check(not app.action_controls[0][0].visible and not app.action_controls[1][0].visible,"The skip button replaces customer actions while the street is closed")
+	check(panel_has_text(app,"PREP FOR OPENING") and find_button(app,"Skip to open").is_visible_in_tree(),"Skip to open is available during the closing countdown and outside the Hours panel")
+	app.drawer.hide()
+	check(find_button(app,"Skip to open").is_visible_in_tree(),"Skip to open is visible with management dismissed")
+	app.drawer.show()
 	check(bar.clean_remaining==15,"Night closure starts cleaning without a manager or manual click")
 	app.root_ui.get_node("NightPrepCancel").pressed.emit()
 	check(app.model.s.street.night_prep.cancelled,"Visible night countdown button cancels the jump")
@@ -320,8 +327,12 @@ func test_clock_ui(app: Control) -> void:
 	use_button(app,"Fridge")
 	use_button(app,"Buy 6 · ฿228")
 	check(bar.stock==stock_before+6,"Prep restocking uses the live stock action in Fridge")
-	use_button(app,"Back")
-	use_button(app,"Skip to 12pm")
+	check(app.fridge_open and find_button(app,"Skip to open").is_visible_in_tree(),"Skip to open remains available in the Fridge after cancelling the countdown")
+	app.model.s.street.minute = 719
+	app.update_action_controls()
+	check(find_button(app,"Skip to open").is_visible_in_tree(),"Skip to open is available up to the last minute before noon")
+	use_button(app,"Skip to open")
+	check(not find_button(app,"Skip to open").visible,"The skip button disappears when trading starts")
 	check(bar.dirt==80 and bar.clean_remaining==0 and app.model.s.street.minute==720,"Skip control cancels unfinished cleaning")
 	check(find_button(app,"Serve a drink").disabled and not find_button(app,"Welcome customers").disabled,"Noon allows welcoming; service waits for a real order")
 

@@ -300,7 +300,7 @@ buy stock, and check the rota. Nightly clean-up now starts automatically for eve
 sold adds dirt; a completely dirty bar loses 25% of its attraction. Cleaning
 costs no cash. Normal stock follows the current supplier pack price and fridge capacity.
 
-After 1am, when all venues have stopped trading, **Skip to 12pm** is available.
+After 1am, when all venues have stopped trading, tap **Skip to open** on the bottom bar to jump to noon.
 The list shows unfinished prep across the street. You can skip anyway: incomplete
 cleaning is cancelled, dirt stays, and no stock is purchased. Waiting naturally
 until noon also cancels incomplete cleaning. Skipping does not run events,
@@ -643,7 +643,7 @@ the next operating charge; managed offline deliveries use their own earned funds
 After the last venue closes for the night, a free **15-second clean-up** starts
 for all dirty venues, including those without a manager. A visible street button
 counts down to noon. **Stay here** cancels the automatic jump for that night;
-cleaning continues, and **Skip to 12pm** remains available when you are ready.
+cleaning continues, and **Skip to open** stays on the bottom bar until noon.
 Even an already-clean street gives you the full fifteen-second choice.
 
 The countdown waits for late-trading venues to finish. Daytime closure and a
