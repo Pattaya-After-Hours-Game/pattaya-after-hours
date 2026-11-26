@@ -1,5 +1,7 @@
 extends RefCounted
 
+const CASH_ACTION_COSTS := {"repair":500,"cool":680,"reserve":500,"paper":330,"rival":420}
+
 const C = preload("res://scripts/content.gd")
 const SAVE = "user://campaign.json"
 const BACKUP = "user://campaign.backup"
@@ -110,6 +112,17 @@ func guide_pay(route_id: int) -> int:
 	var duration: int = C.ROUTES[route_id][2]
 	return duration * [100, 145, 190][int(s.pay)]
 
+func booking_offer(index: int, route_id: int) -> Dictionary:
+	var required := 0 if legacy_mode() else guide_pay(route_id)
+	var reason := tour_offer(index,route_id)
+	if not reason.is_empty(): reason = "%s %s" % [C.STAFF[s.staff[index].id][0],reason]
+	if s.phase!="plan": reason = "Bookings are closed."
+	elif reason.is_empty() and s.pay==0 and C.ROUTES[route_id][2]==2:
+		reason = "The guide asks for standard split or better on long routes."
+	elif reason.is_empty() and s.cash<required:
+		reason = "The guide needs their agreed pay upfront."
+	return {"required":required,"reason":reason,"enabled":reason.is_empty()}
+
 func booking(index: int, route_id: int) -> String:
 	if s.phase != "plan":
 		return "Bookings are closed."
@@ -117,12 +130,9 @@ func booking(index: int, route_id: int) -> String:
 	if s.bookings.get(key, -1) == route_id:
 		s.bookings.erase(key)
 		return "Booking removed."
-	var declined := tour_offer(index, route_id)
-	if not declined.is_empty():
-		return "%s %s" % [C.STAFF[s.staff[index].id][0], declined]
-	if s.pay == 0 and C.ROUTES[route_id][2] == 2:
-		return "The guide asks for standard split or better on long routes."
-	if not legacy_mode() and not spend(guide_pay(route_id)): return "The guide needs their agreed pay upfront."
+	var offer := booking_offer(index,route_id)
+	if not offer.enabled: return offer.reason
+	if not legacy_mode() and not spend(offer.required): return "The guide needs their agreed pay upfront."
 	s.bookings[key] = route_id
 	return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
 
@@ -168,7 +178,7 @@ func action(id: String, index: int = 0) -> String:
 			return result
 		"repair":
 			if s.condition == 100: return "Everything is working."
-			if not spend(500): return "Repairs cost ฿500."
+			if not spend(CASH_ACTION_COSTS.repair): return "Repairs cost ฿500."
 			s.condition = mini(100, s.condition + 20)
 			s.safety = mini(100, s.safety + 4)
 			return "Repairs complete."
@@ -188,7 +198,7 @@ func action(id: String, index: int = 0) -> String:
 		"cool":
 			if s.rig == 0: return "Install the rig first."
 			if s.rig >= 100: return "Cooling is already at full condition."
-			if not spend(680): return "Maintenance costs ฿680."
+			if not spend(CASH_ACTION_COSTS.cool): return "Maintenance costs ฿680."
 			s.rig = mini(100, int(s.rig) + 32)
 			return "Cooling serviced."
 		"mine_switch":
@@ -197,9 +207,9 @@ func action(id: String, index: int = 0) -> String:
 			if s.contract == 2: s.rival = mini(100, int(s.rival) + 4)
 			return ["Power offline.","Independent mining enabled.","Lantern syndicate deal enabled."][s.contract]
 		"reserve":
-			if not spend(500): return "You need ฿500 in the till."
-			s.weekly.costs -= 500
-			s.reserve += 500
+			if not spend(CASH_ACTION_COSTS.reserve): return "You need ฿500 in the till."
+			s.weekly.costs -= CASH_ACTION_COSTS.reserve
+			s.reserve += CASH_ACTION_COSTS.reserve
 			s.partner = mini(100, int(s.partner) + 1)
 			return "฿500 moved into reserve."
 		"draw":
@@ -209,13 +219,13 @@ func action(id: String, index: int = 0) -> String:
 			s.cash += amount
 			return "฿%d released from reserve." % amount
 		"paper":
-			if not spend(330): return "Admin time costs ฿330."
+			if not spend(CASH_ACTION_COSTS.paper): return "Admin time costs ฿330."
 			s.license = mini(100, int(s.license) + 12)
 			s.visa = mini(100, int(s.visa) + 16)
 			s.heat = maxi(0, int(s.heat) - 4)
 			return "Anong and Dao check the folders."
 		"rival":
-			if not spend(420): return "The joint neighborhood night costs ฿420."
+			if not spend(CASH_ACTION_COSTS.rival): return "The joint neighborhood night costs ฿420."
 			s.rival = maxi(0, int(s.rival) - 14)
 			s.trust = mini(100, int(s.trust) + 4)
 			return "Anton agrees to share festival dates."

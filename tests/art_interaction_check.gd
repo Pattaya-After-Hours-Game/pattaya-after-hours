@@ -85,7 +85,7 @@ func run(test: SceneTree) -> void:
 	app.scroll.scroll_vertical = 1000
 	await test.process_frame
 	var cash_before: int = app.model.s.cash
-	await click(test,test.find_button(app,"Unlock auto-restock · ฿900"))
+	await click(test,test.find_button(app,"View auto-restock upgrade  ›"))
 	await test.process_frame
 	var supplier: Control = app.column.find_child("Upgrade_supplier",true,false)
 	test.check(app.upgrades_open and supplier!=null and app.scroll.get_global_rect().intersects(supplier.get_global_rect()) and app.model.s.cash==cash_before,"Fridge opens the supplier upgrade without spending the till")

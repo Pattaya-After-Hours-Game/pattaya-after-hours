@@ -147,6 +147,17 @@ func total_rate(offline: bool = false) -> int:
 func _sell(bar: Dictionary, count: int) -> int:
 	return economy.serve(bar,count)
 
+func preparation_offer() -> Dictionary:
+	var event: Dictionary = s.street.event
+	if event.is_empty(): return {"required":0,"enabled":false,"reason":"Preparation closes when the event starts."}
+	var required := int(C.EVENTS[int(event.id)][3])
+	var reason := ""
+	if event.phase!="warning": reason = "Preparation closes when the event starts."
+	elif event.prepared: reason = "Already prepared."
+	elif event.id==C.Local.BED and race_staff(s.street.bars[int(event.venue)])<0: reason = "Enter with an available bartender."
+	elif s.cash<required: reason = "The preparation needs more cash."
+	return {"required":required,"reason":reason,"enabled":reason.is_empty()}
+
 func action(id: String, index: int = 0) -> String:
 	if not s.phase in ["plan","guided"]: return "Finish the current decision first."
 	var bar := selected()
@@ -210,10 +221,9 @@ func action(id: String, index: int = 0) -> String:
 			result = "Anong puts out the sign. Work the crowd yourself."
 		"prepare":
 			var event: Dictionary = s.street.event
-			if event.is_empty() or event.phase != "warning": return "Preparation closes when the event starts."
-			if event.prepared: return "Already prepared."
-			if event.id==C.Local.BED and race_staff(s.street.bars[int(event.venue)])<0: return "Enter with an available bartender."
-			if not pay(C.EVENTS[int(event.id)][3]): return "The preparation needs more cash."
+			var offer := preparation_offer()
+			if not offer.enabled: return offer.reason
+			if not pay(offer.required): return "The preparation needs more cash."
 			event.prepared = true
 			result = C.EVENTS[int(event.id)][2] + " arranged."
 		"festival":

@@ -126,6 +126,7 @@ var upgrades_ready_only := true
 var upgrade_badge: Button
 var upgrades_entry: Button
 var upgrade_ready: Array[String] = []
+var upgrade_quotes := {}
 var stock_controls: Array = []
 var live_seconds := 0.0
 var save_seconds := 0.0
@@ -312,6 +313,8 @@ func button(value: String, call: Callable, primary: bool = false) -> Button:
 	b.add_theme_stylebox_override("normal",box(TEAL if primary else Color("#2e2028"),TEAL.darkened(.15) if primary else EDGE))
 	b.add_theme_stylebox_override("hover",box(Color("#b2ffe8") if primary else Color("#49303a"),PINK))
 	b.add_theme_stylebox_override("pressed",box(Color("#a0ead8") if primary else Color("#3f2954"),TEAL))
+	b.add_theme_stylebox_override("disabled",box(DARK,EDGE.darkened(.35)))
+	b.add_theme_color_override("font_disabled_color",MUTED)
 	var focus := box(Color.TRANSPARENT,GOLD)
 	focus.draw_center = false
 	b.add_theme_stylebox_override("focus",focus)
@@ -376,6 +379,7 @@ func render(keep_scroll: bool = false) -> void:
 	lease_controls.clear()
 	upgrade_badge = null
 	upgrades_entry = null
+	upgrade_quotes.clear()
 	stock_controls.clear()
 	refresh_street = false
 	var previous := scroll.scroll_vertical if keep_scroll and is_instance_valid(scroll) else 0
@@ -896,9 +900,10 @@ func bar_fine_panel(bar: Dictionary) -> void:
 		row_button("Auto-host rounds · "+("On" if bar.auto_host_drinks_on else "Off"),street_action.bind("auto_host_drinks"))
 	else:
 		var auto_rounds := row_button("Auto-host rounds · ฿1,500",street_action.bind("auto_host_drinks"))
+		watch_purchase(auto_rounds,auto_rounds.text,eco.auto_hosted_offer.bind(bar))
 		live_body(func() -> String:
 			var offer: Dictionary = eco.auto_hosted_offer(bar)
-			auto_rounds.disabled = not offer.enabled
+
 			return offer.reason if not offer.enabled else "Finds topic matches automatically. Bartenders still need to serve. Hosted-drinks-only colleagues get first choice in a tie.",MUTED,12)
 	body("BAR FINES",GOLD,14)
 	body("Accept a real customer's request: the host leaves for 30 seconds, removing her appeal until she returns. Adult hosts choose whether to accept; private activity stays off-screen.",MUTED,12)
@@ -906,9 +911,10 @@ func bar_fine_panel(bar: Dictionary) -> void:
 		row_button("Auto-accept bar fines · "+("On" if bar.auto_bar_fine_on else "Off"),street_action.bind("auto_bar_fine"))
 	else:
 		var buy := row_button("Auto-accept bar fines · ฿3,000",street_action.bind("auto_bar_fine"))
+		watch_purchase(buy,buy.text,eco.auto_bar_fine_offer.bind(bar))
 		live_body(func() -> String:
 			var offer: Dictionary = eco.auto_bar_fine_offer(bar)
-			buy.disabled = not offer.enabled
+
 			return offer.reason if not offer.enabled else "Accepts eligible requests on live ticks. Same fees, consent, budgets and 30-second absence.",MUTED,12)
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
@@ -925,9 +931,10 @@ func bar_fine_panel(bar: Dictionary) -> void:
 		if not training.maxed:
 			var level: int = training.level
 			var upgrade := row_button("Train %s · %s" % [name_text,cash(training.price)],street_action.bind("train_host",i))
+			watch_purchase(upgrade,upgrade.text,eco.host_training_offer.bind(bar,i))
 			live_body(func() -> String:
 				var offer: Dictionary = eco.host_training_offer(bar,i)
-				upgrade.disabled = not offer.enabled
+
 				return "+%.1f → +%.1f appeal%s. %s" % [StreetContent.HOST_APPEAL[level],StreetContent.HOST_APPEAL[level+1]," · hosted drink %s → %s" % [cash(StreetContent.HOST_DRINK_PRICES[level]),cash(StreetContent.HOST_DRINK_PRICES[level+1])]+(" · bar fine %s → %s" % [cash(StreetContent.BAR_FINE_FEES[level]),cash(StreetContent.BAR_FINE_FEES[level+1])] if StreetContent.HOSTS[int(person.host)][2] else ""),offer.reason],MUTED,12)
 	live_body(func() -> String: return "%d requests · %d accepted this shift · %s bar-fine receipts" % [bar.host_requests.size(),bar.shift.get("bar_fines",0),cash(bar.shift.get("bar_fine_income",0))],TEAL,12)
 	update_bar_fine_controls()
@@ -1018,13 +1025,36 @@ func row_button(value: String, call: Callable, primary: bool = false) -> Button:
 	column.add_child(control)
 	return control
 
-func row_pair(first: String, left: Callable, second: String, right: Callable) -> void:
+func purchase_text(control: Button, caption: String, quote: Dictionary, compact: bool = false) -> String:
+	var missing := int(quote.required)-int(model.s.cash)
+	control.disabled = not quote.enabled or missing>0
+	control.tooltip_text = str(quote.get("reason",""))
+	if missing<=0: return caption
+	var shortfall := "Need %s more" % cash(missing)
+	var funding := "%s. %s cash required." % [shortfall,cash(quote.required)]
+	control.tooltip_text = funding if control.tooltip_text.is_empty() else funding+" "+control.tooltip_text
+	return caption+"\n"+("%s short" % cash(missing) if compact else shortfall)
+
+func watch_purchase(control: Button, caption: String, quote: Callable) -> void:
+	var refresh := func() -> String: return purchase_text(control,caption,quote.call())
+	control.text = refresh.call()
+	live_labels.append([control,refresh])
+
+func cash_offer(required: int, reason: String = "") -> Dictionary:
+	return {"required":required,"enabled":reason.is_empty() and model.s.cash>=required,"reason":reason}
+
+func cash_button(caption: String, action: Callable, required: int) -> void:
+	watch_purchase(row_button(caption,action),caption,cash_offer.bind(required))
+
+func row_pair(first: String, left: Callable, second: String, right: Callable) -> Array[Button]:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",6)
 	column.add_child(row)
-	for b in [button(first,left),button(second,right)]:
+	var pair: Array[Button] = [button(first,left),button(second,right)]
+	for b in pair:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(b)
+	return pair
 
 func cycle(key: String, choices: Array) -> void:
 	model.s[key] = (int(model.s[key]) + 1) % choices.size()
@@ -1094,7 +1124,8 @@ func tutorial_panel() -> void:
 			body("A red dot means an order is about to be lost. Chat gives that guest 10 more seconds and shares Welcome’s timer.")
 		4:
 			body("Bartenders serve on their own when ready. Contracts last 10 game days, and training stays with the worker.")
-			row_button("Hire bartender · "+cash(StreetContent.BARTENDER_CONTRACT_COST),street_action.bind("hire"),true)
+			var hire := row_button("Hire bartender · "+cash(StreetContent.BARTENDER_CONTRACT_COST),street_action.bind("hire"),true)
+			watch_purchase(hire,hire.text,model.street.economy.hire_offer.bind(model.street.selected(),0))
 		5:
 			body("Staff served %d drinks in practice. Close on time to let Heat cool. Staying open after 1am risks a raid and fine." % (int(model.s.street.served)-1))
 			row_button("Advance to 1am",tutorial_close,true)
@@ -1128,7 +1159,8 @@ func events_panel() -> void:
 	live_body(func() -> String: return "Operating costs: ฿%d/real min · break-even %.1f drinks/real min" % [model.street.economy.forecast(bar).costs,model.street.economy.forecast(bar).break_even],GOLD,13)
 	for i in StreetContent.PROMOTIONS.size():
 		var offer: Dictionary = StreetContent.PROMOTIONS[i]
-		row_button("%s · %s" % [offer.name,cash(offer.fee)],street_action.bind("promotion",i))
+		var caption := "%s · %s" % [offer.name,cash(offer.fee)]
+		watch_purchase(row_button(caption,street_action.bind("promotion",i)),caption,model.street.economy.promotion_offer.bind(bar,i))
 		body(offer.help,MUTED,13)
 		var estimate: Dictionary = model.street.economy.forecast(bar,false,i)
 		body("With promotion fee: break-even %.1f drinks/real min · estimated staff-only net %s/real min." % [estimate.break_even,cash(estimate.net)],MUTED,12)
@@ -1157,19 +1189,21 @@ func tours_panel() -> void:
 	for i in Content.ROUTES.size():
 		var item: Array = Content.ROUTES[i]
 		var booked: bool = model.s.bookings.get(str(guide),-1) == i
-		var declined: String = model.tour_offer(guide,i)
-		row_button(("%s  ·  %s" % [item[0],"Confirmed" if booked else "Short" if item[2] == 1 else "Long"]),func():
+		var caption := "%s  ·  %s" % [item[0],"Confirmed" if booked else "Short" if item[2] == 1 else "Long"]
+		var route := row_button(caption,func():
 			message = model.booking(guide,i)
 			commit(true),booked)
-		body("%s route listing · %s guide pay%s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i))," / "+declined if not declined.is_empty() else ""],MUTED,12)
+		if not booked: watch_purchase(route,caption,model.booking_offer.bind(guide,i))
+		live_body(func() -> String:
+			var reason: String = "" if booked else model.booking_offer(guide,i).reason
+			return "%s route listing · %s guide pay%s" % [cash(item[1]+int(model.s.route)*35),cash(model.guide_pay(i))," / "+reason if not reason.is_empty() else ""],MUTED,12)
 	body("%d guide bookings tonight" % model.s.bookings.size(),GOLD,13)
 
 func update_lease_controls() -> void:
 	for entry in lease_controls:
 		var info: Dictionary = StreetContent.TYPES[entry.kind]
 		var quote: Dictionary = model.street.lease_quote(entry.kind)
-		entry.button.text = "Lease %s · %s" % [info.name,cash(quote.price)]
-		entry.button.disabled = not quote.enabled
+		entry.button.text = purchase_text(entry.button,"Lease %s · %s" % [info.name,cash(quote.price)],quote)
 		entry.base.text = "Base %s + %s repeat premium (%d earlier purchases). Blue Hour excluded." % [cash(quote.base),cash(quote.surcharge),quote.repeats]
 		entry.sale.visible = quote.discount>0
 		entry.sale.text = "Retiring-owner offer · today only: %d%% off (save %s)" % [StreetContent.LEASE_SALE_PERCENT,cash(quote.discount)]
@@ -1194,16 +1228,24 @@ func empire_panel() -> void:
 	row_button("Host After Hours Street Festival",street_action.bind("festival"))
 	body("Needs stage 3 in all three bar types. A warned district boss event completes the first story arc.")
 	body("Anong · %d trust / Neighbours · %d trust\nSafety %d / Permits %d" % [model.s.partner,model.s.trust,model.s.safety,model.s.license],WHITE,14)
-	row_pair("Repairs · ฿500",do_action.bind("repair"),"Paperwork · ฿330",do_action.bind("paper"))
+	var repairs := "Repairs · "+cash(Campaign.CASH_ACTION_COSTS.repair)
+	var paperwork := "Paperwork · "+cash(Campaign.CASH_ACTION_COSTS.paper)
+	var maintenance := row_pair(repairs,do_action.bind("repair"),paperwork,do_action.bind("paper"))
+	watch_purchase(maintenance[0],repairs,cash_offer.bind(Campaign.CASH_ACTION_COSTS.repair))
+	watch_purchase(maintenance[1],paperwork,cash_offer.bind(Campaign.CASH_ACTION_COSTS.paper))
 	body("Reserve %s · Outstanding %s" % [cash(model.s.reserve),cash(model.s.debt)],GOLD,13)
-	row_pair("Save ฿500",do_action.bind("reserve"),"Release ฿500",do_action.bind("draw"))
-	row_button("Repay debt · up to ฿500",repay_debt)
-	row_button("Share festival dates · ฿420",do_action.bind("rival"))
+	var save := "Save "+cash(Campaign.CASH_ACTION_COSTS.reserve)
+	var reserve := row_pair(save,do_action.bind("reserve"),"Release ฿500",do_action.bind("draw"))
+	watch_purchase(reserve[0],save,cash_offer.bind(Campaign.CASH_ACTION_COSTS.reserve))
+	var repay := "Repay debt · up to ฿500"
+	watch_purchase(row_button(repay,repay_debt),repay,func() -> Dictionary:
+		return cash_offer(0,"No outstanding debt.") if model.s.debt<=0 else cash_offer(1))
+	cash_button("Share festival dates · "+cash(Campaign.CASH_ACTION_COSTS.rival),do_action.bind("rival"),Campaign.CASH_ACTION_COSTS.rival)
 	# Existing mining investments remain accessible without gating the street.
 	if model.s.rig > 0:
 		body("LEGACY RIG · OPTIONAL",GOLD,12)
 		row_button("Rig: "+["Offline","Independent","Lantern contract"][int(model.s.contract)],do_action.bind("mine_switch"))
-		row_button("Service cooling · ฿680",do_action.bind("cool"))
+		cash_button("Service cooling · "+cash(Campaign.CASH_ACTION_COSTS.cool),do_action.bind("cool"),Campaign.CASH_ACTION_COSTS.cool)
 
 func repay_debt() -> void:
 	var amount := mini(500,mini(int(model.s.cash),int(model.s.debt)))
@@ -1301,9 +1343,8 @@ func update_action_controls() -> void:
 	for button in stock_controls:
 		if not is_instance_valid(button): continue
 		var offer: Dictionary = eco.stock_offer(bar)
-		button.disabled = not offer.enabled
-		button.tooltip_text = "%d drinks; cash after purchase %s" % [offer.quantity,cash(offer.remaining_cash)] if offer.enabled else offer.reason
-		button.text = "Buy %d drinks · %s" % [offer.quantity,cash(offer.price)]+("\n"+offer.reason if not offer.enabled else "")
+		button.text = purchase_text(button,"Buy %d drinks · %s" % [offer.quantity,cash(offer.price)],offer)
+		if offer.enabled: button.tooltip_text = "Cash after purchase "+cash(offer.remaining_cash)
 
 func open_fridge() -> void:
 	service_section = ""
@@ -1344,7 +1385,7 @@ func fridge_panel() -> void:
 	if bar.restock:
 		body("Auto-restock on",TEAL,12)
 	elif model.s.phase=="plan":
-		var supplier := row_button("Unlock auto-restock · "+cash(eco.supplier_offer(bar).price),open_upgrades.bind(false,"Upgrade_supplier"))
+		var supplier := row_button("View auto-restock upgrade  ›",open_upgrades.bind(false,"Upgrade_supplier"))
 		supplier.icon = UpgradeIcons.get_icon("supplier")
 
 func fridge_divider(caption: String) -> void:
@@ -1410,9 +1451,8 @@ func fridge_drink(bar: Dictionary, drink: int, needed: bool) -> void:
 	var refresh := func() -> String:
 		var quote: Dictionary = eco.stock_offer(bar,false,drink)
 		var on_hand: int = eco.stock_of(bar,drink)
-		buy.text = "Buy %d · %s" % [quote.quantity,cash(quote.price)]
-		buy.disabled = not quote.enabled
-		buy.tooltip_text = "Cash after purchase "+cash(quote.remaining_cash) if quote.enabled else quote.reason
+		buy.text = purchase_text(buy,"Buy %d · %s" % [quote.quantity,cash(quote.price)],quote,true)
+		if quote.enabled: buy.tooltip_text = "Cash after purchase "+cash(quote.remaining_cash)
 		give_back.disabled = on_hand<=(int(bar.consignment) if drink==0 else 0)
 		if needed: return "%d orders · %d stocked" % [eco.drink_orders(bar,drink),on_hand]
 		return "%d in stock" % on_hand
@@ -1589,7 +1629,7 @@ func upgrade_offers() -> Array[Dictionary]:
 		offers.append(upgrade_offer("manager","Manager · Level %d" % (manager.level+1),"+%s/s while open" % cash(manager.rate),"Manager income uses no stock. Management also enables offline trading.","manager",0,manager))
 	if bar.stage<3:
 		var reason: String = eco.upgrade_reason(bar)
-		var status := {"price":model.street.upgrade_cost(bar),"enabled":reason.is_empty(),"reason":reason}
+		var status := {"price":model.street.upgrade_cost(bar),"required":eco.upgrade_required_cash(bar),"enabled":reason.is_empty(),"reason":reason}
 		offers.append(upgrade_offer("renovate","Renovate to stage %d" % (bar.stage+1),"More room & new upgrades","Renovation uses the happy visits, regulars and healthy shifts earned at this venue.","upgrade",0,status))
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
@@ -1610,7 +1650,9 @@ func sync_upgrade_badge(rebuild: bool = false) -> void:
 	var offers := upgrade_offers()
 	var ready: Array[String] = []
 	for offer in offers:
-		if offer.status.enabled: ready.append("%s/%d" % [offer.action,offer.index])
+		var key := "%s/%d" % [offer.action,offer.index]
+		if offer.status.enabled: ready.append(key)
+		if rebuild and upgrade_quotes.has(key): upgrade_quotes[key].merge(offer.status,true)
 	var changed := upgrade_ready != ready
 	upgrade_ready = ready
 	upgrade_badge.visible = not ready.is_empty()
@@ -1650,6 +1692,7 @@ func upgrades_panel() -> void:
 
 func upgrade_card(offer: Dictionary) -> void:
 	var status: Dictionary = offer.status
+	upgrade_quotes["%s/%d" % [offer.action,offer.index]] = status
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",6)
 	column.add_child(row)
@@ -1668,8 +1711,8 @@ func upgrade_card(offer: Dictionary) -> void:
 	purchase.add_theme_stylebox_override("normal",box(Color("#252b31"),TEAL.darkened(.45)))
 	purchase.add_theme_stylebox_override("disabled",box(DARK,EDGE.darkened(.35)))
 	purchase.add_theme_color_override("font_disabled_color",MUTED)
-	purchase.disabled = not status.enabled
 	row.add_child(purchase)
+	watch_purchase(purchase,purchase.text,func() -> Dictionary: return status)
 	var details := body(offer.help if status.enabled else offer.help+"\n"+status.reason,MUTED,12)
 	details.hide()
 	var info := button("?",func() -> void: details.visible = not details.visible)
@@ -1688,7 +1731,8 @@ func street_panel() -> void:
 		return
 	next_goal_panel()
 	if not eco.is_trading(bar) and not model.street.can_skip() and not bar.open:
-		row_button("Enable opening",street_action.bind("open"),true)
+		var enable := row_button("Enable opening",street_action.bind("open"),true)
+		watch_purchase(enable,"Enable opening",func() -> Dictionary: return cash_offer(ceili(eco.operating_rate(bar)/60.0)))
 	service_tiles("Fridge","fridge",open_fridge,"Team","manager",open_service_section.bind("team"))
 	if model.s.phase=="plan":
 		var growth := func() -> void: open_upgrades(not upgrade_ready.is_empty())
@@ -1784,7 +1828,11 @@ func service_hours(bar: Dictionary) -> void:
 	if not bar.raided and (bar.late_open or model.s.street.minute>=StreetContent.OPEN_MINUTE or model.s.street.minute<StreetContent.CLOSE_MINUTE):
 		live_body(func() -> String: return "Heat %d · Raid chance %.1f%% each 15 late minutes\nPossible fine %s · closed until noon if raided" % [model.s.heat,model.street.raid_chance(),cash(StreetContent.RAID_FINE_PER_STAGE*int(bar.stage))],PINK,12)
 		row_button("Cancel late opening tonight" if bar.late_open else "Stay open until 3am tonight",street_action.bind("late"))
-	row_button("Close venue" if bar.open else "Enable opening",street_action.bind("open"))
+	if bar.open:
+		row_button("Close venue",street_action.bind("open"))
+	else:
+		var enable := row_button("Enable opening",street_action.bind("open"))
+		watch_purchase(enable,"Enable opening",func() -> Dictionary: return cash_offer(ceili(eco.operating_rate(bar)/60.0)))
 	if not bar.open:
 		body(bar.close_reason,PINK,13)
 		row_button("Owner-run recovery shift",street_action.bind("recovery"))
@@ -1828,19 +1876,23 @@ func service_team(bar: Dictionary) -> void:
 		for role in 3:
 			if role>0 and role!=bar.type: continue
 			var role_name: String = StreetContent.ROLE_NAMES[role].to_lower()
-			service_option("Hire %s · %s" % [role_name,cash(eco.contract_cost(role))],street_action.bind("hire",role),"manager",func() -> String:
+			var caption := "Hire %s · %s" % [role_name,cash(eco.contract_cost(role))]
+			var hire := service_option(caption,street_action.bind("hire",role),"manager",func() -> String:
 				var impact := "Serves one drink every 25 seconds and can be trained." if role==0 else "Attracts visitors without serving drinks."
 				return "10-day contract · ฿%d/min on duty.\n\n%s" % [StreetContent.ROLE_WAGES[role],impact])
+			watch_purchase(hire,caption,eco.hire_offer.bind(bar,role))
 		if eco.gabby_venue().is_empty():
 			var gabby := service_option("Hire Gabby · ฿1,200",street_action.bind("hire_gabby"),"pouring",func() -> String:
 				return "Gabby is a bartender. She earns an extra ฿%d in tips per drink she serves. Tips pay out at closing. The contract lasts ten game days." % StreetContent.GABBY_TIP_PER_DRINK)
 			gabby.icon = Art.texture("portrait-gabby")
 			gabby.add_theme_constant_override("icon_max_width",28)
+			watch_purchase(gabby,gabby.text,eco.hire_offer.bind(bar,0))
 		if bar.type==1 and eco.daisy_venue().is_empty():
 			var daisy := service_option("Hire Daisy · ฿4,500",street_action.bind("hire_daisy"),"audience",func() -> String:
 				return "Daisy is an adult entertainer. She attracts visitors and hosts sponsored drinks; she does not serve drinks. Normal host wages and training apply. The contract lasts ten game days and uses one team position.")
 			daisy.icon = Art.texture("portrait-daisy")
 			daisy.add_theme_constant_override("icon_max_width",28)
+			watch_purchase(daisy,daisy.text,eco.hire_offer.bind(bar,1))
 	if eco.promoter_index(bar)<0:
 		var nida := service_option("Hire Nida · ฿1,200",street_action.bind("hire",3),"audience",func() -> String:
 			var forecast: Dictionary = eco.promoter_forecast(bar)
@@ -1848,18 +1900,14 @@ func service_team(bar: Dictionary) -> void:
 			return "Nida welcomes guests. No hourly wage.\n\nEstimated arrivals: %.1f → %.1f/min\nUnattended net: %s → %s/min\nWith you serving: %s → %s/min\n\nKeep %s in reserve plus %s for drinks." % [forecast.before.arrivals,forecast.after.arrivals,cash(forecast.before.net),cash(forecast.after.net),cash(active.before.net),cash(active.after.net),cash(eco.operating_rate(bar)*2),cash(eco.pack_price(bar))])
 		nida.icon = Art.texture("portrait-nida")
 		nida.add_theme_constant_override("icon_max_width",28)
+		watch_purchase(nida,nida.text,eco.hire_offer.bind(bar,3))
 	else:
 		var nida_index: int = eco.promoter_index(bar)
 		var renewal := func() -> String:
 			var offer: Dictionary = eco.rehire_offer(bar,nida_index)
 			return "Keep %s for payroll and one delivery. %s" % [cash(offer.reserve),offer.reason]
 		var renew := service_option("Rehire Nida · ฿1,200",street_action.bind("rehire",nida_index),"audience",renewal)
-		var renewal_label := func() -> String:
-			renew.disabled = not eco.rehire_offer(bar,nida_index).enabled
-			renew.tooltip_text = renewal.call()
-			return "Rehire Nida · ฿1,200"
-		renew.text = renewal_label.call()
-		live_labels.append([renew,renewal_label])
+		watch_purchase(renew,renew.text,eco.rehire_offer.bind(bar,nida_index))
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
 		var name_text: String = StreetContent.ROLE_NAMES[int(person.role)]+" %d" % (i+1)
@@ -1872,18 +1920,15 @@ func service_team(bar: Dictionary) -> void:
 			return ("Contract: %dd %dh %dm left" % [remaining/1440,remaining%1440/60,remaining%60] if remaining>0 else "Contract finished · rehire available")+" · Training %d/%d" % [int(person.get("audience_training",0) if person.role in [2,3] else person.get("training",0)),2 if person.role in [2,3] else eco.training_limit(bar)],GOLD,12)
 		if not eco.contracted(person):
 			if person.role!=3:
-				row_button("Rehire %s · %s" % [name_text,cash(eco.contract_cost(int(person.role)))],street_action.bind("rehire",i))
-				live_body(func() -> String: return eco.rehire_offer(bar,i).reason,MUTED,12)
+				var caption := "Rehire %s · %s" % [name_text,cash(eco.contract_cost(int(person.role)))]
+				watch_purchase(row_button(caption,street_action.bind("rehire",i)),caption,eco.rehire_offer.bind(bar,i))
 			continue
 		if person.role==0:
 			live_body(func() -> String: return eco.staff_status(bar,person).text+" · %d staff drinks served" % int(person.get("drinks_served",0)),TEAL,12)
 			if int(person.get("training",0))<eco.training_limit(bar):
 				var offer: Dictionary = eco.training_offer(bar,i,false)
 				var training_button := row_button("Train %s · %s · %ds" % [name_text,cash(offer.price),StreetContent.STAFF_SERVICE_SECONDS[offer.level+1]],street_action.bind("train_staff",i))
-				live_body(func() -> String:
-					var current: Dictionary = eco.training_offer(bar,i,false)
-					training_button.disabled = not current.enabled
-					return current.reason,MUTED,12)
+				watch_purchase(training_button,training_button.text,eco.training_offer.bind(bar,i,false))
 				training_button.icon = UpgradeIcons.get_icon("training")
 		if person.role in [2,3]:
 			var audience_level := int(person.get("audience_training",0))
@@ -1891,8 +1936,13 @@ func service_team(bar: Dictionary) -> void:
 			if audience_level<2:
 				var training_button := row_button("Train %s · %s · needs stage %d" % [name_text,cash(StreetContent.AUDIENCE_TRAINING_COST*(audience_level+1)),audience_level+2],street_action.bind("train_audience",i))
 				training_button.icon = UpgradeIcons.get_icon("audience")
+				watch_purchase(training_button,training_button.text,eco.training_offer.bind(bar,i,true))
 		row_button("%s · %s" % [name_text,"On duty" if person.on else "Off duty"],street_action.bind("rota",i))
-		if bar.type>0 and person.role!=3 and person.get("identity","")!="gabby" and not (person.role==1 and int(person.host)==StreetContent.DAISY_HOST): row_button("Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))],street_action.bind("role",i))
+		if bar.type>0 and person.role!=3 and person.get("identity","")!="gabby" and not (person.role==1 and int(person.host)==StreetContent.DAISY_HOST):
+			var caption := "Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))]
+			watch_purchase(row_button(caption,street_action.bind("role",i)),caption,func() -> Dictionary:
+				var reason: String = "Wait until this team member returns or finishes hosting." if i in bar.away or not eco.hosted_round(bar,i).is_empty() else ""
+				return cash_offer(eco.role_change_required_cash(bar,i),reason))
 
 func shift_report(bar: Dictionary) -> void:
 	if bar.last_shift.is_empty(): return
@@ -1944,7 +1994,8 @@ func street_event_panel() -> void:
 	live_body(func() -> String: return "%s · %ds · %s" % ["Starts in" if event.phase == "warning" else "Time remaining",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,14)
 	if event.phase == "warning" and not event.prepared:
 		if event.id==Local.ENCORE and not event.get("solo",false): row_button("Work the rush solo",street_action.bind("encore_solo"))
-		row_button("%s · %s" % [info[2],cash(info[3])] if info[3]>0 else info[2],street_action.bind("prepare"))
+		var caption: String = "%s · %s" % [info[2],cash(info[3])] if info[3]>0 else info[2]
+		watch_purchase(row_button(caption,street_action.bind("prepare")),caption,model.street.preparation_offer)
 	if event.phase=="active" and not event.get("attempted",false):
 		if event.id==Local.CART and not event.prepared: row_button("Clear traffic · Play",start_event_game,true)
 		if event.id==Local.BED and event.prepared: row_button("Race the bed · Play",start_event_game,true)
@@ -2060,7 +2111,7 @@ func draw_supplier_special() -> void:
 	abs_text(panel,Rect2(24,302,550,37),note,13,MUTED)
 	at_button(panel,Rect2(24,350,238,46),"Not now",close_supplier_special).grab_focus()
 	var buy := at_button(panel,Rect2(274,350,300,46),"Buy pack · "+cash(deal.price),accept_supplier_special,true)
-	buy.disabled = not deal.enabled
+	buy.text = purchase_text(buy,buy.text,deal)
 
 func draw_newspaper() -> void:
 	var ink := Color("#392526")
@@ -2373,9 +2424,8 @@ func incident_panel() -> void:
 	for i in range(2,card.size(),2):
 		var effects: Dictionary = card[i+1]
 		var option := button(card[i],choose.bind((i-2)/2))
-		option.disabled = model.s.cash < -int(effects.get("cash",0))
+		option.text = purchase_text(option,option.text,cash_offer(maxi(0,-int(effects.get("cash",0)))))
 		column.add_child(option)
-		if option.disabled: body("Not enough cash",PINK,12)
 		if effects.has("fight"):
 			body("Win · ฿240 repairs · Reputation up · Rivals back off",TEAL,12)
 			body("Lose · ฿740 repairs · Reputation down · Mali off",PINK,12)

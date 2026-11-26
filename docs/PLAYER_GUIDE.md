@@ -199,6 +199,9 @@ capacity cannot sell drinks to customers who are not there.
 
 ## Pick what to stock
 
+A dimmed purchase shows what you still need in the till, such as **฿178 short**.
+That figure includes any operating reserve the purchase requires.
+
 Tap **Stock** to open the drink list. If a stocked fridge can’t fill any
 waiting orders, Serve names the missing drink, for example **Need Rum & cola**.
 The gold **Needed now** section groups drinks whose orders exceed available stock.

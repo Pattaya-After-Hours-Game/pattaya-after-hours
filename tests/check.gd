@@ -157,6 +157,14 @@ func test_ui() -> void:
 	var bar: Dictionary = app.model.street.selected()
 	var original_stock: int = bar.stock
 	var original_cash: int = app.model.s.cash
+	app.model.s.cash = original_cash-1
+	use_button(app,"STOCK")
+	var pack := find_button(app,"Buy 6 · ฿228")
+	check(pack.disabled and pack.text.ends_with("฿1 short"),"Fridge shows the exact cash shortfall")
+	app.model.s.cash = original_cash
+	app._process(1.0)
+	check(not find_button(app,"Buy 6 · ฿228").disabled,"Fridge purchases unlock when the till reaches the pack price")
+	use_button(app,"Back")
 	bar.stock = 0
 	app.update_action_controls()
 	use_button(app,"Restock fridge")
@@ -183,8 +191,13 @@ func test_ui() -> void:
 	var opening_cash := int(app.model.s.cash)
 	use_button(app,"Serve a drink")
 	check(app.model.s.street.served == 1 and app.model.s.cash > opening_cash,"Main clicker button serves and earns")
-	app.model.s.cash = 50000
+	var hiring: Dictionary = app.model.street.economy.hire_offer(bar,0)
+	app.model.s.cash = hiring.required-1
 	use_button(app,"Team")
+	var hire := find_button(app,"Hire bartender · ฿1,200")
+	check(hire.disabled and hire.text.ends_with("Need ฿1 more"),"Team hiring includes the payroll reserve in the visible shortfall")
+	app.model.s.cash = 50000
+	app._process(1.0)
 	use_button(app,"Hire bartender · ฿1,200")
 	app.model.street.tick(25)
 	check(app.model.s.street.served == 2,"Hired staff serve without tapping")
@@ -289,8 +302,40 @@ func test_ui() -> void:
 	check(app.model == live_campaign,"Esc exits a replay")
 	test_godzilla(app)
 	test_clock_ui(app)
+	test_purchase_ui(app)
 	app.queue_free()
 	await process_frame
+
+
+func test_purchase_ui(app: Control) -> void:
+	app.model = Campaign.new(72)
+	app.model.s.cash = 0
+	var bar: Dictionary = app.model.street.selected()
+	var eco = app.model.street.economy
+	app.model.street.announce(3)
+	app.change_tab(1)
+	var preparation := find_button(app,"Raise stock & share pumps · ฿450")
+	check(preparation.disabled and preparation.text.ends_with("Need ฿450 more"),"Events show the cost to unlock preparation")
+	var promotion := find_button(app,"Happy Hour · ฿80")
+	check(promotion.disabled and promotion.text.ends_with("Need %s more" % app.cash(eco.promotion_offer(bar,1).required)),"Promotions show the fee plus reserve shortfall")
+	app.change_tab(2)
+	var route: Button = app.column.find_children("*","Button",true,false)[2]
+	check(route.disabled and route.text.ends_with("Need %s more" % app.cash(app.model.guide_pay(0))),"Tours disable unpaid bookings and show missing guide pay")
+	app.change_tab(3)
+	var lease: Button = app.column.get_node("Lease_0")
+	check(lease.disabled and lease.text.ends_with("Need %s more" % app.cash(app.model.street.lease_quote(0).required)),"Leases include the opening reserve even before chapter unlock")
+	var repair := find_button(app,"Repairs · ฿500")
+	check(repair.disabled and repair.text.ends_with("Need ฿500 more"),"Empire maintenance shows the funds needed")
+	app.model.s.street.event = {}
+	app.open_upgrades(false)
+	var seating: Button = app.column.find_child("Upgrade_seating",true,false)
+	var quote: Dictionary = eco.equipment_offer(bar,4)
+	check(seating.disabled and seating.text.ends_with("Need %s more" % app.cash(quote.required)),"Locked upgrade cards show the full cash shortfall")
+	app.model.s.cash = quote.required
+	app.live_seconds = 1.0
+	app._process(0.0)
+	seating = app.column.find_child("Upgrade_seating",true,false)
+	check(not seating.disabled and not seating.text.contains(" more"),"Affordable upgrades unlock and remove the shortfall on live refresh")
 
 
 func test_clock_ui(app: Control) -> void:
@@ -374,7 +419,7 @@ func panel_has_text(app: Control, label: String) -> bool:
 
 func find_button(app: Control, label: String) -> Button:
 	for b: Button in app.root_ui.find_children("*","Button",true,false):
-		if b.text == label: return b
+		if b.text == label or b.text.get_slice("\n",0)==label: return b
 	check(false,"Missing button " + label)
 	return null
 

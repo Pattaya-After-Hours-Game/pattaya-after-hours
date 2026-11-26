@@ -80,6 +80,16 @@ func run() -> void:
 	app.start_new_game()
 	app.model = Campaign.new(72)
 	await capture(app,"opening")
+	app.model.s.cash = 50
+	app.open_fridge()
+	await capture(app,"purchase-fridge")
+	app.open_service_section("team")
+	await capture(app,"purchase-team")
+	app.open_upgrades(false)
+	await capture(app,"purchase-upgrades")
+	app.close_drawer()
+	app.model = Campaign.new(72)
+
 	app.model.s.street.served = 10
 	app.model.street.selected().regulars = 1
 	app.model.s.cash = 4900
@@ -187,7 +197,7 @@ func run() -> void:
 		guest.lager_quote = 0
 	app.open_fridge()
 	await capture(app,"fridge-wrong-stock")
-	await capture(app,"service-pinned-back","Unlock auto-restock")
+	await capture(app,"service-pinned-back","View auto-restock upgrade")
 	await capture(app,"fridge-drink-help","Rum & cola")
 	app.change_tab(0)
 	app.model = Campaign.new(72)
