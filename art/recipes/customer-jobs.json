@@ -70,5 +70,12 @@
     "prompt": "Use case: identity-preserve / style-transfer. Create ONE production customer sprite for the Godot game Pattaya After Hours, on a genuinely transparent background. Image 1 is the identity and clothing reference: preserve this adult man's broad face, warm light skin, dense full dark beard and moustache, thick black square glasses with clear lenses, short dark sides and tousled curly dark-brown hair on top, stocky broad-shouldered build, calm friendly expression. Image 2 is rendering STYLE ONLY: match its crisp illustrated pixel-art silhouette, plum outlines, clustered cel shading, warm amber highlights and restrained cyan rim light. Do NOT copy image 2's old age, grey hair, bare arms, vest or face. Full body standing idle, frontal three-quarter view facing RIGHT, approximately six heads tall so the face and glasses remain readable at 180 pixels tall. White short-sleeved T-shirt with a large navy-blue rectangular graphic panel and simplified cartoon sunglasses-face motif matching image 1; omit tiny lettering for sprite readability. Dark navy knee-length shorts and white casual trainers complete the unseen lower outfit. One hand relaxed at side, other at shorts pocket, no drink or props. Both complete shoes and all hair visible with generous transparent padding. No selfie arm, no beach, no palm trees, no backdrop, no floor, no cast shadow, no glow cloud, no text, no labels, no sheet, no watermark. Keep the beard/glasses/curly-hair identity unmistakable while matching the existing game art. ONE character only.",
     "ref": "customer-beard-glasses-reference",
     "label": "beard-glasses"
+  },
+  {
+    "id": "customer-rainbow-duo",
+    "group": "patrons-rainbow-duo",
+    "index": 0,
+    "prompt": "Production sprite cutout from the supplied artwork. Remove white background and floor shadows to transparent alpha. Preserve both guests, the orange dog, rainbow and plaid shirts, original pixel-art style, poses and full silhouettes.",
+    "label": "rainbow-duo"
   }
 ]

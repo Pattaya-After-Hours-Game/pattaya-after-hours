@@ -167,7 +167,10 @@ func _draw_person(person: Dictionary) -> void:
 	var scale_value := person_scale(foot.y)
 	# Small contact shadows make the common floor plane visible.
 	draw_set_transform(foot*size/Vector2(960,540),0,Vector2(1,.24)*size/Vector2(960,540))
-	if not person.behind_bar: draw_circle(Vector2.ZERO,18*scale_value,Color(0,0,0,.24))
+	if not person.behind_bar:
+		var offsets := [-35,32] if person.who=="patrons-rainbow-duo" else [0]
+		for offset in offsets:
+			draw_circle(Vector2(offset*scale_value,0),18*scale_value,Color(0,0,0,.24))
 	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
 	Art.frame(self,person.who,person.pose,foot,scale_value,person.flip)
 

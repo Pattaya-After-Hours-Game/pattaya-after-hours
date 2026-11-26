@@ -391,6 +391,14 @@
     ],
     "sha256": "60fac81da6798881d2f30d66ef2f889ca4a5b32e8c59192435160d0f18e63b95"
   },
+  "patrons-rainbow-duo": {
+    "file": "res://assets/art/patrons-rainbow-duo.png",
+    "size": [
+      160,
+      192
+    ],
+    "sha256": "395cf8cfdbf7cc584f11968c3f068bc06842464d2edb652422e951225e33edd1"
+  },
   "patrons": {
     "file": "res://assets/art/patrons.png",
     "size": [

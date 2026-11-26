@@ -10,6 +10,7 @@ func run(test: SceneTree) -> void:
 		if variant[0]=="patrons-men": male_variants[variant[1]] = true
 	test.check(male_variants.size()==9,"All nine male customer sprites, including the supplied-reference guest, are reachable")
 	test.check(Art.customer_sprite(2)==["patrons-capybara",0] and Art.customer_sprite(26)==Art.customer_sprite(2),"The capybara regular appears at the opening and on later visits")
+	test.check(Art.customer_sprite(3)==["patrons-rainbow-duo",0] and Art.customer_sprite(35)==Art.customer_sprite(3),"The rainbow duo appears on opening day and returns on later visits")
 	for kind in 3:
 		for stage in range(1,4):
 			var tex := Art.venue(kind,stage)

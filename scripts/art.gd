@@ -87,14 +87,16 @@ static func frame(canvas: CanvasItem, id: String, index: int, foot: Vector2, sca
 static func atlas_specs() -> Dictionary:
 	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),9],"nida":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
 	specs["patrons-capybara"] = [Vector2(224,192),1]
+	specs["patrons-rainbow-duo"] = [Vector2(160,192),1]
 	for id in STAFF: specs[id] = [Vector2(160,192),4]
 	for id in HOSTS: specs[id] = [Vector2(160,256),6]
 	for id in ["mali","juno","vega","orchid"]: specs["fight-"+id] = [Vector2(320,256),12]
 	return specs
 
 static func customer_sprite(customer_id: int) -> Array:
-	# One of the opening orders belongs to this regular, who also appears on later visits.
+	# The companion sprites appear on opening orders and rotate back in later.
 	if customer_id%24==2: return ["patrons-capybara",0]
+	if customer_id%32==3: return ["patrons-rainbow-duo",0]
 	# Existing saved IDs keep a guest's look stable as other guests leave.
 	return CUSTOMER_VARIANTS[(maxi(1,customer_id)-1)%CUSTOMER_VARIANTS.size()]
 
