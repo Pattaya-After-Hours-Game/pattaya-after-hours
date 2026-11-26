@@ -122,6 +122,14 @@ The first useful purchase depends on the bar: frontage helps quiet trade,
 seating helps a full room, and a bartender helps unattended orders. More service
 capacity cannot sell drinks to customers who are not there.
 
+## Pick what to stock
+
+House lager appeals to a broad crowd. Lime soda is cheap to stock, and visitors
+order more Rum & cola. The stage-2 premium menu lets you stock Mango cocktails.
+The drink list shows the expected order share, recent requests and shortages,
+and the current gross margin per sale. Mixed delivery helps match the crowd.
+Return slow stock at half its purchase cost to free fridge space.
+
 ## Give yourself a faster shift
 
 The Serve and Welcome buttons fill back up as foreground time passes. The label

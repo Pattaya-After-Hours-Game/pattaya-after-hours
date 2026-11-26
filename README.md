@@ -84,6 +84,10 @@ costs outrun sales. An owner-run recovery shift offers a way back from an empty
 till. Renovations need satisfied customers, local regulars, healthy shifts and
 cash for the next shift—not just a large bank balance.
 
+Open **Service → Drinks & margins** to compare patron preferences with profit per
+sale. Order a mixed delivery or buy a pack of one drink. The premium menu unlocks
+Mango cocktails.
+
 ## Music, automation and management income
 
 | Purchase | Price and effect |

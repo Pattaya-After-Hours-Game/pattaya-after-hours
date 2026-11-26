@@ -704,12 +704,15 @@ func _read(path: String) -> Variant:
 				if int(parsed.version)==3:
 					for key in Street.Economy.clock_fields(): defaults.erase(key)
 				for key in defaults:
+					if key=="drink_stock" and not bar.has(key): continue
 					if not bar.has(key): return null
 					if defaults[key] is Array and not bar[key] is Array: return null
 					if defaults[key] is Dictionary and not bar[key] is Dictionary: return null
 				for key in defaults.equipment:
 					if key=="music" and int(parsed.version)<7: continue
 					if not bar.equipment.get(key) is float and not bar.equipment.get(key) is int: return null
+				for key in ["drink_requests","drink_misses"]:
+					if bar.shift.has(key) and not bar.shift[key] is Dictionary: return null
 				for person in bar.team:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
 					if not int(person.role) in ([0,1,2,3] if int(parsed.version)>=6 else [0,1,2]) or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
@@ -718,8 +721,15 @@ func _read(path: String) -> Variant:
 					if int(person.get("training",0))>=Street.C.STAFF_SERVICE_SECONDS.size() or int(person.get("contract_left",0))>Street.C.STAFF_CONTRACT_MINUTES: return null
 				for customer in bar.customers:
 					if not customer is Dictionary: return null
-					for key in ["id","life","order","wait","quoted","drinks","next","budget","premium","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
+					for key in ["id","life","order","wait","quoted","drinks","next","budget","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
 						if not customer.has(key): return null
+					if customer.has("drink") and not int(customer.drink) in range(Street.C.DRINKS.size()): return null
+				for sku in bar.get("drink_stock",{}):
+					if bar.drink_stock[sku]!=true: return null
+					var known := false
+					for drink in range(1,Street.C.DRINKS.size()):
+						if Street.C.DRINKS[drink].id==sku: known = true
+					if not known: return null
 				for game in bar.games:
 					if not game is Dictionary or not game.get("players") is Array or not game.has("remaining") or not game.has("fee"): return null
 		if int(parsed.version)>=4:
@@ -773,7 +783,8 @@ func _read(path: String) -> Variant:
 				if not _finite_number(bar.supplier_level,0,5) or float(bar.supplier_level)!=floorf(bar.supplier_level): return null
 				if not _finite_number(bar.equipment.get("music"),0,1): return null
 				for lot in bar.stock_lots:
-					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),6,14): return null
+					if not lot is Dictionary or not _finite_number(lot.get("units"),1,1e9) or not _finite_number(lot.get("cost"),1,25): return null
+					if not _finite_number(lot.get("drink",0),0,Street.C.DRINKS.size()-1): return null
 		if int(parsed.version)>=8:
 			for bar in parsed.street.bars:
 				for customer in bar.customers:

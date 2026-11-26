@@ -47,6 +47,10 @@ func run() -> void:
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	await capture(app,"economy-opening")
+	app.model.street.action("mixed_drinks")
+	app.drink_list_open = true
+	await capture(app,"economy-drinks")
+	app.drink_list_open = false
 	await capture(app,"actions-ready")
 	app.model.street.action("serve")
 	app.model.street.action("welcome")

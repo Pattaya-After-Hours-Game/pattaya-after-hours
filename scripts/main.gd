@@ -53,6 +53,7 @@ var stat_tip_key := ""
 var show_tutorial_hint := false
 var offline_notice := 0
 var drawer_open := false
+var drink_list_open := false
 var drawer: Control
 var event_banner: Button
 var scene_clock := 0.0
@@ -907,6 +908,21 @@ func stock_button() -> void:
 	var bar: Dictionary = model.street.selected()
 	live_body(func() -> String: return "%d/%d stocked · cash after pack %s · next operating charge ≤%s" % [bar.stock,model.street.capacity(bar),cash(int(model.s.cash)-model.street.economy.pack_price(bar)),cash(ceili(model.street.economy.operating_rate(bar)/60.0))],MUTED,12)
 
+func drink_panel(bar: Dictionary) -> void:
+	var eco = model.street.economy
+	row_pair("Mixed delivery",street_action.bind("mixed_drinks"),"Hide drink list" if drink_list_open else "Drinks & margins",func() -> void:
+		drink_list_open = not drink_list_open
+		render(true))
+	if not drink_list_open: return
+	for drink in eco.drink_count(bar):
+		var item: Dictionary = StreetContent.DRINKS[drink]
+		live_body(func() -> String:
+			var recent := int(bar.shift.drink_requests.get(item.id,0))+int(bar.last_shift.get("drink_requests",{}).get(item.id,0))
+			var missed := int(bar.shift.drink_misses.get(item.id,0))+int(bar.last_shift.get("drink_misses",{}).get(item.id,0))
+			var popularity := roundi(100.0*eco.drink_popularity(bar)[drink])
+			return "%s · %d stocked · +฿%d/sale\n%d%% expected · %d asked · %d short" % [item.name,eco.stock_of(bar,drink),eco.price(bar,drink)-eco.drink_cost(bar,drink),popularity,recent,missed],TEAL,13)
+		row_pair("Buy %d · ฿%d ea" % [eco.pack_quantity(bar),eco.drink_cost(bar,drink)],street_action.bind("buy_drink",drink),"Return up to 3",street_action.bind("return_drink",drink))
+
 func live_body(value: Callable,tint: Color = MUTED,px: int = 15) -> void:
 	var label := body(value.call(),tint,px)
 	live_labels.append([label,value])
@@ -947,6 +963,7 @@ func street_panel() -> void:
 	var info: Dictionary = StreetContent.TYPES[int(bar.type)]
 	title(bar.name)
 	body("%s · Stage %d/3\n%s" % [info.name,bar.stage,info.stages[int(bar.stage)-1][0]],TEAL,16)
+	drink_panel(bar)
 	live_body(func() -> String: return "%s · %s" % [model.street.clock_text(),eco.status(bar)],TEAL,14)
 	live_body(func() -> String: return eco.peak_status(bar),TEAL,12)
 	live_body(func() -> String:

@@ -200,6 +200,20 @@ is created. Staff records and equipment remain; contracts continue to expire. An
 covers two minutes of overhead; if the fridge is empty, six consignment drinks
 are paid for only when a real customer buys them. No buyer means no income.
 
+## Drink demand and inventory
+
+Patron audience affects drink preferences. The fridge shares capacity across
+house lager, lime soda, rum and cola, and premium mango cocktails. Guests may
+accept house lager at its order-time quote if their preferred drink is unavailable.
+Unfilled requests and substitutions appear in the drink list.
+
+Manual orders can buy a full pack of a single drink or a mixed selection based on
+current demand. Supplier terms apply to each product. Automatic deliveries cover
+drinks already stocked at that bar. Stock lots retain their paid prices for FIFO
+service and half-cost returns. Old stock becomes house lager and pending orders
+keep their saved quote. Offline trading estimates a drink mix within stock and
+working-capital limits.
+
 ## Compact layout, deliveries and the frontage promoter
 
 Beer-bar seating levels cost ฿400, ฿800 and ฿1,200. Stage-one capacity before
