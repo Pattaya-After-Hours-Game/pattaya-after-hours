@@ -722,14 +722,15 @@ func action_status(bar: Dictionary, id: String) -> Dictionary:
 	var timer := "serve" if id=="serve" else "welcome"
 	var remaining := maxf(0.0,float(bar[timer+"_ready"])-action_time())
 	var duration := maxf(0.001,float(bar[timer+"_duration"]))
+	var no_orders := id=="serve" and pending(bar)==0
 	var reason := ""
 	if not is_trading(bar): reason = status(bar)
+	elif no_orders: reason = "No orders waiting. Welcome customers or plan a promotion."
 	elif remaining>0.000001: reason = "%s ready in %.1fs." % ["Serve" if id=="serve" else "Welcome / Chat",remaining]
 	elif id=="welcome" and promoter_bonus(bar)>0: reason = "Nida is welcoming customers."
-	elif id=="serve" and pending(bar)==0: reason = "No orders waiting. Welcome customers or plan a promotion."
 	elif id=="serve" and bar.stock==0 and not (bar.restock and stock_offer(bar,true).enabled): reason = "Restock the fridge."
 	elif id=="chat" and chat_target(bar).is_empty(): reason = "Chat helps an unchatted guest with 10s or less left to wait."
-	return {"enabled":reason.is_empty(),"reason":reason,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
+	return {"enabled":reason.is_empty(),"reason":reason,"no_orders":no_orders,"remaining":remaining,"duration":duration,"fill":clampf(1.0-remaining/duration,0.0,1.0)}
 
 func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var item: Dictionary = C.ACTION_UPGRADES[index]

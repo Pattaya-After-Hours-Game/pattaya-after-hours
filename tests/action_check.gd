@@ -239,6 +239,27 @@ func run_ui(test: SceneTree) -> void:
 	app.model.s.cash = 10000
 	app.update_action_controls()
 	test.check(not app.upgrade_controls[0][0].disabled and app.upgrade_controls[0][0].text.contains("10s → 8s"),"Upgrade affordability updates live and shows exact improvement")
+	var bar: Dictionary = app.model.street.selected()
+	var eco = app.model.street.economy
+	for guest in bar.customers: guest.order = false
+	bar.serve_ready = eco.action_time()+4
+	app.update_action_controls()
+	var serve_caption: Label = app.action_controls[0][2]
+	serve = test.find_button(app,"Serve a drink")
+	test.check(serve.disabled and serve_caption.text.contains("Waiting for orders") and app.action_controls[0][1].size.x==0,"Without orders Serve shows a disabled waiting state even during cooldown")
+	var before_sale := [bar.stock,bar.serve_ready,app.model.s.cash]
+	app.model.street.action("serve")
+	test.check(before_sale==[bar.stock,bar.serve_ready,app.model.s.cash],"Serving without an order cannot affect the till or stock")
+	bar.serve_ready = eco.action_time()
+	bar.customers.clear()
+	eco.admit(bar)
+	app.update_action_controls()
+	test.check(not serve.disabled,"A new order enables Serve as soon as the owner is ready")
+	app.model.street.action("hire",0)
+	bar.team[0].service_ready = eco.action_time()
+	eco.staff_service(bar)
+	app.update_action_controls()
+	test.check(serve.disabled and serve_caption.text.contains("Waiting for orders"),"The last order served by staff immediately disables manual Serve")
 	app.queue_free()
 	await test.process_frame
 	DirAccess.remove_absolute(Campaign.SAVE)

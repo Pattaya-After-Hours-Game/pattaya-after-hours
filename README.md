@@ -187,8 +187,9 @@ an estimate for up to eight real hours away, counting only projected noon–1am
 windows and limited by demand, stock, service, cleanliness, venue peak hours and costs. Offline time
 does not advance the live clock, cleaning, heat, raids or disasters. See **Journal**
 for the estimate. Optional **Open managed shift** guidance uses the same live
-customers and clock. **Tutorial** runs the older decision lessons in an isolated
-practice campaign and never overwrites your campaign.
+customers and clock. **Tutorial** lets you practise stock deliveries, serving,
+welcoming, Chat, hiring and closing in a separate practice shift. Tap or hover
+over a top-bar stat for a quick explanation.
 
 ## Documentation
 
