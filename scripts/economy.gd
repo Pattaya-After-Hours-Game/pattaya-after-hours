@@ -378,14 +378,17 @@ func commit_orders(bar: Dictionary) -> void:
 		if guest.order: guest.commission_order = true
 
 func stock_offer(bar: Dictionary, automatic: bool = false, drink: int = 0) -> Dictionary:
-	var amount := pack_quantity(bar)*drink_cost(bar,drink)
+	return stock_quote(bar,pack_quantity(bar),drink_cost(bar,drink),automatic)
+
+func stock_quote(bar: Dictionary, quantity: int, unit_cost: int, automatic: bool = false) -> Dictionary:
+	var amount := quantity*unit_cost
 	var room := stock_capacity(bar)-int(bar.stock)
 	var reserve := ceili(operating_rate(bar)/60.0) if automatic else 0
 	var reason := ""
 	if cart_delivery_blocked(bar): reason = "Cart Jam: clear Bo’s route in Events."
-	elif room<pack_quantity(bar): reason = "Need %d free spaces; you have %d." % [pack_quantity(bar),room]
+	elif room<quantity: reason = "Need %d free spaces; you have %d." % [quantity,room]
 	elif s.cash<amount+reserve: reason = "Need ฿%d%s; you have ฿%d." % [amount+reserve," including next operating charge" if automatic else "",s.cash]
-	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"quantity":pack_quantity(bar),"room":room,"remaining_cash":int(s.cash)-amount}
+	return {"enabled":reason.is_empty(),"reason":reason,"price":amount,"quantity":quantity,"room":room,"remaining_cash":int(s.cash)-amount}
 
 static func ledger() -> Dictionary:
 	return {"hosted_drinks":0,"hosted_income":0,"hosted_matches":0,"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"revenue":0,"stock_cost":0,"drink_requests":{},"drink_misses":{},"operating":0,"promo_cost":0,"fines":0,"commission":0,"consumed_stock":0,"manager_income":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}

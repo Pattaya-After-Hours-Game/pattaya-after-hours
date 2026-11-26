@@ -21,8 +21,13 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	var upgrade_target: String = targets.get(scroll_to,"")
 	var was_open: bool = app.upgrades_open
 	var ready_only: bool = app.upgrades_ready_only
-	var forecast_open: bool = app.nida_forecast_open
-	if name_text=="promoter-hire-forecast": app.nida_forecast_open = true
+	var section: String = app.service_section
+	var was_fridge: bool = app.fridge_open
+	if app.tab==0 and upgrade_target.is_empty():
+		if scroll_to in ["TEAM & PAYROLL","FRONTAGE PROMOTER","Hire Gabby","Rehire Gabby","+฿5 tip"] or scroll_to.begins_with("HOST") or name_text.begins_with("barfine-") and not scroll_to.is_empty(): app.service_section = "team"
+		if scroll_to in ["PREP FOR OPENING","Heat"]: app.service_section = "hours"
+		if scroll_to in ["YOUR PROFIT CYCLE","NIGHTLY TIPS","Show visit plans","Hide visit plans"]: app.service_section = "reports"
+		if scroll_to.begins_with("Buy ") or name_text=="economy-drinks": app.fridge_open = true
 	if not upgrade_target.is_empty():
 		app.upgrades_open = true
 		app.upgrades_ready_only = false
@@ -34,7 +39,15 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 		if card: app.scroll.ensure_control_visible(card)
 		await process_frame
 	elif not scroll_to.is_empty():
-		var target := find_text(app.column,scroll_to)
+		var target_text := scroll_to.replace(" drinks"," House lager") if app.fridge_open and scroll_to.begins_with("Buy ") else scroll_to
+		var help_target := "Explain Hire Nida · ฿1,200" if name_text=="promoter-hire-forecast" else "Explain Hire bartender · ฿1,200" if name_text=="service-team-help" else ""
+		if not help_target.is_empty():
+			for control in app.column.find_children("*","Button",true,false):
+				if control.tooltip_text==help_target:
+					control.pressed.emit()
+					await create_timer(.22).timeout
+					break
+		var target := find_text(app.column,target_text)
 		if target:
 			if name_text.begins_with("hosted-") or name_text.begins_with("barfine-") or name_text.begins_with("lease-") or name_text.begins_with("cycle-") or name_text.begins_with("gabby-") or name_text.begins_with("club-") or name_text.begins_with("prices-") or name_text.begins_with("tips-") or name_text.begins_with("night-prep-") or name_text.begins_with("guidance-") or name_text.begins_with("promoter-") or name_text.begins_with("automation-") or name_text.begins_with("bulk-") or name_text.begins_with("party-") or name_text.begins_with("staff-ready-"): app.scroll.scroll_vertical = int(target.position.y)
 			else: app.scroll.ensure_control_visible(target)
@@ -44,7 +57,9 @@ func capture(app: Control, name_text: String, scroll_to: String = "") -> void:
 	get_root().get_texture().get_image().save_png(output.path_join(name_text+".png"))
 	app.upgrades_open = was_open
 	app.upgrades_ready_only = ready_only
-	app.nida_forecast_open = forecast_open
+	app.close_service_help()
+	app.service_section = section
+	app.fridge_open = was_fridge
 
 func run() -> void:
 	if output.is_empty() or DisplayServer.get_name() == "headless":
@@ -61,6 +76,24 @@ func run() -> void:
 	app.start_new_game()
 	app.model = Campaign.new(72)
 	await capture(app,"opening")
+	app.model.s.street.served = 10
+	app.model.street.selected().regulars = 1
+	app.model.s.cash = 4900
+	app.model.s.street.minute = 840
+	app.model.street.supplier_deal_tick()
+	app.open_supplier_special()
+	await capture(app,"supplier-special")
+	app.close_supplier_special()
+	app.model = Campaign.new(72)
+	app.change_tab(0)
+	await capture(app,"service-overview")
+	await capture(app,"service-team","TEAM & PAYROLL")
+	await capture(app,"service-team-help","TEAM & PAYROLL")
+	await capture(app,"service-reports","YOUR PROFIT CYCLE")
+	app.model.s.street.minute = 60
+	await capture(app,"service-closed")
+	app.model.s.street.minute = 720
+	app.close_drawer()
 	app.show_tutorial_hint = false
 	app.model.s.street.chapter = 1
 	app.model.s.rep = 100
@@ -98,7 +131,7 @@ func run() -> void:
 		app.model.street.economy.serve(app.model.street.selected())
 	app.model.street.advance(20)
 	await capture(app,"hosted-buzz")
-	app.drawer_open = true
+	app.open_service_section("team")
 	await capture(app,"hosted-service","GOOD COMPANY")
 	app.model.street.action("train_host",1)
 	app.model.street.action("auto_host_drinks")
@@ -260,9 +293,7 @@ func run() -> void:
 	app.upgrades_open = false
 	app.upgrades_ready_only = true
 	app.model.street.action("mixed_drinks")
-	app.drink_list_open = true
 	await capture(app,"economy-drinks")
-	app.drink_list_open = false
 	await capture(app,"actions-ready")
 	app.model.street.action("serve")
 	app.model.street.action("welcome")

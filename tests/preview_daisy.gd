@@ -18,7 +18,7 @@ func run() -> void:
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 2
 	app.model.street.action("buy",1)
-	app.change_tab(0)
+	app.open_service_section("team")
 	app.drawer_open = true
 	await capture(app,"daisy-hire","Hire Daisy")
 	app.model.street.action("hire_daisy")

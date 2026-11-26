@@ -79,7 +79,7 @@ func run_ui(test: SceneTree) -> void:
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 2
 	app.model.street.action("buy",1)
-	app.change_tab(0)
+	app.open_service_section("team")
 	test.use_button(app,"Hire Daisy · ฿4,500")
 	var b: Dictionary = app.model.street.selected()
 	test.check(b.team.size()==1 and b.team[0].host==C.DAISY_HOST,"Daisy's visible hire control purchases her host contract")

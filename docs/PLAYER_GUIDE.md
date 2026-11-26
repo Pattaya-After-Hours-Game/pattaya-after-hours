@@ -25,7 +25,7 @@ existing campaign does not change its cash, stock, waiting tabs or paid stock co
 
 ## Hire Gabby
 
-In **Service → Team & Payroll**, choose **Hire Gabby · ฿1,200** when a floor
+In **Service → Team**, choose **Hire Gabby · ฿1,200** when a floor
 position is free. She has the standard ten-day bartender contract, wages and
 25-second service, improved through normal training. Each real drink she serves
 earns an extra ฿5 in the nightly tip jar. Owner service and offline estimates
@@ -46,8 +46,11 @@ her training and any pending return time remain intact.
 
 ## Find the next useful step
 
-At the top of **Service**, **Anong's Next Step** shows the current story objective,
-its real progress and relevant cash reserve. **Show next step** takes you to the
+**Service** opens on a short overview with one goal and its progress. Use
+**Fridge** for drinks, **Team** for staff, **Upgrades** for equipment and
+automation, **Reports** for finances and tips, and **Hours** for cleaning,
+closing and guided shifts. Tap **?** beside a goal or hiring choice for a
+slide-out explanation. The highlighted goal button takes you to the
 matching control or tab. It does not buy anything. Early steps cover real drink
 sales and regulars; later ones explain renovation, reopening preparations,
 deliveries and the first manager. The guide follows the Blue Hour and then the
@@ -211,6 +214,11 @@ Serve a guest’s requested specialty drink on their first round for a chance at
 Mixed delivery follows the expected order mix. Return slow stock at half its
 purchase cost to free space.
 
+Bo occasionally offers **12 discounted specialty drinks** in the afternoon.
+The popup shows your wholesale saving, the till after buying, and how far that
+would leave you from your current cash goal. Tap **Not now** to pass. You can
+reopen the deal from **Fridge** until 3:15pm.
+
 ## Give yourself a faster shift
 
 Open **Service → Upgrades** to see what you can buy. The number badge on Service
@@ -360,7 +368,7 @@ keep serving alongside them during rushes. **Train** on their individual card
 costs ฿400 for level 1 (20 seconds) and ฿800 for level 2 (15 seconds). Training
 does not create customers and is retained across contracts and role changes.
 
-**Service → Team & Payroll** shows the remaining contract time. When it expires,
+**Service → Team** shows the remaining contract time. When it expires,
 the person stops working and stops drawing wages. Their card stays available;
 **Rehire** costs ฿1,200 for bartenders (฿4,500 for hosts/dancers) for another ten days and keeps their training. Rehiring is
 manual, never an automatic charge. Existing saves retain their hires and apply
@@ -409,7 +417,7 @@ is removed until she returns. The card shows the countdown. Up to one/two/three
 hosts can be away at once at venue stages one/two/three. Scroll for larger teams.
 May and Fah prefer hosted drinks and never accept bookings.
 
-**Service → Bar fines** has the same controls, training and **Auto-accept for
+**Service → Team** has the same controls, training and **Auto-accept for
 ฿3,000**. Once bought, toggle it on or off. It accepts eligible requests on live
 ticks using the same consent, contract, rota, customer-budget and capacity rules.
 It earns nothing on the startup menu or in offline estimates.

@@ -104,6 +104,7 @@ func run_ui(test: SceneTree) -> void:
 	app.show_tutorial_hint = false
 	app.model.s.cash = 10000
 	app.change_tab(0)
+	test.use_button(app,"Team")
 	test.use_button(app,"Hire Gabby · ฿1,200")
 	var b: Dictionary = app.model.street.selected()
 	test.check(b.team.size()==1 and b.team[0].identity=="gabby" and app.model.s.cash==8800,"Gabby's visible hiring button uses the paid model action")

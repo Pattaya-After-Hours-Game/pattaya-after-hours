@@ -198,6 +198,7 @@ func run_ui(test: SceneTree) -> void:
 	accept = app.root_ui.find_child("AcceptBarFine0",true,false)
 	test.check(accept.disabled and accept.tooltip_text.contains("30s"),"Accepted host shows her remaining absence without another payment button")
 	app.change_tab(0)
+	test.use_button(app,"Team")
 	test.use_button(app,"Train Bee · ฿1,500")
 	test.check(b.team[0].host_training==1 and b.team[0].host_return==30,"Visible training improves the host without resetting an active booking")
 	test.use_button(app,"Auto-accept bar fines · ฿3,000")
