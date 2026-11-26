@@ -103,14 +103,14 @@ shows each agreement's remaining trading time or its **Expired** status.
 
 ## When the rats come out
 
-A rare **Rat Plague** can hit during live trading. When the swarm starts,
-seated customers flee. **Click or tap each rat in the bar** to clear the
-infestation early. The counter shows how many are left. The swarm disperses
-on its own after 45 trading seconds.
+Rats pour in from the restaurant down the street, and seated guests bolt.
+**Call Bo’s rat patrol** for ฿120 to sweep up most of the swarm. **Click or tap
+each remaining rat** to catch it. The counter shows how many are left, and
+normal foot traffic returns after the last catch.
 
-In **Events**, **Call Bo’s rat patrol** for ฿120 during the warning or while
-several rats remain. The patrol catches some rats and helps keep walk-ins
-coming. Catch the remaining rats yourself to clear the infestation early.
+If you’d rather skip the hunt, choose **Close for the day and leave it to Bo**.
+All venues end trading for the day, and the game jumps to the next noon with
+the rats gone.
 
 ## Look ahead to day seven
 

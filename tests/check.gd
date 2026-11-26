@@ -471,8 +471,8 @@ func test_tuning(app: Control) -> void:
 	use_button(app,"Trigger Rat Plague")
 	check(app.model.s.street.event.phase=="active" and app.model.street.selected().customers.is_empty(),"Sandbox can start the swarm immediately")
 	app.change_tab(1)
-	var rat: Button = app.city.rat_buttons[0]
-	var point := rat.get_global_transform_with_canvas()* (rat.size/2)
+	var swarm = app.city.RatSwarm
+	var point: Vector2 = app.city.get_global_transform_with_canvas()*swarm.target_position(0,app.city.clock)
 	var before_rats: int = app.model.street.rat_targets().size()
 	check(app.rat_instruction.text.contains("Click or tap each rat"),"The bar gives an explicit instruction even with Events open")
 	for pressed: bool in [true,false]:
@@ -482,14 +482,17 @@ func test_tuning(app: Control) -> void:
 		click.global_position = point
 		click.pressed = pressed
 		root.push_input(click,true)
-	check(not rat.visible and app.model.street.rat_targets().size()==before_rats-1 and app.rat_instruction.text.ends_with("%d left" % (before_rats-1)),"A click catches one visible rat and immediately updates the HUD")
-	rat = app.city.rat_buttons[1]
+	check(app.model.street.rat_targets().size()==before_rats-1 and app.rat_instruction.text.ends_with("%d left" % (before_rats-1)),"A click catches one visible rat and immediately updates the HUD")
+	point = app.city.get_global_transform_with_canvas()*swarm.target_position(1,app.city.clock)
 	for pressed: bool in [true,false]:
 		var tap := InputEventScreenTouch.new()
-		tap.position = rat.get_global_transform_with_canvas()*(rat.size/2)
+		tap.position = point
 		tap.pressed = pressed
 		root.push_input(tap,true)
-	check(not rat.visible and app.model.street.rat_targets().size()==before_rats-2,"A touch catches exactly one rat through Godot's touch input")
+	check(app.model.street.rat_targets().size()==before_rats-2,"A touch catches exactly one rat through Godot's touch input")
+	check(not app.event_banner.text.contains("45s"),"The swarm shows no countdown")
+	use_button(app,"Close for the day and leave it to Bo")
+	check(app.model.s.street.event.is_empty() and app.model.s.street.minute==720,"The visible overnight action takes the player to a rat-free noon")
 	app.model.street.checkpoint_requested.emit()
 	app._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	check(FileAccess.get_file_as_string(Campaign.SAVE)==saved,"Sandbox actions, pause, and automatic checkpoints leave the campaign save alone")

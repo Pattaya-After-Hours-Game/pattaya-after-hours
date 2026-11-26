@@ -325,15 +325,18 @@ are paid for only when a real customer buys them. No buyer means no income.
 
 After the reopening chapter, each eligible random street-event slot has a 1 in
 50 chance to announce Rat Plague. The roll leaves the regular rotation intact.
-After a 20-second warning, all venues lose their current customers, pending
-orders and pool games. Passing traffic drops to 15%. The player can click or tap
-each of the eight rats to end the event early, or let it expire after 45 trading
-seconds.
+After a 20-second warning, 144 rats arrive from the restaurant down the street.
+All venues lose their current customers, pending orders and pool games. Passing
+traffic drops to 15%. The active swarm persists through ordinary night skips
+and saves the uncaught rats.
 
-Bo’s ฿120 patrol is available during the warning and until only one rat remains.
-It removes up to three rats, leaves at least one for the player to catch, and
-preserves 55% of passing traffic. The event saves its timer and uncaught rats and
-affects live trade only.
+Bo’s ฿120 patrol is available during the warning and while more than six rats
+remain. It takes out up to 24 per live second until six are left and preserves
+55% of passing traffic. The player can click or tap each rat to restore normal
+foot traffic on the last catch. **Close for the day and leave it to Bo** settles
+the street’s actual shift and earned tips, ages contracts through the skipped
+hours and reopens at the next noon with the rats gone. Saved active swarms
+keep existing catch progress and discard the previous event timer.
 
 ## Drink demand and inventory
 

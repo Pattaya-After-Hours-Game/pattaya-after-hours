@@ -129,8 +129,14 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if bar.stage==3:
 			times.stage3 = second
 			break
-		if not model.s.street.event.is_empty() and model.s.street.event.phase=="warning" and model.s.cash>700:
-			if model.s.street.event.id in [0,3]: st.action("prepare")
+		var event: Dictionary = model.s.street.event
+		if event.get("id",-1)==C.RAT_PLAGUE:
+			if not event.prepared and st.preparation_offer().enabled: st.action("prepare")
+			var targets: Array = st.rat_targets()
+			if not targets.is_empty() and (not event.prepared or targets.size()<=C.RAT_STRAGGLERS) and second%click_interval==0:
+				st.catch_rat(targets.front())
+		elif event.get("phase","")=="warning" and model.s.cash>700 and event.id in [0,3]:
+			st.action("prepare")
 		st.tick(1)
 	times.club = st.selected().club_level
 	times.staff_training = st.selected().team[0].get("training",0) if not st.selected().team.is_empty() else 0

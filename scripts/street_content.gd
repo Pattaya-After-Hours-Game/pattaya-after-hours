@@ -27,11 +27,12 @@ const CHAPTERS = [
 const Local = preload("res://scripts/local_events.gd")
 const RAT_PLAGUE = 10
 const RAT_WARNING_SECONDS = 20
-const RAT_PLAGUE_SECONDS = 45
 const RAT_EVENT_ODDS = 50
-const RAT_COUNT = 8
-const RAT_PATROL_CATCHES = 3
-const RAT_INSTRUCTION = "Click or tap each rat to clear the infestation."
+const RAT_COUNT = 144
+const RAT_STRAGGLERS = 6
+const RAT_PATROL_CATCHES = 24
+const RAT_INSTRUCTION = "Click or tap each rat to catch it."
+const RAT_CLOSE = "Close for the day and leave it to Bo"
 const EVENTS = [
 	["Reopening Blackout", "The new BLUE HOUR sign is ready. Bo suggests testing the generator before the party.", "Rent a generator", 350, "The sign lights up. So does the entire street. Only the karaoke machine loses power."],
 	["US Navy Carrier Visit", "Shore leave is announced. A lot of people will want the same cold drink.", "Book relief shifts & ice", 500, "Last orders! The rush back to the ship begins. Bo counts the empty crates twice."],
@@ -43,7 +44,7 @@ const EVENTS = [
 	["Anton's Grand Re-Reopening", "Lantern House has a new sign, a new promotion and exactly the same chairs.", "Promote your own lineup", 350, "Anton's screen blows a fuse. His overflow crowd discovers your street."],
 	["Godzilla Wants a Cold One", "Something enormous is coming in from the bay. Find the largest glasses you own.", "Stage giant ice buckets", 450, "The harbour is quiet again. Nobody can agree whose tab the monster belongs on."],
 	["After Hours Street Festival", "Your whole street is on the programme. The headline guest has dorsal plates.", "Coordinate all venues", 1200, "Anong: You came here to relax. Now look at this place. Same time next year?"],
-	["Rat Plague", "Anong heard scratching. The beer crates are moving.", "Call Bo's rat patrol", 120, "Bo saw the last rat leave with a cocktail umbrella. Word gets out that the coast is clear."],
+	["Rat Plague", "Rats are pouring out of the restaurant down the street.", "Call Bo's rat patrol", 120, "Bo saw the last rat leave with a cocktail umbrella. Word gets out that the coast is clear."],
 	["Encore Rush", "The band at the end of the soi is about to finish. Keep an ear out for an encore.", "Book a relief bartender", 100, "The last concertgoers drift down to the beach."],
 	["Cart Jam", "Bo’s delivery van is boxed in by a convoy of snack carts.", "Book a hand delivery", 90, "The last cart rolls away. Bo can finally get through."],
 	["Last Call of the Dead", "A Halloween parade is shuffling towards Soi 6.", "Host the costume contest", 90, "The zombies go home. The glitter stays."],

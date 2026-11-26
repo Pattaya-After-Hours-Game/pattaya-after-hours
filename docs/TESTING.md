@@ -2,12 +2,12 @@
 
 ## Rat Plague
 
-The street checks cover guests fleeing with and without the patrol, calling
-Bo during the swarm, catching each target once, clearing on the last catch,
-the timed fallback, and save compatibility. The UI check sends a mouse click
-and a touch through the viewport with Events open and checks the rat counter.
-The `event-10-*` previews cover the warning, Dispatch, active swarm, paid help,
-partial progress and early clear.
+The street checks cover guests fleeing with and without the patrol, Bo
+sweeping the full swarm down to six, clearing on the last catch, ongoing swarms
+surviving reload, and overnight cleanup before and after midnight. The UI
+check sends a mouse click and a touch through the viewport with Events open,
+checks the counter, and uses the overnight action. The `event-10-*` previews
+cover the warning, Dispatch, full swarm, patrol, stragglers and cleanup.
 
 ## Celebration notices — 27 November 2026
 

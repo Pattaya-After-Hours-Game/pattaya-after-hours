@@ -224,17 +224,22 @@ func run() -> void:
 			app.render()
 			app.city.set_process(false)
 			app.city.clock = app.scene_clock+.19
-			app.city.position_rat_buttons()
+			app.city.queue_redraw()
 			await capture(app,"event-10-scurrying",false)
 			app.tab = 1
 			app.drawer_open = true
 			await capture(app,"event-10-patrol")
 			app.street_action("prepare")
-			app.catch_rat(0)
+			app.model.street.tick(6)
+			app.catch_rat(app.model.street.rat_targets().front())
 			await capture(app,"event-10-patrol-progress")
 			for target in app.model.street.rat_targets().duplicate(): app.catch_rat(target)
 			app.drawer_open = false
 			await capture(app,"event-10-cleared")
+			app.model.street.announce(event)
+			app.model.street.start_event()
+			app.street_action("close_for_rats")
+			await capture(app,"event-10-overnight")
 			app.model.s.street.selected = selected
 		app.model.s.street.event = {}
 	fresh(app)

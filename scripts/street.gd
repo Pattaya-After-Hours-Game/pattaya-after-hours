@@ -46,6 +46,10 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("supplier_deal"): s.street.supplier_deal = {}
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	if not s.street.has("expired_tours"): s.street.expired_tours = {}
+	var event: Dictionary = s.street.event
+	if event.get("id",-1)==C.RAT_PLAGUE and event.phase=="active":
+		event.erase("remaining")
+		if not event.has("rats"): event.rats = range(C.RAT_COUNT)
 	economy = Economy.new(s,fresh)
 	economy.tour_arrived.connect(record_tour_arrival)
 	s.version = 15
@@ -172,7 +176,7 @@ func preparation_offer() -> Dictionary:
 	var reason := ""
 	if event.phase!="warning" and event.id!=C.RAT_PLAGUE: reason = "Preparation closes when the event starts."
 	elif event.prepared: reason = "Already prepared."
-	elif event.id==C.RAT_PLAGUE and event.phase=="active" and rat_targets().size()==1: reason = "Only one rat left. Click or tap it to clear the infestation."
+	elif event.id==C.RAT_PLAGUE and event.phase=="active" and rat_targets().size()<=C.RAT_STRAGGLERS: reason = "Only stragglers left. Click or tap them to clear the infestation."
 	elif event.id==C.Local.BED and race_staff(s.street.bars[int(event.venue)])<0: reason = "Enter with an available bartender."
 	elif s.cash<required: reason = "The preparation needs more cash."
 	return {"required":required,"reason":reason,"enabled":reason.is_empty()}
@@ -200,13 +204,23 @@ func action(id: String, index: int = 0) -> String:
 			result = "Staying for prep. Cleaning continues; use Skip to open when ready."
 		"skip":
 			if not can_skip(): return "Skip is available after 1am when every venue has stopped trading."
-			count_tips()
-			economy.advance_contracts(C.OPEN_MINUTE-int(s.street.minute))
-			s.street.minute = C.OPEN_MINUTE
-			reopen_noon()
-			celebration_tick()
-			s.street.offline_cursor = C.OPEN_MINUTE
+			skip_to_noon(C.OPEN_MINUTE-int(s.street.minute))
 			result = "12pm. Check cleanliness, stock and the rota."
+		"close_for_rats":
+			if rat_targets().is_empty(): return "There is no active infestation."
+			var minute := int(s.street.minute)
+			var to_noon := C.OPEN_MINUTE-minute
+			if minute>=C.OPEN_MINUTE:
+				to_noon += C.DAY_MINUTES
+				next_calendar_day()
+			s.street.minute = maxi(C.CLOSE_MINUTE,minute if minute<C.OPEN_MINUTE else 0)
+			for venue in s.street.bars: venue.late_open = false
+			reconcile_closures()
+			settle_overnight()
+			celebration_tick()
+			finish_event(true,"Bo clears the last of the restaurant's rats overnight.")
+			skip_to_noon(to_noon)
+			result = "12pm. Bo cleared all the rats. The street is ready to trade."
 		"supplier_deal": result = buy_supplier_deal()
 		"restock": result = economy.buy_supplier(bar)
 		"manager": result = economy.buy_manager(bar)
@@ -244,10 +258,6 @@ func action(id: String, index: int = 0) -> String:
 			var offer := preparation_offer()
 			if not offer.enabled: return offer.reason
 			if not pay(offer.required): return "The preparation needs more cash."
-			if event.id==C.RAT_PLAGUE and event.phase=="active":
-				var targets := rat_targets()
-				targets.resize(maxi(1,targets.size()-C.RAT_PATROL_CATCHES))
-				event.rats = targets
 			event.prepared = true
 			result = "Bo's rat patrol is on the job." if event.id==C.RAT_PLAGUE else C.EVENTS[int(event.id)][2] + " arranged."
 		"festival":
@@ -426,30 +436,30 @@ func announce(id: int) -> void:
 func rat_targets() -> Array:
 	var event: Dictionary = s.street.event
 	if event.get("id",-1)!=C.RAT_PLAGUE or event.phase!="active": return []
-	if event.has("rats"): return event.rats
-	return range(C.RAT_COUNT-C.RAT_PATROL_CATCHES if event.prepared else C.RAT_COUNT)
+	return event.rats
 
 func catch_rat(index: int) -> bool:
 	if not s.phase in ["plan","guided"]: return false
 	var targets := rat_targets()
 	if not targets.has(index): return false
 	targets.erase(index)
-	s.street.event.rats = targets
 	if targets.is_empty(): finish_event()
 	return true
 
 func start_event() -> void:
 	var event: Dictionary = s.street.event
 	event.phase = "active"
-	event.remaining = C.RAT_PLAGUE_SECONDS if event.id==C.RAT_PLAGUE else 45 if event.id>=C.Local.ENCORE else 90
 	record("TONIGHT · " + C.EVENTS[int(event.id)][0])
 	if event.id==C.RAT_PLAGUE:
-		event.rats = rat_targets()
+		event.erase("remaining")
+		event.rats = range(C.RAT_COUNT)
 		var fled := 0
 		for bar in s.street.bars:
 			fled += bar.customers.size()
 			economy.clear_visits(bar)
-		record("RAT PLAGUE · %d guests bolt for the door. New walk-ins are scarce." % fled)
+		record("RAT PLAGUE · Rats from the restaurant send %d guests running." % fled)
+	else:
+		event.remaining = 45 if event.id>=C.Local.ENCORE else 90
 	if int(event.id)>=C.Local.ENCORE:
 		var target: Dictionary = s.street.bars[int(event.venue)]
 		match int(event.id):
@@ -512,7 +522,7 @@ func settle_event_game(id: int, won: bool) -> String:
 		return "You won the bed race! The trophy is on the wall."
 	return "Bo’s bed finished. Eventually."
 
-func finish_event(won: bool = true) -> void:
+func finish_event(won: bool = true, outcome: String = "") -> void:
 	if s.street.event.is_empty(): return
 	var event: Dictionary = s.street.event
 	var id := int(event.id)
@@ -532,7 +542,7 @@ func finish_event(won: bool = true) -> void:
 	if id == 3 and event.prepared: s.trust = mini(100,int(s.trust)+8)
 	if id == 5: s.rep = clampi(int(s.rep)+(4 if event.prepared else -2),0,100)
 	if id == 6 and event.prepared: record("The locals appreciate the invitation. Good visits can earn their loyalty.")
-	record(C.EVENTS[id][4])
+	record(C.EVENTS[id][4] if outcome.is_empty() else outcome)
 	s.street.events_survived += 1
 	s.street.event = {}
 	s.street.event_wait = 180
@@ -607,6 +617,14 @@ func night_prep_text() -> String:
 
 func raid_chance() -> float:
 	return C.RAID_BASE_CHANCE+C.RAID_HEAT_CHANCE*clampi(int(s.heat),0,100)
+
+func skip_to_noon(minutes: int) -> void:
+	count_tips()
+	economy.advance_contracts(minutes)
+	s.street.minute = C.OPEN_MINUTE
+	reopen_noon()
+	celebration_tick()
+	s.street.offline_cursor = C.OPEN_MINUTE
 
 func reopen_noon() -> void:
 	s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
@@ -696,7 +714,11 @@ func tick(seconds: int) -> void:
 		s.street.cycle = (int(s.street.cycle)+1)%4
 		for bar in s.street.bars: bar.closed = maxi(0,int(bar.closed)-1)
 		var event: Dictionary = s.street.event
-		if trading_now:
+		if event.get("id",-1)==C.RAT_PLAGUE and event.phase=="active":
+			if event.prepared and event.rats.size()>C.RAT_STRAGGLERS:
+				var catches := mini(C.RAT_PATROL_CATCHES,event.rats.size()-C.RAT_STRAGGLERS)
+				event.rats = event.rats.slice(catches)
+		elif trading_now:
 			if not event.is_empty():
 				event.remaining -= 1
 				if event.remaining<=0:

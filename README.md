@@ -230,10 +230,11 @@ there is no forced one-year ending. All staff are adults, private activity stays
 off-screen, and hosts retain control over bar-fine participation.
 
 Street events include Navy visits, inspections, floods, Songkran, viral crowds,
-low season, rival promotions, Rat Plague and Godzilla. During Rat Plague,
-click or tap each rat in the bar to clear the swarm early. Walk the district or
-visit **Events** for optional Toybox sparring. Tours and legacy mining
-investments are not progression gates.
+low season, rival promotions, Rat Plague and Godzilla. When rats pour in from
+the restaurant down the street, call Bo to clear most of the swarm, then click or
+tap the stragglers. You can also close for the day and leave it to Bo. Walk the
+district or visit **Events** for optional Toybox sparring. Tours and legacy
+mining investments are not progression gates.
 
 ![Toybox with the finished fighter artwork](docs/toybox.png)
 

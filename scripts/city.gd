@@ -34,7 +34,7 @@ var rig := 0
 var bars: Array = []
 var selected_bar := 0
 var street_event: Dictionary = {}
-var rat_buttons := {}
+
 var service_flash := 0.0
 var fridge_install_flash := 0.0
 var fridge_capacity := 1
@@ -42,6 +42,7 @@ var legacy_staff: Array = []
 var font = ThemeDB.fallback_font
 signal site(tab: int)
 signal select_bar(index: int)
+signal rat_caught(index: int)
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -52,21 +53,11 @@ func _process(delta: float) -> void:
 	arrival_time += delta
 	service_flash = maxf(0,service_flash-delta)
 	fridge_install_flash = maxf(0,fridge_install_flash-delta)
-	position_rat_buttons()
 	queue_redraw()
 
-func position_rat_buttons() -> void:
-	if rat_buttons.is_empty(): return
-	if RatSwarm.frames.is_empty(): RatSwarm.build_frames()
-	for index: int in rat_buttons:
-		var button: Button = rat_buttons[index]
-		var center := Vector2(78+index%4*135,185+(index/4)*128)
-		var scurry := clock*2.3+index*1.7
-		center += Vector2(21*sin(scurry),12*cos(scurry*1.4))
-		button.position = center.round()-button.size/2
-		button.icon = RatSwarm.frames[int(clock*12+index)%RatSwarm.frames.size()]
-
 func _gui_input(event: InputEvent) -> void:
+	var targets: Array = street_event.get("rats",[])
+	if not targets.is_empty() and rat_pointer_input(event,targets): return
 	if bars.is_empty(): return
 	if event is InputEventMouseButton:
 		if event.device==InputEvent.DEVICE_ID_EMULATION or event.button_index!=MOUSE_BUTTON_LEFT or not event.pressed or not event.double_click: return
@@ -83,6 +74,31 @@ func _gui_input(event: InputEvent) -> void:
 			duo_reaction.assign({"id":person.customer_id,"until":clock+KISS_SECONDS})
 			accept_event()
 		return
+
+func rat_pointer_input(event: InputEvent, targets: Array) -> bool:
+	if event is InputEventKey and event.is_action_pressed("ui_accept") and not event.is_echo():
+		accept_event()
+		rat_caught.emit(targets.front())
+		return true
+	if event.device==InputEvent.DEVICE_ID_EMULATION: return false
+	if event is InputEventMouseButton:
+		if not event.pressed or event.button_index!=MOUSE_BUTTON_LEFT: return false
+	elif event is InputEventScreenTouch:
+		if not event.pressed: return false
+	else:
+		return false
+	var point: Vector2 = event.position*Vector2(960,540)/size
+	var nearest := -1
+	var best := 26.0*26.0
+	for index: int in targets:
+		var distance := point.distance_squared_to(RatSwarm.target_position(index,clock))
+		if distance<best:
+			best = distance
+			nearest = index
+	if nearest<0: return false
+	accept_event()
+	rat_caught.emit(nearest)
+	return true
 
 func _person_contains(person: Dictionary, point: Vector2) -> bool:
 	var cell: Vector2 = Art.atlas_specs()[person.who][0]
@@ -196,8 +212,10 @@ func _draw() -> void:
 			draw_string(font,Vector2(160,280),"CLEANING / %ds" % bar.clean_remaining,HORIZONTAL_ALIGNMENT_CENTER,390,18,TEAL)
 	if bar.get("raided",false): Art.frame(self,"event-inspection",0,Vector2(505,365),person_scale(365))
 	_draw_event(closed)
-	if int(street_event.get("id",-1))==Content.RAT_PLAGUE and street_event.phase=="warning":
-		RatSwarm.draw_warning(self,clock,size/Vector2(960,540))
+	if int(street_event.get("id",-1))==Content.RAT_PLAGUE:
+		var viewport_scale := size/Vector2(960,540)
+		if street_event.phase=="warning": RatSwarm.draw_warning(self,clock,viewport_scale)
+		elif not street_event.rats.is_empty(): RatSwarm.draw_active(self,clock,viewport_scale,street_event.rats,has_focus())
 	if weather >= 5:
 		for i in 65:
 			var p := Vector2(fposmod(i*53-clock*40,180),fposmod(i*71+clock*250,540))

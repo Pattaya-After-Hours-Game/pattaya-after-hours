@@ -30,10 +30,10 @@ func test_rat_plague(test: SceneTree) -> void:
 	test.check(m.street.catch_rat(2) and not m.street.catch_rat(2),"Each rat can be caught once")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.street.event.remaining==45 and loaded.street.selected().customers.is_empty(),"Reload preserves an active plague without restoring fleeing guests")
+	test.check(loaded.load_game() and not loaded.s.street.event.has("remaining") and loaded.street.selected().customers.is_empty(),"Reload preserves an active plague without a countdown or returning guests")
 	test.check(loaded.street.rat_targets().size()==Content.RAT_COUNT-1 and not loaded.street.rat_targets().has(2),"Caught rats stay gone after reload")
-	loaded.street.tick(45)
-	test.check(loaded.s.street.event.is_empty() and loaded.street.economy.traffic_rate()==baseline,"Traffic returns to normal when the swarm clears")
+	for i in 3: loaded.street.tick(60)
+	test.check(loaded.street.rat_targets().size()==Content.RAT_COUNT-1 and is_equal_approx(loaded.street.economy.traffic_rate(),baseline*.15),"The unassisted swarm never disperses on a timer")
 
 	m = Campaign.new(72)
 	bar = m.street.selected()
@@ -43,23 +43,62 @@ func test_rat_plague(test: SceneTree) -> void:
 	m.street.action("prepare")
 	m.street.start_event()
 	test.check(bar.customers.is_empty() and m.s.cash==opening_cash-prep_cost and is_equal_approx(m.street.economy.traffic_rate(),baseline*.55),"Guests always flee, and the paid patrol protects some passing traffic")
-	test.check(m.street.rat_targets().size()==Content.RAT_COUNT-Content.RAT_PATROL_CATCHES,"Calling Bo before the swarm leaves fewer rats to catch")
+	test.check(m.street.rat_targets().size()==Content.RAT_COUNT,"The full swarm appears even when Bo is ready")
+	m.street.tick(6)
+	test.check(m.street.rat_targets().size()==Content.RAT_STRAGGLERS,"A prepared Bo sweeps the swarm down to the stragglers")
 
 	m = Campaign.new(72)
 	m.street.announce(Content.RAT_PLAGUE)
 	m.street.start_event()
-	m.s.street.event.erase("rats")
+	m.s.street.event.rats = [1,3]
+	m.s.street.event.remaining = 9
 	m.save_game()
-	test.check(loaded.load_game() and loaded.street.rat_targets().size()==Content.RAT_COUNT,"An old active plague with no target list loads with a full swarm")
-	loaded.street.catch_rat(0)
-	loaded.street.action("prepare")
-	test.check(loaded.s.cash==opening_cash-prep_cost and not loaded.street.preparation_offer().enabled,"The patrol can be called once after the swarm starts")
-	var remaining: Array = loaded.street.rat_targets().duplicate()
-	test.check(remaining.size()==Content.RAT_COUNT-Content.RAT_PATROL_CATCHES-1 and not remaining.has(0),"Active help removes rats without undoing previous catches")
+	test.check(loaded.load_game() and loaded.street.rat_targets()==[1,3],"An old active plague keeps existing catch progress")
+	loaded.street.tick(10)
+	test.check(loaded.street.rat_targets()==[1,3],"The old timeout cannot clear an ongoing swarm")
+
+	m = Campaign.new(72)
+	m.street.announce(Content.RAT_PLAGUE)
+	m.street.start_event()
+	m.street.catch_rat(Content.RAT_COUNT-1)
+	m.street.action("prepare")
+	m.street.tick(6)
+	test.check(not m.street.preparation_offer().enabled and m.street.rat_targets().size()==Content.RAT_STRAGGLERS and not m.street.rat_targets().has(Content.RAT_COUNT-1),"Bo can be called once while active and does not undo catches")
+	var remaining: Array = m.street.rat_targets().duplicate()
 	for target in remaining:
-		test.check(not loaded.s.street.event.is_empty() and loaded.street.catch_rat(target),"Each remaining target can be caught")
-	test.check(loaded.s.street.event.is_empty() and loaded.s.street.events_survived==1 and is_equal_approx(loaded.street.economy.traffic_rate(),baseline),"The final catch clears the event immediately and restores traffic")
-	test.check(not loaded.street.catch_rat(remaining.back()) and loaded.s.street.events_survived==1,"Repeat input cannot finish the event twice")
+		test.check(not m.s.street.event.is_empty() and m.street.catch_rat(target),"Each remaining target can be caught")
+	test.check(m.s.street.event.is_empty() and m.s.street.events_survived==1 and is_equal_approx(m.street.economy.traffic_rate(),baseline),"The final catch clears the event immediately and restores traffic")
+	test.check(not m.street.catch_rat(remaining.back()) and m.s.street.events_survived==1,"Repeat input cannot finish the event twice")
+
+	for minute: int in [Content.OPEN_MINUTE,Content.OPEN_MINUTE+20,20,Content.CLOSE_MINUTE+7]:
+		m = Campaign.new(72)
+		m.s.day = 5
+		m.s.street.minute = minute
+		m.s.street.chapter = 2
+		m.s.cash = 50000
+		bar = m.street.selected()
+		m.street.action("hire",0)
+		m.street.action("serve")
+		m.street.action("buy",0)
+		var closed_bar: Dictionary = m.street.selected()
+		m.street.action("open")
+		bar.late_open = true
+		var paid_stock: Array = bar.stock_lots.duplicate(true)
+		var cash_before: int = m.s.cash
+		var contract_before: int = bar.team[0].contract_left
+		var remaining_day := posmod(Content.OPEN_MINUTE-minute,Content.DAY_MINUTES)
+		if remaining_day==0: remaining_day = Content.DAY_MINUTES
+		var next_day := 6 if minute>=Content.OPEN_MINUTE else 5
+		m.street.announce(Content.RAT_PLAGUE)
+		m.street.start_event()
+		m.street.action("close_for_rats")
+		test.check(m.s.day==next_day and m.s.street.minute==Content.OPEN_MINUTE and m.s.street.offline_cursor==Content.OPEN_MINUTE,"Leaving it to Bo reopens at the next noon")
+		test.check(m.s.street.event.is_empty() and m.s.street.events_survived==1 and bar.tip_visits==0,"Overnight cleanup finishes the plague and settles tips once")
+		test.check(bar.team[0].contract_left==contract_before-remaining_day and bar.stock_lots==paid_stock and m.s.cash==cash_before+bar.last_tips.amount,"Skipped hours age contracts and settle earned tips without simulated trade")
+		test.check(not bar.late_open and bar.open and not closed_bar.open,"Overnight cleanup preserves owners' closure choices and resets late trading")
+		var cash_after: int = m.s.cash
+		m.street.action("close_for_rats")
+		test.check(m.s.day==next_day and m.s.cash==cash_after,"Repeated overnight input cannot skip another opening or pay tips twice")
 
 func run(test: SceneTree) -> void:
 	test_rat_plague(test)

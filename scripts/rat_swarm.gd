@@ -10,6 +10,29 @@ const LANES = [
 	[Vector2(278,168),Vector2(593,212)],
 	[Vector2(19,121),Vector2(25,402)],
 ]
+const Content = preload("res://scripts/street_content.gd")
+# Keep all paths clear of the event controls and the management drawer.
+const SWARM_LANES = [
+	[Vector2(32,152),Vector2(531,165)],
+	[Vector2(46,194),Vector2(507,182)],
+	[Vector2(262,218),Vector2(533,205)],
+	[Vector2(34,239),Vector2(336,227)],
+	[Vector2(59,266),Vector2(520,256)],
+	[Vector2(22,302),Vector2(473,284)],
+	[Vector2(103,331),Vector2(528,310)],
+	[Vector2(31,351),Vector2(540,345)],
+	[Vector2(101,163),Vector2(117,334)],
+	[Vector2(349,180),Vector2(369,333)],
+	[Vector2(523,170),Vector2(486,324)],
+]
+const HIDING_SPOTS = [
+	[Vector2(35,195),Vector2(76,202)],
+	[Vector2(147,304),Vector2(217,292)],
+	[Vector2(256,157),Vector2(299,163)],
+	[Vector2(321,343),Vector2(380,350)],
+	[Vector2(439,228),Vector2(494,217)],
+	[Vector2(477,321),Vector2(530,322)],
+]
 const COATS = [Color("#ffffff"),Color("#e8bca6"),Color("#c3c5f9"),Color("#a9dcc7")]
 const PIXELS = [
 	"............dd...dd.....",
@@ -51,6 +74,29 @@ static func draw_warning(canvas: CanvasItem, clock: float, viewport_scale: Vecto
 		canvas.draw_set_transform(position.round()*viewport_scale,direction.angle()+facing*hop*.019,viewport_scale*Vector2(facing,1)*magnification)
 		canvas.draw_texture(frames[frame],Vector2(-12,-6),COATS[i%COATS.size()])
 	canvas.draw_set_transform(Vector2.ZERO,0,viewport_scale)
+
+static func target_position(index: int, clock: float) -> Vector2:
+	var hiding := index>=Content.RAT_COUNT-Content.RAT_STRAGGLERS
+	var lane: Array = HIDING_SPOTS[index-(Content.RAT_COUNT-Content.RAT_STRAGGLERS)] if hiding else SWARM_LANES[index%SWARM_LANES.size()]
+	var start: Vector2 = lane[0]
+	var end: Vector2 = lane[1]
+	var speed := 24.0 if hiding else 72.0+index*19%95
+	var travel := pingpong(clock*speed/start.distance_to(end)+index*.618,1.0)
+	var spread := 0.0 if hiding else float(index*17%21)-10.0
+	return (start.lerp(end,travel)+(end-start).normalized().orthogonal()*spread).round()
+
+static func draw_active(canvas: CanvasItem, clock: float, viewport_scale: Vector2, targets: Array, focused: bool) -> void:
+	if frames.is_empty(): build_frames()
+	for index: int in targets:
+		var point := target_position(index,clock)
+		var hiding := index>=Content.RAT_COUNT-Content.RAT_STRAGGLERS
+		var scale_value := .9 if hiding else 1.1+(index%5)*.09
+		var facing := 1.0 if target_position(index,clock+.04).x>=point.x else -1.0
+		canvas.draw_set_transform(point*viewport_scale,0,viewport_scale*Vector2(facing,1)*scale_value)
+		canvas.draw_texture(frames[int(clock*14.0+index)%frames.size()],Vector2(-12,-6),COATS[index%COATS.size()])
+	canvas.draw_set_transform(Vector2.ZERO,0,viewport_scale)
+	if focused:
+		canvas.draw_arc(target_position(targets.front(),clock),17,0,TAU,22,Color("#ffda87"),2)
 
 static func build_frames() -> void:
 	for frame in 4:
