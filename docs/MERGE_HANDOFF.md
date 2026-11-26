@@ -1,5 +1,36 @@
 # Current implementation and release handoff
 
+## Separate tills, company funding and growth — 27 November 2026
+
+This revision builds on main `4cfc7e4`, retaining the Rat Plague catch controls,
+full swarm and Bo's overnight cleanup as well as the completed graphics refresh.
+It supersedes the earlier upgrade-visibility-only fix and shared-wallet rules.
+
+- Each venue owns its till, local costs, tips and five-second net sample. Company
+  money lives in the bank. Tap Till for explicit transfers and Deposit surplus.
+- Fund & buy covers only a local upgrade's cash shortfall. Leases spend bank
+  money and transfer a startup float into the new property. No automatic bailout.
+- Renovations need cash/reserve, with unchanged prices. Old customer milestones
+  now earn +5%/+10% local loyalty appeal. Regulars Club keeps its regular gates.
+- All venue types have frontage tiers 1/3/5 by stage. Ten bank-funded street
+  marketing tiers add bounded shared traffic; additional open premises also
+  attract a small shared audience.
+- Managers cost ฿2,000/6,000/18,000 and earn 25/50/75% of real drink and paid-pool
+  margin. They no longer earn independently of customer trade. Owned levels stay.
+- Schema 16 conserves old cash plus reserve exactly, assigns working floats and
+  banks surplus. It preserves paid inventory, venues, staff, training and visits.
+
+Rules and measurements are in [finance and growth](design/FINANCE_AND_GROWTH.md),
+[ECONOMY](ECONOMY.md) and [TESTING](TESTING.md). README, story, player guide,
+DEVELOPMENT and AGENTS reflect the changed rules. Prior sections below describe
+historical integration states, not the current list of worktrees or releases.
+
+Verification: the full isolated combined suite passed, including all pacing
+routes; the final stock-return regression and both visual sizes also passed. Device play remains unverified. The main release workflow repeats
+all tests, exports signed Android and desktop packages, and verifies hashes before
+publishing. Use the [release list](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases)
+for the published version; source changes are not release downloads until CI completes.
+
 ## Combined graphics and controls update — 27 November 2026
 
 The main checkout held the remaining changes. All other local and fetched

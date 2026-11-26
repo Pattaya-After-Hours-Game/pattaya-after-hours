@@ -17,9 +17,9 @@ func test_drink_bonus(test: SceneTree) -> void:
 	guest.quoted = eco.price(bar,1)
 	guest.lager_quote = eco.price(bar)
 	eco.restock(bar,false,1)
-	var cash_before: int = m.s.cash
+	var cash_before: int = m.street.selected().cash
 	eco.serve(bar,1,true)
-	test.check(bar.bonus_tips==5 and m.s.cash==cash_before+70 and eco.last_sale.contains("+฿5 tip"),"A matched first drink can add a visible bonus to the jar")
+	test.check(bar.bonus_tips==5 and m.street.selected().cash==cash_before+70 and eco.last_sale.contains("+฿5 tip"),"A matched first drink can add a visible bonus to the jar")
 	m.save_game()
 	var loaded = Campaign.new(1)
 	test.check(loaded.load_game() and loaded.street.selected().bonus_tips==5,"An earned bonus survives reload")
@@ -46,9 +46,9 @@ func run(test: SceneTree) -> void:
 	var m = Campaign.new(72)
 	var b: Dictionary = m.street.selected()
 	var e = m.street.economy
-	var money: int = m.s.cash
+	var money: int = m.street.selected().cash
 	e.serve(b)
-	test.check(b.tip_visits==1 and m.s.cash==money+80 and b.tips_total==0,"First real sale banks one ten-baht tip without paying it early")
+	test.check(b.tip_visits==1 and m.street.selected().cash==money+80 and b.tips_total==0,"First real sale banks one ten-baht tip without paying it early")
 	var guest: Dictionary = b.customers[0]
 	guest.next = 0
 	e.order(b,guest)
@@ -70,26 +70,26 @@ func run(test: SceneTree) -> void:
 	test.check(loaded.load_game() and loaded.street.selected().tip_visits==1 and loaded.street.selected().bonus_tips==0,"Old schema-11 saves retain pending visits and start with zero bonus")
 	b.bonus_tips = 0
 	m.s.street.pass_credit = -10000000
-	money = m.s.cash
+	money = m.street.selected().cash
 	close_night(m)
-	test.check(m.s.cash==money+10 and b.tip_visits==0 and b.tips_total==10 and b.last_tips.visits==1,"Night closure pays exactly ten per served visit and clears the jar")
+	test.check(m.street.selected().cash==money+10 and b.tip_visits==0 and b.tips_total==10 and b.last_tips.visits==1,"Night closure pays exactly ten per served visit and clears the jar")
 	test.check(b.last_shift.revenue==160 and b.last_tips.amount==10,"Tip receipts remain separate from drink/healthy-shift accounting")
 	m.street.action("stay")
 	m.street.night_prep_tick()
 	m.save_game()
 	loaded = Campaign.new(1)
 	test.check(loaded.load_game(),"Settled tips reload")
-	money = loaded.s.cash
+	money = loaded.street.selected().cash
 	loaded.street.action("skip")
 	loaded.street.count_tips()
-	test.check(loaded.s.cash==money and loaded.street.selected().tips_total==10,"Cancellation, reload, manual skip and repeated settlement cannot repay a jar")
+	test.check(loaded.street.selected().cash==money and loaded.street.selected().tips_total==10,"Cancellation, reload, manual skip and repeated settlement cannot repay a jar")
 	m = Campaign.new(72)
-	m.s.cash = 100000
+	m.street.selected().cash = 100000
 	m.s.rep = 100
 	m.s.street.chapter = 1
 	b = m.street.selected()
 	m.street.economy.serve(b)
-	m.street.action("buy",1)
+	load("res://tests/finance_fixture.gd").buy(m.street,1)
 	var other: Dictionary = m.street.selected()
 	m.street.action("late")
 	m.street.economy.admit(other)
@@ -97,12 +97,12 @@ func run(test: SceneTree) -> void:
 	close_night(m)
 	test.check(b.tips_total==0 and other.tips_total==0,"Late venue delays the street-wide count")
 	m.s.street.minute = 179
-	money = m.s.cash
+	money = m.street.selected().cash
 	m.street.tick(1)
-	test.check(b.tips_total==10 and other.tips_total==10 and m.s.cash==money+19,"After the ordinary baht of overhead, each venue's real customers contribute once at final closure")
+	test.check(b.tips_total==10 and other.tips_total==10 and m.street.selected().cash==money+9,"After the ordinary baht of overhead, each venue's real customers contribute once at final closure")
 	# All service paths contribute visits; tips never change historical commission.
 	m = Campaign.new(72)
-	m.s.cash = 10000
+	m.street.selected().cash = 10000
 	b = m.street.selected()
 	m.street.action("hire",0)
 	m.street.action("hire",3)
@@ -115,33 +115,34 @@ func run(test: SceneTree) -> void:
 	test.check(b.tips_total==20 and b.commission_paid==commission,"The tip jar does not change historical commission")
 	# Reproduce the screenshot without awarding money or deleting waiting orders.
 	m = Campaign.new(72)
-	m.s.cash = 39
+	m.street.selected().cash = 39
 	b = m.street.selected()
 	b.stock = 0
 	var orders: int = m.street.economy.pending(b)
 	m.street.action("emergency_stock")
-	test.check(b.stock==6 and b.consignment==6 and m.s.cash==39 and m.street.economy.pending(b)==orders,"Emergency delivery recovers the exact screenshot state without fake buyers or cash")
+	test.check(b.stock==6 and b.consignment==6 and m.street.selected().cash==39 and m.street.economy.pending(b)==orders,"Emergency delivery recovers the exact screenshot state without fake buyers or cash")
 	m.street.action("emergency_stock")
 	test.check(b.stock==6 and b.recovery==120,"Repeated emergency clicks cannot stack stock or cover")
 	m.street.economy.serve(b,3)
-	test.check(m.s.cash==237 and b.consignment==3 and b.tip_visits==3,"Three real recovery sales repay their stock costs and earn enough for a normal pack")
+	test.check(m.street.selected().cash==237 and b.consignment==3 and b.tip_visits==3,"Three real recovery sales repay their stock costs and earn enough for a normal pack")
 	m.street.action("stock")
-	test.check(b.stock==9 and m.s.cash==9,"Recovered business can purchase a normal full pack")
+	test.check(b.stock==9 and m.street.selected().cash==9,"Recovered business can purchase a normal full pack")
 	m = Campaign.new(72)
 	b = m.street.selected()
 	b.stock = 0
 	b.supplier_level = 2
-	m.s.cash = 430
+	m.street.selected().cash = 430
 	m.street.action("emergency_stock")
-	test.check(b.stock==6 and m.s.cash==430,"Bulk-pack affordability uses the actual 432-baht bill; recovery stays the six-drink exception")
+	test.check(b.stock==6 and m.street.selected().cash==430,"Bulk-pack affordability uses the actual 432-baht bill; recovery stays the six-drink exception")
 	# Current customers already served before migration do not retroactively tip.
 	m = Campaign.new(72)
 	b = m.street.selected()
 	m.street.economy.serve(b)
+	load("res://tests/finance_fixture.gd").legacy(m)
 	m.s.version = 10
 	m.save_game()
 	loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==15 and loaded.street.selected().tip_visits==0,"Old saves start with an empty tip jar, retaining cash and progress")
+	test.check(loaded.load_game() and loaded.s.version==16 and loaded.street.selected().tip_visits==0,"Old saves start with an empty tip jar, retaining cash and progress")
 	b = loaded.street.selected()
 	loaded.street.economy.order(b,b.customers[0])
 	loaded.street.economy.serve(b)
@@ -166,13 +167,13 @@ func run_ui(test: SceneTree) -> void:
 	app.muted = true
 	app.start_new_game()
 	app.show_tutorial_hint = false
-	app.model.s.cash = 39
+	app.model.street.selected().cash = 39
 	app.model.street.selected().stock = 0
 	app.model.s.street.minute = 1045
 	app.open_fridge()
 	test.check(test.find_button(app,"Bo's recovery delivery · 6 drinks").visible,"Screenshot stockout exposes recovery directly beside stock")
 	test.use_button(app,"Bo's recovery delivery · 6 drinks")
-	test.check(app.model.s.cash==39 and app.model.street.selected().stock==6,"Recovery UI invokes model consignment without cash handout")
+	test.check(app.model.street.selected().cash==39 and app.model.street.selected().stock==6,"Recovery UI invokes model consignment without cash handout")
 	app.queue_free()
 	await test.process_frame
 	for path in [Campaign.SAVE,Campaign.BACKUP]:

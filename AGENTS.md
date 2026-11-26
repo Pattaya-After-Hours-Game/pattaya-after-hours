@@ -48,7 +48,7 @@ claiming behaviour exists; update the relevant documentation when it changes.
   visits count happy. Never replace an existing saved visit with a new random plan.
   Beer-bar cumulative caps by stage are seating 3/5/7, sign 1/3/5, fridge 2/3/4,
   music 1/2/4 and staff training 2/4/6. Costs per tier N are 400N/900N/800N/1200N/400N.
-  Compact-layout recovery applies at seating >=3. Other venue tracks stay unchanged.
+  Compact-layout recovery applies at seating >=3. Hostess/gogo frontage also uses the 1/3/5 tier caps, ฿900 per tier number and +2 appeal; other venue tracks stay unchanged.
   Base traffic is 7.3 + 2 × max(0, highest owned beer sign − 1), one shared pool.
   Advice and visit details are read-only. Customer contribution uses consumed paid
   stock and excludes manager income, tips and investments; keep the till cashflow
@@ -58,18 +58,19 @@ claiming behaviour exists; update the relevant documentation when it changes.
   adds 25% of base, excluding the inherited slot-zero beer bar. Never refund old
   purchases. Every fourteenth day has a visible 10% offer, rotating hostess/beer/
   gogo. `street.lease_quote()` owns price, retained opening cash, affordability and
-  cost estimates. Only the lease is spent; the reserve stays in the till. Keep
-  local renovation/manager gates and all renovation prices unchanged.
+  cost estimates. Leases spend company-bank cash and transfer the quoted startup float into the new venue.
+  Keep renovation prices and physical stage gates; customer milestones now earn loyalty.
 - Pool costs **฿50 per game per table**, charged once at game start; new games last 30 seconds.
   Preserve saved remaining time for games already underway, including older 45-second games. Free Pool
   Night trades fees for attraction. Timers, capacity, customer budgets and
   promotion cooldowns still apply. Reloading must not duplicate rewards.
 - Keep all three venue types useful, with three stages each. Renovation earns
   space and options; it does not automatically raise every drink's price.
-  Local satisfaction, regulars and healthy operation matter alongside cash.
+  Local satisfaction, regulars and healthy operation earn loyalty appeal; cash funds renovation.
   Keep selected-venue renovation progress visible above Upgrades, including Ready
   only; show live locked reasons and keep navigation/readouts free of mutations.
-  Stage three requires 450 happy visits, 70 regulars and 40 healthy shifts;
+  Loyalty ranks require 70/10/8 and 450/70/40 happy visits/regulars/healthy shifts,
+  for +5% and +10% total appeal. These never block renovation;
   final renovations cost ฿40,000/65,000/120,000 by venue type.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.
   Bartender contracts cost ฿1,200; host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped/offline
@@ -105,10 +106,12 @@ claiming behaviour exists; update the relevant documentation when it changes.
   recovery exception. Each fridge tier earns +1 extra reputation per ten happy
   departures, capped at 100, with no purchase/reload reward. Third beer-bar seating must hold twelve with pool and fans.
   The schema-7 migration preserves paid manager/supplier appointments as level 1 and grants no
-  free music/auto-serve or higher levels. Manager income is an explicit exception
-  to customer-based receipts: ฿10/20/40 per trading second at levels 1/2/3, with
-  purchase prices ฿8,000/36,000/72,000. Keep it separate from drink/pool sales,
-  commission, customer counters and healthy-service milestones. No closed income.
+  free music/auto-serve or higher levels. Manager levels cost ฿2,000/6,000/18,000
+  and add 25/50/75% of earned drink and paid-pool gross margin. Use actual price
+  less FIFO paid stock and consignment repayments, preserving fractional bonus carry.
+  Includes hosted drinks; excludes bar fines, tips, transfers, returns and event rewards.
+  No independent timer income. Keep bonuses separate from healthy-service progress.
+  Stage gates remain 2/3/3, with a bartender, deliveries and reserve; no healthy-shift gate.
 - Music costs ฿1,200 for 35→25-second repeats; stage-two better sound costs
   ฿2,400 and reaches 18 seconds (party 14). Beer-bar stage three adds ฿3,600/4,800
   tiers for 14/11 seconds (party 11/8). Preserve existing drinking deadlines,
@@ -148,11 +151,36 @@ claiming behaviour exists; update the relevant documentation when it changes.
   pool states and closures. Do not replace production assets with placeholders
   or decorative crowds that contradict the model.
 
+## Separate finance and growth (approved 27 November 2026)
+
+- `s.cash` is the company bank; `bar.cash` is the venue till. Local income/costs,
+  tips, staff and upgrades use that till. Leases, street marketing and unattributed
+  legacy/company actions use the bank. Never silently cover a shortfall.
+- Cash & Bank offers explicit transfers. Fund & buy transfers only the shortfall
+  for a quoted local upgrade and reserve, then purchases once. Navigation is pure.
+  Recommended working cash is two packs plus two minutes of operating costs.
+- New leases retain their existing prices. Transfer a startup float of ฿1,200 +
+  ฿228 + two minutes of new overhead and one bartender's wage into the new till.
+- Schema 16 conserves old `cash + reserve` exactly, allocating working floats and
+  leaving surplus in the bank. Insufficient cash is apportioned proportionally
+  with stable integer remainders. Preserve all owned assets; no refunds or gifts.
+  Fresh campaigns put ฿228 in Blue Hour and zero in the company bank.
+- Street marketing requires any stage-two venue. Ten incremental bank-funded
+  prices: 2000/4000/8000/16000/30000/50000/80000/120000/180000/260000.
+  Traffic increments: 2/3/4/6/8/10/12/15/20/25 potential visitors/minute.
+  Each additional open property adds two potential visitors/minute, maximum seven.
+  All compete for one bounded audience; forecasts never create actual sales.
+- HUD Till and its five-second net sample belong to the selected venue. Transfers,
+  investments, tips and offline claims do not enter the trading sample. Offline
+  bonuses require estimated customer trade and protect each opening cash balance.
+- See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for account routing.
+
 ## Implementation boundaries
 
 This is a Godot/GDScript project, not a web app. Use the engine version pinned in
 `.godot-version`; do not add a server or change the engine merely for convenience.
 
+- `scripts/finance.gd` owns explicit transfers, total wealth and schema-16 cash allocation.
 - `scripts/economy.gd` owns customers, orders, pool, promotions, costs and forecasts.
 - `scripts/street.gd` owns the shared live clock, properties, chapters and events.
 - `scripts/street_content.gd` holds balance, equipment, promotion and story data.

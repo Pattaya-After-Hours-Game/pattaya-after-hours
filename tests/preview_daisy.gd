@@ -14,10 +14,10 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.show_tutorial_hint = false
-	app.model.s.cash = 200000
+	app.model.street.selected().cash = 200000
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 2
-	app.model.street.action("buy",1)
+	load("res://tests/finance_fixture.gd").buy(app.model.street,1)
 	app.open_service_section("team")
 	app.drawer_open = true
 	await capture(app,"daisy-hire","Hire Daisy")

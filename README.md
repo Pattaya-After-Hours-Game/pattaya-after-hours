@@ -17,6 +17,25 @@ waiting-order dots turn red as patience runs out. Source and release downloads
 are tracked separately; the download links above select the latest published build.
 See [the current handover](docs/MERGE_HANDOFF.md) for chat and branch status.
 
+## Your bar's money, your company's money
+
+Every bar has its own till and five-second **฿/s** figure. Tap **Till** for
+**Cash & Bank**: transfer money explicitly or deposit surplus while retaining
+working cash. A rich company can **Fund & buy** a local upgrade directly from
+Upgrades. Leases and **Empire → Street marketing** use company-bank money.
+
+Renovations now require cash and operating reserve. Happy visits, regulars and
+healthy shifts earn **loyalty appeal**, rather than stopping a wealthy owner
+from building. Hostess and gogo frontage now has five tiers across three stages.
+Street marketing adds a bounded audience shared by all your venues: more seats,
+faster service and adequate stock still matter.
+
+Managers cost **฿2,000 / ฿6,000 / ฿18,000** and earn **25% / 50% / 75%** of
+real drink and paid-pool gross margin. An empty room pays no bonus. Existing
+levels stay owned. Schema 16 preserves every baht of old till plus reserve,
+allocates working floats to venues and puts the balance in the bank.
+See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for the complete rules.
+
 ## Start playing
 
 Open `project.godot` in **Godot 4.7.2** and press **F5**, or run from the checkout:
@@ -92,9 +111,9 @@ A two-note bell alerts you to waiting orders at the selected venue, repeating at
 most once every ten seconds. **Sound / Muted** controls it along with game audio.
 Staff cost money while on duty, even when the bar is quiet. Use the rota or temporarily close if
 costs outrun sales. An owner-run recovery shift offers a way back from an empty
-till. Renovations need satisfied customers, local regulars, healthy shifts and
-cash for the next shift. **Upgrades** lists current-stage purchases by budget,
-then shows the next renovation and the upgrades it opens. The **Unlock stage**
+till. Renovations need their purchase price and operating cash. Local satisfied
+customers, regulars and healthy shifts earn loyalty appeal instead of blocking construction. **Upgrades** lists current-stage purchases by budget,
+then shows the next renovation and the upgrades it opens. The **Renovate to stage**
 shortcut jumps to the renovation’s live requirements and purchase. **Ready only**
 filters the list.
 
@@ -143,7 +162,8 @@ buyers. A satisfied one-drink visit can earn a regular.
 Beer bars now have several investments per stage: seating caps **3/5/7**, frontage
 **1/3/5**, fridges **2/3/4**, music **1/2/4**, and bartender training **2/4/6**.
 The next tier shows its stage requirement. Higher frontage grows one shared street
-visitor pool. Other venue types keep their existing purchase limits.
+visitor pool. Hostess and gogo frontage shares the five-tier ladder; their other
+purchase limits remain unchanged.
 
 **Service → Your profit cycle** separates actual customer profit from manager
 income and explains the last shift's bottleneck. **Show visit plans** reveals
@@ -175,7 +195,7 @@ the saving. Existing buildings, cash and stock receive no refunds or revaluation
 | Regulars Club | Stage two: ฿600 / ฿1,200 / ฿2,400; 35% / 65% / 100% of new visitors plan and budget for an extra round, capped at three. Requires 10 / 20 / 35 local regulars. |
 | Auto-serve | ฿3,000 per venue; uses the existing Serve timer as rush backup for bartenders, or covers the bar without them. Manual taps share it. |
 | Two-second pouring | ฿5,600 after the existing pouring tiers, from venue stage 2. Welcome still stops at four seconds. |
-| Manager levels 1 / 2 / 3 | ฿8,000 / ฿36,000 / ฿72,000 incremental purchases; ฿10 / ฿20 / ฿40 per game minute (real second) while open. Level 1 needs stage 2; later levels need stage 3. |
+| Manager levels 1 / 2 / 3 | ฿2,000 / ฿6,000 / ฿18,000 incremental purchases; 25% / 50% / 75% bonus on actual drink and paid-pool gross margin. Level 1 needs stage 2; later levels need stage 3. |
 | Supplier levels 1–5 | ฿900 / ฿1,200 / ฿2,400 / ฿4,800 / ฿9,600; delivery prices ฿228 for 6, then ฿432 / ฿408 / ฿384 / ฿360 for 12. |
 
 Manager income is separate from drink/pool receipts, uses no stock and pays no
@@ -256,7 +276,7 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 15.
+retain money, staff, venues and owned stages when migrated to save schema 16.
 Schema 15 retains sponsored orders, paid rounds and Room Buzz. Old visitors keep
 their budgets and plans and receive no new hosted-drink invitation.
 Schema 14 saves host training, auto-accept and thirty-second booking deadlines.
@@ -437,10 +457,9 @@ expansion and the festival. **Show next step** opens the relevant tab or purchas
 section without spending anything. Progress is read from the existing save;
 there is no checklist payout or extra compulsory purchase.
 
-Bartender training costs **฿400 / ฿800**, then **฿1,200 / ฿1,600** from stage two. The first manager costs **฿8,000**. Stage-three renovations cost **฿40,000 / ฿65,000 / ฿120,000** for
-beer / Soi / gogo venues, requiring **450 happy visits, 70 regulars and 40 healthy
-shifts at that venue**, plus the operating reserve. Stage-two gates and prices
-are unchanged. Existing upgrades stay owned, with no retroactive refunds.
+Bartender training costs **฿400 / ฿800**, then **฿1,200 / ฿1,600** from stage two. The first manager costs **฿2,000** and earns a bonus from actual customer margins. Stage-three renovations cost **฿40,000 / ฿65,000 / ฿120,000** for
+beer / hostess / gogo venues, plus the operating reserve. The old customer
+thresholds now earn loyalty ranks (+5% / +10% appeal); they do not block renovation. Existing upgrades stay owned, with no retroactive refunds.
 
 Regulars Club starts at **฿600** from stage two, giving regular visitors a reason
 to stay for another paid round while you save for management. See the

@@ -14,9 +14,9 @@ func run(test: SceneTree) -> void:
 		var guest: Dictionary = b.customers[0]
 		var quote: int = [80,100,120][kind]
 		test.check(guest.quoted==quote,"Venue price ladder quotes each real customer's first order")
-		var cash_before: int = m.s.cash
+		var cash_before: int = m.street.selected().cash
 		e.serve(b)
-		test.check(m.s.cash==cash_before+quote and b.shift.consumed_stock==38,"Standard sale settles its venue price and actual stock cost")
+		test.check(m.street.selected().cash==cash_before+quote and b.shift.consumed_stock==38,"Standard sale settles its venue price and actual stock cost")
 		b.stage = 3
 		test.check(e.price(b)==quote,"Renovation does not multiply the venue's standard drink price")
 		b.equipment.menu = 1
@@ -29,15 +29,15 @@ func run(test: SceneTree) -> void:
 	b.stock_lots = [{"units":5,"cost":6},{"units":7,"cost":14}]
 	b.customers[0].quoted = 55
 	b.customers[0].budget = 210
-	m.s.cash = 987
+	m.street.selected().cash = 987
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.cash==987,"Price update preserves the saved cash balance")
+	test.check(loaded.load_game() and loaded.street.selected().cash==987,"Price update preserves the saved cash balance")
 	b = loaded.street.selected()
 	var e = loaded.street.economy
 	test.check(b.stock_lots==[{"units":5,"cost":6},{"units":7,"cost":14}] and b.customers[0].quoted==55,"Old supplier costs and waiting quotes survive reload unchanged")
 	e.serve(b)
-	test.check(loaded.s.cash==1042 and b.shift.consumed_stock==6,"An old tab settles once at its saved price using its original paid stock cost")
+	test.check(loaded.street.selected().cash==1042 and b.shift.consumed_stock==6,"An old tab settles once at its saved price using its original paid stock cost")
 	b.customers[0].next = 0
 	e.order(b,b.customers[0])
 	test.check(b.customers[0].quoted==e.price(b,int(b.customers[0].drink)) and b.customers[0].budget==155,"Only the next round adopts the new price; old customer budgets are preserved")
@@ -48,18 +48,18 @@ func supplier_auto_restock(test: SceneTree) -> void:
 	var model := Campaign.new(72)
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
-	model.s.cash = 5000
+	model.street.selected().cash = 5000
 	model.street.action("buy_drink",2)
 	for unit in 6: eco.consume_stock(bar,2)
 	var guest: Dictionary = bar.customers[0]
 	guest.drink = 2
 	guest.lager_quote = 0
 	guest.quoted = eco.price(bar,2)
-	var cash_before: int = model.s.cash
-	test.check(eco.serve(bar)==1 and guest.order and model.s.cash==cash_before+80,"Before the supplier upgrade, only the other guest can be served")
+	var cash_before: int = model.street.selected().cash
+	test.check(eco.serve(bar)==1 and guest.order and model.street.selected().cash==cash_before+80,"Before the supplier upgrade, only the other guest can be served")
 	model.street.action("restock")
-	cash_before = model.s.cash
-	test.check(eco.serve(bar)==1 and not guest.order and eco.stock_of(bar,2)==5 and model.s.cash==cash_before-114+int(guest.quoted),"After the upgrade, a real rum order buys a paid pack and uses one drink")
+	cash_before = model.street.selected().cash
+	test.check(eco.serve(bar)==1 and not guest.order and eco.stock_of(bar,2)==5 and model.street.selected().cash==cash_before-114+int(guest.quoted),"After the upgrade, a real rum order buys a paid pack and uses one drink")
 
 func supplier_special(test: SceneTree) -> void:
 	var m := Campaign.new(72)
@@ -67,24 +67,24 @@ func supplier_special(test: SceneTree) -> void:
 	var eco = m.street.economy
 	m.s.street.served = 10
 	bar.regulars = 1
-	m.s.cash = 4900
+	m.street.selected().cash = 4900
 	m.s.street.minute = 839
 	m.street.tick(1)
 	var quote: Dictionary = m.street.supplier_deal_offer()
 	test.check(quote.drink==2 and quote.quantity==12 and quote.price==168 and quote.normal==228,"Bo offers twelve rums at the actual discounted wholesale price")
-	test.check(quote.goal_name=="Blue Hour renovation" and m.s.cash>=quote.target and quote.remaining_cash<quote.target,"The quote reveals when the discount would put a saved-up renovation out of reach")
+	test.check(quote.goal_name=="Blue Hour renovation" and m.street.selected().cash>=quote.target and quote.remaining_cash<quote.target,"The quote reveals when the discount would put a saved-up renovation out of reach")
 	var stock: int = bar.stock
-	var total: int = m.s.cash
+	var total: int = m.street.selected().cash
 	m.street.action("supplier_deal")
-	test.check(m.s.cash==total-quote.price and eco.stock_of(bar,2)==12 and bar.stock==stock+12,"The deal buys real stock for the quoted price")
+	test.check(m.street.selected().cash==total-quote.price and eco.stock_of(bar,2)==12 and bar.stock==stock+12,"The deal buys real stock for the quoted price")
 	test.check(bar.stock_lots.back().cost==quote.unit and bar.shift.stock_cost==quote.price,"The receipt preserves discounted cost for sales and returns")
 	m.save_game()
 	var loaded := Campaign.new(1)
 	test.check(loaded.load_game(),"A bought supplier offer persists across reload")
 	loaded.street.supplier_deal_tick()
-	var after: int = loaded.s.cash
+	var after: int = loaded.street.selected().cash
 	loaded.street.action("supplier_deal")
-	test.check(loaded.s.cash==after and loaded.street.supplier_deal_offer().is_empty(),"Reloading cannot redeem the pack again")
+	test.check(loaded.street.selected().cash==after and loaded.street.supplier_deal_offer().is_empty(),"Reloading cannot redeem the pack again")
 	loaded.s.day = 4
 	loaded.street.selected().equipment.menu = 1
 	loaded.street.supplier_deal_tick()
@@ -106,12 +106,12 @@ func run_ui(test: SceneTree) -> void:
 	app.render()
 	app._process(1)
 	test.check(app.supplier_special_open and app.model.s.street.supplier_deal.seen,"The deal pops up once without advancing the clock")
-	var cash_before: int = app.model.s.cash
+	var cash_before: int = app.model.street.selected().cash
 	test.use_button(app,"Not now")
-	test.check(not app.supplier_special_open and app.model.s.cash==cash_before,"Passing on the deal spends nothing")
+	test.check(not app.supplier_special_open and app.model.street.selected().cash==cash_before,"Passing on the deal spends nothing")
 	app.open_fridge()
 	test.use_button(app,"Bo’s special · save ฿60")
 	test.use_button(app,"Buy pack · ฿168")
-	test.check(not app.supplier_special_open and app.model.s.cash==cash_before-168,"The fridge can reopen and redeem a dismissed deal")
+	test.check(not app.supplier_special_open and app.model.street.selected().cash==cash_before-168,"The fridge can reopen and redeem a dismissed deal")
 	app.queue_free()
 	await test.process_frame

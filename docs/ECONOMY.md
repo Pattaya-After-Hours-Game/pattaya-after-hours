@@ -1,5 +1,10 @@
 # Customer economy
 
+The current account and growth rules are defined in
+[Finance and growth](design/FINANCE_AND_GROWTH.md). Schema 16 replaces shared
+cash, renovation loyalty gates and timer-based manager income. Older dated
+balance records below describe previous releases, not current purchase rules.
+
 The live street is authoritative. `scripts/economy.gd` owns visitors, orders,
 stock settlement, payroll, pool games, promotions and forecasts. `street.gd`
 advances this model once per foreground second and settles reports every 120
@@ -9,6 +14,20 @@ Balance and purchase definitions live in `scripts/street_content.gd`.
 The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
+
+## Current finance and pacing — 27 November 2026
+
+Venue tills are independent; the company bank funds leases and street marketing.
+Fund & buy explicitly covers upgrade shortfalls. Renovations cost money and
+reserve; the old milestones earn local loyalty appeal. Management pays a bonus
+only on earned customer margins. [Finance and growth](design/FINANCE_AND_GROWTH.md)
+defines exact prices, account routing and schema-16 migration.
+
+Fresh active baselines reach the first pool table in 13–18 minutes, stage two
+in 29–34, a second property in 97–109 and stage three in 132–144. Manager saving
+gaps are 2m16s–3m20s and the longest investment gaps 19m35s–23m08s. These use
+real cash transfers and reinvestment, not a mandatory wait. See the
+[current verification record](TESTING.md) for exact timings and acceptance limits.
 
 ## Current profit-cycle rules — 26 November 2026
 
@@ -20,12 +39,13 @@ before leaving, with bounded pool waiting. Happy one-drink visits count.
 
 Beer caps by stage: seating **3/5/7**, frontage **1/3/5**, fridges **2/3/4**,
 music **1/2/4**, service training **2/4/6**. Prices per tier N are respectively
-฿400N/900N/800N/1,200N/400N. Only beer bars gain these additional tracks.
+฿400N/900N/800N/1,200N/400N. Hostess and gogo frontage shares the 1/3/5 caps; their other tracks are unchanged.
 Music takes 35/25/18/14/11 seconds (party 26/19/14/11/8); bartender service takes
 25/20/15/12/10/8/6. Existing timers are never shortened retroactively.
 
 Base street traffic is 7.3 + 2 × max(0, highest owned beer frontage − 1) per minute,
-shared among all venues. Completed-shift advice reads actual losses/occupancy;
+plus cumulative marketing. Each additional open property adds two; existing type
+diversity also applies. This remains shared among all venues. Completed-shift advice reads actual losses/occupancy;
 customer profit subtracts consumed paid stock and operating expenses, excluding
 manager income and tips. The till sample remains actual cashflow. Offline visitor
 estimates divide settled drinks by expected variable rounds, not a fixed two.
@@ -597,32 +617,31 @@ cash for a complete pack plus the next operating charge. Supplier purchases
 preserve one shift's operating reserve. Pre-lot inventory migrates at ฿14 per unit; recorded lots retain their paid costs.
 Consignment drinks retain Bo's original ฿14 repayment regardless of supplier tier.
 
-| Manager level | Incremental purchase | Separate income per real second | Minimum venue stage |
+| Manager level | Incremental purchase | Bonus on earned margin | Minimum venue stage |
 | --- | ---: | ---: | ---: |
-| 1 | ฿8,000 | ฿10 | 2 |
-| 2 | ฿36,000 | ฿20 | 3 |
-| 3 | ฿72,000 | ฿40 | 3 |
+| 1 | ฿2,000 | 25% | 2 |
+| 2 | ฿6,000 | 50% | 3 |
+| 3 | ฿18,000 | 75% | 3 |
 
-Level one retains the bartender, deliveries and eight-healthy-shift requirements.
-Every purchase preserves operating reserve. A manager adds ฿12/real-minute
-overhead, enables managed offline estimates and cleaning, and now provides
-explicit separate management income while trading. This is a user-requested
-passive-income exception, not an ordinary drink sale. It grants no orders,
-customers, satisfaction, regulars, pool games or commission, consumes no stock,
-and is excluded from healthy-service margin. Owner closure, scheduled closure,
-raids, temporary event closure and recovery suppress it. Skipping time grants
-none; existing managers receive level one without an additional fee.
+Purchases require an on-duty bartender, deliveries and operating reserve, without
+healthy-shift gates. Management adds ฿12/minute overhead and enables offline
+operation and cleaning. Bonuses use the current percentage, not stacked levels.
+Each real drink (including hosted rounds) earns a bonus on its actual receipt
+less FIFO paid stock cost and any consignment repayment. Paid pool fees also
+qualify. Negative margins earn no bonus; saved hundredths carry into later sales.
+Free pool, bookings, tips, refunds, transfers and event rewards earn no bonus.
+Empty or closed venues generate no manager income. Owned manager levels survive
+migration without refunds or recharge.
 
-Manager income enters gross revenue plus a dedicated shift-report field, and
-is included in net forecasts. Offline legal windows project it independently
-from demand-limited drink sales. It can fund packs from that claim's new surplus;
-starting cash is still protected. No service means no projected drinks or packs,
-but manager income continues while the projected venue is legally open.
+Manager receipts remain separate from drink/pool counters and healthy-shift
+margin, while entering actual trading cashflow. Offline estimates use the same
+margin formula after demand, stock and service limits and credit the venue till.
+They protect starting cash, stop when unviable and never advance live milestones.
 
-The HUD samples shared trading cash flow every five foreground seconds, keeping
+The HUD samples each venue’s trading cash flow every five foreground seconds, keeping
 sample time and pending net in the save. `income` and operating/stock/commission/
 fine charges feed it. One-off equipment, staff contracts, training, leases and
-offline claims do not. All venues contribute; closed seconds move the sample
+offline claims do not. The selected venue’s sample is displayed; closed seconds move its sample
 toward zero. Decisions, boot menu and offline time do not run the sampler.
 
 ## Pool and promotions
@@ -651,22 +670,24 @@ not additional revenue. Late purchases from attributed guests update the report.
 
 ## Renovation and expansion
 
-Stage 2 requires 70 satisfied visits, 10 local regulars and eight healthy shifts.
-Stage 3 requires 450 satisfied visits, 70 local regulars and forty healthy shifts.
+Renovations require the unchanged price plus operating reserve. Local milestones
+now earn loyalty: 70 satisfied visits / 10 regulars / eight healthy shifts gives
++5% appeal; 450 / 70 / forty gives +10% total, not an additional 10%.
+These milestones do not gate construction.
 A healthy shift serves at least four orders, fulfils at least 80% of orders and
 has positive operating margin after stock consumed, payroll, promotion costs, fines and drink commission.
 The cash report separately records inventory purchases when paid. Manager
 income and nightly tips do not qualify a healthy shift.
 
-Upgrades groups each stage’s offers by whether the till can cover the price and
-reserve. The next renovation separates current-stage purchases from later-stage
-previews and shows the selected venue’s live milestone counts and cash target.
+Upgrades groups each stage’s offers by whether the till and explicit company
+funding can cover the price and reserve. The next renovation separates current-stage purchases from later-stage
+previews and shows the selected venue’s till, bank and cash target. Loyalty counts appear separately.
 The top shortcut jumps to that section. Ready only keeps renovation progress
 visible while filtering purchase cards.
 
-Milestones belong to the venue. Renovation also requires its fee and the next
+Loyalty belongs to the venue. Renovation requires its fee and the next
 shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿40,000. New
-leases additionally require a float for a ฿1,200 bartender contract, stock and existing street payroll.
+leases additionally require a float for a ฿1,200 bartender contract, stock and two minutes of the new venue’s overhead plus one bartender’s wages.
 First purchased leases cost ฿12,000/24,000/60,000 for beer/hostess/gogo. Each
 prior same-type purchase adds 25% of its base lease, never compounded. The original
 beer bar in slot zero is excluded even if renamed. Existing owned venues count
@@ -682,8 +703,8 @@ The retirement story no longer silently discounts every first hostess property.
 `street.lease_quote()` owns price, base/repeat/offer breakdown, retained reserve,
 total affordability, overhead and one-bartender house-drink break-even. Empire
 presents the same quote that purchase settlement uses. The reserve includes a
-bartender contract, a future stock pack, two minutes of new overhead and two
-minutes of existing open-venue operating costs. It stays in the till. Forecast
+bartender contract, a future stock pack and two minutes of new overhead plus one
+bartender’s wages. It transfers from the bank to the new venue’s till. Forecast
 break-even excludes pool and manager receipts and does not promise demand.
 Money earned elsewhere can fund the building but cannot buy its loyal clientele.
 There are no mandatory waiting timers. Renovation adds space, staffing positions
@@ -739,9 +760,9 @@ cap, and include expiry notices in the offline report. Never auto-renew contract
 Expected sales are bounded by shared demand, space, service and stock. Estimated
 sales consume owned stock; supplier purchases add complete six- or twelve-drink deliveries at the
 venue’s current supplier price.
-Only surplus generated within that claim funds packs: existing cash is protected,
-so an empty fridge needs newly generated manager income before an offline pack
-can be bought. A legacy projection without manager income cannot bootstrap it. Operating costs and
+Only surplus generated within that claim funds packs: existing cash is protected.
+An empty fridge cannot bootstrap offline trading; restock before leaving. Manager
+bonuses depend on estimated customer margins and cannot generate seed money. Operating costs and
 commission settle with projected receipts; fractional sales and their associated
 costs/pool income persist together so short claims cannot avoid charges.
 Repeated claims at the same timestamp credit nothing. Splitting a long absence

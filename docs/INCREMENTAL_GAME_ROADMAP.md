@@ -22,15 +22,15 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Visible venue renovation progress and upgrade blockers |
-| Status | DONE; verified in shared main, commit/release follows |
+| Active feature | Separate tills, company funding, loyalty and customer-driven growth |
+| Status | COMPLETE — implementation and local verification |
 | Implementer | Codex in shared main |
-| Reviewer / playtester | Codex regression and layout checks; device play pending |
-| Shared claim location | This table in `/home/zak/projects/pattaya-after-hours` |
-| Working branch / chat / PR | `main`, synced through `860b56c` |
-| Scope and owned files | Upgrade UI, focused tests/previews and related docs; no balance or save changes |
-| Acceptance | Show selected venue's local milestones and cash gate live; expose locked reasons; preserve price sorting, gates, saves and read-only navigation |
-| Next handoff / blocker | Full tests and two-resolution previews pass; see current handover for release verification |
+| Reviewer / playtester | Automated regression, balance and visual checks; device play pending |
+| Shared claim location | This table |
+| Working branch / chat / PR | main, synced through 4cfc7e4 |
+| Scope and owned files | Finance/economy/street/save/UI, tests, previews and documentation |
+| Acceptance | Approved separate-finance plan; conserve saved wealth, bounded demand, earned management bonuses, unchanged pacing acceptance |
+| Next handoff / blocker | Local regression, all balance suites and visuals passed; main workflow verifies publication |
 | Recommended next, when free | Await user direction |
 | Last updated | 2026-11-27 |
 

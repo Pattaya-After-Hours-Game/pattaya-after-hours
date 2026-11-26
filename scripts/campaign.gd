@@ -140,6 +140,8 @@ func booking(index: int, route_id: int) -> String:
 	return "Tour agreement active · Guide pay ฿%d." % guide_pay(route_id)
 
 func action(id: String, index: int = 0) -> String:
+	if not legacy_mode() and id in ["reserve","draw"]:
+		return "Transferred ฿500." if street.finance.transfer(street.selected(),500,id=="reserve") else "Not enough cash in the source account."
 	if not legacy_mode() and id in ["buy","hire","rota","train","reno"]:
 		return street.action({"buy":"stock","hire":"hire","rota":"rota","train":"train_staff","reno":"upgrade"}[id],index)
 	if s.phase != "plan":
@@ -691,7 +693,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -749,6 +751,8 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)<16:
+					for key in Street.Economy.Finance.fields(): defaults.erase(key)
 				if int(parsed.version)<15:
 					for key in Street.Economy.hosted_fields(): defaults.erase(key)
 				if int(parsed.version)<14:
@@ -863,6 +867,13 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=16:
+			if not _finite_number(parsed.cash,0,1e15) or float(parsed.cash)!=floorf(float(parsed.cash)): return null
+			if not _finite_number(parsed.street.get("marketing_level"),0,10) or float(parsed.street.marketing_level)!=floorf(float(parsed.street.marketing_level)): return null
+			for bar in parsed.street.bars:
+				for key in ["cash","manager_bonus_carry","earnings_net","earnings_seconds"]:
+					if not _finite_number(bar.get(key),-1e15 if key=="earnings_net" else 0,99 if key=="manager_bonus_carry" else 4 if key=="earnings_seconds" else 1e15) or float(bar[key])!=floorf(float(bar[key])): return null
+				if not _finite_number(bar.get("net_per_second"),-1e15,1e15): return null
 		if int(parsed.version)>=15:
 			for bar in parsed.street.bars:
 				for flag in ["auto_host_drinks","auto_host_drinks_on"]:

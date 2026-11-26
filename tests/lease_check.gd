@@ -21,7 +21,7 @@ func run(test: SceneTree) -> void:
 		test.check(m.s.street.bars.size()==count,"Lease requires the full opening reserve")
 		m.s.cash = quote.required
 		st.action("buy",kind)
-		test.check(m.s.street.bars.size()==count+1 and m.s.cash==quote.reserve,"Only lease cash is spent; operating float stays in till")
+		test.check(m.s.street.bars.size()==count+1 and m.s.cash==0 and st.selected().cash==quote.reserve,"Lease price is spent and the operating float transfers into the new till")
 		test.check(st.purchase_cost(kind)==int(C.LEASES[kind])*125/100,"Next same-type lease adds 25 percent of base, never compounds")
 		st.action("buy",kind)
 		test.check(m.s.street.bars.size()==count+1,"Repeated unaffordable purchase cannot duplicate a venue")
@@ -64,7 +64,7 @@ func run_ui(test: SceneTree) -> void:
 	app.model.s.day = 15
 	app.update_lease_controls()
 	if button: button.pressed.emit()
-	test.check(app.model.street.selected().type==1 and app.model.s.cash==76000,"Lease button purchases through the authoritative quote")
+	test.check(app.model.street.selected().type==1 and app.model.s.cash==76000-app.model.street.opening_reserve(1),"Lease button purchases through the authoritative quote")
 	app.queue_free()
 	await test.process_frame
 	for path in [Campaign.SAVE,Campaign.BACKUP]:

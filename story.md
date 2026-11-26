@@ -77,8 +77,8 @@ then 10-second service at stage two for ฿1,200 and ฿1,600. The extra skill s
 with the person, even after a contract ends. These are business purchases,
 not additional character quests or automatic rewards.
 
-The first management appointment now costs ฿8,000. Dao can bring in the existing
-฿10 per open second sooner, while the owner chooses between better visits,
+The first management appointment costs ฿2,000. Dao earns 25% of real drink
+and paid-pool margin as a separate management bonus, while the owner chooses between better visits,
 faster service and the next building. Anong still insists on stock and payroll
 reserves: an empty fridge cannot serve an encore.
 
@@ -104,7 +104,7 @@ stage opens more options; none installs itself. Other venue types retain their
 existing investments while sharing the new visitor behaviour.
 
 Service's profit report gives Anong evidence: actual arrivals, orders, drinks and
-completed visits, with guaranteed manager income shown separately. Her advice
+completed visits, with earned manager bonuses shown separately. Her advice
 points to the constraint the last shift exposed. These are working business
 systems, not new personal quests or promises of an endless customer stream.
 
@@ -112,11 +112,22 @@ systems, not new personal quests or promises of an endless customer stream.
 
 > **Anong:** “The Blue Hour can buy the paint. It cannot buy Neon Mango's regulars.”
 
-The shared till can fund a renovation, but each venue earns its own happy
-visits, regulars and healthy shifts. Manager takings make expansion affordable;
-they do not prove that the new room serves its customers well. The renovation
-in Upgrades shows that venue's progress and what still needs work. The cards
-below it show what the next stage will let you buy.
+Each bar keeps its own till. Anong moves surplus to the company bank, then
+funds renovations, a new lease or street marketing. Money can buy the building;
+it cannot instantly buy a following. Happy visits, regulars and healthy shifts
+earn local loyalty and more appeal. They no longer stop construction.
+
+Dao's manager bonus now comes from real drink and paid-pool margins. An empty
+venue earns none. Better management matters when the bar has customers to serve.
+Pim can sell the sound; Nida can sell the welcome; neither can conjure a tab.
+
+> **Anong:** “Seven tills. One bank. If Neon Mango needs money, write down why.”
+
+Street marketing progresses from small campaigns toward a district audience.
+Every new open property adds a little street draw, but all venues share those
+visitors. A successful campaign can expose the next problem: too few chairs,
+too few hands or an empty fridge. The expanding street keeps the original
+seats → service → appeal → seats rhythm.
 
 ## A shift has a rhythm
 
@@ -246,7 +257,7 @@ past the first birthday get the next scheduled gathering without a cash handout.
 | Nida at the door | Her ฿1,200 ten-day contract replaces welcoming while she works, with no commission or hourly wage. Owner Welcome upgrades only help during her absence. |
 | Bo's bulk terms | Six drinks initially cost ฿228. Supplier level two requires twelve spaces and ฿432, with later twelve-drink bills of ฿408/384/360. Old stock keeps its paid cost. |
 | Music and automatic pouring | Music costs ฿1,200 and normally brings repeat orders forward from 35 to 25 seconds; stage-two better sound costs ฿2,400 and reaches 18 seconds. ฿3,000 auto-serve uses the owner's existing cooldown; the stage-two pouring tier can reduce it to two seconds. |
-| Management | ฿8,000/36,000/72,000 incremental appointments earn separate ฿10/20/40 per trading second and enable bounded offline estimates. They do not fabricate customer visits. |
+| Management | ฿2,000/6,000/18,000 incremental appointments earn separate bonuses of 25/50/75% of real drink and paid-pool margin and enable bounded offline estimates. They do not fabricate customer visits. |
 | The till and the books | The five-second ฿/s sample shows actual net trading. Shift, promotion and party reports explain why a busy room did or did not pay. |
 
 These are implemented mechanics, not new personal-quest promises. Equipment,

@@ -8,6 +8,7 @@ func run(test: SceneTree) -> void:
 	var bar: Dictionary = model.street.selected()
 	var eco = model.street.economy
 	model.s.cash = 5000
+	bar.cash = 5000
 	model.street.announce(Local.CART)
 	model.street.start_event()
 	test.check(not eco.stock_offer(bar).enabled and not eco.stock_offer(bar,true).enabled,"Cart Jam blocks manual and automatic deliveries at the affected venue")
@@ -56,6 +57,7 @@ func run_ui(test: SceneTree) -> void:
 	app.boot_menu = false
 	app.model = Campaign.new(72)
 	app.model.s.cash = 5000
+	app.model.street.selected().cash = 5000
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	app.render()

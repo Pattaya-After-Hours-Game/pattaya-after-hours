@@ -5,7 +5,7 @@ const E = preload("res://scripts/economy.gd")
 
 func fresh():
 	var m = Campaign.new(72)
-	m.s.cash = 100000
+	m.street.selected().cash = 100000
 	m.s.street.pass_credit = -100000000
 	m.s.street.event_wait = 1000000
 	m.street.selected().customers.clear()
@@ -67,7 +67,7 @@ func run(test: SceneTree) -> void:
 		b.customers.back().planned_rounds = 1
 		b.customers.back().pool = true
 	e.pool_tick(b)
-	var cash_before: int = m.s.cash
+	var cash_before: int = m.street.selected().cash
 	e.serve(b,2)
 	m.street.tick(11)
 	test.check(b.customers.size()==2 and b.games.size()==1 and b.customers[0].visit_phase=="finished","Finished drinkers wait for their paid pool game")
@@ -93,9 +93,9 @@ func run(test: SceneTree) -> void:
 			var cap: int = C.BEER_CAPS[id][stage-1]
 			while b.equipment[id]<cap:
 				var quote: Dictionary = e.equipment_offer(b,index)
-				cash_before = m.s.cash
+				cash_before = m.street.selected().cash
 				m.street.action("equipment",index)
-				test.check(m.s.cash==cash_before-quote.price,"Beer-bar tier settles its published price")
+				test.check(m.street.selected().cash==cash_before-quote.price,"Beer-bar tier settles its published price")
 			var quote: Dictionary = e.equipment_offer(b,index)
 			test.check(not quote.enabled and (quote.maxed if stage==3 else not quote.maxed and quote.reason.contains("stage")),"Stage cap leaves a locked next-tier offer")
 		b.equipment[id] = 0
@@ -119,7 +119,7 @@ func run(test: SceneTree) -> void:
 	m.street.action("train_staff",0)
 	test.check(e.service_seconds(person)==6 and person.service_ready==17.25 and person.identity=="gabby","New retained training works with Gabby and keeps her deadline")
 	b.type = 1
-	test.check(e.training_offer(b,0,false).maxed and e.equipment_limit(b,"sign",1)==1,"Other venue types do not gain beer-bar upgrade tracks")
+	test.check(e.training_offer(b,0,false).maxed and e.equipment_limit(b,"sign",1)==5,"All venue types gain frontage tiers; service tracks stay distinct")
 	b.type = 0
 	b.equipment.sign = 5
 	b.equipment.music = 4
@@ -136,7 +136,7 @@ func run(test: SceneTree) -> void:
 	test.check(m._read(Campaign.SAVE)==null,"Save validation rejects an impossible new frontage tier")
 	var traffic: float = e.traffic_rate()
 	m.s.street.bars.append(b.duplicate(true))
-	test.check(is_equal_approx(e.base_traffic(),15.3) and e.traffic_rate()==traffic,"Frontage expands one bounded street pool, never one stream per bar")
+	test.check(is_equal_approx(e.base_traffic(),15.3) and is_equal_approx(e.traffic_rate(),traffic+2.0),"Frontage expands one bounded street pool, never one stream per bar")
 	# Historical visitors and their quotes are not randomly replanned on update.
 	m = fresh()
 	b = m.street.selected()
@@ -146,12 +146,13 @@ func run(test: SceneTree) -> void:
 	m.save_game()
 	var loaded = Campaign.new(4)
 	test.check(loaded.load_game() and loaded.street.selected().customers[0]==g,"Mid-drink save retains the exact plan and remaining timer")
+	load("res://tests/finance_fixture.gd").legacy(m)
 	m.s.version = 12
 	for key in E.visit_fields(): g.erase(key)
 	b.erase("completed")
 	m.save_game()
 	loaded = Campaign.new(4)
-	test.check(loaded.load_game() and loaded.s.version==15 and loaded.s.cash==m.s.cash,"Schema-twelve campaign migrates with no cash or inventory gift")
+	test.check(loaded.load_game() and loaded.s.version==16 and loaded.street.finance.total()==m.street.finance.total(),"Schema-twelve campaign migrates with no cash or inventory gift")
 	var old: Dictionary = loaded.street.selected().customers[0]
 	test.check(old.visit_phase=="legacy" and old.next==35 and old.drinks==1 and old.budget==g.budget and old.quoted==g.quoted,"Legacy visit retains quote, budget, drink and departure commitments")
 	for audience in 3:

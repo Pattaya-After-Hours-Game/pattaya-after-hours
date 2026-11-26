@@ -6,7 +6,7 @@ func bottleneck_case(seed_value: int, kind: String, upgrade: String) -> Dictiona
 	var st = m.street
 	var e = st.economy
 	var b: Dictionary = st.selected()
-	m.s.cash = 50000
+	m.street.selected().cash = 50000
 	m.s.rep = 50
 	m.s.street.event_wait = 1000000
 	b.stage = 1 if kind in ["seating","music"] else 2
@@ -30,9 +30,9 @@ func bottleneck_case(seed_value: int, kind: String, upgrade: String) -> Dictiona
 	e.clear_visits(b)
 	b.stock = 70
 	e.ensure_stock_lots(b)
-	var opening: int = m.s.cash+b.stock*e.stock_unit_cost(b)
+	var opening: int = m.street.selected().cash+b.stock*e.stock_unit_cost(b)
 	for second in 600: st.tick(1)
-	return {"profit":m.s.cash+b.stock*e.stock_unit_cost(b)-opening,"sales":b.sold,"orders":b.orders,"arrivals":b.arrivals,"offered":m.s.street.offered,"cash":m.s.cash,"lost_full":b.lost_full,"lost_service":b.lost_service,"lost_stock":b.lost_stock}
+	return {"profit":m.street.selected().cash+b.stock*e.stock_unit_cost(b)-opening,"sales":b.sold,"orders":b.orders,"arrivals":b.arrivals,"offered":m.s.street.offered,"cash":m.street.selected().cash,"lost_full":b.lost_full,"lost_service":b.lost_service,"lost_stock":b.lost_stock}
 
 func run() -> void:
 	var failures := 0

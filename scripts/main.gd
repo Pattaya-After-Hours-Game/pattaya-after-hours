@@ -39,7 +39,7 @@ const EQUIPMENT_CAPTIONS = {
 }
 const TAB_NAMES = ["Service","Events","Tours","Empire","Journal"]
 const STAT_TIPS = {
-	"TILL":"Shared cash for stock, wages, upgrades and leases. The small rate shows net trading per second over the last five seconds.",
+	"TILL":"This venue’s till and five-second trading rate. Tap for Cash & Bank and explicit transfers.",
 	"STOCK":"Drinks in this venue's fridge. Each sale uses one. Tap to open the fridge.",
 	"REPUTATION":"Happy customers build your reputation. It attracts visitors and unlocks new venue types.",
 	"HEAT":"Trading after 1am raises Heat and increases the chance of a raid and fine. Closing on time lets it cool.",
@@ -208,7 +208,7 @@ func render_boot_menu() -> void:
 	else:
 		var summary := "No saved campaign yet. Start your first bar."
 		if resume_available:
-			summary = "Day %d · %s in the till · %d venue%s" % [model.s.day,cash(model.s.cash),model.s.street.bars.size(),"" if model.s.street.bars.size()==1 else "s"]
+			summary = "Day %d · %s total cash · %d venue%s" % [model.s.day,cash(model.street.finance.total()),model.s.street.bars.size(),"" if model.s.street.bars.size()==1 else "s"]
 		abs_text(menu,Rect2(28,111,464,28),summary,16,WHITE)
 		abs_text(menu,Rect2(28,148,464,48),"One street. One saved campaign.\nNew Game replaces your existing progress.",15,MUTED)
 		var resume := at_button(menu,Rect2(28,224,464,48),"Resume",resume_game,true)
@@ -446,7 +446,7 @@ func render(keep_scroll: bool = false) -> void:
 		update_button.add_theme_font_size_override("font_size",12)
 		update_button.visible = not windows_updates.tag.is_empty()
 		update_button.disabled = model.s.phase == "godzilla"
-	metric(244,77,"TILL",cash(model.s.cash),TEAL)
+	metric(244,77,"TILL",cash(model.street.selected().cash),TEAL)
 	metric(323,55,"STOCK",str(model.street.selected().stock),GOLD)
 	metric(382,90,"REPUTATION",str(int(model.s.rep)),TEAL)
 	metric(474,42,"HEAT",str(int(model.s.heat)),PINK)
@@ -728,7 +728,7 @@ func close_drawer() -> void:
 
 func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> void:
 	var stock_shortcut: bool = name_text=="STOCK" and campaign_before_tutorial==null and model.s.phase in ["plan","guided"]
-	var callback := open_fridge if stock_shortcut else toggle_stat_tip.bind(name_text,x)
+	var callback := open_service_section.bind("finance") if name_text=="TILL" and campaign_before_tutorial==null else open_fridge if stock_shortcut else toggle_stat_tip.bind(name_text,x)
 	var target := at_button(root_ui,Rect2(x-4,2,width,44),name_text,callback)
 	target.tooltip_text = STAT_TIPS[name_text]
 	var empty := StyleBoxEmpty.new()
@@ -745,12 +745,12 @@ func metric(x: int,width: int,name_text: String,value: String,tint: Color) -> vo
 		return
 	if name_text=="TILL" and campaign_before_tutorial==null:
 		var rate := abs_text(root_ui,Rect2(x,33,105,14),"",10,TEAL)
-		live_labels.append([rate,func() -> String: return "%s฿%.2f/s" % ["+" if model.s.street.net_per_second>=0 else "−",absf(model.s.street.net_per_second)]])
+		live_labels.append([rate,func() -> String: return "%s฿%.2f/s" % ["+" if model.street.selected().net_per_second>=0 else "−",absf(model.street.selected().net_per_second)]])
 		rate.text = live_labels.back()[1].call()
 	if campaign_before_tutorial == null:
 		live_labels.append([label,func() -> String:
 			match name_text:
-				"TILL": return cash(model.s.cash) if model.s.cash < 100000 else "฿%.1fk" % (model.s.cash/1000.0)
+				"TILL": return cash(model.street.selected().cash) if model.street.selected().cash < 100000 else "฿%.1fk" % (model.street.selected().cash/1000.0)
 				"STOCK": return str(model.street.selected().stock)
 				"SHIFT": return "D%03d" % model.s.day
 				"TIME": return model.street.clock_text()
@@ -1131,9 +1131,10 @@ func row_button(value: String, call: Callable, primary: bool = false) -> Button:
 	return control
 
 func purchase_text(control: Button, caption: String, quote: Dictionary, compact: bool = false) -> String:
-	var missing := int(quote.required)-int(model.s.cash)
+	var missing := int(quote.required)-int(quote.get("available",model.s.cash))
 	control.disabled = not quote.enabled or missing>0
 	control.tooltip_text = str(quote.get("reason",""))
+	if int(quote.get("transfer",0))>0 and quote.enabled: return caption+"\nFund & buy · bank → till "+cash(quote.transfer)
 	if missing<=0: return caption
 	var shortfall := "Need %s more" % cash(missing)
 	var funding := "%s. %s cash required." % [shortfall,cash(quote.required)]
@@ -1149,6 +1150,9 @@ func watch_purchase(control: Button, caption: String, quote: Callable, hint: Str
 		return label
 	control.text = refresh.call()
 	live_labels.append([control,refresh])
+
+func venue_cash_offer(bar: Dictionary, required: int, reason: String = "") -> Dictionary:
+	return {"required":required,"available":int(bar.cash),"enabled":reason.is_empty() and bar.cash>=required,"reason":reason}
 
 func cash_offer(required: int, reason: String = "") -> Dictionary:
 	return {"required":required,"enabled":reason.is_empty() and model.s.cash>=required,"reason":reason}
@@ -1207,7 +1211,7 @@ func start_tutorial() -> void:
 	message = ""
 	model = Campaign.new(72)
 	model.street.checkpoint_requested.disconnect(model.save_checkpoint)
-	model.s.cash = 2000
+	model.street.selected().cash = 2000
 	model.s.street.minute = StreetContent.DAY_MINUTES+StreetContent.CLOSE_MINUTE-75
 	render()
 
@@ -1382,13 +1386,15 @@ func update_lease_controls() -> void:
 		entry.base.text = "Base %s + %s repeat premium (%d earlier purchases). Blue Hour excluded." % [cash(quote.base),cash(quote.surcharge),quote.repeats]
 		entry.sale.visible = quote.discount>0
 		entry.sale.text = "Retiring-owner offer · today only: %d%% off (save %s)" % [StreetContent.LEASE_SALE_PERCENT,cash(quote.discount)]
-		entry.cash.text = "Pay now: %s\nKeep in till: %s for hiring, next stock pack and opening payroll\nCash needed to open: %s" % [cash(quote.price),cash(quote.reserve),cash(quote.required)]
+		entry.cash.text = "Pay now: %s\nFund new till: %s for hiring, next stock pack and opening payroll\nCash needed to open: %s" % [cash(quote.price),cash(quote.reserve),cash(quote.required)]
 		entry.running.text = "Bare premises %s/min · with one bartender %s/min\nEstimated break-even %.1f house drinks/min before pool or manager income. Running costs exclude stock; break-even includes it. Shared traffic does not guarantee buyers.\nNeeds chapter 2 · %d reputation" % [cash(quote.overhead),cash(quote.running),quote.break_even,info.rep]
 		entry.reason.text = quote.reason
 		entry.reason.visible = not quote.enabled
 
 func empire_panel() -> void:
 	title("One bar to the whole soi")
+	row_button("Cash & Bank",open_service_section.bind("finance"))
+	marketing_panel()
 	chapter_panel()
 	for i in model.s.street.bars.size():
 		var bar: Dictionary = model.s.street.bars[i]
@@ -1408,10 +1414,7 @@ func empire_panel() -> void:
 	var maintenance := row_pair(repairs,do_action.bind("repair"),paperwork,do_action.bind("paper"))
 	watch_purchase(maintenance[0],repairs,cash_offer.bind(Campaign.CASH_ACTION_COSTS.repair))
 	watch_purchase(maintenance[1],paperwork,cash_offer.bind(Campaign.CASH_ACTION_COSTS.paper))
-	body("Reserve %s · Outstanding %s" % [cash(model.s.reserve),cash(model.s.debt)],GOLD,13)
-	var save := "Save "+cash(Campaign.CASH_ACTION_COSTS.reserve)
-	var reserve := row_pair(save,do_action.bind("reserve"),"Release ฿500",do_action.bind("draw"))
-	watch_purchase(reserve[0],save,cash_offer.bind(Campaign.CASH_ACTION_COSTS.reserve))
+	body("Company bank %s · Outstanding %s" % [cash(model.s.cash),cash(model.s.debt)],GOLD,13)
 	var repay := "Repay debt · up to ฿500"
 	watch_purchase(row_button(repay,repay_debt),repay,func() -> Dictionary:
 		return cash_offer(0,"No outstanding debt.") if model.s.debt<=0 else cash_offer(1))
@@ -1434,7 +1437,7 @@ func select_bar(index: int) -> void:
 	tab = 0
 	commit()
 
-func street_action(id: String,index: int = 0) -> void:
+func street_action(id: String,index: int = 0, funded: bool = false, expected_price: int = -1) -> void:
 	if campaign_before_tutorial != null:
 		if tutorial_step>=TUTORIAL_ACTIONS.size() or id!=TUTORIAL_ACTIONS[tutorial_step]: return
 		var bar: Dictionary = model.street.selected()
@@ -1453,7 +1456,7 @@ func street_action(id: String,index: int = 0) -> void:
 	var selected: Dictionary = model.street.selected()
 	var slot := int(model.s.street.selected)
 	var fridge_before := City.fridge_tier(selected,slot)
-	message = model.street.action(id,index)
+	message = model.street.fund_and_buy(id,index,expected_price) if funded else model.street.action(id,index)
 	if id=="serve" and model.s.street.served>sold_before: service_animation = 0.7
 	var fridge_after := City.fridge_tier(selected,slot)
 	if fridge_after>fridge_before:
@@ -1795,7 +1798,7 @@ func upgrade_offers() -> Array[Dictionary]:
 		if status.maxed: continue
 		var caption: String = EQUIPMENT_CAPTIONS[item.id]
 		var name_text: String = item.name
-		if bar.type==0 and StreetContent.BEER_CAPS.has(item.id): name_text += " · Level %d" % (int(bar.equipment[item.id])+1)
+		if (bar.type==0 or item.id=="sign") and StreetContent.BEER_CAPS.has(item.id): name_text += " · Level %d" % (int(bar.equipment[item.id])+1)
 		if item.id=="sign": caption = "+2 appeal"+(" · street draw uses the best sign" if bar.type==0 and bar.equipment.sign>=1 else "")
 		if item.id=="fridge": caption = "+40 stock room · colder-beer reputation"
 		if item.id=="music":
@@ -1819,11 +1822,11 @@ func upgrade_offers() -> Array[Dictionary]:
 		offers.append(upgrade_offer("supplier","Supplier · Level %d" % (supplier.level+1),caption,"Bo buys paid packs of drinks you carry when orders come in and supplies are low. You need fridge space and cash for the pack plus the next operating charge. Later tiers lower the price per drink.","restock",0,supplier))
 	var manager: Dictionary = eco.manager_offer(bar)
 	if manager.level<StreetContent.MANAGER_PRICES.size():
-		offers.append(upgrade_offer("manager","Manager · Level %d" % (manager.level+1),"+%s/s while open" % cash(manager.rate),"Manager income uses no stock. Management also enables offline trading.","manager",0,manager))
+		offers.append(upgrade_offer("manager","Manager · Level %d" % (manager.level+1),"+%d%% earned drink/pool margin" % manager.rate,"Earns only with real drink or paid-pool sales. Includes offline management; empty venues earn no bonus.","manager",0,manager))
 	if bar.stage<3:
 		var reason: String = eco.upgrade_reason(bar)
 		var status := {"price":model.street.upgrade_cost(bar),"required":eco.upgrade_required_cash(bar),"enabled":reason.is_empty(),"reason":reason}
-		offers.append(upgrade_offer("renovate","Renovate to stage %d" % (bar.stage+1),"More room & new upgrades","Renovation uses the happy visits, regulars and healthy shifts earned at this venue.","upgrade",0,status))
+		offers.append(upgrade_offer("renovate","Renovate to stage %d" % (bar.stage+1),"More room & new upgrades","Pay for the premises and retain operating cash. Local customer milestones earn loyalty instead of blocking construction.","upgrade",0,status))
 	for i in bar.team.size():
 		var person: Dictionary = bar.team[i]
 		if not int(person.role) in [0,2,3]: continue
@@ -1836,7 +1839,8 @@ func upgrade_offers() -> Array[Dictionary]:
 	return offers
 
 func upgrade_offer(icon: String, name_text: String, caption: String, help: String, action_id: String, index: int, status: Dictionary) -> Dictionary:
-	status.affordable = model.s.cash>=status.required
+	status.merge(model.street.funded_offer(action_id,index),true)
+	status.affordable = status.available>=status.required
 	return {"icon":icon,"name":name_text,"caption":caption,"help":help,"action":action_id,"index":index,"status":status}
 
 func sync_upgrade_badge(rebuild: bool = false) -> void:
@@ -1883,6 +1887,7 @@ func upgrades_panel() -> void:
 	var offers := upgrade_offers()
 	var bar: Dictionary = model.street.selected()
 	var stage := int(bar.stage)
+	loyalty_panel()
 	body("Venue stage %d of 3 · %s" % [stage,bar.name],GOLD,13)
 	var renovation: Dictionary = {}
 	var visible_offers: Array[Dictionary] = []
@@ -1894,12 +1899,21 @@ func upgrades_panel() -> void:
 			renovation_progress_panel(renovation,renovation.status.enabled)
 		else:
 			var link := row_button("",open_upgrades.bind(false,"Upgrade_renovate"))
-			var goal: Dictionary = StreetContent.STAGE_GOALS[stage-1]
 			var caption := func() -> String:
-				var met := [bar.happy>=goal.happy,bar.regulars>=goal.regulars,bar.healthy>=goal.healthy,model.s.cash>=renovation.status.required].count(true)
-				return "Unlock stage %d · %d/4 requirements met  ›" % [stage+1,met]
+				var quote: Dictionary = model.street.funded_offer("upgrade")
+				return "Renovate to stage %d · %s  ›" % [stage+1,"Ready to fund" if quote.enabled else "Save "+cash(maxi(0,int(quote.required)-int(quote.available)))+" more"]
 			link.text = caption.call()
 			live_labels.append([link,caption])
+	if not upgrades_ready_only:
+		var completed: Array[String] = []
+		for i in StreetContent.EQUIPMENT.size():
+			var item: Dictionary = StreetContent.EQUIPMENT[i]
+			if item.id=="training" or (item.id=="pool" and bar.type!=0): continue
+			if model.street.economy.equipment_offer(bar,i).maxed: completed.append(item.name)
+		if bar.stage==3: completed.append("Renovation")
+		if bar.manager_level==3: completed.append("Manager")
+		if bar.supplier_level==5: completed.append("Supplier")
+		if not completed.is_empty(): body("Complete · "+", ".join(completed),TEAL,12)
 	row_button("Show all" if upgrades_ready_only else "Ready only",open_upgrades.bind(not upgrades_ready_only))
 	if offers.is_empty():
 		body("All upgrades installed",MUTED,13)
@@ -1933,29 +1947,79 @@ func upgrade_budget_groups(offers: Array[Dictionary]) -> void:
 
 func renovation_progress_panel(offer: Dictionary, show_card: bool) -> void:
 	var bar: Dictionary = model.street.selected()
-	var eco = model.street.economy
-	var goal: Dictionary = StreetContent.STAGE_GOALS[int(bar.stage)-1]
 	var section := VBoxContainer.new()
 	section.name = "RenovationSection"
 	column.add_child(section)
 	var previous := column
 	column = section
-	body("UNLOCK VENUE STAGE %d" % (bar.stage+1),GOLD,13)
+	body("RENOVATE TO STAGE %d" % (bar.stage+1),GOLD,13)
 	var progress := body("",WHITE,13)
 	progress.name = "RenovationProgress"
 	var summary := func() -> String:
-		var required: int = eco.upgrade_required_cash(bar)
-		var funding := "Cash ready" if model.s.cash>=required else "Cash target %s incl. reserve" % cash(required)
-		if not show_card and model.s.cash<required: funding = "Need %s more incl. reserve" % cash(required-int(model.s.cash))
-		return "Happy visits %d/%d · Regulars %d/%d\nHealthy shifts %d/%d · %s" % [mini(bar.happy,goal.happy),goal.happy,mini(bar.regulars,goal.regulars),goal.regulars,mini(bar.healthy,goal.healthy),goal.healthy,funding]
+		var quote: Dictionary = model.street.funded_offer("upgrade")
+		return "Till %s · Bank %s\nPay %s · retain %s operating cash\n%s" % [cash(bar.cash),cash(model.s.cash),cash(quote.price),cash(int(quote.required)-int(quote.price)),"Ready to buy" if quote.enabled else "Need %s more" % cash(maxi(0,int(quote.required)-int(quote.available)))]
 	progress.text = summary.call()
 	live_labels.append([progress,summary])
 	if show_card: upgrade_card(offer)
-	var explain := func() -> void:
-		show_service_help("Earn the next stage here","Earn the milestones at this venue. Happy guests can become regulars.\n\nHealthy shifts need 4+ sales, 80%+ orders served and profit after stock and costs. Checked every 2 minutes and at closing.\n\nManager income and tips do not count.")
-	if show_card: row_button("What counts?",explain)
-	else: row_pair("View renovation  ›",open_upgrades.bind(false,"Upgrade_renovate"),"What counts?",explain)
+	else: row_button("View renovation  ›",open_upgrades.bind(false,"Upgrade_renovate"))
 	column = previous
+
+func loyalty_panel() -> void:
+	var bar: Dictionary = model.street.selected()
+	live_body(func() -> String:
+		var rank: int = model.street.economy.loyalty_rank(bar)
+		var goal: Dictionary = StreetContent.STAGE_GOALS[mini(rank,1)]
+		return "LOYALTY · %s (+%d%% appeal)\n%d/%d happy · %d/%d regulars · %d/%d healthy shifts\nLoyalty earns appeal. It never blocks renovation." % [["New arrival","Known locally","Neighbourhood favourite"][rank],rank*5,mini(bar.happy,goal.happy),goal.happy,mini(bar.regulars,goal.regulars),goal.regulars,mini(bar.healthy,goal.healthy),goal.healthy],MUTED,12)
+
+func funded_purchase(id: String, index: int, expected_price: int) -> void:
+	street_action(id,index,true,expected_price)
+
+func finance_panel() -> void:
+	var bar: Dictionary = model.street.selected()
+	title("Cash & Bank")
+	live_body(func() -> String: return "%s till: %s\nCompany bank: %s\nTotal cash: %s" % [bar.name,cash(bar.cash),cash(model.s.cash),cash(model.street.finance.total())],WHITE,16)
+	live_body(func() -> String: return "Recommended working cash: %s\nTwo stock packs + two minutes of scheduled costs. Transfers do not count as profit." % cash(model.street.economy.working_cash(bar)),MUTED,12)
+	for amount in [1000,10000]:
+		var pair := row_pair("Deposit "+cash(amount),transfer_cash.bind(amount,true),"Withdraw "+cash(amount),transfer_cash.bind(amount,false))
+		watch_purchase(pair[0],pair[0].text,func() -> Dictionary: return {"required":amount,"available":int(bar.cash),"enabled":bar.cash>=amount,"reason":""})
+		watch_purchase(pair[1],pair[1].text,func() -> Dictionary: return cash_offer(amount))
+	var custom := SpinBox.new()
+	custom.name = "TransferAmount"
+	custom.min_value = 1
+	custom.max_value = 1000000000000000
+	custom.step = 1
+	custom.value = 500
+	custom.prefix = "฿"
+	column.add_child(custom)
+	row_pair("Deposit amount",func() -> void: transfer_cash(int(custom.value),true),"Withdraw amount",func() -> void: transfer_cash(int(custom.value),false))
+	row_button("Deposit surplus",func() -> void: transfer_cash(maxi(0,int(bar.cash)-model.street.economy.working_cash(bar)),true))
+	body("VENUE TILLS",GOLD,12)
+	for venue in model.s.street.bars:
+		live_body(func() -> String: return "%s · %s · %+.2f baht/s" % [venue.name,cash(venue.cash),venue.net_per_second],WHITE,13)
+
+func transfer_cash(amount: int, deposit: bool) -> void:
+	var bar: Dictionary = model.street.selected()
+	message = "%s %s %s." % [cash(amount),"deposited from" if deposit else "withdrawn into",bar.name] if model.street.finance.transfer(bar,amount,deposit) else "Transfer unavailable: choose a positive amount within the source balance."
+	commit(true)
+
+func marketing_panel() -> void:
+	body("STREET MARKETING",GOLD,14)
+	live_body(func() -> String: return "Company bank %s · marketing %d/10\nPotential street traffic %.1f/min (estimate before admission). One shared audience." % [cash(model.s.cash),model.s.street.marketing_level,model.street.economy.traffic_rate()],WHITE,13)
+	var quote: Dictionary = model.street.marketing_offer()
+	if quote.level==10:
+		body("Street marketing complete",TEAL,13)
+		return
+	var caption := "Marketing %d · +%d visitors/min · %s" % [quote.level+1,quote.traffic,cash(quote.price)]
+	watch_purchase(row_button(caption,func() -> void:
+		message = model.street.buy_marketing()
+		commit(true)),caption,model.street.marketing_offer)
+	live_body(func() -> String: return model.street.marketing_offer().reason,MUTED,12)
+	body("Potential visitors, not guaranteed sales. Check seating, service and stock before advertising.",MUTED,12)
+	for venue in model.s.street.bars:
+		live_body(func() -> String:
+			var before: Dictionary = model.street.economy.forecast(venue)
+			var after: Dictionary = model.street.economy.forecast(venue,false,-1,-1,0,false,{},float(model.street.marketing_offer().traffic))
+			return "%s · estimated demand %.1f → %.1f drinks/min\nAutomatic net %s → %s/min\n%s" % [venue.name,before.demand,after.demand,cash(before.net),cash(after.net),after.reason],MUTED,12)
 
 func upgrade_card(offer: Dictionary) -> void:
 	var status: Dictionary = offer.status
@@ -1964,7 +2028,7 @@ func upgrade_card(offer: Dictionary) -> void:
 	row.add_theme_constant_override("separation",6)
 	column.add_child(row)
 	var caption := "%s · %s" % [offer.caption,cash(status.price)]
-	var purchase := button("%s\n%s" % [offer.name,caption],street_action.bind(offer.action,offer.index))
+	var purchase := button("%s\n%s" % [offer.name,caption],funded_purchase.bind(offer.action,offer.index,int(status.price)))
 	purchase.name = "Upgrade_"+offer.icon if not offer.action.begins_with("train_") else "Upgrade_%s_%d" % [offer.icon,offer.index]
 	if offer.action in ["auto_bar_fine","auto_host_drinks"]: purchase.name = "Upgrade_"+offer.action
 	purchase.icon = UpgradeIcons.get_icon(offer.icon)
@@ -2000,12 +2064,13 @@ func street_panel() -> void:
 		match service_section:
 			"team": service_team(bar)
 			"reports": service_reports(bar)
+			"finance": finance_panel()
 			"hours": service_hours(bar)
 		return
 	next_goal_panel()
 	if not eco.is_trading(bar) and not model.street.can_skip() and not bar.open:
 		var enable := row_button("Enable opening",street_action.bind("open"),true)
-		watch_purchase(enable,"Enable opening",func() -> Dictionary: return cash_offer(ceili(eco.operating_rate(bar)/60.0)))
+		watch_purchase(enable,"Enable opening",func() -> Dictionary: return venue_cash_offer(bar,ceili(eco.operating_rate(bar)/60.0)))
 	service_tiles("Fridge","fridge",open_fridge,"Team","manager",open_service_section.bind("team"))
 	if model.s.phase=="plan":
 		var row := service_tiles("Upgrades","upgrades",open_upgrades,"Reports","menu",open_service_section.bind("reports"))
@@ -2106,7 +2171,7 @@ func service_hours(bar: Dictionary) -> void:
 		row_button("Close venue",street_action.bind("open"))
 	else:
 		var enable := row_button("Enable opening",street_action.bind("open"))
-		watch_purchase(enable,"Enable opening",func() -> Dictionary: return cash_offer(ceili(eco.operating_rate(bar)/60.0)))
+		watch_purchase(enable,"Enable opening",func() -> Dictionary: return venue_cash_offer(bar,ceili(eco.operating_rate(bar)/60.0)))
 	if not bar.open:
 		body(bar.close_reason,PINK,13)
 		row_button("Owner-run recovery shift",street_action.bind("recovery"))
@@ -2216,7 +2281,7 @@ func service_team(bar: Dictionary) -> void:
 			var caption := "Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))]
 			watch_purchase(row_button(caption,street_action.bind("role",i)),caption,func() -> Dictionary:
 				var reason: String = "Wait until this team member returns or finishes hosting." if i in bar.away or not eco.hosted_round(bar,i).is_empty() else ""
-				return cash_offer(eco.role_change_required_cash(bar,i),reason))
+				return venue_cash_offer(bar,eco.role_change_required_cash(bar,i),reason))
 
 func shift_report(bar: Dictionary) -> void:
 	if bar.last_shift.is_empty(): return
@@ -2419,7 +2484,7 @@ func draw_supplier_special() -> void:
 	var share := roundi(100.0*eco.drink_popularity(deal.bar)[deal.drink])
 	abs_text(panel,Rect2(24,173,550,34),"%d%% expected orders · %s gross per sale at the deal cost" % [share,cash(eco.price(deal.bar,deal.drink)-deal.unit)],14,TEAL)
 	var leftover := int(deal.remaining_cash)
-	var before := maxi(0,int(deal.target)-int(model.s.cash))
+	var before := maxi(0,int(deal.target)-int(model.street.selected().cash))
 	var after := maxi(0,int(deal.target)-leftover)
 	var till_line := "Till after buying: "+cash(leftover) if leftover>=0 else "You need "+cash(-leftover)+" more to buy this pack."
 	var trade_off := "Still enough for %s." % deal.goal_name
@@ -2722,8 +2787,8 @@ func journal_panel() -> void:
 		body("%d real minutes away · %.1f eligible trading minutes\n%d estimated customers · income %s · costs %s · net %s" % [int(report.seconds)/60,float(report.get("legal_seconds",report.seconds))/60.0,report.customers,cash(report.get("income",report.net)),cash(report.get("costs",0)),cash(report.net)],WHITE,13)
 		for note in report.notes: body(str(note),MUTED,12)
 	title("Anong's books")
-	body("Week %d · Till %s · Reserve %s
-Live overhead includes premises costs." % [model.week(),cash(model.s.cash),cash(model.s.reserve)])
+	body("Week %d · Company bank %s · Total cash %s
+Live overhead includes premises costs." % [model.week(),cash(model.s.cash),cash(model.street.finance.total())])
 	week_lines(model.s.weekly)
 	if not model.s.last_week.is_empty(): week_lines(model.s.last_week)
 	body("RECENT SHIFTS",GOLD,12)

@@ -86,6 +86,7 @@ func run() -> void:
 		model.next_day()
 	check(clean_days == 365 and model.s.phase == "plan" and model.s.day == 366,"Street continues beyond the first year")
 	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
+	load("res://tests/finance_check.gd").new().run(self)
 	load("res://tests/street_check.gd").new().run(self)
 	load("res://tests/clock_check.gd").new().run(self)
 	load("res://tests/night_prep_check.gd").new().run(self)
@@ -110,6 +111,7 @@ func run() -> void:
 	test_risk()
 	test_windows_updates()
 	load("res://tests/boot_menu_check.gd").new().run(self)
+	await load("res://tests/finance_check.gd").new().run_ui(self)
 	await load("res://tests/action_check.gd").new().run_ui(self)
 	await load("res://tests/celebration_check.gd").new().run_ui(self)
 	await load("res://tests/tips_check.gd").new().run_ui(self)
@@ -141,7 +143,11 @@ func test_ui() -> void:
 	use_button(app,"New Game")
 	check(app.show_tutorial_hint,"New players see the tutorial hint")
 	test_tuning(app)
-	for stat in ["TILL","REPUTATION","HEAT","TIME"]:
+	use_button(app,"TILL")
+	check(app.service_section=="finance","Tapping Till opens Cash & Bank")
+	use_button(app,"Back")
+	use_button(app,"×")
+	for stat in ["REPUTATION","HEAT","TIME"]:
 		var button := find_button(app,stat)
 		check(not button.tooltip_text.is_empty(),"Hover explains "+stat)
 		use_button(app,stat)
@@ -157,19 +163,19 @@ func test_ui() -> void:
 	use_button(app,"Back")
 	var bar: Dictionary = app.model.street.selected()
 	var original_stock: int = bar.stock
-	var original_cash: int = app.model.s.cash
-	app.model.s.cash = original_cash-1
+	var original_cash: int = app.model.street.selected().cash
+	app.model.street.selected().cash = original_cash-1
 	use_button(app,"STOCK")
 	var pack := find_button(app,"Buy 6 · ฿228")
 	check(pack.disabled and pack.text.ends_with("฿1 short"),"Fridge shows the exact cash shortfall")
-	app.model.s.cash = original_cash
+	app.model.street.selected().cash = original_cash
 	app._process(1.0)
 	check(not find_button(app,"Buy 6 · ฿228").disabled,"Fridge purchases unlock when the till reaches the pack price")
 	use_button(app,"Back")
 	bar.stock = 0
 	app.update_action_controls()
 	use_button(app,"Restock fridge")
-	check(app.fridge_open and bar.stock==0 and app.model.s.cash==original_cash and app.model.s.street.served==0,"Serve stockout opens the fridge without buying or selling")
+	check(app.fridge_open and bar.stock==0 and app.model.street.selected().cash==original_cash and app.model.s.street.served==0,"Serve stockout opens the fridge without buying or selling")
 	bar.stock = 30
 	var original_customers: Array = bar.customers.duplicate(true)
 	for customer in bar.customers:
@@ -180,7 +186,7 @@ func test_ui() -> void:
 	check(app.fridge_open and panel_has_text(app,"NEEDED NOW") and panel_has_text(app,"Return spare stock to free 6 slots."),"Wrong-stock shortcut highlights demand and explains how to make space")
 	var demand_card: Control = app.column.get_node("Drink_rum")
 	var house_card: Control = app.column.get_node("Drink_lager")
-	check(demand_card.get_index()<house_card.get_index() and panel_has_text(app,"OTHER DRINKS") and bar.stock==30 and app.model.s.cash==original_cash,"The missing drink is separated from regular stock; opening the fridge is free")
+	check(demand_card.get_index()<house_card.get_index() and panel_has_text(app,"OTHER DRINKS") and bar.stock==30 and app.model.street.selected().cash==original_cash,"The missing drink is separated from regular stock; opening the fridge is free")
 	check(find_button(app,"Buy 6 · ฿114").disabled and demand_card.find_children("*","TextureRect",true,false).size()==1,"The needed drink has an icon and its purchase is blocked while the fridge is full")
 	bar.stock = original_stock
 	bar.customers = original_customers
@@ -189,15 +195,15 @@ func test_ui() -> void:
 	use_button(app,"Tutorial")
 	check(FileAccess.get_file_as_string(Campaign.SAVE)==initial_save,"Opening a tutorial leaves the new campaign save untouched")
 	use_button(app,"Exit")
-	var opening_cash := int(app.model.s.cash)
+	var opening_cash := int(app.model.street.selected().cash)
 	use_button(app,"Serve a drink")
-	check(app.model.s.street.served == 1 and app.model.s.cash > opening_cash,"Main clicker button serves and earns")
+	check(app.model.s.street.served == 1 and app.model.street.selected().cash > opening_cash,"Main clicker button serves and earns")
 	var hiring: Dictionary = app.model.street.economy.hire_offer(bar,0)
-	app.model.s.cash = hiring.required-1
+	app.model.street.selected().cash = hiring.required-1
 	use_button(app,"Team")
 	var hire := find_button(app,"Hire bartender · ฿1,200")
 	check(hire.disabled and hire.text.ends_with("Need ฿1 more"),"Team hiring includes the payroll reserve in the visible shortfall")
-	app.model.s.cash = 50000
+	app.model.street.selected().cash = 50000
 	app._process(1.0)
 	use_button(app,"Hire bartender · ฿1,200")
 	app.model.street.tick(25)
@@ -211,6 +217,8 @@ func test_ui() -> void:
 	app.render()
 	app.event_banner.pressed.emit()
 	check(app.tab == 1,"The event banner opens preparation controls")
+	app.model.s.cash = 450
+	app.render()
 	use_button(app,"Raise stock & share pumps · ฿450")
 	check(app.model.s.street.event.prepared,"Event preparation works through the UI")
 	app.model.s.street.event = {}
@@ -226,13 +234,13 @@ func test_ui() -> void:
 	var nida: Dictionary = app.model.street.selected().team.back()
 	nida.contract_left = 1
 	nida.audience_training = 1
-	app.model.s.cash = 1200
+	app.model.street.selected().cash = 1200
 	app.render()
 	var renewal_state: Array = app.street_ui_state()
 	app._process(1.0)
 	check(renewal_state!=app.street_ui_state(),"Contract expiry invalidates Service controls directly")
 	check(find_button(app,"Rehire Nida · ฿1,200").disabled,"Nida renewal disables for insufficient cash including reserve")
-	app.model.s.cash = 50000
+	app.model.street.selected().cash = 50000
 	app._process(1.0)
 	check(not find_button(app,"Rehire Nida · ฿1,200").disabled,"Earning the missing reserve enables renewal without reopening the drawer")
 	use_button(app,"Rehire Nida · ฿1,200")
@@ -311,6 +319,7 @@ func test_ui() -> void:
 
 func test_tour_update(app: Control) -> void:
 	app.model = Campaign.new(48)
+	app.model.s.cash = 1000
 	app.change_tab(2)
 	check(app.root_ui.get_node("TourBadge").text=="!","The Tours tab flags an empty agreement list")
 	var fern: Button = app.column.get_node("TourGuide_2")
@@ -375,6 +384,7 @@ func test_tour_update(app: Control) -> void:
 func test_purchase_ui(app: Control) -> void:
 	app.model = Campaign.new(72)
 	app.model.s.cash = 0
+	app.model.street.selected().cash = 0
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	app.model.street.announce(3)
@@ -408,6 +418,7 @@ func test_clock_ui(app: Control) -> void:
 	app.model = Campaign.new(72)
 	app.offline_notice = 0
 	app.model.s.cash = 10000
+	app.model.street.selected().cash = 10000
 	app.change_tab(0)
 	var bar: Dictionary = app.model.street.selected()
 	use_button(app,"Hours")

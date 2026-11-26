@@ -1,5 +1,49 @@
 # Testing and release checks
 
+## Separate finance and growth — 27 November 2026
+
+The release gate remains the isolated `tools/test.sh` on pinned Godot 4.7.2,
+including all existing balance suites. Current acceptance windows remain stage 2
+28–45 minutes, second property 75–115, stage 3 110–210, manager-saving gap ≤21,
+longest investment gap ≤38 and active profit-cycle median 2.5–5 minutes. Older
+measurements and acceptance windows below are historical.
+
+`finance_check.gd` verifies separate fresh balances, exact transfer conservation,
+no invalid/foreign transfers, lease floats, atomic Fund & buy, stale-price
+rejection, local insolvency, FIFO-margin bonuses and fractional carry, paid/free
+pool, consignment repayment counted once, loyalty, all ten marketing tiers,
+save conservation/reload, malformed finances, local offline credit and repeat
+safety. Its four-venue ฿700k scenario funds three new renovations with no local
+loyalty and verifies that marketing creates no sales. UI coverage checks the
+funding control, custom-transfer controls and pure navigation.
+
+All legacy regression fixtures now distinguish venue money from company funding.
+Pre-schema-16 fixtures reconstruct their old shared wallet explicitly. Balance
+policies deposit actual earned money for leases/preparations/marketing, hire into
+new-property floats, and choose useful investments from forecast improvements.
+They receive no extra starting cash. Rat-catching and Bo's overnight cleanup
+from main `4cfc7e4` are included in the combined scenarios.
+
+Fresh baseline active policies, seeds 11/72/291, measured:
+
+| Milestone | Observed elapsed active play |
+| --- | --- |
+| First small investment | 2m37s–3m40s |
+| First pool table | 13m00s–17m56s |
+| Stage two | 29m03s–33m32s |
+| First manager | 46m56s–51m52s |
+| Second property | 96m41s–109m24s |
+| Stage three | 131m53s–143m39s |
+| Manager saving gap | 2m16s–3m20s |
+| Longest investment gap | 19m35s–23m08s |
+
+`finance-*` economy previews cover Cash & Bank, the rich-company upgrade list,
+Ready-only renovation and per-venue marketing forecasts at 960×540 and 1280×720.
+Production graphics are retained. The full isolated suite passed; the final
+stock-return cashflow regression also passed. Active profit-cycle median
+investment gaps were 164–196.5 seconds (2m44s–3m16.5s), within 2.5–5 minutes.
+These checks are not an Android device playtest.
+
 ## Rat Plague
 
 The street checks cover guests fleeing with and without the patrol, Bo

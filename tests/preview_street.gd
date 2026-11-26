@@ -31,6 +31,7 @@ func capture(app: Control, name_text: String, rebuild: bool = true) -> void:
 
 func fresh(app: Control) -> void:
 	app.model = Campaign.new(72)
+	app.model.street.selected().cash = 999999
 	app.model.s.cash = 999999
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 4
@@ -139,7 +140,7 @@ func run() -> void:
 	await capture(app,"passerby-gap")
 	app.scene_clock = 3.4
 	for kind in 3:
-		if kind > 0: app.model.street.action("buy",kind)
+		if kind > 0: load("res://tests/finance_fixture.gd").buy(app.model.street,kind)
 		for stage in range(1,4):
 			var bar: Dictionary = app.model.street.selected()
 			populate(app,bar,stage)
@@ -190,7 +191,7 @@ func run() -> void:
 		app.model.s.street.next_customer = customer_base+Art.CUSTOMER_VARIANTS.size()
 		for i in 3: app.model.street.economy.admit(bar)
 		await capture(app,"customer-beard-glasses-%d" % kind)
-	while app.model.s.street.bars.size()<8: app.model.street.action("buy",app.model.s.street.bars.size()%3)
+	while app.model.s.street.bars.size()<8: load("res://tests/finance_fixture.gd").buy(app.model.street,app.model.s.street.bars.size()%3)
 	for i in 8:
 		app.model.s.street.selected = i
 		await capture(app,"property-%d" % (i+1))
@@ -388,7 +389,7 @@ func run() -> void:
 	for n in 24:
 		app.scene_clock = n*.25
 		await capture(app,"service-playback-%02d" % n)
-	app.model.street.action("buy",2)
+	load("res://tests/finance_fixture.gd").buy(app.model.street,2)
 	populate(app,app.model.street.selected(),3)
 	for n in 12:
 		app.scene_clock = n*.125

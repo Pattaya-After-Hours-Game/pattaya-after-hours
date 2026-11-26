@@ -4,10 +4,10 @@ const C = preload("res://scripts/street_content.gd")
 
 func fixture(stage: int = 2) -> RefCounted:
 	var m = Campaign.new(72)
-	m.s.cash = 200000
+	m.street.selected().cash = 200000
 	m.s.rep = 100
 	m.s.street.chapter = 2
-	m.street.action("buy",1)
+	load("res://tests/finance_fixture.gd").buy(m.street,1)
 	var b: Dictionary = m.street.selected()
 	b.stage = stage
 	m.street.action("hire",1) # Bee accepts.
@@ -42,12 +42,12 @@ func run(test: SceneTree) -> void:
 	var guest := request(m)
 	m.street.advance(0.5)
 	var appeal: float = e.attraction(b)
-	var cash_before: int = m.s.cash
+	var cash_before: int = m.street.selected().cash
 	var stock_before: int = b.stock
 	m.street.action("bar_fine",1)
-	test.check(m.s.cash==cash_before and b.away.is_empty(),"A declining host keeps her availability and never earns a booking fee")
+	test.check(m.street.selected().cash==cash_before and b.away.is_empty(),"A declining host keeps her availability and never earns a booking fee")
 	m.street.action("bar_fine",0)
-	test.check(m.s.cash==cash_before+500 and guest.fine_budget==1300 and b.away==[0] and b.team[0].host_return==30.5,"Accepted booking pays exactly 500 and saves a fractional thirty-second return deadline")
+	test.check(m.street.selected().cash==cash_before+500 and guest.fine_budget==1300 and b.away==[0] and b.team[0].host_return==30.5,"Accepted booking pays exactly 500 and saves a fractional thirty-second return deadline")
 	test.check(is_equal_approx(e.attraction(b),appeal-0.6) and b.stock==stock_before and b.sold==0 and b.tip_visits==0,"Host absence removes her appeal without manufacturing drinks, stock use or tips")
 	test.check(b.shift.bar_fines==1 and b.shift.bar_fine_income==500 and b.shift.revenue==500,"Booking fee appears once in the actual venue ledger")
 	before = JSON.stringify(m.s)
@@ -57,7 +57,7 @@ func run(test: SceneTree) -> void:
 	test.check(0 in b.away and b.team[0].host_return==30.5,"A report boundary cannot return a host before her booking deadline")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==15 and loaded.street.selected().team[0].host_return==30.5,"Schema fourteen round-trips an active booking without rounding or repayment")
+	test.check(loaded.load_game() and loaded.s.version==16 and loaded.street.selected().team[0].host_return==30.5,"Schema fourteen round-trips an active booking without rounding or repayment")
 	loaded.street.advance(29.5)
 	test.check(0 in loaded.street.selected().away,"Host remains away before the saved deadline")
 	loaded.street.advance(0.5)
@@ -82,14 +82,14 @@ func run(test: SceneTree) -> void:
 	b.team[0].on = false
 	test.check(e.bar_fine_offer(b,0).reason=="Off duty","Off-duty hosts cannot accept requests")
 	m.street.action("auto_bar_fine")
-	cash_before = m.s.cash
+	cash_before = m.street.selected().cash
 	e.auto_bar_fines(b)
-	test.check(b.away==[1] and m.s.cash==cash_before+500,"Auto-accept uses the same available willing host and real budget checks")
+	test.check(b.away==[1] and m.street.selected().cash==cash_before+500,"Auto-accept uses the same available willing host and real budget checks")
 	m.street.action("auto_bar_fine")
 	m.street.advance(30)
-	cash_before = m.s.cash
+	cash_before = m.street.selected().cash
 	e.auto_bar_fines(b)
-	test.check(b.away.is_empty() and m.s.cash==cash_before,"Switching auto-accept off stops bookings without resetting return timers")
+	test.check(b.away.is_empty() and m.street.selected().cash==cash_before,"Switching auto-accept off stops bookings without resetting return timers")
 
 	# Personal progression is purchased, stage-gated and retained through rehire.
 	m = fixture(1)
@@ -99,13 +99,13 @@ func run(test: SceneTree) -> void:
 	test.check(b.team[0].host_training==0,"Host training tier one needs venue stage two")
 	b.stage = 2
 	var price: int = e.host_training_offer(b,0).price
-	m.s.cash = price+e.operating_rate(b)*2-1
+	m.street.selected().cash = price+e.operating_rate(b)*2-1
 	m.street.action("train_host",0)
 	test.check(b.team[0].host_training==0,"Host training preserves the exact next-shift reserve")
-	m.s.cash += 1
+	m.street.selected().cash += 1
 	m.street.action("train_host",0)
-	test.check(b.team[0].host_training==1 and m.s.cash==e.operating_rate(b)*2 and e.host_fee(b.team[0])==750,"First paid host tier costs 1500 and raises the fee to 750")
-	m.s.cash = 100000
+	test.check(b.team[0].host_training==1 and m.street.selected().cash==e.operating_rate(b)*2 and e.host_fee(b.team[0])==750,"First paid host tier costs 1500 and raises the fee to 750")
+	m.street.selected().cash = 100000
 	m.street.action("train_host",0)
 	test.check(b.team[0].host_training==1,"Host training tier two needs venue stage three")
 	b.stage = 3
@@ -155,6 +155,7 @@ func run(test: SceneTree) -> void:
 	m = fixture()
 	b = m.street.selected()
 	b.away = [0]
+	load("res://tests/finance_fixture.gd").legacy(m)
 	m.s.version = 13
 	for key in e.bar_fine_fields(): b.erase(key)
 	for person in b.team:
@@ -162,7 +163,7 @@ func run(test: SceneTree) -> void:
 		person.erase("host_return")
 	m.save_game()
 	loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.cash==m.s.cash and loaded.street.selected().away==[0],"Schema thirteen migration retains old paid absences and cash")
+	test.check(loaded.load_game() and loaded.street.finance.total()==m.street.finance.total() and loaded.street.selected().away==[0],"Schema thirteen migration retains old paid absences and cash")
 	var lb: Dictionary = loaded.street.selected()
 	test.check(not lb.auto_bar_fine and lb.team[0].host_training==0,"Migration grants neither auto-accept nor host training")
 	loaded.street.end_shift()

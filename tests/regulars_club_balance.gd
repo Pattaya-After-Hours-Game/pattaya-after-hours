@@ -11,7 +11,7 @@ func scenario(seed_value: int, level: int, slow: bool = false, music_level: int 
 	var b: Dictionary = st.selected()
 	m.s.day = 8
 	m.s.rep = 100
-	m.s.cash = 20000
+	m.street.selected().cash = 20000
 	m.s.street.event_wait = 10000000
 	b.stage = 2
 	b.regulars = 40
@@ -28,9 +28,9 @@ func scenario(seed_value: int, level: int, slow: bool = false, music_level: int 
 	b.customers.clear()
 	b.stock = 50
 	e.ensure_stock_lots(b)
-	var opening: int = m.s.cash+b.stock*e.stock_unit_cost(b)
+	var opening: int = m.street.selected().cash+b.stock*e.stock_unit_cost(b)
 	for second in 600: st.tick(1)
-	return {"sales":b.sold,"orders":b.orders,"cash":m.s.cash,"profit":m.s.cash+b.stock*e.stock_unit_cost(b)-opening}
+	return {"sales":b.sold,"orders":b.orders,"cash":m.street.selected().cash,"profit":m.street.selected().cash+b.stock*e.stock_unit_cost(b)-opening}
 
 func run() -> void:
 	var failures := 0

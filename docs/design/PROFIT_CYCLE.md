@@ -49,15 +49,16 @@ ownership remains. Costs below are incremental cost for tier N.
 
 Compact layout applies from seating tier three onward, recovering up to three
 furniture places. Stage one holds twelve with one pool table and fans. Stage
-three holds 34 without furniture, or 32 with the two-table maximum and fans. Other venue types keep their existing equipment/training limits.
+three holds 34 without furniture, or 32 with the two-table maximum and fans. Hostess/gogo frontage also has five tiers; their other equipment/training limits stay unchanged.
 The next locked tier remains visible with its required stage. Current drink and
 staff timers finish normally after upgrades. Training survives rehire.
 
 The shared street's base traffic is **7.3 + 2 × max(0, highest owned beer-bar
 frontage − 1)** visitors/minute. Mixed audiences, weather and events still modify
 it. Multiple venues compete for this one bounded pool; copying a sign does not
-copy a customer stream. Existing prices, stock costs, contracts, manager income,
-renovation prices and local milestone gates are otherwise retained.
+copy a customer stream. The later [finance and growth revision](FINANCE_AND_GROWTH.md)
+adds shared street marketing and additional-open-property traffic, replaces timer
+manager income with earned bonuses, and converts renovation milestones into loyalty.
 
 ## Readable feedback and saves
 

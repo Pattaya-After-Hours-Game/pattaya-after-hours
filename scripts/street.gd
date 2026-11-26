@@ -8,6 +8,7 @@ const SHIFT_SECONDS = 120
 const TOUR_UPDATE_SECONDS = 8
 var s: Dictionary
 var economy: RefCounted
+var finance: RefCounted
 signal checkpoint_requested
 var raid_checkpoint := false
 var night_prep_visible := true
@@ -52,7 +53,10 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 		if not event.has("rats"): event.rats = range(C.RAT_COUNT)
 	economy = Economy.new(s,fresh)
 	economy.tour_arrived.connect(record_tour_arrival)
-	s.version = 15
+	finance = Economy.Finance.new(s)
+	finance.migrate(economy,fresh)
+	s.street.merge({"marketing_level":0})
+	s.version = 16
 
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()
@@ -102,6 +106,72 @@ func pay(cost: int) -> bool:
 	s.weekly.costs += cost
 	return true
 
+func venue_pay(bar: Dictionary, amount: int) -> bool:
+	if amount<0 or bar.cash<amount: return false
+	bar.cash -= amount
+	s.weekly.costs += amount
+	return true
+
+func purchase_offer(bar: Dictionary, id: String, index: int = 0) -> Dictionary:
+	if (id=="equipment" and (index<0 or index>=C.EQUIPMENT.size())) or (id in ["train_staff","train_audience","train_host"] and (index<0 or index>=bar.team.size())) or (id=="action_upgrade" and not index in [0,1]):
+		return {"enabled":false,"reason":"Unknown purchase.","price":0,"required":0}
+	match id:
+		"upgrade":
+			var reason: String = economy.upgrade_reason(bar)
+			return {"price":upgrade_cost(bar),"required":economy.upgrade_required_cash(bar) if bar.stage<3 else 0,"enabled":reason.is_empty(),"reason":reason}
+		"equipment": return economy.equipment_offer(bar,index)
+		"restock": return economy.supplier_offer(bar)
+		"manager": return economy.manager_offer(bar)
+		"regulars_club": return economy.club_offer(bar)
+		"auto_serve":
+			if bar.auto_serve: return {"enabled":false,"reason":"Already installed.","price":0,"required":0}
+			return economy.auto_serve_offer(bar)
+		"auto_host_drinks": return economy.auto_hosted_offer(bar)
+		"auto_bar_fine": return economy.auto_bar_fine_offer(bar)
+		"train_staff","train_audience": return economy.training_offer(bar,index,id=="train_audience")
+		"train_host": return economy.host_training_offer(bar,index)
+		"action_upgrade":
+			var quote: Dictionary = economy.action_upgrade_status(bar,index)
+			quote.reason = "Needs venue stage 2." if not quote.stage_ok else "Keep the next shift's operating cash." if not quote.enabled else ""
+			return quote
+	return {"enabled":false,"reason":"Unknown purchase.","price":0,"required":0}
+
+func funded_offer(id: String, index: int = 0) -> Dictionary:
+	var bar := selected()
+	var proposal := bar.duplicate(true)
+	proposal.cash += s.cash
+	var quote := purchase_offer(proposal,id,index)
+	quote.transfer = maxi(0,int(quote.required)-int(bar.cash))
+	quote.available = int(bar.cash)+int(s.cash)
+	return quote
+
+func fund_and_buy(id: String, index: int = 0, expected_price: int = -1) -> String:
+	if not s.phase in ["plan","guided"]: return "Finish the current decision first."
+	var quote := funded_offer(id,index)
+	if expected_price>=0 and quote.price!=expected_price: return "The offer changed. Review the current price."
+	if not quote.enabled: return quote.reason
+	var bar := selected()
+	if quote.transfer>0 and not finance.transfer(bar,int(quote.transfer),false): return "Company bank is short."
+	return action(id,index)
+
+func marketing_offer() -> Dictionary:
+	var level := int(s.street.marketing_level)
+	var ready := false
+	for bar in s.street.bars: ready = ready or bar.stage>=2
+	var price := int(C.MARKETING_PRICES[level]) if level<C.MARKETING_PRICES.size() else 0
+	var reason := ""
+	if level>=C.MARKETING_PRICES.size(): reason = "Street marketing complete."
+	elif not ready: reason = "Renovate one venue to stage 2 first."
+	elif s.cash<price: reason = "Deposit venue surplus into the company bank."
+	return {"level":level,"price":price,"required":price,"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"traffic":C.MARKETING_TRAFFIC[level] if level<C.MARKETING_TRAFFIC.size() else 0}
+
+func buy_marketing() -> String:
+	var quote := marketing_offer()
+	if not quote.enabled: return quote.reason
+	if not pay(int(quote.price)): return "Company bank is short."
+	s.street.marketing_level += 1
+	return "Street marketing %d: +%d potential visitors/min. Seats, service and stock still matter." % [s.street.marketing_level,quote.traffic]
+
 func credit(gross: int, costs: int = 0) -> void:
 	s.cash += gross - costs
 	s.weekly.revenue += gross
@@ -133,7 +203,7 @@ func purchase_cost(kind: int) -> int:
 	var normal := int(C.LEASES[kind])*(100+purchased_count(kind)*C.LEASE_REPEAT_PERCENT)/100
 	return normal*(100-C.LEASE_SALE_PERCENT)/100 if lease_sale(kind) else normal
 
-# A read-only opening quote. The reserve remains in the till; only the lease is paid.
+# A read-only opening quote. The bank spends the lease and transfers the float.
 func lease_quote(kind: int) -> Dictionary:
 	var base := int(C.LEASES[kind])
 	var repeats := purchased_count(kind)
@@ -228,7 +298,7 @@ func action(id: String, index: int = 0) -> String:
 			if bar.stage >= 3: return "This venue is at its final stage."
 			var reason: String = economy.upgrade_reason(bar)
 			if not reason.is_empty(): return reason
-			if not pay(upgrade_cost(bar)): return "Save a little more for the renovation."
+			if not venue_pay(bar,upgrade_cost(bar)): return "Save a little more for the renovation."
 			bar.stage += 1
 			if s.street.selected == 0:
 				s.level = bar.stage
@@ -246,6 +316,7 @@ func action(id: String, index: int = 0) -> String:
 			var defaults: Dictionary = economy.new_fields()
 			for key in defaults: new_bar[key] = defaults[key]
 			economy.ensure_stock_lots(new_bar)
+			finance.transfer(new_bar,int(quote.reserve),false)
 			s.street.selected = s.street.bars.size()-1
 			result = "%s opens. %s" % [new_bar.name,C.TYPES[index].stages[0][2]]
 		"encore_solo":
@@ -299,8 +370,8 @@ func check_chapters() -> void:
 		record("%s · %s" % [heading,C.CHAPTERS[int(s.street.chapter)][0]])
 
 # Read-only guidance: no reward, purchase, chapter advance, RNG or save mutation.
-func goal_cash(price: int, reserve: int) -> String:
-	return "฿%d purchase + ฿%d kept in reserve; ฿%d still to save." % [price,reserve,maxi(0,price+reserve-int(s.cash))]
+func goal_cash(price: int, reserve: int, bank: bool = false) -> String:
+	return "฿%d purchase + ฿%d kept in reserve; ฿%d still to save." % [price,reserve,maxi(0,price+reserve-int(s.cash if bank else s.street.bars[0].cash))]
 
 func next_goal() -> Dictionary:
 	var chapter := int(s.street.chapter)
@@ -327,10 +398,9 @@ func next_goal() -> Dictionary:
 			detail = "Keep orders moving and stock ready. Happy departures can earn your first regular. Anong: A second visit beats a five-star promise."
 			focus = "TEAM & PAYROLL"
 		elif first.stage<2:
-			var target: Dictionary = C.STAGE_GOALS[0]
 			title = "Renovate the Blue Hour"
-			summary = "%d/%d happy · %d/%d regulars · %d/%d shifts" % [mini(first.happy,target.happy),target.happy,mini(first.regulars,target.regulars),target.regulars,mini(first.healthy,target.healthy),target.healthy]
-			detail = "%d/%d happy visits · %d/%d regulars · %d/%d healthy shifts. %s" % [mini(first.happy,target.happy),target.happy,mini(first.regulars,target.regulars),target.regulars,mini(first.healthy,target.healthy),target.healthy,goal_cash(upgrade_cost(first),economy.operating_rate(first)*2)]
+			summary = "Fund the renovation and keep operating cash."
+			detail = goal_cash(upgrade_cost(first),economy.operating_rate(first)*2)+" Local milestones earn loyalty, not building permission."
 			cash_target = upgrade_cost(first)+economy.operating_rate(first)*2
 			cash_goal = "Blue Hour renovation"
 			focus = "Upgrade ·"
@@ -358,14 +428,14 @@ func next_goal() -> Dictionary:
 				title = "Hand Dao the keys"
 				var offer: Dictionary = economy.manager_offer(first)
 				summary = "Manager ready" if offer.enabled else "Save for a manager · ฿%d" % offer.price
-				detail = "%s Dao enables managed offline trading and ฿10 per open second. %s" % [goal_cash(offer.price,(economy.operating_rate(first)+12)*2),"Ready to appoint." if offer.enabled else offer.reason]
+				detail = "%s Dao enables managed offline trading and a 25%% bonus on earned drink/pool margins. %s" % [goal_cash(offer.price,(economy.operating_rate(first)+12)*2),"Ready to appoint." if offer.enabled else offer.reason]
 				cash_target = int(offer.price)+(economy.operating_rate(first)+12)*2
 				cash_goal = "a manager"
 				focus = "MANAGEMENT"
 	elif chapter==1:
 		title = "Open a second bar"
 		summary = "Reputation %d / 20 · Check the lease" % mini(20,int(s.rep))
-		detail = "Anong: He's retiring again. This time, get the keys. Hostess lease: %s Reputation %d/20. Other venue types remain your choice." % [goal_cash(purchase_cost(1),opening_reserve(1)),mini(20,int(s.rep))]
+		detail = "Anong: He's retiring again. This time, get the keys. Hostess lease: %s Reputation %d/20. Other venue types remain your choice." % [goal_cash(purchase_cost(1),opening_reserve(1),true),mini(20,int(s.rep))]
 		cash_target = int(lease_quote(1).required)
 		cash_goal = "second bar lease"
 		tab = 3
@@ -377,7 +447,7 @@ func next_goal() -> Dictionary:
 			soi = soi or bar.type==1
 		title = "Run two managed bars"
 		summary = "%d / 2 managers · Hostess bar %s" % [mini(2,managers),"owned" if soi else "needed"]
-		detail = "Hostess bar: %s · managers %d/2. Each new bar must earn its own customers and healthy shifts. Dao: Two sets of keys. One owner who finally sits down." % ["owned" if soi else "still needed",mini(2,managers)]
+		detail = "Hostess bar: %s · managers %d/2. Each new bar builds its own loyalty. Fund its till from the company bank. Dao: Two sets of keys. One owner who finally sits down." % ["owned" if soi else "still needed",mini(2,managers)]
 		tab = 3
 	elif chapter==3:
 		title = "Open a gogo and reach stage 2"
@@ -658,7 +728,7 @@ func settle_overnight() -> void:
 
 func raid(bar: Dictionary) -> void:
 	if bar.raided or not economy.is_trading(bar) or s.street.minute<C.CLOSE_MINUTE or s.street.minute>=C.LATE_CLOSE_MINUTE: return
-	var fine := mini(maxi(0,int(s.cash)),C.RAID_FINE_PER_STAGE*int(bar.stage))
+	var fine := mini(maxi(0,int(bar.cash)),C.RAID_FINE_PER_STAGE*int(bar.stage))
 	economy.cost(bar,fine,"fines")
 	bar.raided = true
 	economy.close_customers(bar)
@@ -765,7 +835,4 @@ func claim_offline(now: int) -> int:
 	return earnings
 
 func opening_reserve(kind: int) -> int:
-	var amount := int(C.OVERHEAD[kind])*2+C.BARTENDER_CONTRACT_COST+C.STOCK_PACK*C.STOCK_COST
-	for bar in s.street.bars:
-		if bar.open: amount += economy.operating_rate(bar)*2
-	return amount
+	return C.BARTENDER_CONTRACT_COST+C.STOCK_PACK*C.STOCK_COST+2*(int(C.OVERHEAD[kind])+int(C.ROLE_WAGES[0]))

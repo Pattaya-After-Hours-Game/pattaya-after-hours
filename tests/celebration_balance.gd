@@ -9,7 +9,7 @@ func scenario(seed_value: int, party: bool, prepared: bool) -> Dictionary:
 	var st = m.street
 	var e = st.economy
 	var b: Dictionary = st.selected()
-	m.s.cash = 50000
+	m.street.selected().cash = 50000
 	# Fixed comparable day-six businesses; these are paired scenarios, not pacing runs.
 	st.action("equipment",0)
 	st.action("equipment",2)
@@ -21,21 +21,21 @@ func scenario(seed_value: int, party: bool, prepared: bool) -> Dictionary:
 		for i in 2:
 			st.action("train_staff",0)
 			st.action("action_upgrade",0)
-	m.s.cash = 3000
+	m.street.selected().cash = 3000
 	b.customers.clear()
 	b.stock = 70
 	e.ensure_stock_lots(b)
 	m.s.day = 7 if party else 6
 	m.s.street.minute = 720
 	st.celebration_tick()
-	var start_value: int = m.s.cash+b.stock*e.stock_unit_cost(b)
+	var start_value: int = m.street.selected().cash+b.stock*e.stock_unit_cost(b)
 	for second in 780:
 		if b.stock<12: e.restock(b)
 		if e.action_status(b,"serve").enabled: st.action("serve")
 		if e.action_status(b,"chat").enabled: st.action("chat")
 		elif e.action_status(b,"welcome").enabled: st.action("welcome")
 		st.tick(1)
-	return {"arrivals":b.arrivals,"sales":b.sold,"happy":b.happy,"regulars":b.regulars,"lost":b.lost_full+b.lost_service+b.lost_stock,"contribution":m.s.cash+b.stock*e.stock_unit_cost(b)-start_value,"cash":m.s.cash,"orders":b.orders,"offered":m.s.street.offered,"report":m.s.street.celebration.last_report}
+	return {"arrivals":b.arrivals,"sales":b.sold,"happy":b.happy,"regulars":b.regulars,"lost":b.lost_full+b.lost_service+b.lost_stock,"contribution":m.street.selected().cash+b.stock*e.stock_unit_cost(b)-start_value,"cash":m.street.selected().cash,"orders":b.orders,"offered":m.s.street.offered,"report":m.s.street.celebration.last_report}
 
 func run() -> void:
 	var failures := 0

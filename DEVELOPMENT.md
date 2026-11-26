@@ -457,7 +457,7 @@ and their saved lifetime/quotes/timers. Completion is distinct from sales and
 nightly first-drink tips. Existing reports gain zeroed timing/completion fields.
 
 `business_summary()` and `visit_lines()` are pure reads. The UI displays actual
-customer contribution separately from guaranteed management; no accounting lives
+customer contribution separately from earned management bonuses; no accounting lives
 in the HUD. Cyan glasses use actual drinking state. `base_traffic()` grows one
 shared supply using the highest owned beer sign; forecasts substitute candidate
 bars into that same competition. Offline forecasts use expected variable rounds
@@ -517,3 +517,23 @@ activity and keeps the host on the floor. `hosted_drinks_check.gd` covers paymen
 stock, matching, saved quotes, limits, cooldowns, timeouts, Buzz, automation,
 offline exclusion, migration and visible controls. Preview with `hosted-*` in
 the economy runner. Forecasts remain ordinary-trade estimates.
+
+## Schema 16: venue tills, company bank and growth
+
+`finance.gd` owns exact transfers, total cash and migration allocation. It never
+reports a transfer as income. `economy.gd` settles local transactions and each
+venue’s five-second cashflow sample; `street.gd` quotes compound Fund & buy and
+company-funded marketing. UI controls only consume those operations.
+
+Old shared cash plus reserve is conserved and allocated deterministically to
+working floats, with remainder in the company bank. Existing schema-16 balances
+are not reallocated. Validation rejects negative/fractional balances, invalid
+marketing tiers and invalid fractional bonus carry. Practice remains isolated.
+`manager_bonus_carry` stores hundredths; bonus computation uses actual receipt,
+FIFO consumed cost and consignment repayment. Offline claims credit each bar and
+never debit its opening balance or fabricate customer milestones.
+
+`tests/finance_check.gd` covers model and UI account boundaries. Existing fixture
+setups now fund local tills explicitly; legacy-save fixtures intentionally combine
+wealth back into the old shared shape. Balance policies use real explicit
+transfers and purchases, not the fixture helper. See [finance and growth](docs/design/FINANCE_AND_GROWTH.md).
