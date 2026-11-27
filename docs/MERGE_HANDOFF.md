@@ -15,16 +15,18 @@ unverified; source on main is not a receipt for published release downloads.
 
 ## Tour funding clarity — 27 November 2026
 
-Follow-up to `a64539e`: removed the extra Tours balance paragraph, instructions
-and separate bank shortcut. A route short of company funds now opens a compact
-bank-deposit popup with the missing amount prefilled. Confirming returns to the
-same guide without booking; cancel changes nothing. Trading pauses in the popup.
-Escape and Android Back dismiss it. Other eligibility blockers remain disabled.
+Follow-up to `2ad8d36`: Tours now pays guides directly from the selected venue's
+till and starts the agreement in one tap. Removed the deposit popup and bank
+transfer step. Quotes and validation use the same local balance; company-bank
+wealth cannot cover a local shortfall. Other guide eligibility rules still apply.
 
-Account routing, tour prices, stock and saves are unchanged. Coverage is recorded
-in [testing](TESTING.md#tour-funding-clarity--27-november-2026). Target-device play
-remains unverified. The full isolated suite and two-resolution visual review
-pass; a source push is not proof of published release downloads.
+Guide pay is recorded once in weekly costs and stays outside the five-second
+trading sample. Existing agreements retain their terms, with no refund or extra
+charge. Navigation is pure. Other finance routing and save formats are unchanged.
+The full isolated combined suite and two-resolution visual review passed,
+including the charcoal-guest work committed separately as `ed4136a`.
+See [testing](TESTING.md#tour-funding-clarity--27-november-2026). Target-device
+play remains unverified; source changes do not confirm release publication.
 
 ## Front/rear traffic in the bar opening — 27 November 2026
 

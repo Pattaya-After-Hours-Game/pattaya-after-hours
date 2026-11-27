@@ -130,11 +130,9 @@ Bed Race take over the game screen until you finish or leave.
 
 Open **Tours**, choose a guide, then assign a route. The guide recommends your
 street for the current trading shift. Use **Back** to return to the guide list.
-Guide pay comes from the **company bank**. If it is short, tap the route's
-**Deposit … to bank ›** button. A popup shows both balances and fills in the
-missing amount. Choose **Deposit** to return to the same guide, then assign the
-route. **Cancel** leaves your money untouched. Keep enough till money for stock
-and running costs.
+Tap **Assign** to pay the guide from the selected bar’s till and start the tour
+in one action. The route shows any till shortfall. Keep enough local money for
+stock and running costs. Cancelling an agreement does not refund guide pay.
 When a referral gets a seat, the top-left update names the guide and venue.
 The badge above **Tours** counts active agreements. A red **!** appears when
 there are no active tours and the selected venue has a free seat. The guide list

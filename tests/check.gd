@@ -322,7 +322,7 @@ func test_ui() -> void:
 
 func test_tour_update(app: Control) -> void:
 	app.model = Campaign.new(48)
-	app.model.s.cash = 1000
+	app.model.street.selected().cash = 1000
 	app.change_tab(2)
 	check(app.root_ui.get_node("TourBadge").text=="!","The Tours tab flags an empty agreement list")
 	var fern: Button = app.column.get_node("TourGuide_2")
@@ -350,7 +350,7 @@ func test_tour_update(app: Control) -> void:
 	app.model.save_game()
 	var restored = Campaign.new(48)
 	check(restored.load_game() and restored.s.street.expired_tours=={"2":0} and restored.s.bookings.is_empty(),"The expired route survives reload without reactivating")
-	app.model.s.cash = 1000
+	app.model.street.selected().cash = 1000
 	app.model._add_staff(4)
 	app.model.booking(2,0)
 	app.model.booking(3,1)
@@ -399,32 +399,33 @@ func test_purchase_ui(app: Control) -> void:
 	app.change_tab(2)
 	app.column.get_node("TourGuide_2").pressed.emit()
 	var route: Button = app.column.get_node("TourRoute_0")
-	check(not route.disabled and route.text.ends_with("Deposit %s to bank ›" % app.cash(app.model.guide_pay(0))),"Unfunded tours open a deposit popup")
-	bar.cash = 670
+	check(route.disabled and route.text.ends_with("Need ฿145 more"),"Tours show the selected till's shortfall")
+	app.model.s.cash = 1000
+	check(not app.model.booking_offer(2,0).enabled,"Company wealth does not silently fund a local tour")
+	bar.cash = 144
 	var before: String = JSON.stringify(app.model.s)
+	app.model.booking(2,0)
+	check(JSON.stringify(app.model.s)==before,"Insufficient local funds cannot move money or start a tour")
+	bar.cash = 670
+	before = JSON.stringify(app.model.s)
 	app.render()
-	check(JSON.stringify(app.model.s)==before,"Opening Tours with a funded till never transfers money")
-	app.column.get_node("TourRoute_0").pressed.emit()
-	check(not app.tour_deposit.is_empty() and app.tab==2 and JSON.stringify(app.model.s)==before,"Blocked route opens the bank popup without changing the model or leaving Tours")
-	var transfer: SpinBox = app.event_overlay.find_child("TourDepositAmount",true,false)
-	check(transfer.value==145,"Tour deposit starts with the exact missing bank amount")
-	app._process(1.0)
-	check(JSON.stringify(app.model.s)==before,"Deposit popup pauses trading")
-	app.close_tour_deposit()
-	check(app.tour_deposit.is_empty() and JSON.stringify(app.model.s)==before,"Cancelling a tour deposit preserves all model state")
-	app.column.get_node("TourRoute_0").pressed.emit()
-	transfer = app.event_overlay.find_child("TourDepositAmount",true,false)
-	transfer.value = 671
-	check(app.event_overlay.find_child("TourDepositConfirm",true,false).disabled,"Deposit rejects an amount above the till balance")
-	transfer.value = 145
-	app.event_overlay.find_child("TourDepositConfirm",true,false).pressed.emit()
-	check(bar.cash==525 and app.model.s.cash==145 and app.tour_deposit.is_empty() and app.guide==2 and app.model.s.bookings.is_empty(),"Deposit returns to the same guide and moves money without booking")
-	app.change_tab(2)
-	app.column.get_node("TourGuide_2").pressed.emit()
+	check(JSON.stringify(app.model.s)==before,"Opening Tours does not transfer money or book a route")
 	route = app.column.get_node("TourRoute_0")
-	check(not route.disabled and not route.text.contains("Need"),"Depositing the missing bank funds clears the tour blocker")
+	check(not route.disabled,"A funded till can book a tour directly")
+	app.model.s.staff[2].work = false
+	before = JSON.stringify(app.model.s)
+	app.model.booking(2,0)
+	check(JSON.stringify(app.model.s)==before,"Local cash cannot bypass guide eligibility")
+	app.model.s.staff[2].work = true
+	app.model.s.cash = 0
+	var costs: int = app.model.s.weekly.costs
+	var sample: int = bar.earnings_net
 	route.pressed.emit()
-	check(app.model.s.bookings.get("2",-1)==0 and app.model.s.cash==0 and bar.cash==525,"Booking charges the bank once and leaves the till intact")
+	check(app.model.s.bookings.get("2",-1)==0 and app.model.s.cash==0 and bar.cash==525,"One tap starts the tour and charges only the selected till")
+	check(app.model.s.weekly.costs==costs+145 and bar.earnings_net==sample,"Guide pay is recorded once and excluded from the trading sample")
+	app.column.get_node("TourRoute_0").pressed.emit()
+	check(not app.model.s.bookings.has("2") and bar.cash==525,"Cancelling does not charge again or refund guide pay")
+
 	app.model.s.cash = 0
 	bar.cash = 0
 	app.change_tab(3)

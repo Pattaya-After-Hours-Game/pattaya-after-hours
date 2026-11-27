@@ -92,11 +92,12 @@ func run() -> void:
 		app.change_tab(2)
 		await capture(app,"tour-funding-guides","",false)
 		app.guide = 2
-		await capture(app,"tour-funding-blocked")
-		app.column.get_node("TourRoute_0").pressed.emit()
-		await capture(app,"tour-funding-accounts","",false)
-		app.event_overlay.find_child("TourDepositConfirm",true,false).pressed.emit()
 		await capture(app,"tour-funding-ready")
+		app.column.get_node("TourRoute_0").pressed.emit()
+		await capture(app,"tour-funding-active","",false)
+		app.model.street.selected().cash = 100
+		app.guide = 1
+		await capture(app,"tour-funding-short")
 		app.queue_free()
 		await process_frame
 		quit()

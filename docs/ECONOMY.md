@@ -339,11 +339,11 @@ Local, tourist and nightlife groups choose among the venues and outside options.
 Each booked tour guide adds 0.5 to live venue appeal before modifiers. When the
 guide's share of the same arrival draw brings customers who get seats, the
 street update names the guide and venue.
-Live tour agreements pay the guide upfront from the company bank. A funding
-shortfall turns the route button into a deposit-popup action. The popup shows
-both balances and prefills the shortfall; confirming transfers only, then returns
-to the guide. Cancel and navigation change no model state. Trading pauses while
-the popup is open. Guide eligibility and pay rules still apply.
+Live tour agreements pay the guide upfront from the selected venue’s till in
+the same action that starts the tour. The company bank and other tills are not
+used. Guide pay remains excluded from the five-second trading sample; weekly
+costs record it once. Existing agreements are not charged again or refunded.
+Guide eligibility and pay rules still apply; navigation changes no model state.
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.

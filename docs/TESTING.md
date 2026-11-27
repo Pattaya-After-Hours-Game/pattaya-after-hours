@@ -21,18 +21,19 @@ unverified. The exact prompt and built-in ImageGen receipt are in
 
 ## Tour funding clarity — 27 November 2026
 
-`tests/check.gd` reproduces a ฿670 venue till with an empty company bank.
-It checks direct route-to-deposit popup navigation, the prefilled shortfall,
-paused trading, cancellation purity, insufficient-till rejection, an explicit
-฿145 deposit returning to the same guide without booking, and one bank-funded
-booking that leaves the remaining ฿525 till untouched.
+`tests/check.gd` checks a funded company bank cannot cover an empty local till,
+insufficient till funds and guide refusal leave state unchanged, navigation is
+pure, and one tap starts an agreement while charging only the selected till.
+The ฿670 example leaves ฿525 after guide pay, with no bank transfer. Weekly costs
+count pay once; the trading sample excludes it. Cancellation adds no charge or
+refund. Legacy tour checks remain in the combined suite.
 
-The `tour-funding-*` group in `tests/preview_economy.gd`, run through
-`tools/preview-art.sh`, covers the guide list, blocked route, deposit popup
-and funded route. All four states were inspected at 960×540 and 1280×720.
-The complete isolated `tools/test.sh` suite passed on Godot 4.7.2, including all
-pacing suites. Documentation links and `git diff --check` pass. Target-device
-play remains unverified.
+The `tour-funding-*` economy previews cover guides, a funded local route with an
+empty bank, an active agreement after one tap and a local-cash shortfall.
+Affected states were inspected at 960×540 and 1280×720. The complete isolated
+`tools/test.sh` suite passed on Godot 4.7.2, including all pacing suites and the
+concurrent charcoal-guest changes. Documentation links and `git diff --check`
+pass. Target-device play remains unverified.
 
 ## Outdoor layers and animated traffic — 27 November 2026
 

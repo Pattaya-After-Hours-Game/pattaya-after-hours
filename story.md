@@ -123,8 +123,8 @@ Pim can sell the sound; Nida can sell the welcome; neither can conjure a tab.
 
 > **Anong:** “Seven tills. One bank. If Neon Mango needs money, write down why.”
 
-Tour guides are paid upfront from that company bank. When it is short, the route
-opens a deposit popup with the missing amount ready for the owner to confirm.
+Tour guides are paid upfront from the bar arranging their tour. One tap pays
+from that venue’s till and starts the agreement.
 
 Street marketing progresses from small campaigns toward a district audience.
 Every new open property adds a little street draw, but all venues share those

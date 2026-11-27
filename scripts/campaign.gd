@@ -119,9 +119,9 @@ func booking_offer(index: int, route_id: int) -> Dictionary:
 	if s.phase!="plan": reason = "Bookings are closed."
 	elif reason.is_empty() and s.pay==0 and C.ROUTES[route_id][2]==2:
 		reason = "The guide asks for standard split or better on long routes."
-	var funding: bool = reason.is_empty() and s.cash<required
-	if funding: reason = "Company bank is ฿%d short." % (required-int(s.cash))
-	return {"required":required,"available":int(s.cash),"funding":funding,"reason":reason,"enabled":reason.is_empty()}
+	var available: int = s.cash if legacy_mode() else street.selected().cash
+	if reason.is_empty() and available<required: reason = "Not enough money in this bar’s till."
+	return {"required":required,"available":available,"reason":reason,"enabled":reason.is_empty()}
 
 func booking(index: int, route_id: int) -> String:
 	if s.phase != "plan":
@@ -133,7 +133,9 @@ func booking(index: int, route_id: int) -> String:
 		return "Booking removed." if legacy else "Tour agreement cancelled."
 	var offer := booking_offer(index,route_id)
 	if not offer.enabled: return offer.reason
-	if not legacy and not spend(offer.required): return "The guide needs their agreed pay upfront."
+	if not legacy:
+		street.selected().cash -= int(offer.required)
+		s.weekly.costs += int(offer.required)
 	s.bookings[key] = route_id
 	if legacy: return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
 	s.street.expired_tours.erase(key)
