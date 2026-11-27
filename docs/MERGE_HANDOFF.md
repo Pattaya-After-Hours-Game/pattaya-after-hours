@@ -1,5 +1,18 @@
 # Current implementation and release handoff
 
+## Action readiness and event timers — 27 November 2026
+
+Serve, Welcome and Chat now share the bright mint ready-button style and dark
+caption, retaining the existing refill and eligibility rules. Timed street-event
+banners and Events details show a draining time bar; active venue promotions
+show the same bar in Events. Seconds remain visible, and active Rat Plague
+remains untimed. Presentation reads existing timers; no economy/save change.
+
+Focused action/event/promotion previews are available with
+`PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='timers-*' tools/preview-art.sh`.
+See [testing](TESTING.md#action-readiness-and-event-timers--27-november-2026)
+for verification. Source updates do not confirm published release downloads.
+
 ## Charcoal reference guest — 27 November 2026
 
 Adds the user's supplied adult likeness as an ordinary customer and fifth street

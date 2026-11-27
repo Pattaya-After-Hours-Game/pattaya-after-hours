@@ -55,8 +55,10 @@ seconds. Pouring has an additional **two-second tier for ฿5,600**, available f
 stage 2. **Have a chat** buys an urgent waiting guest ten more seconds; it shares
 Welcome’s timer and takes twenty seconds to recover. Refill bars are green
 when there’s room to welcome, a guest needs Chat, or an order needs serving.
-No order means no sale. Open **Service** to see demand, service speed, occupancy,
-stock, payroll and recent actual profit. Waiting-order bells respect Sound / Muted.
+All three buttons turn bright mint when clickable. Street-event banners and
+Events details show a draining time bar; active promotions also show one beside
+their remaining seconds. No order means no sale. Open **Service** to see demand,
+service speed, occupancy, stock, payroll and recent actual profit. Waiting-order bells respect Sound / Muted.
 
 Inside the scene, customers stand on the public side of the bar, bartenders
 work behind the counters, and yellow/gold dots above customers mark waiting orders.

@@ -118,6 +118,7 @@ var visit_plans_open := false
 var arcade_circuit := false
 
 var live_labels: Array = []
+var live_meters: Array = []
 var reputation_label: Label
 var reputation_float: Label
 var reputation_campaign := 0
@@ -388,6 +389,7 @@ func render(keep_scroll: bool = false) -> void:
 	close_service_help()
 	drawer_close_button = null
 	live_labels.clear()
+	live_meters.clear()
 	stat_tip = null
 	stat_tip_key = ""
 	action_controls.clear()
@@ -480,6 +482,13 @@ func render(keep_scroll: bool = false) -> void:
 			return "%s · %s · %ds  ›" % ["SOON" if e.phase == "warning" else "LIVE",StreetContent.EVENTS[int(e.id)][0],e.remaining]
 		event_banner.text = banner_text.call()
 		live_labels.append([event_banner,banner_text])
+		if model.s.street.event.has("remaining"):
+			var meter := time_meter(event_banner,event_time_fraction)
+			meter.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+			meter.offset_left = 3
+			meter.offset_right = -3
+			meter.offset_top = -6
+			meter.offset_bottom = -2
 	if show_party:
 		var party_banner := at_button(root_ui,Rect2(310,56,244,36) if show_street_event else Rect2(14,56,540,36),celebration_title(party)+"  ›",change_tab.bind(1))
 		party_banner.name = "CelebrationBanner"
@@ -1283,6 +1292,35 @@ func event_detail(control: Control, heading: String, detail: Callable) -> void:
 	row.add_child(info)
 	live_labels.append([copy,refresh])
 
+# Read existing model timers; drawing these meters never advances an event.
+func event_time_fraction() -> float:
+	var event: Dictionary = model.s.street.event
+	if not event.has("remaining"): return 0.0
+	var local: bool = int(event.id)>=StreetContent.Local.ENCORE
+	var duration: float = 45 if local else 90
+	if event.phase=="warning":
+		duration = StreetContent.RAT_WARNING_SECONDS if event.id==StreetContent.RAT_PLAGUE else 30 if local else 60
+	return clampf(float(event.remaining)/duration,0.0,1.0)
+
+func time_meter(parent: Control, fraction: Callable) -> ProgressBar:
+	var meter := ProgressBar.new()
+	meter.name = "TimeRemaining"
+	meter.custom_minimum_size.y = 4
+	meter.show_percentage = false
+	meter.max_value = 1.0
+	meter.step = 0.0
+	meter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	meter.add_theme_stylebox_override("background",box(DARK,Color.TRANSPARENT,0))
+	meter.add_theme_stylebox_override("fill",box(TEAL,Color.TRANSPARENT,0))
+	parent.add_child(meter)
+	meter.value = fraction.call()
+	live_meters.append([meter,fraction])
+	return meter
+
+func update_time_meters() -> void:
+	for entry in live_meters:
+		if is_instance_valid(entry[0]): entry[0].value = entry[1].call()
+
 func events_panel() -> void:
 	street_event_panel()
 	celebration_panel(true)
@@ -1295,6 +1333,8 @@ func events_panel() -> void:
 		if not bar.promo.is_empty(): return "%s · %ds left · attraction ÷ %d" % [StreetContent.PROMOTIONS[int(bar.promo.kind)].name,bar.promo.remaining,bar.promo.repetition]
 		if bar.promo_cooldown>0: return "Promotion cooldown · %ds" % bar.promo_cooldown
 		return "%s · %s" % [bar.name,"Ready to promote" if promotion_available(bar) else "No promotion available"],GOLD,13)
+	if not bar.promo.is_empty():
+		time_meter(column,func() -> float: return float(bar.promo.get("remaining",0))/StreetContent.PROMOTION_SECONDS)
 	for i in StreetContent.PROMOTIONS.size():
 		var offer: Dictionary = StreetContent.PROMOTIONS[i]
 		var caption := "%s · %s" % [offer.name,cash(offer.fee) if offer.fee>0 else "Free"]
@@ -1457,7 +1497,7 @@ func street_action(id: String,index: int = 0, funded: bool = false, expected_pri
 	commit(true)
 
 func cooldown_button(rect: Rect2, label: String, id: String) -> void:
-	var button := at_button(root_ui,rect,"",street_action.bind(id),id=="serve")
+	var button := at_button(root_ui,rect,"",street_action.bind(id),true)
 	button.add_theme_font_size_override("font_size",13)
 	button.add_theme_stylebox_override("disabled",box(DARK,EDGE.darkened(.5)))
 	var fill := ColorRect.new()
@@ -1523,7 +1563,7 @@ func update_action_controls() -> void:
 		elif not state.enabled and entry[4]=="serve": detail = "Restock fridge"
 		elif not practice_action: detail = "Practice step"
 		entry[2].text = caption+"\n"+detail
-		entry[2].modulate = DARK if not entry[0].disabled and entry[4]=="serve" else WHITE if not entry[0].disabled or refilling else MUTED
+		entry[2].modulate = DARK if not entry[0].disabled else WHITE if refilling else MUTED
 	for button in stock_controls:
 		if not is_instance_valid(button): continue
 		var offer: Dictionary = eco.stock_offer(bar)
@@ -2363,6 +2403,7 @@ func street_event_panel() -> void:
 		body("The swarm came from the restaurant down the street. Bo's patrol handles most of it.",WHITE,13)
 		row_button(StreetContent.RAT_CLOSE,street_action.bind("close_for_rats"))
 	else:
+		time_meter(column,event_time_fraction)
 		live_body(func() -> String: return "%s%s %ds · %s" % [venue_name,"Starts in" if event.phase == "warning" else "Time left",event.remaining,"Prepared" if event.prepared else "Unprepared"],GOLD,13)
 	if (event.phase=="warning" or event.id==StreetContent.RAT_PLAGUE) and not event.prepared:
 		if event.id==Local.ENCORE and not event.get("solo",false): row_button("Work the rush solo",street_action.bind("encore_solo"))
@@ -2930,6 +2971,7 @@ func _process(delta: float) -> void:
 		update_reputation_hud()
 		refresh_street = refresh_street or before != street_ui_state()
 		update_action_controls()
+		update_time_meters()
 		update_bartender_hud()
 		update_bar_fine_controls()
 		live_seconds += minf(delta,1.0)

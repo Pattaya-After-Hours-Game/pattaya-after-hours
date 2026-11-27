@@ -1051,3 +1051,23 @@ manual-first tests defer deliveries/fridge until stage 2 and restock by hand.
 These are deterministic strategy checks, not proof of every human play style.
 Android device play, Windows/macOS execution and human balance testing remain
 unverified. No exports, merge or publication were performed.
+
+## Action readiness and event timers — 27 November 2026
+
+Serve, Welcome and Chat share their bright mint clickable state. Existing
+eligibility and cooldowns are retained, including Welcome/Chat's shared recovery.
+Timed street events show remaining-time bars in their banner and Events details;
+active promotions show a bar in Events. Active Rat Plague stays untimed.
+
+- Godot 4.7.2 `tools/test.sh`: passed, including gameplay/UI/save regressions and
+  the complete pacing, promotion, automation, celebration, club, profit-cycle
+  and lease-route suites.
+- `PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='timers-*' tools/preview-art.sh`:
+  inspected ready, refilling, halfway, warning, active-event, promotion and
+  untimed swarm states at 960 × 540 and the wider 1560 × 720 window. Additional
+  Chat captures confirm its shared twenty-second refill with Welcome.
+- `git diff --check` and changed-document local links passed.
+
+No economy rules, assets or save fields changed. Android touch/device play and
+Windows/macOS execution remain unverified. Source verification does not confirm
+that release downloads have been published.

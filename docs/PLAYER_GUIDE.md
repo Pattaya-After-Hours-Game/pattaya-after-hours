@@ -767,3 +767,14 @@ At zero, completed cleaning is retained and the existing skip moves the clock
 to noon. Stock is not bought, no income is awarded, and contracts age through the
 skipped hours as before. Owner-closed or cash-shortage-closed venues stay closed.
 The date already advanced at midnight, so the jump does not add another day.
+
+## Action readiness and event time
+
+Serve, Welcome and Chat use the same bright mint button when clickable. Their
+refill bars show cooldown recovery; a dim button explains missing orders, urgent
+guests, seats or other requirements. Welcome and Chat still share a timer.
+
+Street-event banners and their Events details have a draining bar for time until
+an announced event starts or an active event ends. Active venue promotions show
+the same indicator in Events. The seconds readout remains visible. Rat Plague
+has no duration bar once active: catch the remaining rats or leave it to Bo.

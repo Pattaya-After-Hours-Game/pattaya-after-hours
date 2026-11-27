@@ -85,6 +85,47 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.model = Campaign.new(72)
+	if filter.begins_with("timers-"):
+		app.show_tutorial_hint = false
+		app.drawer_open = false
+		var bar: Dictionary = app.model.street.selected()
+		var eco = app.model.street.economy
+		bar.customers[0].wait = eco.patience(bar,bar.customers[0])-8
+		await capture(app,"timers-ready")
+		app.model.street.action("serve")
+		app.model.street.action("welcome")
+		await capture(app,"timers-refilling")
+		app.model.s.street.elapsed += 5
+		await capture(app,"timers-half-refilled")
+		app.model.street.announce(1)
+		app.model.s.street.event.remaining = 30
+		await capture(app,"timers-event-warning")
+		app.model.street.start_event()
+		app.model.s.street.event.remaining = 45
+		await capture(app,"timers-event-half")
+		app.change_tab(1)
+		await capture(app,"timers-event-details")
+		app.model.s.street.event = {}
+		bar.cash = 10000
+		app.model.street.action("promotion",1)
+		bar.promo.remaining = 60
+		await capture(app,"timers-promotion-half","Venue promotions")
+		app.model.street.announce(app.model.street.C.RAT_PLAGUE)
+		app.model.street.start_event()
+		app.drawer_open = false
+		await capture(app,"timers-rats-untimed")
+		app.model = Campaign.new(72)
+		bar = app.model.street.selected()
+		eco = app.model.street.economy
+		for i in 2: bar.customers[i].wait = eco.patience(bar,bar.customers[i])-8
+		app.model.street.action("chat")
+		await capture(app,"timers-chat-refilling")
+		app.model.s.street.elapsed += 10
+		await capture(app,"timers-chat-half-refilled")
+		app.queue_free()
+		await process_frame
+		quit()
+		return
 	if filter.begins_with("tour-funding-"):
 		app.show_tutorial_hint = false
 		app.model.s.cash = 0
