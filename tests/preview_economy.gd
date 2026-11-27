@@ -93,11 +93,9 @@ func run() -> void:
 		await capture(app,"tour-funding-guides","",false)
 		app.guide = 2
 		await capture(app,"tour-funding-blocked")
-		app.open_service_section("finance")
+		app.column.get_node("TourRoute_0").pressed.emit()
 		await capture(app,"tour-funding-accounts","",false)
-		app.model.street.finance.transfer(app.model.street.selected(),145,true)
-		app.change_tab(2)
-		app.guide = 2
+		app.event_overlay.find_child("TourDepositConfirm",true,false).pressed.emit()
 		await capture(app,"tour-funding-ready")
 		app.queue_free()
 		await process_frame

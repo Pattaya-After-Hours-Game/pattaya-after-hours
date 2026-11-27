@@ -73,6 +73,7 @@ var event_badge: Button
 var rat_instruction: Label
 var news_issue := {}
 var supplier_special_open := false
+var tour_deposit := {}
 var seen_news := {}
 var event_overlay: Control
 var event_game := -1
@@ -1055,11 +1056,12 @@ func _input(event: InputEvent) -> void:
 	if event_game==Local.CART and cart_pointer_input(event):
 		get_viewport().set_input_as_handled()
 		return
-	if (event_game>=0 or not news_issue.is_empty() or supplier_special_open) and event is InputEventKey:
+	if (event_game>=0 or not news_issue.is_empty() or supplier_special_open or not tour_deposit.is_empty()) and event is InputEventKey:
 		var playing := event_game>=0
 		if event.is_action_pressed("ui_cancel"):
 			if event_game>=0: end_event_game(false)
 			elif supplier_special_open: close_supplier_special()
+			elif not tour_deposit.is_empty(): close_tour_deposit()
 			else: close_news(false)
 		elif event is InputEventKey and event.pressed and not event.echo:
 			if event_game==Local.BED and event.physical_keycode==KEY_SPACE: tap_race()
@@ -1125,7 +1127,6 @@ func purchase_text(control: Button, caption: String, quote: Dictionary, compact:
 	if int(quote.get("transfer",0))>0 and quote.enabled: return caption+"\nFund & buy · bank → till "+cash(quote.transfer)
 	if missing<=0: return caption
 	var shortfall := "Need %s more" % cash(missing)
-	if not str(quote.get("account","")).is_empty(): shortfall += " in "+str(quote.account)
 	var funding := "%s. %s cash required." % [shortfall,cash(quote.required)]
 	control.tooltip_text = funding if control.tooltip_text.is_empty() else funding+" "+control.tooltip_text
 	return caption+"\n"+("%s short" % cash(missing) if compact else shortfall)
@@ -1320,10 +1321,6 @@ func promotion_report(bar: Dictionary) -> void:
 
 func tours_panel() -> void:
 	var crew: Array = model.s.staff
-	if not model.legacy_mode():
-		live_body(func() -> String: return "Company bank: %s · %s till: %s\nTours use the company bank. Deposit till money before assigning a route." % [cash(model.s.cash),model.street.selected().name,cash(model.street.selected().cash)],WHITE,13)
-		var accounts := row_button("Cash & Bank · deposit tour funds",open_service_section.bind("finance"))
-		accounts.name = "TourCashBank"
 	if guide<0:
 		title("Tour guides")
 		body("Choose a guide to assign a tour. Guides recommend your street until the trading shift ends.")
@@ -1353,12 +1350,24 @@ func tours_panel() -> void:
 		var booked: bool = model.s.bookings.get(str(guide),-1) == i
 		var caption := "Cancel %s" % item[0] if booked else "Assign %s" % item[0]
 		var route := row_button(caption,func():
+			var offer: Dictionary = model.booking_offer(guide,i)
+			if not booked and offer.funding:
+				tour_deposit = {"bar":model.street.selected(),"amount":int(offer.required)-int(offer.available)}
+				draw_event_overlay()
+				return
 			message = model.booking(guide,i)
 			commit(true),booked)
 		route.name = "TourRoute_%d" % i
-		if not booked: watch_purchase(route,caption,model.booking_offer.bind(guide,i))
+		if not booked:
+			var refresh := func() -> String:
+				var offer: Dictionary = model.booking_offer(guide,i)
+				route.disabled = not offer.enabled and not offer.funding
+				return caption+"\nDeposit %s to bank ›" % cash(int(offer.required)-int(offer.available)) if offer.funding else caption
+			route.text = refresh.call()
+			live_labels.append([route,refresh])
 		live_body(func() -> String:
-			var reason: String = "" if booked else model.booking_offer(guide,i).reason
+			var offer: Dictionary = model.booking_offer(guide,i)
+			var reason: String = "" if booked or offer.funding else offer.reason
 			return "%s route · Guide pay %s%s" % ["Short" if item[2]==1 else "Long",cash(model.guide_pay(i)),"\n"+reason if not reason.is_empty() else ""],MUTED,12)
 
 func tour_agreement_text(index: int) -> String:
@@ -2443,6 +2452,39 @@ func draw_event_overlay() -> void:
 		draw_newspaper()
 	elif supplier_special_open:
 		draw_supplier_special()
+	elif not tour_deposit.is_empty():
+		draw_tour_deposit()
+
+func close_tour_deposit() -> void:
+	tour_deposit = {}
+	draw_event_overlay()
+
+func draw_tour_deposit() -> void:
+	var bar: Dictionary = tour_deposit.bar
+	var panel := overlay_panel(Rect2(240,145,480,250),DARK,GOLD)
+	abs_text(panel,Rect2(24,16,432,32),"Deposit to company bank",23,TEAL)
+	abs_text(panel,Rect2(24,60,432,28),"%s till: %s · Bank: %s" % [bar.name,cash(bar.cash),cash(model.s.cash)],15,WHITE)
+	var amount := SpinBox.new()
+	amount.name = "TourDepositAmount"
+	amount.position = Vector2(24,104)
+	amount.size = Vector2(432,44)
+	amount.min_value = 1
+	amount.max_value = 1000000000000000
+	amount.value = tour_deposit.amount
+	amount.prefix = "฿"
+	panel.add_child(amount)
+	at_button(panel,Rect2(24,177,206,46),"Cancel",close_tour_deposit).grab_focus()
+	var deposit := at_button(panel,Rect2(242,177,214,46),"Deposit",func() -> void:
+		if not model.street.finance.transfer(bar,int(amount.value),true): return
+		tour_deposit = {}
+		commit(true),true)
+	deposit.name = "TourDepositConfirm"
+	var refresh := func(_value: float) -> void:
+		tour_deposit.amount = int(amount.value)
+		deposit.disabled = amount.value>bar.cash
+		deposit.text = "Deposit "+cash(amount.value) if not deposit.disabled else "Till short "+cash(int(amount.value)-int(bar.cash))
+	amount.value_changed.connect(refresh)
+	refresh.call(amount.value)
 
 func open_supplier_special() -> void:
 	if model.street.supplier_deal_offer().is_empty(): return
@@ -2920,7 +2962,7 @@ func _process(delta: float) -> void:
 				if race_left<=0: end_event_game(false)
 				else: update_race()
 		return
-	if not news_issue.is_empty() or supplier_special_open: return
+	if not news_issue.is_empty() or supplier_special_open or not tour_deposit.is_empty(): return
 	if campaign_before_tutorial == null:
 		poll_news()
 		if not news_issue.is_empty(): return
@@ -3076,6 +3118,7 @@ func _notification(what: int) -> void:
 		if event_game>=0: end_event_game(false)
 		elif not news_issue.is_empty(): close_news(false)
 		elif supplier_special_open: close_supplier_special()
+		elif not tour_deposit.is_empty(): close_tour_deposit()
 		elif is_instance_valid(district): close_district()
 		elif is_instance_valid(fight): leave_fight(fight.result if fight.over else false)
 		elif campaign_before_tutorial != null: finish_tutorial()
