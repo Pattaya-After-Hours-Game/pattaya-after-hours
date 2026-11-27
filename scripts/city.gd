@@ -240,7 +240,7 @@ func _draw() -> void:
 			draw_line(fan+ray*.22,fan+ray,Color("#8e5e5670"),5)
 	if closed:
 		draw_rect(Rect2(0,0,960,540),Color(0.08,0.03,0.09,.55))
-		var reason := "RAID / UNTIL 12PM" if bar.get("raided",false) else "CLOSED / PREP TIME" if not Economy.scheduled(bar,int(street_state.get("minute",720))) else "TEMPORARILY CLOSED"
+		var reason := closure_title(bar,int(street_state.get("minute",720)))
 		draw_string(font,Vector2(160,250),reason,HORIZONTAL_ALIGNMENT_CENTER,390,23,GOLD)
 		if bar.get("clean_remaining",0)>0:
 			draw_string(font,Vector2(160,280),"CLEANING / %ds" % bar.clean_remaining,HORIZONTAL_ALIGNMENT_CENTER,390,18,TEAL)
@@ -613,3 +613,9 @@ func _draw_event(closed: bool) -> void:
 			draw_colored_polygon(PackedVector2Array([p,p+Vector2(123,19),p+Vector2(158,-85),p+Vector2(182,-96),p+Vector2(196,-86),p+Vector2(178,-75),p+Vector2(148,64),p+Vector2(55,62)]),Color("#3c354c"))
 			draw_rect(Rect2(p+Vector2(25,64),Vector2(150,12)),Color("#7f524e"))
 			draw_circle(p+Vector2(180,-86),3,GOLD)
+
+static func closure_title(bar: Dictionary, minute: int) -> String:
+	if bar.get("raided",false): return "RAID / UNTIL 12PM"
+	if not Economy.scheduled(bar,minute): return "CLOSED / PREP TIME"
+	if not bar.get("open",true): return "CLOSED / REOPEN WHEN READY"
+	return "TEMPORARILY CLOSED"

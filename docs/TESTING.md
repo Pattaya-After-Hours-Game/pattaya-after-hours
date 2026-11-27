@@ -1403,3 +1403,20 @@ Reviewed these at 960 × 540 and a 1560 × 720 window (1280 × 720 game canvas).
 The final compact explanation and prices also passed a fresh preview review.
 Existing production art is retained. Device play, Windows/macOS execution and
 release publication remain unverified for this change.
+
+## Reopening after restored cash — 27 November 2026
+
+Cash/owner shutdowns now show a main-screen Reopen bar button during legal
+opening hours, with the exact next-charge shortfall if unaffordable. The room
+label distinguishes an intentional/financial shutdown from a timed incident;
+restored cash changes the status to the reopening instruction. Reopening still
+requires an explicit tap and grants/spends nothing. `reopen_check.gd` covers the
+reported 3pm/฿500 case, live cash refresh, read-only presentation and reopening
+without cash or stock changes. The earlier sixty-second recovery work remains a
+separate pending change.
+
+The standalone reopening fix passes the complete pinned Godot `tools/test.sh`
+suite, including all pacing and lease routes. Affordable and unaffordable
+reopening screens were inspected at 960 × 540 and 1560 × 720. Device play remains
+unverified. The working-tree sixty-second recovery change is excluded from this
+verified commit and retains its separate pending cadence decision.

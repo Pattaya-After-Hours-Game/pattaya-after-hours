@@ -26,6 +26,9 @@ Purchases require only the listed price; there are no transfers or cash reserves
 If you cannot afford stock, **Close & count tips** pauses that venue's running
 costs and counts its earned jar immediately. Buy a full pack while closed, then
 enable opening. Repeated closing and reload never pay the same tips twice.
+A venue closed by its owner or a cash shortage shows **Reopen bar** on the main
+screen during trading hours. Restored money enables it; reopening spends nothing.
+
 Bo's consignment recovery remains available if the jar is too small.
 
 Renovations use cash; happy visits, regulars and healthy shifts earn loyalty

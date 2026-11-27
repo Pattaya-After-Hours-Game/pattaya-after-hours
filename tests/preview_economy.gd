@@ -85,6 +85,21 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.model = Campaign.new(72)
+	if filter.begins_with("reopen-"):
+		app.show_tutorial_hint = false
+		app.drawer_open = false
+		app.model.s.street.minute = 900
+		app.model.s.cash = 500
+		app.model.street.selected().open = false
+		app.model.street.selected().close_reason = "Cannot pay rent, electricity or on-duty wages. Close and count tips to restock."
+		app.model.street.economy.close_customers(app.model.street.selected())
+		await capture(app,"reopen-cash-restored")
+		app.model.s.cash = 0
+		await capture(app,"reopen-shortfall")
+		app.queue_free()
+		await process_frame
+		quit()
+		return
 	if filter.begins_with("afk-"):
 		app.show_tutorial_hint = false
 		app.drawer_open = false

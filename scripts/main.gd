@@ -685,7 +685,7 @@ func render(keep_scroll: bool = false) -> void:
 	if not live_service and not practicing:
 		at_button(root_ui,Rect2(594,490,352,40),action_label,action,true)
 	if live_service:
-		skip_to_open = at_button(root_ui,Rect2(504,490,352,40),"Skip to open",street_action.bind("skip"),true)
+		skip_to_open = at_button(root_ui,Rect2(504,490,352,40),"Skip to open",func() -> void: street_action("skip" if model.street.can_skip() else "open"),true)
 		skip_to_open.tooltip_text = "Jump to the noon opening."
 	if live_service or practicing:
 		cooldown_button(Rect2(414,490,170,40),"Serve a drink","serve")
@@ -1576,11 +1576,17 @@ func update_action_controls() -> void:
 	var eco = model.street.economy
 	var trading: bool = eco.is_trading(bar)
 	var skipping: bool = is_instance_valid(skip_to_open) and model.street.can_skip()
-	if is_instance_valid(skip_to_open): skip_to_open.visible = skipping
+	var reopening: bool = is_instance_valid(skip_to_open) and not bar.open and not bar.raided and bar.closed==0 and eco.scheduled(bar,int(model.s.street.minute))
+	if is_instance_valid(skip_to_open):
+		skip_to_open.visible = skipping or reopening
+		var shortfall := maxi(0,ceili(eco.operating_rate(bar)/60.0)-int(model.s.cash))
+		skip_to_open.text = "Skip to open" if skipping or not reopening else "Reopen bar" if shortfall==0 else "Reopen · need ฿%d more" % shortfall
+		skip_to_open.disabled = not skipping and shortfall>0
+		skip_to_open.tooltip_text = "Jump to the noon opening." if skipping else "Resume trading with your existing stock and team." if shortfall==0 else "Need ฿%d for the next operating charge. Service → Hours offers an owner-run recovery shift." % shortfall
 	for entry in action_controls:
 		if not is_instance_valid(entry[0]): continue
-		entry[0].visible = not skipping
-		if skipping: continue
+		entry[0].visible = not (skipping or reopening)
+		if skipping or reopening: continue
 		var state: Dictionary = eco.action_status(bar,entry[4])
 		var practice_action: bool = campaign_before_tutorial == null or (tutorial_step<TUTORIAL_ACTIONS.size() and entry[4]==TUTORIAL_ACTIONS[tutorial_step])
 		var stock_shortcut: bool = state.needs_stock and campaign_before_tutorial==null

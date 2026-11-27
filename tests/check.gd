@@ -143,6 +143,7 @@ func run() -> void:
 	var tour_checks = load("res://tests/tour_manager_check.gd").new()
 	tour_checks.run(self)
 	await tour_checks.run_ui(self)
+	await load("res://tests/reopen_check.gd").new().run(self)
 	var afk_checks = load("res://tests/afk_check.gd").new()
 	afk_checks.run(self)
 	await afk_checks.run_ui(self)

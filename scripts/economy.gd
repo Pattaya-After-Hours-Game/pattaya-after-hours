@@ -97,7 +97,10 @@ func is_trading(bar: Dictionary, offline: bool = false) -> bool:
 
 func status(bar: Dictionary) -> String:
 	if bar.raided: return "Raided: closed until 12pm."
-	if not bar.open: return str(bar.close_reason)
+	if not bar.open:
+		if bar.closed==0 and scheduled(bar,int(s.street.minute)) and s.cash>=ceili(operating_rate(bar)/60.0):
+			return "Closed. Tap Reopen bar to resume trading."
+		return str(bar.close_reason)
 	if bar.closed>0: return "Event closure: %ds remaining." % bar.closed
 	if not scheduled(bar,int(s.street.minute)): return "Closed for prep. Opens at 12pm."
 	return "Trading until %s." % ("3am tonight" if bar.late_open else "1am")
