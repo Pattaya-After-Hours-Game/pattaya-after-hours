@@ -1,0 +1,24 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "assets/art/beer-1.png",
+  "images": [
+    {
+      "phase": "dawn",
+      "index": 0,
+      "prompt": "Use case: lighting-weather. Asset: Godot pixel-art bar interior with street visible through left opening. Edit supplied image preserving FULL original 16:9 room, output 960x540. HARD EDIT BOUNDARY: change ONLY outdoor street visible THROUGH LEFT OPENING (approximately x44..200 of original960 width, y100..470 of540 height). Leave every interior pixel and layout unchanged, including entire ceiling, wall, bar, stools, refrigerator, shrine, bottles, signs, fan, floor and interior light/reflections. Keep exact camera, perspective, street architecture and vanishing point. Preserve doorway posts, awning, plants and street shopfront geometry. DAWN exterior: soft pale peach sunrise daylight and cool blue early-morning sky. Street neon switched OFF and muted, gentle amber streetlamps remain lit. Preserve street depth, clean readable pavement and original buildings. Outside opening must contain NO baked people, crowds, silhouettes, characters or vehicles. REMOVE the parked pink scooter from outdoor pavement, reveal continuous matching pavement in its place. Engine sprites supply street walkers and traffic. No new objects, signs, readable text, festival, rain or weather effects. Same crisp detailed pixel-art style. One full original room scene, no crops, no montage, no borders or watermark.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-f7e5b4ef-45e0-43ef-8540-54a08f8d61c9.png",
+      "output": "art/sources/street-daylight-0.png",
+      "attempts": 1,
+      "qa": "Full room layout and street vanishing point retained; no people or vehicles. Scooter removed. Image generation redraws details, so composite exterior onto original for exact interior preservation."
+    },
+    {
+      "phase": "noon",
+      "index": 2,
+      "prompt": "Use case: lighting-weather. Asset: Godot pixel-art bar interior with street visible through left opening. Edit supplied image preserving FULL original 16:9 room, output 960x540. HARD EDIT BOUNDARY: change ONLY outdoor street visible THROUGH LEFT OPENING (approximately x44..200 of original960 width, y100..470 of540 height). Leave every interior pixel and layout unchanged, including entire ceiling, wall, bar, stools, refrigerator, shrine, bottles, signs, fan, floor and interior light/reflections. Keep exact camera, perspective, street architecture and vanishing point. Preserve doorway posts, awning, plants and street shopfront geometry. NOON exterior: clear bright tropical midday daylight, blue sky, warm sun lighting the street and shopfronts. Neon is switched OFF and unlit, streetlamps off. Same buildings under clean daylight, dry readable pavement, not rainy. Outside opening must contain NO baked people, crowds, silhouettes, characters or vehicles. REMOVE the parked pink scooter from outdoor pavement, reveal continuous matching pavement in its place. Engine sprites supply street walkers and traffic. No new objects, signs, readable text, festival, rain or weather effects. Same crisp detailed pixel-art style. One full original room scene, no crops, no montage, no borders or watermark.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-98092b9a-b44d-4171-9870-b8f65e64f03a.png",
+      "output": "art/sources/street-daylight-2.png",
+      "attempts": 1,
+      "qa": "Full room layout and street vanishing point retained; no people or vehicles. Scooter removed. Image generation redraws details, so composite exterior onto original for exact interior preservation."
+    }
+  ]
+}

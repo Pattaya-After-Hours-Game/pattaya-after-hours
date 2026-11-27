@@ -127,6 +127,8 @@ func run() -> void:
 	await test_ui()
 	load("res://tests/art_check.gd").new().run(self)
 	load("res://tests/scene_check.gd").new().run(self)
+	load("res://tests/street_activity_check.gd").new().run(self)
+	await load("res://tests/street_activity_check.gd").new().run_ui(self)
 	await load("res://tests/art_interaction_check.gd").new().run(self)
 	var local_checks = load("res://tests/local_events_check.gd").new()
 	local_checks.run(self)

@@ -1,5 +1,26 @@
 # Current implementation and release handoff
 
+## Outdoor underlays and traffic — 27 November 2026
+
+Built on main, retaining the concurrent Linux AppImage work in `4ba103c`.
+Eight district atmosphere plates remain available. The bar opening instead uses
+eight reusable clock-based street underlays behind an exact-pixel room shell.
+The original nine interiors, furniture, equipment and stage-three beer terrace
+remain intact. No production source/runtime room PNG is replaced.
+
+Four walking adult identities, two helmeted scooters and a car each have four
+frames. Shared read-only `street_view.gd` scales ambient traffic from actual
+guests in trading venues; it creates no customers, receipts, RNG draws or save
+fields. The bar tints pedestrians as subdued silhouettes and clips traffic
+behind the doorway/terrace. District roads use the same separate animated atlases.
+
+Full isolated tests and pacing pass; all activity/time bands, nine apertures and
+motion were inspected at 960×540 and 1280×720. See [testing](TESTING.md),
+[bar motion](street-motion.gif), [district motion](district-motion.gif) and
+[packing/provenance](../art/README.md#street-activity--27-november-2026).
+Target-device play remains unverified. Pushing main triggers the release workflow;
+this source handoff does not claim that release downloads are already published.
+
 ## Separate tills, company funding and growth — 27 November 2026
 
 This revision builds on main `4cfc7e4`, retaining the Rat Plague catch controls,

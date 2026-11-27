@@ -1,5 +1,31 @@
 # Testing and release checks
 
+## Outdoor layers and animated traffic — 27 November 2026
+
+The complete isolated `tools/test.sh` passes on pinned Godot 4.7.2, including
+all pacing suites. `street_activity_check.gd` covers all eight guest boundaries,
+multi-venue aggregation, owner/temporary/raid/scheduled closures, late permission,
+clock periods across midnight, atlas bounds, deterministic animated motion,
+increasing pedestrian/scooter/car counts and read-only navigation/RNG.
+It also checks travel facing and that increasing activity adds traffic without
+teleporting existing actors. The final motion adjustment passed the isolated
+regression suite again. Existing `staff-ready-*` economy previews were also
+captured and reviewed for real service, readiness and closure.
+
+Pixel checks cover all nine room shells: every pixel outside the outdoor mask
+matches the original room exactly, every aperture pixel is transparent and the
+cached source texture remains unchanged. The final beer bar's terrace uses its
+own smaller mask. All existing source and runtime room PNG files remain unchanged.
+
+`preview_street_activity.gd`, launched via `tools/preview-art.sh`, was reviewed at
+960×540 and 1280×720. It captures eight district activity bands, closure/rain,
+eight bar lighting periods, eight traffic levels, all nine room apertures and
+24 animation frames for each view. Fixtures use actual admitted campaign guests
+within venue capacity. [District comparison](street-activity.png),
+[bar lighting](street-underlays.png), [bar motion](street-motion.gif) and
+[district motion](district-motion.gif) show the resulting layers. Android device
+and Windows/macOS execution remain unverified; no export is claimed as a device test.
+
 ## Linux AppImage packaging — 27 November 2026
 
 The release script now produces `PattayaAfterHours-linux-x86_64.AppImage`

@@ -295,6 +295,14 @@ The street gets busy in waves: beer-bar peaks run from 5–9pm, Hostess bars fro
 passersby. More trade also leaves more work: each drink sold during peak time
 makes twice the mess. A gogo's final peak hour tempts the owner into late opening.
 
+The district's eight street illustrations echo that rhythm, from a quiet lane
+under amber lamps to vivid neon and reflections. Their atmosphere follows guests
+currently in open venues; it is a view of the business, not a new crowd reward.
+
+From the bar, Anong sees that neighbourhood through the same doorway: daylight,
+sunset and neon nights, with shadowy pedestrians and passing scooters and cars.
+The room stays familiar while the street outside changes around it.
+
 Late takings come with attention. Operating after 1am raises heat; a raid fines
 the offending venue and shuts it until noon. This is separate from the warned
 street inspection event. Losing the gamble leaves a recoverable business,

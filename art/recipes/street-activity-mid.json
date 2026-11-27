@@ -1,0 +1,27 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "assets/art/district.png",
+  "images": [
+    {
+      "level": 3,
+      "prompt": "Use case: lighting-weather. Asset: pixel-art Godot game street map, level 3 of 8, STEADY. Edit the supplied original district image by changing ONLY illumination. Preserve exact original camera, 16:9 framing, map geometry, all building silhouettes, door/window/roof positions, trees, poles, signs, boardwalk, ocean and all navigation paths. Output 960x540, same crisp detailed pixel-art style. STEADY lighting: approximately half original neon intensity, inviting amber open windows, restrained teal and pink street reflections. Preserve original warm amber/magenta/teal identity and dark readable roofs. Do not add/remove/move architecture, signs or props. Absolutely NO people, silhouettes, crowds, vehicles or characters; live customers are rendered in engine. No readable text, labels, numbers, watermark, UI, borders or montage. One full map plate only.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-c506b50a-e432-4a86-afbb-d264689858d9.png",
+      "output": "art/sources/street-activity-3.png",
+      "attempts": 1
+    },
+    {
+      "level": 4,
+      "prompt": "Use case: lighting-weather. Asset: pixel-art Godot game street map, level 4 of 8, LIVELY. Edit the supplied original district image by changing ONLY illumination. Preserve exact original camera, 16:9 framing, map geometry, all building silhouettes, door/window/roof positions, trees, poles, signs, boardwalk, ocean and all navigation paths. Output 960x540, same crisp detailed pixel-art style. LIVELY lighting: retain original rich illumination but strengthen warm amber windows along the middle row of venues; teal and magenta outlines glowing brightly with colorful street reflections. Preserve original warm amber/magenta/teal identity and dark readable roofs. Do not add/remove/move architecture, signs or props. Absolutely NO people, silhouettes, crowds, vehicles or characters; live customers are rendered in engine. No readable text, labels, numbers, watermark, UI, borders or montage. One full map plate only.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-f5ec1a67-d611-4fb3-860c-4f2372c3e94d.png",
+      "output": "art/sources/street-activity-4.png",
+      "attempts": 1
+    },
+    {
+      "level": 5,
+      "prompt": "Use case: lighting-weather. Asset: pixel-art Godot game street map, level 5 of 8, BUSY. Edit the supplied original district image by changing ONLY illumination. Preserve exact original camera, 16:9 framing, map geometry, all building silhouettes, door/window/roof positions, trees, poles, signs, boardwalk, ocean and all navigation paths. Output 960x540, same crisp detailed pixel-art style. BUSY lighting: vividly luminous teal neon on central Blue Hour bar and vivid pink neon on right-middle Toybox venue, stronger amber window light, richer long saturated magenta and cyan reflections down the street and walkways. Keep dark roof shapes readable and preserve original warm amber/magenta/teal identity. Do not add/remove/move architecture, signs or props. Absolutely NO people, silhouettes, crowds, vehicles or characters; live customers are rendered in engine. No readable text, labels, numbers, watermark, UI, borders or montage. One full map plate only.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-553da2dd-f125-43b7-8a62-bdb8c458c1bb.png",
+      "output": "art/sources/street-activity-5.png",
+      "attempts": 1
+    }
+  ]
+}

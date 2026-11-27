@@ -66,6 +66,61 @@ prompt is not deterministic; packing the committed sources is deterministic.
 
 ## Engine mapping
 
+### Street activity — 27 November 2026
+
+Eight new lighting edits of the existing district map are saved as
+`sources/street-activity-0.png` through `sources/street-activity-7.png`.
+The built-in image generator produced individual reference edits; exact prompts
+and returned source paths are in `recipes/street-activity-low.json`,
+`recipes/street-activity-mid.json` and `recipes/street-activity-high.json`.
+The original district source and runtime plate remain intact. Fine illustrated
+details vary between generated edits, while destinations and road layout match.
+`tools/prepare_street_art.py` packs each into a 960×540 RGB runtime plate and
+updates the manifest; the full packer calls it too. No people are baked into
+the plates. The scoped packer preserves all existing room files byte-for-byte.
+
+`district.gd` reads customers in currently trading venues, choosing Quiet / Sleepy /
+Warming up / Steady / Lively / Busy / Buzzing / Packed at 0/1/3/6/10/16/24/36
+guests. A 0.4-second crossfade softens transitions. Four adult walking identities,
+two helmeted scooters and a compact car have four animation frames each.
+`street_view.gd` supplies deterministic motion and activity bands to both views.
+The district caps its ambient traffic at 36 walkers, six scooters and three cars.
+They disappear at zero activity and are not extra admitted customers. Animation
+and image selection are read-only, with no RNG or saved visual state. Signs,
+controls, Anong, paths and destinations remain engine-authored. Rain stays an
+engine effect. Atlas prompts and provenance are in `recipes/street-walkers.json`,
+`street-scooters.json` and `street-cars.json`.
+
+The bar uses eight reusable **time-of-day underlays**, cropped to 164×435 from
+lighting edits of `beer-1.png`. The clock selects late night / before dawn /
+dawn / morning / daylight / sunset / dusk / night at
+00:00/03:00/05:00/07:00/11:00/17:00/19:00/21:00. The first second of each
+period crossfades. `street-window-*.json` and `street-daylight-*.json` record
+the built-in image prompts and source receipts; `street-packing.json` maps
+the selected sources to runtime periods. Unused night-lighting studies remain
+authoring-only. Generated interior pixels are discarded during packing.
+
+`Art.room_shell` makes a cached transparent aperture in the existing room texture.
+The underlay and moving traffic draw first, then this exact original foreground
+occludes them. Pixels outside the aperture remain unchanged, including all
+purchased equipment. The stage-three beer bar uses a smaller, distant cutout
+behind its original furnished terrace. Bar traffic caps at seven subdued walkers,
+three scooters and two cars, scaled by distance. Room sources, runtime PNGs and
+property thumbnails remain unchanged.
+
+```sh
+PATTAYA_PREVIEW_SCRIPT=tests/preview_street_activity.gd tools/preview-art.sh /tmp/pattaya-street-activity
+```
+
+This preview covers all eight bands, closure and rain, eight bar lighting periods,
+all nine room apertures and animated traffic using actual campaign customers.
+See [the district comparison](../docs/street-activity.png) and
+[the bar comparison](../docs/street-underlays.png).
+Motion previews: [inside the bar](../docs/street-motion.gif) and
+[district crowd](../docs/district-motion.gif).
+
+### Shared scene catalog
+
 `scripts/art.gd` owns texture lookup, venue stages, identities, semantic animation
 states, atlas bounds and event identifiers. City staff availability comes from
 the existing campaign state. Gogo stages use one, two or three pole positions;
@@ -73,12 +128,10 @@ remaining hosts work the floor. Interior adults share a floor-depth scale, inclu
 The foreground counter occludes Anong's legs; crops of the original venue plate
 occlude bartenders behind the illustrated counters. Customers and pool tables
 are drawn in floor-depth order, with waiting-order dots above customer heads.
-Both pool tables stay indoors. Street traffic follows the visible outside lane,
-cycling through the three distinct existing patron appearances on successive
-crossings, alternating direction and leaving a short gap. Each appearance stays
-fixed throughout its crossing; the patron cells are not a walking-animation cycle.
-The visual clock does not consume gameplay RNG or count as customer arrivals;
-the furnished beer-bar terrace does not receive a passerby sprite. Event effects
+Both pool tables stay indoors. Street traffic follows the visible outside lane
+using the separate walking and vehicle atlases described above. The visual clock
+does not consume gameplay RNG or count as customer arrivals; the furnished
+beer-bar terrace only reveals distant traffic behind its furnishings. Event effects
 do not add an indoor decorative crowd. The message strip sits above the room,
 leaving customers' feet clear of the property selector.
 

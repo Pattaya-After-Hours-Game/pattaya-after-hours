@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "reference": "assets/art/district.png",
+  "outputs": [
+    {
+      "level": 0,
+      "prompt": "Use case: lighting-weather. Edit the supplied image as the exact target, not as loose inspiration. Asset: Godot pixel-art district street activity plate 0, Quiet, 16:9 960x540. Preserve pixel-art style, exact camera/map geometry, buildings, roofs, signs, props, waterline, navigation paths, and every object position. Change LIGHTING ONLY: dim moody indigo street, most windows and neon lighting switched off, essential amber streetlamp pools keep every path legible. Very faint amber, magenta and teal palette identity remains. Reduce road and sea reflections to match quiet lighting. No people or crowds (live Godot customers are overlaid), no readable text, no new elements, no moved architecture. Keep identical waterfront and framing.",
+      "generatedSource": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-51fa-7141-a02b-1a93dd9e13b4/exec-00cba220-8bde-405b-9ed4-89e5db7eaec1.png",
+      "savedSource": "art/sources/street-activity-0.png",
+      "attempts": 1,
+      "qa": "Visual inspection: map landmark positions, road and waterfront geometry retained; no people or readable text. Output near 16:9 requires runtime normalization; generated style softer than original pixel art at high resolution."
+    },
+    {
+      "level": 1,
+      "prompt": "Use case: lighting-weather. Edit the supplied original image as exact target, not loose inspiration. Asset: Godot pixel-art district activity plate 1, Sleepy, 16:9 960x540. Preserve pixel-art style, exact camera/map geometry, buildings, roofs, signs, props, waterline, navigation paths, every object position. Change LIGHTING ONLY: dark indigo late-night street, a few amber windows glow (around one in five), faint teal outline of the central Blue Hour bar sign and awning, very faint pink boxing-gloves outline. Essential amber streetlamps illuminate clear paths; most neon remains off. Low glow and restrained reflections, a small step brighter than an almost-dark empty street, far dimmer than original reference. Retain original amber/magenta/teal identity. No people or crowds (live Godot customers overlaid), no readable text, no new or moved elements. Keep identical waterfront/framing.",
+      "generatedSource": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-51fa-7141-a02b-1a93dd9e13b4/exec-e35488a0-47ba-4884-910e-d8ba089b234d.png",
+      "savedSource": "art/sources/street-activity-1.png",
+      "attempts": 1,
+      "qa": "Visual inspection: map landmark positions, road and waterfront geometry retained; no people or readable text. Output near 16:9 requires runtime normalization; generated style softer than original pixel art at high resolution."
+    },
+    {
+      "level": 2,
+      "prompt": "Use case: lighting-weather. Edit the supplied original image as exact target, not loose inspiration. Asset: Godot pixel-art district activity plate 2, Warming up, 16:9 960x540. Preserve pixel-art style, exact camera/map geometry, buildings, roofs, signs, props, waterline, navigation paths and every object position. Change LIGHTING ONLY: subdued indigo night with roughly one third of amber windows lit, gentle pink and teal venue neon beginning to glow. Central Blue Hour sign edge and side awning highlights lit teal, boxing-gloves sign soft pink, a few warm counter lights on. Essential amber lamps and restrained wet-street reflections. More lively than sleepy street, clearly far below full-bright original reference. Keep original warm amber/magenta/teal identity. No people or crowds (live Godot customers overlaid), no readable text, no new elements or moved architecture. Match original waterfront and framing exactly.",
+      "generatedSource": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-51fa-7141-a02b-1a93dd9e13b4/exec-03304f8d-9cf3-4a14-8aab-87f7576a4e9b.png",
+      "savedSource": "art/sources/street-activity-2.png",
+      "attempts": 1,
+      "qa": "Visual inspection: map landmark positions, road and waterfront geometry retained; no people or readable text. Output near 16:9 requires runtime normalization; generated style softer than original pixel art at high resolution."
+    }
+  ]
+}

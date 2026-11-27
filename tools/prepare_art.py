@@ -240,6 +240,8 @@ for sheet, cols, rows, cell in [
     atlas.save(OUT/(sheet+'.png'))
 Image.open(SRC/'bed-race-beach.png').convert('RGB').resize((960,320),NEAREST).save(OUT/'bed-race-beach.png')
 
+from prepare_street_art import prepare as prepare_street
+prepare_street()
 manifest={}
 for p in sorted(OUT.glob('*.png')):
     im=Image.open(p)

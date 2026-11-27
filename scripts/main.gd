@@ -3039,6 +3039,7 @@ func walk_district() -> void:
 	district = District.new()
 	district.size = Vector2(960,540)
 	district.weather = int(model.s.weather)
+	district.street_state = model.s.street
 	district.destination.connect(func(index: int):
 		close_district()
 		change_tab(index))

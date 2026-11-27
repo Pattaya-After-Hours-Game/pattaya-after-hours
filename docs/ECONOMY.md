@@ -11,6 +11,21 @@ advances this model once per foreground second and settles reports every 120
 seconds of street trading, plus one partial report at overnight closure. UI and artwork consume this state; they never award sales themselves.
 Balance and purchase definitions live in `scripts/street_content.gd`.
 
+District artwork reads the total customers currently in trading venues, using
+`Economy.trading` for opening, late permission, owner, raid and temporary closures.
+Eight visual bands begin at 0/1/3/6/10/16/24/36 guests. The atmosphere plates
+and bounded ambient street walkers create no arrivals, orders, revenue or RNG
+draws. The map labels the actual count as guests in open venues. No save fields
+or economic thresholds change.
+
+The bar's reusable exterior underlay instead follows eight clock periods, starting
+at 00:00/03:00/05:00/07:00/11:00/17:00/19:00/21:00. Cars, scooters and animated
+pedestrians use the same activity bands in both views. District caps are 36
+pedestrians, six scooters and three cars; the narrow bar opening caps them at
+seven/three/two. These are ambient visual traffic, not customers, queues or
+capacity. All nine original interiors retain exact pixels outside their outdoor
+apertures; the final beer bar uses a smaller opening behind its furnished terrace.
+
 The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.

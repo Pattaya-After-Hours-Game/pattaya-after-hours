@@ -1,0 +1,20 @@
+{
+  "generator": "built-in image_gen",
+  "edit_target": "assets/art/district.png",
+  "outputs": [
+    {
+      "level": 6,
+      "prompt": "Use case: lighting-weather. Asset type: Godot pixel-art street map activity plate 6 of 8, Buzzing. Input image is the edit target. Edit ONLY illumination and reflections of this exact 960x540 16:9 pixel-art waterfront nightlife street map. Preserve original camera, exact map geometry, all building silhouettes, rooflines, roads, alley widths, waterfront, navigation paths, signs and every prop in identical positions. Preserve original crisp detailed pixels, dark roof silhouettes and warm amber / magenta / teal identity. Buzzing level: strong electric teal and magenta neon, warmly radiant windows, brilliant layered multicolored reflections on roads and waterfront, vivid busy nightlife lighting. No people or crowds at all: live characters will be drawn by the game separately. Do not add, remove, resize or move buildings, signs, props, roads or people. No readable text. No festival bunting, confetti, lasers, cars, UI or watermark. Keep the original waterfront and navigation paths exactly. This is a lighting-only edit, keep architecture unchanged.",
+      "generation_output_hint": "Generated images are saved to /var/home/rebellionrumco/.codex/generated_images/01a21a80-a510-77b0-93de-378e5f07d964 as /var/home/rebellionrumco/.codex/generated_images/01a21a80-a510-77b0-93de-378e5f07d964/exec-1aa006bc-ed5d-4365-9f99-81881577e675.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "path": "art/sources/street-activity-6.png",
+      "qa": "No crowds or people; main map composition, roads and waterfront retained. Generated fine trim/prop details can vary; native source requires runtime resize."
+    },
+    {
+      "level": 7,
+      "prompt": "Use case: lighting-weather. Asset type: Godot pixel-art street map activity plate 7 of 8, Packed. Input image is the edit target. Edit ONLY illumination and reflections of this exact 960x540 16:9 pixel-art waterfront nightlife street map. Preserve original camera, exact map geometry, all building silhouettes, rooflines, roads, alley widths, waterfront, navigation paths, signs and every prop in identical positions. Preserve original crisp detailed pixels and dark roof silhouettes. Packed level: maximum neon nightlife glow without blown out whites, intensely saturated electric cyan and pink light pools, golden windows glowing like lanterns, shimmering multicolored water and wet street reflections, rich amber / magenta / teal identity. No people or crowds at all: live characters are added by the game separately. Do not add, remove, resize or move architecture, signs, props, roads or people. No readable text. No festival bunting, confetti, lasers, cars, UI or watermark. Keep the original waterfront and navigation paths exactly. This is a lighting-only edit, keep architecture unchanged.",
+      "generation_output_hint": "Generated images are saved to /var/home/rebellionrumco/.codex/generated_images/01a21a80-a510-77b0-93de-378e5f07d964 as /var/home/rebellionrumco/.codex/generated_images/01a21a80-a510-77b0-93de-378e5f07d964/exec-e29923b9-a3b2-4658-a37c-d3076bf9ab42.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "path": "art/sources/street-activity-7.png",
+      "qa": "No crowds or people; main map composition, roads and waterfront retained. Generated fine trim/prop details can vary; native source requires runtime resize."
+    }
+  ]
+}

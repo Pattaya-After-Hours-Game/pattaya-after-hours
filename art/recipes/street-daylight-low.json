@@ -1,0 +1,9 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "reference": "assets/art/beer-1.png",
+  "prompt": "Use case: lighting-weather. Edit Image1 exactly as target: original full 16:9 pixel-art Thai beer bar room. Create MORNING street daylight variant. Change ONLY OUTDOOR STREET VISIBLE THROUGH LEFT OPENING (roughly original x44..200 y100..470): gentle clear tropical morning daylight, pale blue sky, warm cream sunlight, cool soft blue shadows, exterior neon lights switched off. Same buildings, facades, air conditioners, plants, street paving and exact vanishing point/framing. No festival, rain, crowds or people; no moving vehicles. Remove parked pink scooter from outdoor opening, replacing it with continuous unchanged pavement/plants behind it, because engine scooter traffic will be overlaid. Preserve doorway posts and awning exactly. Preserve ALL INTERIOR elements, textures, lights, shrine, counter, stools, refrigerator, room walls/ceiling/floor and composition; interior must stay identical to reference, no new daylight spill across room. No new objects, signs or readable text. Full original 16:9 frame, not an outdoor crop. Crisp original pixel-art rendering.",
+  "generatedSource": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-51fa-7141-a02b-1a93dd9e13b4/exec-bcc2bb63-6364-458c-b772-86ecfd5b8482.png",
+  "savedSource": "art/sources/street-daylight-1.png",
+  "attempts": 1,
+  "qa": "Full room source retained. Outdoor morning daylight pale blue sky and warm light, original street perspective maintained, scooter removed. No people or moving vehicles. Composite outdoor opening only to preserve exact original room pixels."
+}

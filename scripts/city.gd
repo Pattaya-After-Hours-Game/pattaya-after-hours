@@ -3,6 +3,7 @@ const Art = preload("res://scripts/art.gd")
 const Economy = preload("res://scripts/economy.gd")
 const Content = preload("res://scripts/street_content.gd")
 const RatSwarm = preload("res://scripts/rat_swarm.gd")
+const StreetView = preload("res://scripts/street_view.gd")
 const INK = Color("#21131e")
 const TEAL = Color("#73f5dc")
 const PINK = Color("#f37ab0")
@@ -119,13 +120,15 @@ func _draw() -> void:
 	var stage := int(bar.stage)
 	var tier := fridge_tier(bar) if not bars.is_empty() else -1
 	var backdrop := Art.venue(kind,stage,fan_owned(bar),screen_owned(bar),tier)
-	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
+	# Exterior and its traffic sit UNDER the original room's exact-pixel shell.
+	_draw_street(kind,stage)
+	var shell := Art.room_shell(backdrop,kind,stage)
+	if shell: draw_texture_rect(shell,Rect2(0,0,960,540),false)
 	if tier>=0: _draw_fridge_stock(tier,int(bar.stock))
 	if celebrating: _draw_celebration()
 	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
 	# Only the street opening contains ambient traffic. Interior sprites come
 	# from the actual customers and available team, sorted by their floor depth.
-	_draw_passerby(kind,stage)
 	var people := scene_people(bar)
 	for person in people:
 		if person.behind_bar: _draw_person(person)
@@ -311,28 +314,14 @@ static func counter_regions(kind: int, stage: int) -> Array[Rect2]:
 		return [Rect2(440,278,400,120)]
 	return [Rect2(665,290,180,110)]
 
-func _draw_passerby(kind: int, stage: int) -> void:
-	# The stage-three beer bar has a furnished terrace in this opening.
-	if kind==0 and stage==3: return
-	var passerby := passerby_at(clock)
-	var tint := Color(.72,.80,.92,passerby.alpha)
-	Art.frame(self,"patrons",passerby.pose,passerby.foot,passerby.scale,passerby.flip,Vector2.ZERO,tint)
-
-static func passerby_at(time: float) -> Dictionary:
-	# Cells 0 and 2 depict the same man. Choose distinct appearances per
-	# crossing, never per animation frame, and leave a gap between people.
-	# This visual clock does not consume campaign RNG or create customers.
-	var cycle := int(maxf(0,time)/24.0)
-	var progress := clampf(fposmod(maxf(0,time),24.0)/20.0,0,1)
-	var approaching := cycle%2==0
-	var depth := progress if approaching else 1-progress
-	return {
-		"pose":[2,3,1][cycle%3],
-		"foot":Vector2(183,278).lerp(Vector2(122,355),depth),
-		"scale":lerpf(.36,.56,depth),
-		"flip":approaching,
-		"alpha":smoothstep(0,.12,progress)*(1-smoothstep(.88,1,progress))
-	}
+func _draw_street(kind: int, stage: int) -> void:
+	var minute := int(street_state.get("minute",720))
+	var period := StreetView.period(minute)
+	var blend := clampf(float(minute-StreetView.TIME_STARTS[period])+float(street_state.get("tick_fraction",0.0)),0,1)
+	if blend<1:
+		Art.image(self,"street-day-%d" % posmod(period-1,8),Rect2(Art.STREET_RECT))
+	Art.image(self,"street-day-%d" % period,Rect2(Art.STREET_RECT),Color(1,1,1,blend))
+	StreetView.draw_traffic(self,StreetView.activity(street_state),clock,true,kind==0 and stage==3)
 
 func scene_people(bar: Dictionary) -> Array:
 	var people: Array = []

@@ -1,5 +1,6 @@
 extends Control
 const Art = preload("res://scripts/art.gd")
+const StreetView = preload("res://scripts/street_view.gd")
 signal destination(index: int)
 signal dismissed
 const TEAL = Color("#73ffdc")
@@ -16,6 +17,13 @@ const SITES = [
 ]
 const LANES = [58.0,114.0,169.0]
 const ALLEYS = [12.0,103.0,216.0,310.0]
+# Absolute street activity, rather than how full one small bar is.
+const ACTIVITY_GUESTS = StreetView.GUEST_BANDS
+const ACTIVITY_NAMES = StreetView.NAMES
+var street_state: Dictionary = {}
+var plate_level := -1
+var previous_plate := -1
+var plate_blend := 1.0
 var point := Vector2(160,114)
 var target := point
 var waypoints: Array[Vector2] = []
@@ -33,6 +41,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	clock += delta
+	update_activity(delta)
 	var axis := Input.get_vector("ui_left","ui_right","ui_up","ui_down")
 	if Input.is_physical_key_pressed(KEY_A): axis.x -= 1
 	if Input.is_physical_key_pressed(KEY_D): axis.x += 1
@@ -61,6 +70,23 @@ func _process(delta: float) -> void:
 		focus_site = -1
 		destination.emit(SITES[selected][2])
 	queue_redraw()
+
+func live_guests() -> int:
+	return StreetView.live_guests(street_state)
+
+func activity_level() -> int:
+	return StreetView.activity(street_state)
+
+func update_activity(delta: float) -> void:
+	var next := activity_level()
+	if plate_level<0:
+		plate_level = next
+		previous_plate = next
+	elif next!=plate_level:
+		previous_plate = plate_level
+		plate_level = next
+		plate_blend = 0.0
+	plate_blend = minf(1.0,plate_blend+delta*2.5)
 
 func on_path(p: Vector2) -> bool:
 	if not Rect2(5,48,310,127).has_point(p): return false
@@ -129,7 +155,11 @@ func _input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
-	Art.image(self,"district",Rect2(0,0,960,540))
+	var current := activity_level() if plate_level<0 else plate_level
+	var plate_rect := Rect2(0,0,960,540)
+	if plate_blend<1.0 and previous_plate>=0:
+		Art.image(self,"street-activity-%d" % previous_plate,plate_rect)
+	Art.image(self,"street-activity-%d" % current,plate_rect,Color(1,1,1,plate_blend))
 	for i in SITES.size():
 		var item: Array = SITES[i]
 		var rect := site_rect(i)
@@ -138,9 +168,7 @@ func _draw() -> void:
 		draw_rect(rect,Color("#211621ee"))
 		draw_rect(rect,item[3] if nearby==i else GOLD.darkened(.4),false,1)
 		draw_string(font,rect.position+Vector2(5,30),item[0],HORIZONTAL_ALIGNMENT_CENTER,rect.size.x-10,16,item[3])
-	for i in 6:
-		var x := fposmod(i*147+clock*(9+i),960)
-		Art.frame(self,"patrons",2+i%2,Vector2(x,348-absf(sin(clock*7+i))),.22,i%2==1)
+	StreetView.draw_traffic(self,activity_level(),clock)
 	var breath := 1.0 if walking else 1.0+.008*sin(clock*2)
 	Art.frame(self,"anong-walk",facing*4+(int(clock*24)%4 if walking else 0),point*3,.3,false,Vector2(128,192),Color.WHITE,Vector2(1,breath))
 	if weather>=5:
@@ -150,6 +178,8 @@ func _draw() -> void:
 	draw_rect(Rect2(0,0,960,48),Color("#21161ff5"))
 	draw_string(font,Vector2(15,29),"BAY DISTRICT",HORIZONTAL_ALIGNMENT_LEFT,-1,23,GOLD)
 	draw_string(font,Vector2(242,29),"WASD / tap to walk · E to enter",HORIZONTAL_ALIGNMENT_LEFT,-1,14,TEAL)
+	draw_string(font,Vector2(583,22),ACTIVITY_NAMES[current].to_upper(),HORIZONTAL_ALIGNMENT_LEFT,235,15,PINK)
+	draw_string(font,Vector2(583,39),"%d guests in open venues" % live_guests(),HORIZONTAL_ALIGNMENT_LEFT,235,12,TEAL)
 	draw_rect(Rect2(828,6,126,36),Color("#51333d"))
 	draw_string(font,Vector2(839,30),"BACK  [ESC]",HORIZONTAL_ALIGNMENT_LEFT,-1,16,GOLD)
 	if nearby>=0:

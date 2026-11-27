@@ -647,6 +647,158 @@
     ],
     "sha256": "4b1ed8d3dfc4617f31a076d4ca9de2b8d13bf66811827394de66a39d93fc9716"
   },
+  "street-activity-0": {
+    "file": "res://assets/art/street-activity-0.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "50ac99d0bbb219193800ac65c40acf0e0607d9b97050148ad92de33f92200082"
+  },
+  "street-activity-1": {
+    "file": "res://assets/art/street-activity-1.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "00546cb893c7d7f536dee408b7ff89d6b92047d6730e04d342a6d84af3435d9d"
+  },
+  "street-activity-2": {
+    "file": "res://assets/art/street-activity-2.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "4176b2130c7ccece5c48b0189ae3a70df4db14ce10de21ebfc7e0b1ccceee7b1"
+  },
+  "street-activity-3": {
+    "file": "res://assets/art/street-activity-3.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "e66ceb87261a34143c038c97a7ed485890f4f411aa6c3090356b411461c12a5f"
+  },
+  "street-activity-4": {
+    "file": "res://assets/art/street-activity-4.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "07454b11295bee5a8386932ca7031140efeeecb1e783e766cede0e609a3947be"
+  },
+  "street-activity-5": {
+    "file": "res://assets/art/street-activity-5.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "de43ce9ee9325828b3d323c38e63a318b83a77f9f3ceb1280f8fbaa49db98c65"
+  },
+  "street-activity-6": {
+    "file": "res://assets/art/street-activity-6.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "9ed689d13cdd2d5c5d79cea52d373a66046b59aac88f4035d6a9e5a9f724dc8e"
+  },
+  "street-activity-7": {
+    "file": "res://assets/art/street-activity-7.png",
+    "size": [
+      960,
+      540
+    ],
+    "sha256": "23a90380c820d1f64e5bf680335c2bd644e0942015e52b50a79b121e926b58ed"
+  },
+  "street-cars": {
+    "file": "res://assets/art/street-cars.png",
+    "size": [
+      896,
+      112
+    ],
+    "sha256": "f0c86ca2899ee8ab2f40bf12413471b2f1052e33fc8f6dff82033ff177f7be54"
+  },
+  "street-day-0": {
+    "file": "res://assets/art/street-day-0.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "cf8fc43bac44cd5a6606c72490aed95eceab4933847bb42c9008286ef588db79"
+  },
+  "street-day-1": {
+    "file": "res://assets/art/street-day-1.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "6b9bfdad33125b11331a923659144da6e4dfdc7e6efc1aa17cad1c723e04849f"
+  },
+  "street-day-2": {
+    "file": "res://assets/art/street-day-2.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "5ffbbaf8362f041642b5513d12bb284a2e0603ce28182d83fbfd196b6aa5e642"
+  },
+  "street-day-3": {
+    "file": "res://assets/art/street-day-3.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "8fdc0f8ddc6769e451c7e6b6b201214c35d66e3702272840aeacd6b6bb62367f"
+  },
+  "street-day-4": {
+    "file": "res://assets/art/street-day-4.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "886c987573988094bce106e52904e4a06eddb8a2d44d0d4bdab446f1aa824565"
+  },
+  "street-day-5": {
+    "file": "res://assets/art/street-day-5.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "2c07c0569db9c90db4abb23f110d165aa7c98029ecec60aa14376d5236326757"
+  },
+  "street-day-6": {
+    "file": "res://assets/art/street-day-6.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "d8051490e4f6de91ee0086bab91ab6077b2a0bcc32ac00dcda1e99c638b3d795"
+  },
+  "street-day-7": {
+    "file": "res://assets/art/street-day-7.png",
+    "size": [
+      164,
+      435
+    ],
+    "sha256": "00ec8bf7b901b351036f5f03480a13efadcc69cfbd22a381cd2fdcf580ebeb18"
+  },
+  "street-scooters": {
+    "file": "res://assets/art/street-scooters.png",
+    "size": [
+      768,
+      288
+    ],
+    "sha256": "a816f4d22ca964a9efd57d900039d6d0427fee4dc25c28fb5a70dda79bf2c643"
+  },
+  "street-walkers": {
+    "file": "res://assets/art/street-walkers.png",
+    "size": [
+      384,
+      512
+    ],
+    "sha256": "0d0996e9c72589c81a576837ab8c6899921b4b57c6b28363011809d0827a6947"
+  },
   "toybox": {
     "file": "res://assets/art/toybox.png",
     "size": [

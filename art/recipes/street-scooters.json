@@ -1,0 +1,19 @@
+{
+  "generator": "built-in image_gen",
+  "style_reference": "assets/art/beer-1.png",
+  "prompt": "Use case: stylized-concept. Asset type: Godot animated scooter sprite atlas, genuine transparent background. Reference image is rendering/style reference ONLY: match the crisp outlined colorful production pixel art of the small scooter visible outside this bar. Create ONE clean sprite sheet, exactly 4 columns × 2 rows with eight equal fixed-size cells, transparent background and no visible grid. Row 0: a red small Thai motor scooter carrying ONE fully clothed ADULT rider wearing a helmet, short-sleeve casual shirt, trousers and shoes. Row 1: a teal small Thai motor scooter carrying TWO fully clothed ADULTS, both wearing helmets; driver and passenger casual shirts, trousers and shoes. In every cell the scooters face RIGHT in identical strict side profile. Each row is four successive subtle ride animation frames of the SAME vehicle and SAME rider identities/clothes, slight lean/tiny bob, rotating wheel spokes, hands on handlebars, feet on footboard. Entire scooter and riders fully visible with generous clear padding, equal frame scale, identical centered horizontal placement per cell and consistent wheel-ground baseline. Transparent empty pixels separate all frames. Both wheels visible. Crisp cartoon pixel-art dark outlines, warm magenta/cyan accent shading matching the reference bar. No text, labels, grid, shadows, road, background, scenery, motion streaks, cropped limbs or extra vehicles.",
+  "generation_output_hint": "Generated images are saved to /var/home/rebellionrumco/.codex/generated_images/01a21a80-a510-77b0-93de-378e5f07d964 as /var/home/rebellionrumco/.codex/generated_images/01a21a80-a510-77b0-93de-378e5f07d964/exec-21496989-6d70-41e9-a1c0-8ec7c7dcda90.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+  "path": "art/sources/street-scooters.png",
+  "qa": {
+    "size": [
+      1774,
+      887
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "content": "Two rows of four right-facing scooter frames, helmeted fully clothed adults, red solo and teal pair, no scenery. Genuine alpha, subtle bob/lean; cell bounds need normalization while packing due to odd native resolution."
+  }
+}

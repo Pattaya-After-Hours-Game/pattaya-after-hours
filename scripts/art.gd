@@ -6,6 +6,8 @@ const STAFF = ["dao", "mali", "fern", "nok", "jin", "pim"]
 const HOSTS = ["bee", "may", "june", "lek", "fah", "nan"]
 const FRIDGE_ORIGIN = Vector2i(800,160)
 const FRIDGE_CELL = Vector2i(160,256)
+const STREET_RECT = Rect2i(40,40,164,435)
+static var street_masks: Dictionary = {}
 # Appearance is independent of audience, spending budget and gameplay RNG.
 const CUSTOMER_VARIANTS = [
 	["patrons-men",0], ["patrons",1], ["patrons-men",2],
@@ -76,6 +78,34 @@ static func venue(kind: int, stage: int, has_fan: bool = true, has_screen: bool 
 static func frontage(kind: int, stage: int) -> Texture2D:
 	return texture("frontage-%s-%d" % [TYPES[clampi(kind,0,2)],clampi(stage,1,3)])
 
+static func street_mask(terrace: bool = false) -> Image:
+	if not street_masks.has(terrace):
+		# Conservative apertures protect posts, awnings, the threshold and terrace.
+		var polygon := PackedVector2Array([Vector2(44,51),Vector2(50,50),Vector2(55,54),Vector2(60,57),Vector2(65,60),Vector2(70,61),Vector2(75,60),Vector2(80,67),Vector2(85,70),Vector2(90,72),Vector2(95,71),Vector2(100,73),Vector2(105,81),Vector2(110,82),Vector2(115,84),Vector2(120,84),Vector2(125,88),Vector2(130,91),Vector2(135,96),Vector2(140,98),Vector2(145,98),Vector2(150,103),Vector2(155,104),Vector2(160,109),Vector2(165,111),Vector2(170,113),Vector2(175,116),Vector2(180,122),Vector2(185,123),Vector2(190,127),Vector2(195,130),Vector2(198,131),Vector2(198,355),Vector2(44,468)])
+		if terrace:
+			polygon = PackedVector2Array([Vector2(180,193),Vector2(198,184),Vector2(198,278),Vector2(185,291),Vector2(185,252),Vector2(180,236)])
+		var mask := Image.create(STREET_RECT.size.x,STREET_RECT.size.y,false,Image.FORMAT_RGBA8)
+		for y in mask.get_height():
+			for x in mask.get_width():
+				if Geometry2D.is_point_in_polygon(Vector2(STREET_RECT.position)+Vector2(x+.5,y+.5),polygon):
+					mask.set_pixel(x,y,Color.WHITE)
+		street_masks[terrace] = mask
+	return street_masks[terrace]
+
+static func room_shell(backdrop: Texture2D, kind: int, stage: int) -> Texture2D:
+	if backdrop==null: return null
+	var key := "street-shell#%d" % backdrop.get_instance_id()
+	if not textures.has(key):
+		var room := backdrop.get_image().duplicate() as Image
+		room.convert(Image.FORMAT_RGBA8)
+		var mask := street_mask(kind==0 and stage==3)
+		for y in mask.get_height():
+			for x in mask.get_width():
+				if mask.get_pixel(x,y).a>0:
+					room.set_pixel(x+STREET_RECT.position.x,y+STREET_RECT.position.y,Color.TRANSPARENT)
+		textures[key] = ImageTexture.create_from_image(room)
+	return textures[key]
+
 static func image(canvas: CanvasItem, id: String, rect: Rect2, tint: Color = Color.WHITE) -> void:
 	var tex := texture(id)
 	if tex: canvas.draw_texture_rect(tex,rect,false,tint)
@@ -98,6 +128,9 @@ static func atlas_specs() -> Dictionary:
 	specs["patrons-capybara"] = [Vector2(224,192),5]
 	specs["gabby"] = [Vector2(160,192),4]
 	specs["daisy"] = [Vector2(160,256),6]
+	specs["street-walkers"] = [Vector2(96,128),16]
+	specs["street-scooters"] = [Vector2(192,144),8]
+	specs["street-cars"] = [Vector2(224,112),4]
 	specs["patrons-rainbow-duo"] = [Vector2(160,192),2]
 	for id in STAFF: specs[id] = [Vector2(160,192),4]
 	for id in HOSTS: specs[id] = [Vector2(160,256),6]

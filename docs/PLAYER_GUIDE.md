@@ -32,6 +32,19 @@ Leases use the bank for the rent and transfer a separately displayed starting
 float into the new till. Old saves retain all their cash: working floats go to
 the venues and the remainder goes to the bank. See the [finance rules](design/FINANCE_AND_GROWTH.md).
 
+## See the street get busy
+
+Choose **Walk district** to see eight street moods: Quiet, Sleepy, Warming up,
+Steady, Lively, Busy, Buzzing and Packed. Lighting and reflections become more
+vivid as the total guests in your open venues grows. The header shows that live
+count. Street walkers illustrate activity; entering the map does not admit
+extra customers. All six destinations and walking controls stay available.
+
+Inside the bar, look through the left opening: the street background follows
+time of day, while animated walkers, scooters and cars reflect current activity.
+They stay outside, behind the existing doorway and furnishings. They are ambient
+traffic, separate from the actual guests and orders inside your venue.
+
 ## Drink prices and restocking money
 
 House beers are ฿80 in beer bars, ฿100 in hostess bars and ฿120 in gogos.

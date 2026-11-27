@@ -101,6 +101,7 @@ the affected screens when changing visuals, controls, audio, or mobile layout.
 | `scripts/content.gd` | Six staff profiles, events, tours, weather, 51 incident cards, 15 story beats |
 | `scripts/city.gd` | Layered venue interiors, available workers, event treatments and Godzilla |
 | `scripts/district.gd` | Walkable neighborhood and links back to management tabs |
+| `scripts/street_view.gd` | Read-only shared street activity, clock lighting and pedestrian/vehicle animation |
 | `scripts/windows_updates.gd` | Windows release checks, verified executable staging and update worker |
 | `scripts/fight.gd` | Mali's Toybox fights, three opponents, AI, keyboard/touch controls and timed sprite states |
 | `tests/check.gd` | Campaign and UI regression checks |
@@ -125,6 +126,12 @@ trade can fund repayment in Empire. The campaign continues past day 365.
 
 GDScript composes the generated texture catalog with live customers, pool timers,
 role-aware staff animation and event effects.
+Outdoor layers use `tools/prepare_street_art.py` for a scoped rebuild, also called
+by the full art packer. It packs eight district plates, eight reusable clock-based
+street underlays and the walking/scooter/car atlases. Existing room PNGs remain
+unchanged; `Art.room_shell` caches an aperture-only alpha cutout over those layers.
+Use `tests/preview_street_activity.gd` through `tools/preview-art.sh` to inspect
+activity, daylight, all nine venue openings and animated traffic.
 Keep mouse, keyboard, touch, scrolling, and Android back behavior in mind
 when changing interface code.
 

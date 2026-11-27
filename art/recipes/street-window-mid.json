@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "assets/art/beer-1.png",
+  "images": [
+    {
+      "level": 3,
+      "prompt": "Use case: lighting-weather. Asset: Godot pixel-art bar interior with street visible through left opening. Edit supplied image preserving FULL original 16:9 room, output 960x540. HARD EDIT BOUNDARY: change ONLY outdoor street illumination visible THROUGH LEFT OPENING (approximately x44..200 of original960 width, y100..470 of540 height). Leave every interior pixel and layout unchanged, including entire ceiling, wall, bar, stools, refrigerator, shrine, bottles, signs, fan, floor and interior light/reflections. Keep exact camera, perspective and vanishing point. Preserve doorway posts, awning, scooter, plants, street buildings and their geometry. LEVEL 3 STEADY exterior only: steady amber street windows, restrained pink and teal neon reflections on outdoor pavement. No people baked in: no crowds, silhouettes, bodies or characters, because walkers are drawn in engine. No new objects, signs, text, festival, weather or time setting. Same crisp detailed pixel-art style. Pavement remains readable. One full original room scene, no crops, no montage, no borders or watermark.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-75bdb61d-f225-43b1-bb69-9e644e179422.png",
+      "output": "art/sources/street-window-3.png",
+      "attempts": 1,
+      "qa": "Full room layout, perspective and outdoor vanishing point retained; no people. Image generation redraws details, so composite exterior onto original for exact interior preservation."
+    },
+    {
+      "level": 4,
+      "prompt": "Use case: lighting-weather. Asset: Godot pixel-art bar interior with street visible through left opening. Edit supplied image preserving FULL original 16:9 room, output 960x540. HARD EDIT BOUNDARY: change ONLY outdoor street illumination visible THROUGH LEFT OPENING (approximately x44..200 of original960 width, y100..470 of540 height). Leave every interior pixel and layout unchanged, including entire ceiling, wall, bar, stools, refrigerator, shrine, bottles, signs, fan, floor and interior light/reflections. Keep exact camera, perspective and vanishing point. Preserve doorway posts, awning, scooter, plants, street buildings and their geometry. LEVEL 4 LIVELY exterior only: original rich neon illumination strengthened, stronger warm amber street windows, attractive pink and teal light reflections on outdoor pavement. No people baked in: no crowds, silhouettes, bodies or characters, because walkers are drawn in engine. No new objects, signs, text, festival, weather or time setting. Same crisp detailed pixel-art style. Pavement remains readable. One full original room scene, no crops, no montage, no borders or watermark.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-8e205adc-c599-435d-b2b5-d2936602d2eb.png",
+      "output": "art/sources/street-window-4.png",
+      "attempts": 1,
+      "qa": "Full room layout, perspective and outdoor vanishing point retained; no people. Image generation redraws details, so composite exterior onto original for exact interior preservation."
+    },
+    {
+      "level": 5,
+      "prompt": "Use case: lighting-weather. Asset: Godot pixel-art bar interior with street visible through left opening. Edit supplied image preserving FULL original 16:9 room, output 960x540. HARD EDIT BOUNDARY: change ONLY outdoor street illumination visible THROUGH LEFT OPENING (approximately x44..200 of original960 width, y100..470 of540 height). Leave every interior pixel and layout unchanged, including entire ceiling, wall, bar, stools, refrigerator, shrine, bottles, signs, fan, floor and interior light/reflections. Keep exact camera, perspective and vanishing point. Preserve doorway posts, awning, scooter, plants, street buildings and their geometry. LEVEL 5 BUSY exterior only: vividly luminous teal and pink street neon, richer saturated longer magenta and cyan reflections on outdoor street pavement. No people baked in: no crowds, silhouettes, bodies or characters, because walkers are drawn in engine. No new objects, signs, text, festival, weather or time setting. Same crisp detailed pixel-art style. Pavement remains readable. One full original room scene, no crops, no montage, no borders or watermark.",
+      "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-2d540197-0ea3-4b62-9165-6ef76881e7e5.png",
+      "output": "art/sources/street-window-5.png",
+      "attempts": 1,
+      "qa": "Full room layout, perspective and outdoor vanishing point retained; no people. Image generation redraws details, so composite exterior onto original for exact interior preservation."
+    }
+  ]
+}

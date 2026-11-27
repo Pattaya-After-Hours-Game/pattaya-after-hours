@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "reference": "assets/art/beer-1.png",
+  "outputs": [
+    {
+      "level": 0,
+      "prompt": "Use case: lighting-weather. Edit target Image1 exactly: FULL original 16:9 pixel-art beer bar interior, 960x540 framing. Create street-window-0 Quiet. Edit ONLY THE OUTDOOR STREET VISIBLE THROUGH THE LEFT OPENING, roughly x44..200 y100..470 in original. Change exterior illumination to quiet dim indigo street, almost all exterior neon/window lights off, essential warm amber lamps, legible pavement. Preserve exact exterior buildings, scooter, potted plants, posts, awning, vanishing point and geometry. PRESERVE ALL INTERIOR pixels, furniture, ceiling, walls, lights, shrine, counter, stools, refrigerator, floor and room layout. Do not dim or change bar interior or add interior light spill. No people/crowds (engine walkers added later), new objects, new signs, readable text, festival, weather or time-setting change. Only outdoor lighting through left opening changes; everything else stays identical.",
+      "generatedSource": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-51fa-7141-a02b-1a93dd9e13b4/exec-8878b2aa-e1e2-4ec1-aeff-41caf0957526.png",
+      "savedSource": "art/sources/street-window-0.png",
+      "attempts": 1,
+      "qa": "Visual inspection: room composition retained; outdoor lighting progresses from dark lamps to subdued neon. Generated source resamples interior, so runtime should composite only opening onto original to preserve interior pixels. Original sources near16:9 1672x941 require normalization."
+    },
+    {
+      "level": 1,
+      "prompt": "Use case: lighting-weather. Edit target Image1 exactly: FULL original 16:9 pixel-art beer bar interior, 960x540 framing. Create street-window-1 Sleepy. Edit ONLY OUTDOOR STREET THROUGH LEFT OPENING roughly x44..200 y100..470 original. Exterior lighting becomes subdued indigo, most exterior neon off; a few warm amber shop windows and essential amber streetlamps, a faint teal exterior neon outline, very modest reflections and readable pavement. Sparse sleepy light. Preserve exact exterior street buildings, scooter, plants, doorway posts, awning, vanishing point and geometry. PRESERVE ALL INTERIOR pixels, ceiling, lights, shrine, counter, stools, refrigerator, floor, textures, room layout and palette; no changed interior light spill. No people/crowds (engine walkers added later), objects, signs, readable text, festival, weather or time-setting change. Only exterior lighting changes, everything else identical.",
+      "generatedSource": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-51fa-7141-a02b-1a93dd9e13b4/exec-763bddd2-ba86-4426-8af4-27191f02a642.png",
+      "savedSource": "art/sources/street-window-1.png",
+      "attempts": 1,
+      "qa": "Visual inspection: room composition retained; outdoor lighting progresses from dark lamps to subdued neon. Generated source resamples interior, so runtime should composite only opening onto original to preserve interior pixels. Original sources near16:9 1672x941 require normalization."
+    },
+    {
+      "level": 2,
+      "prompt": "Use case: lighting-weather. Edit target Image1 exactly: FULL original 16:9 pixel-art beer bar interior, 960x540 framing. Create street-window-2 Warming up. Edit ONLY OUTDOOR STREET THROUGH LEFT OPENING roughly x44..200 y100..470 original. Exterior lighting subdued indigo night with more amber windows gently lit and gentle soft pink/teal neon beginning along existing shopfronts, moderate warm streetlamps, restrained reflections. Brighter than sparse sleepy lights yet clearly subdued compared with fully lit original reference. Preserve EXACT exterior buildings, scooter, plants, doorway posts, awning, vanishing point and geometry. PRESERVE ALL INTERIOR pixels, ceiling, walls, lights, shrine, counter, stools, refrigerator, floor, textures, room layout and palette, no changed interior light spill. No people/crowds (engine walkers added later), new objects or signs, readable text, festival, weather or time-setting change. Only exterior illumination changes, everything else identical.",
+      "generatedSource": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-51fa-7141-a02b-1a93dd9e13b4/exec-c6168b4c-9226-4486-8933-2adadcb212a9.png",
+      "savedSource": "art/sources/street-window-2.png",
+      "attempts": 1,
+      "qa": "Visual inspection: room composition retained; outdoor lighting progresses from dark lamps to subdued neon. Generated source resamples interior, so runtime should composite only opening onto original to preserve interior pixels. Original sources near16:9 1672x941 require normalization."
+    }
+  ]
+}

@@ -250,6 +250,14 @@ Pim, Mali, Bo and rival owner Anton. The street continues after the festival;
 there is no forced one-year ending. All staff are adults, private activity stays
 off-screen, and hosts retain control over bar-fine participation.
 
+**Walk district** now has eight matching street graphics, from Quiet to Packed.
+Neon, window light, reflections and ambient pedestrians follow the live guest
+count across open venues. The map keeps the same destinations and paths.
+
+From inside any bar, a reusable street underlay follows the game clock from
+daylight to neon nights. Animated shadowy walkers, scooters and cars show how
+busy the street is. The existing room artwork and final beer-bar terrace stay intact.
+
 Street events include Navy visits, inspections, floods, Songkran, viral crowds,
 low season, rival promotions, Rat Plague and Godzilla. When rats pour in from
 the restaurant down the street, call Bo to clear most of the swarm, then click or
