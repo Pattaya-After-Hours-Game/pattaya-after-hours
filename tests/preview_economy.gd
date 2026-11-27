@@ -161,6 +161,25 @@ func run() -> void:
 		await process_frame
 		quit()
 		return
+	if filter.begins_with("tour-manager-"):
+		app.show_tutorial_hint = false
+		app.model.s.cash = 20000
+		app.change_tab(2)
+		await capture(app,"tour-manager-unlock","",false)
+		app.model.upgrade_tours()
+		app.model.upgrade_tours()
+		await capture(app,"tour-manager-level-two")
+		app.model.tour_manager_tick()
+		app.guide = 2
+		await capture(app,"tour-manager-guide")
+		app.model.upgrade_tours(2)
+		app.model.upgrade_tours(2)
+		app.model.upgrade_tours()
+		await capture(app,"tour-manager-trained")
+		app.queue_free()
+		await process_frame
+		quit()
+		return
 	if filter.begins_with("tour-funding-"):
 		app.show_tutorial_hint = false
 		app.model.s.cash = 0

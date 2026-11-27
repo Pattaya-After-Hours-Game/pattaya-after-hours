@@ -1381,3 +1381,21 @@ active promotions show a bar in Events. Active Rat Plague stays untimed.
 No economy rules, assets or save fields changed. Android touch/device play and
 Windows/macOS execution remain unverified. Source verification does not confirm
 that release downloads have been published.
+
+
+## Tour manager and guide training — 27 November 2026
+
+`tests/tour_manager_check.gd` covers exact-price upgrades, strict >฿1,000 checks
+before each guide, full/closed venues, two-hour boundaries including late
+permission, guide/weather refusals, remembered routes, expiry, repeat-safe
+payment, separate trained appeal, manual discounted fees, save round-trips,
+malformed optional fields, old saves, tuning copies, live ticking, menu/offline
+isolation and real UI purchase/toggle controls. The focused isolated runner
+passed with zero failures. The combined `tools/test.sh` includes this suite.
+
+`PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='tour-manager-*' tools/preview-art.sh`
+produces unlock, level-two management, guide detail and fully trained states.
+Reviewed these at 960 × 540 and a 1560 × 720 window (1280 × 720 game canvas).
+The final compact explanation and prices also passed a fresh preview review.
+Existing production art is retained. Device play, Windows/macOS execution and
+release publication remain unverified for this change.

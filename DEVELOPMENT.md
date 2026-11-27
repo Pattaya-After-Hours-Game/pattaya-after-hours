@@ -202,6 +202,18 @@ menu pauses, read-only UI and popup suppression. Run it through `tools/test.sh`
 so save fixtures remain isolated. AFK visual states are in the `afk-*` filter of
 `tests/preview_economy.gd`.
 
+## Tour manager and guide training
+
+`campaign.gd` owns tour upgrade quotes, purchases, guide fees and automation;
+`street.gd` emits `tour_manager_requested` only during live fixed ticks. Fresh,
+loaded and tuning-copy campaigns connect the same handler. `economy.gd` applies
+per-guide trained appeal and weighted referral attribution within bounded demand.
+Optional schema-17 `street.tour_manager` (0–3), `tour_manager_on` (boolean),
+`staff[].tour_training` (0–2) and `tour_route` (route index) validate on load.
+Absence means no purchase, baseline guide skill and Market loop. The guide list
+and detail controls use pure offers; no UI read books or spends. Regression
+coverage is in `tests/tour_manager_check.gd`; previews use `tour-manager-*`.
+
 ## Saves and settings
 
 On default Linux installations, campaign files live at:

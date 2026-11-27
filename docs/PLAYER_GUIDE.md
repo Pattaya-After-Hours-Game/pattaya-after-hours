@@ -182,6 +182,19 @@ The badge above **Tours** counts active agreements. A red **!** appears when
 there are no active tours and the selected venue has a free seat. The guide list
 shows each agreement's remaining trading time or its **Expired** status.
 
+In the guide list, unlock **Tour manager** for **฿2,000**, then switch automation
+on or off. It books eligible guides on their last route (Market loop initially)
+when shared money is **above ฿1,000** and an open venue has a free seat with
+**more than two game hours before closing**. It renews agreements after expiry.
+Turn it off before cancelling a tour if you do not want it booked again.
+Manager levels 2/3 cost **฿4,000/8,000** and save **10%/25%** on future tour fees,
+including manual assignments. Fees round up to whole baht.
+
+Each guide's detail screen has separate **Tour guide training**: **฿800** for
+level 2 (+10% guide appeal), then **฿1,600** for level 3 (+25% total). Training
+works without a manager. Tours still compete for the same street visitors.
+These upgrades do not run tours offline or during guided shifts.
+
 ## When the rats come out
 
 Rats pour in from the restaurant down the street, and seated guests bolt.

@@ -714,11 +714,15 @@ func traffic_rate(offline: bool = false, replacement: Dictionary = {}, marketing
 	if s.weather >= 5: rate *= .8
 	return rate*walk_in_scale
 
+func guide_appeal(index: int) -> float:
+	return .5 * [1.0,1.1,1.25][int(s.staff[index].get("tour_training",0))]
+
 func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minute: int = -1, offset: int = 0, include_guides: bool = true) -> float:
 	if not is_trading(bar,offline): return 0.0
 	var value := 4.0 + (int(bar.stage)-1)*1.0 + int(bar.equipment.sign)*2 + int(bar.equipment.pool)*1.5
 	value += minf(3.0,int(bar.regulars)/15.0) + minf(1.5,int(s.rep)/80.0)
-	if not offline and include_guides: value += s.bookings.size()*.5
+	if not offline and include_guides:
+		for key in s.bookings: value += guide_appeal(int(key))
 	for i in bar.team.size():
 		var host: Dictionary = bar.team[i]
 		if host.role==1 and host.on and contracted(host,offset) and not i in bar.away: value += host_appeal(host)
@@ -1764,8 +1768,14 @@ func tick() -> void:
 					if choice>=without_guides:
 						var guides: Array = s.bookings.keys()
 						guides.sort()
-						var guide_slot := (choice-without_guides)*guides.size()/(weight-without_guides)
-						tour_arrived.emit(int(guides[guide_slot]),str(bar.name),admitted)
+						var total_appeal := 0.0
+						for key in guides: total_appeal += guide_appeal(int(key))
+						var referral := float(choice-without_guides)*total_appeal/(weight-without_guides)
+						for key in guides:
+							referral -= guide_appeal(int(key))
+							if referral<0:
+								tour_arrived.emit(int(key),str(bar.name),admitted)
+								break
 				break
 			choice -= weight
 	for bar in s.street.bars:

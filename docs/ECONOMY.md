@@ -375,11 +375,29 @@ Local, tourist and nightlife groups choose among the venues and outside options.
 Each booked tour guide adds 0.5 to live venue appeal before modifiers. When the
 guide's share of the same arrival draw brings customers who get seats, the
 street update names the guide and venue.
-Live tour agreements pay the guide upfront from the selected venue’s till in
-the same action that starts the tour. The company bank and other tills are not
-used. Guide pay remains excluded from the five-second trading sample; weekly
-costs record it once. Existing agreements are not charged again or refunded.
+Live tour agreements pay the guide upfront from shared money in the same
+action that starts the tour. Guide pay remains excluded from the five-second
+trading sample; weekly costs record it once. Existing agreements are not charged again or refunded.
 Guide eligibility and pay rules still apply; navigation changes no model state.
+Tour Manager costs ฿2,000/4,000/8,000 for levels 1/2/3. Level 1 enables a
+saved on/off switch and automatic bookings on normal plan ticks only: shared
+cash must be strictly above ฿1,000 before each booking, and at least one trading
+venue must have a free seat and more than 120 game minutes before its own
+scheduled close (including late permission). These are start conditions, not
+protected reserves. Active agreements are never repaid. After expiry the manager
+uses each guide's last paid route, defaulting to Market loop; all normal guide,
+weather and pay-split refusals apply. Cancellation keeps the remembered route;
+switch automation off to prevent rebooking. Levels 2/3 reduce future manual and
+automatic guide fees by 10%/25% total, rounded up to whole baht. No retroactive
+refunds. Automation never runs offline, in practice or during guided decisions.
+
+Each guide separately buys level 2/3 training for ฿800/1,600, raising their base
+0.5 appeal to 0.55/0.625 (+10%/+25% total). No manager purchase is required.
+Training does not create guests, change visit budgets or expand shared traffic.
+Referral attribution uses each guide's actual contribution. Optional schema-17
+manager level/toggle and per-guide training/last-route fields preserve progress;
+absent fields grant no purchases and loading does not book tours.
+
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.

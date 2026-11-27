@@ -6,6 +6,8 @@ const C = preload("res://scripts/content.gd")
 const SAVE = "user://campaign.json"
 const BACKUP = "user://campaign.backup"
 const Street = preload("res://scripts/street.gd")
+const TOUR_MANAGER_COSTS = [2000,4000,8000]
+const TOUR_TRAINING_COSTS = [800,1600]
 const HOURS = ["Early close", "Standard", "Late close"]
 const PROMOS = ["Regular prices", "Happy hour", "Loyalty night", "Big campaign"]
 const SECURITY = ["House team", "Licensed crew", "Shoreline Desk"]
@@ -43,6 +45,7 @@ func _init(seed_value: int = 0, practice: bool = false) -> void:
 	_forecast()
 	street = Street.new(s,not practice)
 	street.checkpoint_requested.connect(save_checkpoint)
+	street.tour_manager_requested.connect(tour_manager_tick)
 	s.street.economy_seed = maxi(1,seed_value) if seed_value != 0 else rng.randi_range(1,2147483646)
 
 func tuning_copy() -> RefCounted:
@@ -50,6 +53,7 @@ func tuning_copy() -> RefCounted:
 	copy.s = s.duplicate(true)
 	copy.rng.state = rng.state
 	copy.street = Street.new(copy.s)
+	copy.street.tour_manager_requested.connect(copy.tour_manager_tick)
 	return copy
 
 func _add_staff(id: int) -> void:
@@ -110,7 +114,55 @@ func tour_disruption_percent(staff: Dictionary, route_id: int) -> int:
 
 func guide_pay(route_id: int) -> int:
 	var duration: int = C.ROUTES[route_id][2]
-	return duration * [100, 145, 190][int(s.pay)]
+	var base: int = duration * [100, 145, 190][int(s.pay)]
+	if legacy_mode(): return base
+	return ceili(base * [1.0,1.0,.9,.75][int(s.street.tour_manager)])
+
+func tour_upgrade_offer(index: int = -1) -> Dictionary:
+	var level := int(s.street.tour_manager) if index<0 else int(s.staff[index].get("tour_training",0))
+	var costs: Array = TOUR_MANAGER_COSTS if index<0 else TOUR_TRAINING_COSTS
+	var required := int(costs[level]) if level<costs.size() else 0
+	var reason := ""
+	if legacy_mode() or s.phase!="plan": reason = "Available during live street planning."
+	elif level>=costs.size(): reason = "Fully upgraded."
+	elif index>=0 and int(s.staff[index].guide)<=0: reason = "Doesn't take guide shifts."
+	elif int(s.cash)<required: reason = "Need ฿%d more." % (required-int(s.cash))
+	return {"required":required,"available":int(s.cash),"reason":reason,"enabled":reason.is_empty()}
+
+func upgrade_tours(index: int = -1) -> String:
+	var offer := tour_upgrade_offer(index)
+	if not offer.enabled: return offer.reason
+	if not spend(int(offer.required),"Tour manager upgrade" if index<0 else "Tour guide training"): return "Not enough money."
+	if index<0:
+		s.street.tour_manager += 1
+		if int(s.street.tour_manager)==1: s.street.tour_manager_on = true
+		return "Tour manager level %d unlocked." % s.street.tour_manager
+	s.staff[index].tour_training = int(s.staff[index].get("tour_training",0))+1
+	return "%s tour guide level %d." % [C.STAFF[s.staff[index].id][0],int(s.staff[index].tour_training)+1]
+
+func toggle_tour_manager() -> String:
+	if legacy_mode() or s.phase!="plan" or int(s.street.tour_manager)==0: return "Unlock the tour manager first."
+	s.street.tour_manager_on = not s.street.tour_manager_on
+	return "Tour manager on." if s.street.tour_manager_on else "Tour manager off."
+
+func tour_manager_ready() -> bool:
+	if legacy_mode() or s.phase!="plan" or not s.street.tour_manager_on or int(s.street.tour_manager)==0 or int(s.cash)<=1000: return false
+	for bar in s.street.bars:
+		if not street.economy.is_trading(bar) or bar.customers.size()>=street.economy.seats(bar): continue
+		var close: int = Street.C.LATE_CLOSE_MINUTE if bar.late_open else Street.C.CLOSE_MINUTE
+		var remaining := (close-int(s.street.minute)+1440)%1440
+		if remaining>120: return true
+	return false
+
+func tour_manager_tick() -> void:
+	if not tour_manager_ready(): return
+	for index in s.staff.size():
+		if not tour_manager_ready(): break
+		var key := str(index)
+		if s.bookings.has(key): continue
+		var route_id := int(s.staff[index].get("tour_route",s.street.expired_tours.get(key,0)))
+		var offer := booking_offer(index,route_id)
+		if offer.enabled: booking(index,route_id)
 
 func booking_offer(index: int, route_id: int) -> Dictionary:
 	var required := 0 if legacy_mode() else guide_pay(route_id)
@@ -139,6 +191,7 @@ func booking(index: int, route_id: int) -> String:
 	s.bookings[key] = route_id
 	if legacy: return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
 	s.street.expired_tours.erase(key)
+	s.staff[index].tour_route = route_id
 	return "Tour agreement active · Guide pay ฿%d." % guide_pay(route_id)
 
 func action(id: String, index: int = 0) -> String:
@@ -706,6 +759,15 @@ func _read(path: String) -> Variant:
 			var data: Dictionary = parsed.street
 			if data.has("afk") and not data.afk is bool: return null
 			if data.has("shotgun_ready") and not _finite_number(data.shotgun_ready,0,1.0e15): return null
+			if data.has("tour_manager_on") and not data.tour_manager_on is bool: return null
+			if data.has("tour_manager") and (not _finite_number(data.tour_manager,0,3) or float(data.tour_manager)!=floorf(float(data.tour_manager))): return null
+			if not parsed.staff is Array: return null
+			for person in parsed.staff:
+				if not person is Dictionary: return null
+				for field in ["tour_training","tour_route"]:
+					if person.has(field):
+						var maximum := 2 if field=="tour_training" else C.ROUTES.size()-1
+						if not _finite_number(person[field],0,maximum) or float(person[field])!=floorf(float(person[field])): return null
 			for key in ["bars","selected","chapter","served","earned","seconds","cycle","event","event_wait","event_index","events_survived","reopening","festival","festivals","last_seen","offline","history"]:
 				if not data.has(key): return null
 			if not data.bars is Array or data.bars.is_empty() or data.bars.size() > Street.C.NAMES.size(): return null
@@ -990,6 +1052,7 @@ func load_game() -> bool:
 	rng.state = int(str(s.rng))
 	street = Street.new(s)
 	street.checkpoint_requested.connect(save_checkpoint)
+	street.tour_manager_requested.connect(tour_manager_tick)
 	if s.phase == "end":
 		s.phase = "plan"
 		s.end = ""

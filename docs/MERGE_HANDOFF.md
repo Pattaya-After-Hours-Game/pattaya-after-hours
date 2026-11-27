@@ -11,6 +11,21 @@ Concurrent tour and closure changes are preserved outside this commit.
 Device play and release publication remain unverified.
 
 
+## Tour manager and individual guide training — 27 November 2026
+
+Adds independent tour manager purchases (฿2,000/4,000/8,000) and personal guide
+training (฿800/1,600). Automation renews eligible guides on their last route only
+on normal live plan ticks, with cash strictly above ฿1,000 and an open venue
+with space and more than two game hours before its scheduled close. Manager
+levels 2/3 save 10%/25% on future fees; guide levels 2/3 add 10%/25% appeal to
+the same bounded arrival draw. Saved agreements are never charged again.
+Optional schema-17 fields preserve the toggle, levels and last routes; missing
+fields grant nothing. Navigation, startup menus and offline claims never book.
+
+Verification and remaining platform limits are recorded in
+[testing](TESTING.md#tour-manager-and-guide-training--27-november-2026).
+Concurrent Shotgun and incident-recovery work in the shared checkout is preserved.
+The main release workflow determines when source changes reach downloads.
 
 ## Shotgun patience boost — 27 November 2026
 

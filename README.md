@@ -222,6 +222,12 @@ and fines. It excludes equipment/contract purchases, nightly tip counts and offl
 Nida now faces toward the street; a purchased music system has a playing/off
 indicator. Sound/Muted remains independent of the business upgrade.
 
+In **Tours**, a separate **Tour manager** costs ฿2,000/4,000/8,000. It automates
+eligible guide agreements when shared money is above ฿1,000, an open venue has
+space and more than two game hours remain before closing. Levels 2/3 save
+10%/25% on tour fees. Individual **Tour guide training** costs ฿800/1,600 for
++10%/+25% guide appeal; training and manager ownership are independent.
+
 ## Leave the street running with AFK
 
 Tap **AFK OFF** above the property cards to enable it; **AFK ON** switches it

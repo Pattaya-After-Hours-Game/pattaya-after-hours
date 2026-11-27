@@ -1387,7 +1387,22 @@ func tours_panel() -> void:
 	var crew: Array = model.s.staff
 	if guide<0:
 		title("Tour guides")
-		body("Choose a guide to assign a tour. Guides recommend your street until the trading shift ends.")
+		var manager_level := int(model.s.street.tour_manager)
+		live_body(func() -> String:
+			return "Tour manager · level %d · %d%% fee saving" % [int(model.s.street.tour_manager),[0,0,10,25][int(model.s.street.tour_manager)]],GOLD,14)
+		if manager_level<3:
+			var buy := row_button(("Unlock tour manager" if manager_level==0 else "Tour manager level %d" % (manager_level+1))+" · "+cash(Campaign.TOUR_MANAGER_COSTS[manager_level]),func():
+				message = model.upgrade_tours()
+				commit(true))
+			buy.name = "TourManagerUpgrade"
+			watch_purchase(buy,buy.text,model.tour_upgrade_offer)
+		if manager_level>0:
+			var toggle := row_button("Tour manager ON" if model.s.street.tour_manager_on else "Tour manager OFF",func():
+				message = model.toggle_tour_manager()
+				commit(true))
+			toggle.name = "TourManagerToggle"
+		body("Auto-book last routes (Market loop initially) with >฿1,000, free seats at an open venue and >2 game hours to close. Levels 2/3 save 10%/25% on fees.",MUTED,12)
+		body("Choose a guide for routes and training. Agreements last until the trading shift ends.")
 		for i in crew.size():
 			if int(crew[i].guide)<=0: continue
 			var staff_id := int(crew[i].id)
@@ -1407,6 +1422,14 @@ func tours_panel() -> void:
 	var staff_id := int(crew[guide].id)
 	character_card(Art.STAFF[staff_id],Content.STAFF[staff_id][0],Content.STAFF[staff_id][1])
 	live_body(tour_agreement_text.bind(guide),GOLD,14)
+	var training := int(crew[guide].get("tour_training",0))
+	body("Tour guide level %d · +%d%% guide appeal" % [training+1,[0,10,25][training]],GOLD,14)
+	if training<2:
+		var train := row_button("Tour guide training · level %d (+%d%% appeal) · %s" % [training+2,[10,25][training],cash(Campaign.TOUR_TRAINING_COSTS[training])],func():
+			message = model.upgrade_tours(guide)
+			commit(true))
+		train.name = "TourGuideTraining"
+		watch_purchase(train,train.text,model.tour_upgrade_offer.bind(guide))
 	row_button(
 		["Base split","Standard split","Premium split"][int(model.s.pay)],cycle.bind("pay",[0,1,2]))
 	for i in Content.ROUTES.size():

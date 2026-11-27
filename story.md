@@ -124,8 +124,11 @@ Pim can sell the sound; Nida can sell the welcome; neither can conjure a tab.
 > **Anong:** “One balance. If money goes out, tell me what we bought.”
 
 Tour guides are paid upfront from the shared account. One tap pays and starts
-the agreement. If the fridge is empty and money is short, close, count the earned
-tips and buy stock when the jar covers a pack. The same coins cannot be counted twice.
+the agreement. An optional Tour Manager renews eligible guides while there is
+cash above ฿1,000, room for customers and more than two hours before closing.
+Better management saves guide fees; each guide's separate training improves
+referral appeal without inventing visitors. If the fridge is empty and money is
+short, close, count the earned tips and buy stock when the jar covers a pack. The same coins cannot be counted twice.
 
 Street marketing progresses from small campaigns toward a district audience.
 Every new open property adds a little street draw, but all venues share those
