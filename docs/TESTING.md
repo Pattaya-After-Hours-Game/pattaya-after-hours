@@ -1,5 +1,37 @@
 # Testing and release checks
 
+## Shotgun customer and ribs reaction — 27 November 2026
+
+Shotgun joins through normal admissions as a saved optional cosmetic identity,
+using the supplied photograph and the existing customer art style. A single
+mouse click or real touch plays his 3.2-second ribs-eating animation, displays
+“Shotgun BBQ!” and triggers an original synthetic shout through Sound / Muted.
+Repeated input during the reaction does not restart it or overlap the voice.
+Only his visual route pauses; normal orders, stock, money and visit/service
+clocks keep their model behavior. Old visitors keep their original appearances.
+
+Verified on Godot 4.7.2:
+
+- `tools/test.sh` passed the full isolated gameplay/save/UI/art and pacing suites.
+  The complete `tests/check.gd` regression runner passed again after adding the
+  Shotgun checks and final animation timing.
+- `tests/shotgun_check.gd` covers real admission, complete saved-visit round-trip,
+  old appearance stability, single-click/touch input, emulated duplicate rejection,
+  both rib poses, fixed feet, reaction expiry, HUD retention, campaign reset,
+  muted playback and unchanged model/RNG. Shared catalog checks include Shotgun.
+- `python3 tests/test_customer_art_build.py` passed. Only Shotgun's runtime PNG
+  was built; existing character PNGs remain unchanged.
+- `PATTAYA_PREVIEW_SCRIPT=tests/preview_shotgun.gd tools/preview-art.sh` produced
+  15 captures each at 960×540 and 1280×720. Inspected idle, showing ribs, biting
+  and post-reaction states across all three venue types, including bubble fit.
+- `git diff --check` and changed-document local links passed.
+
+[In-game preview](shotgun.png). The [art receipt](../art/recipes/customer-shotgun.json)
+contains the exact built-in ImageGen prompt and synthetic-speech commands.
+Android touch/device play, listening quality and Windows/macOS execution remain
+unverified. Source verification does not confirm release publication.
+
+
 ## Continuous customer motion and individual templates — 27 November 2026
 
 The real Serve path rebuilt City with the HUD, losing route/pose state and

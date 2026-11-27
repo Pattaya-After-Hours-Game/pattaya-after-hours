@@ -971,6 +971,7 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 	# Cosmetic identity on new admissions only. Saved guests keep their old look;
 	# this consumes no RNG and cannot change traffic, orders or visit plans.
 	if int(customer.id)%48==24: customer.appearance = "charcoal"
+	elif int(customer.id)%48==12: customer.appearance = "shotgun"
 	customer.party_patience = C.CELEBRATION_PATIENCE if celebrating(bar) else 0
 	customer.commission_visit = C.COMMISSION_PERCENT>0 and promoter_bonus(bar)>0
 	s.street.next_customer += 1

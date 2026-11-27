@@ -361,6 +361,7 @@ has a new sign.
 | **Dao** | Shift lead and the face of trusted management | Wants predictable hours and a venue she can run properly. Her progression is from dependable colleague to someone the player trusts with the keys. |
 | **Mali** | Bartender and Toybox regular | Likes a contest with clear rules. Wants fight nights that pay their way, not endless promises of exposure. |
 | **Gabby** | Adult bartender in a very short red dress, with pale skin and tied-back brown hair | Quick wit and a good memory for orders; her regulars leave an extra ฿5 for each drink she serves, counted in the nightly jar. |
+| **Shotgun** | Adult customer with a grey mohawk, salt-and-pepper beard and blue shirt | Loves a juicy rack of ribs. Click or tap him for his “Shotgun BBQ!” eating reaction and synthetic shout; he remains an ordinary paying customer. |
 | **Daisy** | Fictional adult hostess-bar entertainer, with pale skin, tied-back brown hair and a red bikini | Quick with a joke and strict about finishing on time. Attracts guests under the normal host contract; a separate character from bartender Gabby. |
 | **Pim** | Bartender with a music programme in mind | Saves for a sound studio. Distinguishes a booked performer from Bo arriving with a karaoke machine. |
 | **Fern** | Guide who knows the market | Connects the business to life outside its frontage. Her knowledge and time have value. |

@@ -6,7 +6,7 @@ const City = preload("res://scripts/city.gd")
 func run(test: SceneTree) -> void:
 	var catalog := Art.customer_catalog()
 	test.check(catalog.size()>=15,"Every existing customer has an individual named-pose definition")
-	var appearances: Array = Art.CUSTOMER_VARIANTS+[["patrons-capybara",0],["patrons-rainbow-duo",0],["patrons-charcoal",12]]
+	var appearances: Array = Art.CUSTOMER_VARIANTS+[["patrons-capybara",0],["patrons-rainbow-duo",0],["patrons-charcoal",12],["shotgun",0]]
 	for appearance in appearances:
 		var name := Art.customer_character_id(appearance)
 		var definition: Dictionary = catalog[name]

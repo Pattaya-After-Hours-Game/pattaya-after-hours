@@ -1,0 +1,33 @@
+{
+  "source": "art/sources/customer-shotgun-sheet.png",
+  "columns": [
+    0,
+    260,
+    513,
+    765,
+    1018,
+    1279
+  ],
+  "rows": [
+    0,
+    268,
+    536,
+    776,
+    1016,
+    1262
+  ],
+  "tool": "built-in image_gen",
+  "generated_path": "/var/home/rebellionrumco/.codex/generated_images/01a21c9d-4cb8-7862-ab41-97cf8ae6967b/exec-250c1b51-bb60-4206-8c0c-6859046b8747.png",
+  "preparation": "Eight transparent pixels of outer padding; original generated pixels preserved. Authored grid separators.",
+  "prompt": "Use case: stylized-concept\nAsset type: transparent game character sprite sheet, EXACT 5 columns x 5 rows equal-sized cells.\nInput images: first image is identity reference for adult Shotgun; second image is rendering style only.\nCreate Shotgun, a broad stocky adult Black man with tall short grey mohawk, shaved sides, huge full salt-and-pepper beard, royal-blue T-shirt with lime abstract graphic (no letters), charcoal shorts and dark trainers. Preserve recognizable reference face and beard. Match the detailed small painted/pixel-edged game sprite style of the second reference. Full body including shoes in EVERY cell. Same clothing/proportions, generous transparent gaps between cells, no labels/text/background/shadows/furniture.\nRead each row left to right, exactly:\nRow 1: right-facing side walk left foot forward; side walk right foot forward; front walk left foot; front walk right foot; standing three-quarter idle.\nRow 2: rear walk left foot; rear walk right foot; standing sipping golden beer from glass; standing chatting with open hand; standing holding pool cue.\nRow 3: seated idle bent knees (no chair); seated sipping beer; seated chatting; standing rear watching empty hands; standing rear watching holding beer glass visibly at side.\nRow 4: side walk left foot carrying beer; side walk right foot carrying beer; front walk left foot carrying beer; front walk right foot carrying beer; rear walk left foot carrying beer.\nRow 5: rear walk right foot carrying beer; seated holding lowered beer; seated sipping beer; standing holding large juicy glazed rack of BBQ ribs in both hands below beard, smiling mouth open; standing biting the same rack of ribs lifted to mouth.\nConstraints: exactly 25 separate complete adult figures on real transparent alpha, one per uniform cell, no cropped heads/feet/props. Rib poses same body scale and stance as idle, ribs visibly brown-red glaze with pale bone ends. No guns, speech bubbles, watermarks or scenery.",
+  "reference_roles": {
+    "identity": "user-supplied Screenshot_20261127-204450.png",
+    "style": "assets/art/customer-charcoal.png"
+  },
+  "audio": {
+    "type": "original synthetic speech; no reference voice used",
+    "text": "Shotgun! Barbecue!",
+    "command": "espeak-ng -v en-us -p 28 -s 155 -a 180 -w /tmp/shotgun-bbq-raw.wav 'Shotgun! Barbecue!'",
+    "processing": "ffmpeg -y -i /tmp/shotgun-bbq-raw.wav -af 'acompressor=threshold=-18dB:ratio=3,volume=1.4,afade=t=out:st=1.8:d=0.3' -ar 22050 -ac 1 assets/shotgun.wav"
+  }
+}

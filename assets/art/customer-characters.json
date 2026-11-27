@@ -1122,6 +1122,104 @@
       ]
     }
   },
+  "shotgun": {
+    "atlas": "customer-shotgun",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 28,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "walk_front": [
+        2,
+        3,
+        2,
+        3
+      ],
+      "walk_back": [
+        5,
+        6,
+        5,
+        6
+      ],
+      "idle": [
+        4
+      ],
+      "drinking": [
+        7
+      ],
+      "chat": [
+        8
+      ],
+      "pool": [
+        9
+      ],
+      "seated_idle": [
+        10
+      ],
+      "seated_drinking": [
+        11
+      ],
+      "seated_chat": [
+        12
+      ],
+      "watch": [
+        13
+      ],
+      "beer_watch": [
+        14
+      ],
+      "beer_walk": [
+        15,
+        16,
+        15,
+        16
+      ],
+      "beer_walk_front": [
+        17,
+        18,
+        17,
+        18
+      ],
+      "beer_walk_back": [
+        19,
+        20,
+        19,
+        20
+      ],
+      "beer_seated_idle": [
+        21
+      ],
+      "beer_seated_drinking": [
+        22
+      ],
+      "beer_stand": [
+        7
+      ],
+      "bbq": [
+        23,
+        24,
+        24,
+        23
+      ],
+      "beer_seated_chat": [
+        21
+      ],
+      "beer_chat": [
+        7
+      ],
+      "rest": [
+        4
+      ]
+    }
+  },
   "silver-polo": {
     "atlas": "customer-silver-polo",
     "cell": [

@@ -184,7 +184,7 @@ func _ready() -> void:
 	order_sound.stream = preload("res://assets/order_waiting.wav")
 	order_sound.volume_db = -9
 	add_child(order_sound)
-	for kind in ["click","impact","block","gong"]:
+	for kind in ["click","impact","block","gong","shotgun"]:
 		sfx_streams[kind] = load("res://assets/%s.wav" % kind)
 	if not muted and DisplayServer.get_name() != "headless": music.play()
 	render()
@@ -360,6 +360,7 @@ func set_sound() -> void:
 	if muted:
 		music.stop()
 		order_sound.stop()
+		sfx.stop()
 	elif DisplayServer.get_name() != "headless": music.play()
 	var config := ConfigFile.new()
 	config.set_value("audio","muted",muted)
@@ -440,6 +441,7 @@ func render(keep_scroll: bool = false) -> void:
 	city.clip_contents = true
 	if not is_same(city.street_state,model.s.street) or city.selected_bar!=int(model.s.street.selected):
 		city.fridge_install_flash = 0.0
+	if not city.shotgun_shout.is_connected(tone): city.shotgun_shout.connect(tone)
 	city.duo_reaction = duo_reaction
 	city.service_flash = service_animation
 	city.night = model.s.phase in ["incident","fight","report","godzilla"]

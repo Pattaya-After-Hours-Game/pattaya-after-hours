@@ -796,7 +796,7 @@ func _read(path: String) -> Variant:
 					if int(person.get("training",0))>=Street.C.STAFF_SERVICE_SECONDS.size() or int(person.get("contract_left",0))>Street.C.STAFF_CONTRACT_MINUTES: return null
 				for customer in bar.customers:
 					if not customer is Dictionary: return null
-					if customer.has("appearance") and customer.appearance!="charcoal": return null
+					if customer.has("appearance") and not customer.appearance in ["charcoal","shotgun"]: return null
 					for key in ["id","life","order","wait","quoted","drinks","next","budget","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
 						if not customer.has(key): return null
 					if customer.has("drink") and not int(customer.drink) in range(Street.C.DRINKS.size()): return null

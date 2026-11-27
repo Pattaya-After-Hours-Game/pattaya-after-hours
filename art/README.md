@@ -531,3 +531,28 @@ Engine-drawn POUR/CHEERS markers represent real orders; hosts keep their appeal
 and use a stationary existing pose while entertaining. The meter reads saved
 completion progress. This feature adds no image assets; concurrent cast artwork
 is preserved.
+
+## Shotgun — 27 November 2026
+
+Shotgun uses the supplied photograph as his identity reference and the finished
+charcoal customer atlas as a style reference. The built-in ImageGen tool produced
+[one 25-pose source](sources/customer-shotgun-sheet.png); its
+[receipt](recipes/customer-shotgun.json) records the exact prompt, returned path
+and authored grid cuts. Eight transparent border pixels were added during
+packing; generated pixels stay unchanged. His [individual definition](characters/shotgun.json)
+owns empty/beer walks, seated activities, Chat, pool and the ribs reaction.
+Two authored steps repeat over each four-entry walking cycle. Existing art
+files are unchanged. Rebuild only him with:
+
+```sh
+python3 tools/prepare_customers.py --character shotgun
+```
+
+`assets/shotgun.wav` is an original synthetic espeak-ng utterance, not a recording
+or imitation of the reference person. Its reproducible command is recorded in
+the art receipt. Godot renders the exact “Shotgun BBQ!” text; the click/tap
+reaction holds only his visual walking position for 3.2 seconds. Real model
+service, budgets, timers and stock continue. Sound / Muted controls the voice.
+
+[In-game reaction](../docs/shotgun.png). Preview with
+`PATTAYA_PREVIEW_SCRIPT=tests/preview_shotgun.gd tools/preview-art.sh`.

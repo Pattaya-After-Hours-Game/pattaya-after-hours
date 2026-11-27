@@ -1,5 +1,19 @@
 # Current implementation and release handoff
 
+## Shotgun — 27 November 2026
+
+Added the supplied-reference adult Shotgun as a normal customer, with an
+independent named-pose sheet. Click or tap for ribs-eating animation, exact
+“Shotgun BBQ!” bubble and a mute-aware synthetic shout. Identity survives saves;
+existing guests, business rules and gameplay RNG stay intact. No new food
+purchase or economic reward is introduced. Source/recipe/audio provenance is
+committed alongside the runtime assets.
+
+The full isolated suite, final regression rerun, authoring test and two-resolution
+visual previews passed; see [verification](TESTING.md#shotgun-customer-and-ribs-reaction--27-november-2026).
+Target-device play and release publication remain unverified.
+
+
 ## Continuous motion, beer and customer templates — 27 November 2026
 
 Fixes the real Serve/HUD redraw path that recreated City and discarded walking

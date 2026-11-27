@@ -11,6 +11,7 @@ const PINK = Color("#f37ab0")
 const GOLD = Color("#e8ba7b")
 const ORDER_URGENT = Color("#ff514d")
 const KISS_SECONDS = 1.2
+const BBQ_SECONDS = 3.2
 const FRIDGE_BOTTLE_BAYS = [
 	[Vector2i(63,5)],
 	[Vector2i(71,7)],
@@ -25,6 +26,7 @@ var clock := 0.0
 var street_state: Dictionary = {}
 var arrival_time := 0.0
 var duo_reaction := {}
+var shotgun_reaction := {}
 # Disposable presentation cache. Saves, admission and pool settlement stay in
 # the model; walking never delays service, spends money or consumes RNG.
 var customer_motion := {}
@@ -48,6 +50,7 @@ var fridge_install_flash := 0.0
 var fridge_capacity := 1
 var legacy_staff: Array = []
 var font = ThemeDB.fallback_font
+signal shotgun_shout(kind: String)
 signal site(tab: int)
 signal select_bar(index: int)
 signal rat_caught(index: int)
@@ -71,7 +74,7 @@ func _gui_input(event: InputEvent) -> void:
 	if not targets.is_empty() and rat_pointer_input(event,targets): return
 	if bars.is_empty(): return
 	if event is InputEventMouseButton:
-		if event.device==InputEvent.DEVICE_ID_EMULATION or event.button_index!=MOUSE_BUTTON_LEFT or not event.pressed or not event.double_click: return
+		if event.device==InputEvent.DEVICE_ID_EMULATION or event.button_index!=MOUSE_BUTTON_LEFT or not event.pressed: return
 	elif event is InputEventScreenTouch:
 		if event.device==InputEvent.DEVICE_ID_EMULATION or not event.pressed: return
 	else:
@@ -81,10 +84,18 @@ func _gui_input(event: InputEvent) -> void:
 	people.reverse()
 	for person in people:
 		if person.behind_bar or not _person_contains(person,point): continue
-		if person.who=="patrons-rainbow-duo":
+		if person.who=="shotgun":
+			if not shotgun_active(person.customer_id):
+				shotgun_reaction.assign({"id":person.customer_id,"until":clock+BBQ_SECONDS})
+				shotgun_shout.emit("shotgun")
+			accept_event()
+		elif person.who=="patrons-rainbow-duo" and (event is InputEventScreenTouch or event.double_click):
 			duo_reaction.assign({"id":person.customer_id,"until":clock+KISS_SECONDS})
 			accept_event()
 		return
+
+func shotgun_active(customer_id: int) -> bool:
+	return shotgun_reaction.get("id",-1)==customer_id and clock<float(shotgun_reaction.get("until",0.0))
 
 func rat_pointer_input(event: InputEvent, targets: Array) -> bool:
 	if event is InputEventKey and event.is_action_pressed("ui_accept") and not event.is_echo():
@@ -166,6 +177,10 @@ func _draw() -> void:
 	# Markers are drawn after the people so a nearer guest cannot hide an order.
 	for person in people:
 		if person.who=="patrons-rainbow-duo" and person.pose==1 and not person.get("motion_state","").begins_with("walk"): _draw_kiss_heart(person)
+		if person.get("bbq",false):
+			var bubble := Vector2(clampf(order_position(person).x-79,8,794),maxf(34,order_position(person).y-43))
+			draw_style_box(_sign_box(),Rect2(bubble,Vector2(158,27)))
+			draw_string(font,bubble+Vector2(9,19),"Shotgun BBQ!",HORIZONTAL_ALIGNMENT_LEFT,140,18,GOLD)
 		if person.get("chat_until",0.0)>float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0)):
 			var feedback := order_position(person)+Vector2(-31,-14)
 			draw_style_box(_sign_box(),Rect2(feedback-Vector2(4,15),Vector2(78,21)))
@@ -343,6 +358,7 @@ static func customer_pool_foot(bar: Dictionary, guest: Dictionary, home: Vector2
 func update_customer_motion(delta: float) -> void:
 	if not is_same(motion_street,street_state):
 		customer_motion.clear()
+		shotgun_reaction.clear()
 		motion_street = street_state
 		motion_selected = -1
 	if bars.is_empty() or selected_bar>=bars.size(): return
@@ -357,7 +373,12 @@ func update_customer_motion(delta: float) -> void:
 	if first_view: customer_motion[key] = {}
 	var records: Dictionary = customer_motion[key]
 	var now := float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0))
+	# Hold only the reacting actor at his current feet; model time and service
+	# continue normally, and the walk resumes without a position jump.
+	var reacting_id := int(shotgun_reaction.get("id",-1))
+	var held: Dictionary = records[reacting_id].duplicate(true) if shotgun_active(reacting_id) and records.has(reacting_id) else {}
 	CustomerRoutine.update(bar,records,delta,first_view or changed_view,now)
+	if not held.is_empty() and records.has(reacting_id): records[reacting_id] = held
 
 func scene_people(bar: Dictionary) -> Array:
 	var people: Array = []
@@ -482,7 +503,13 @@ func scene_people(bar: Dictionary) -> Array:
 		elif state=="idle" and appearance[0]=="patrons-men" and int(appearance[1])==Art.COBALT_IDLE:
 			visual_pose = "sunglasses"
 			visual_phase = [6,9,10,11].find(Art.cobalt_frame(clock+float(customer_id/Art.CUSTOMER_VARIANTS.size())*1.31))
-		var visual := Art.customer_visual(appearance,visual_pose,visual_time,8,visual_phase)
+		person.bbq = appearance[0]=="shotgun" and shotgun_active(customer_id)
+		if person.bbq:
+			visual_pose = "bbq"
+			visual_time = clock-(float(shotgun_reaction.until)-BBQ_SECONDS)
+			person.body_height = 180
+			person.flip = false
+		var visual := Art.customer_visual(appearance,visual_pose,visual_time,4 if person.bbq else 8,visual_phase)
 		person.draw_who = visual[0]
 		person.draw_pose = visual[1]
 		person.visual_pose = visual_pose

@@ -972,3 +972,11 @@ She never serves orders or earns Gabby's bartender bonus. Only one roster place
 across the street belongs to Daisy, including expired contracts. Renewal retains
 her training and any booking deadline. Her appended host ID preserves the six
 existing host identities; no saved employee is replaced or granted for free.
+
+## Shotgun customer — 27 November 2026
+
+New admissions whose IDs are 12 modulo 48 carry the optional saved cosmetic
+identity `shotgun`. Existing customers keep their appearances, paid quotes,
+budgets and visit plans. Shotgun uses the same bounded arrivals and business
+rules as every guest. Clicking/tapping his ribs reaction affects presentation
+only: no food stock, purchase, income, service, visit extension or gameplay RNG.

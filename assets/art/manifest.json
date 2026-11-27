@@ -1438,5 +1438,13 @@
       1728
     ],
     "sha256": "759aea11c49c5704999d65f59400d287e0d2b780b9225a8e25ddd67f3f6603b2"
+  },
+  "customer-shotgun": {
+    "file": "res://assets/art/customer-shotgun.png",
+    "size": [
+      640,
+      1344
+    ],
+    "sha256": "5d77793e05e97d8867c0bc6770f475bd2f5473fd9af6befd7f4624060b3ec08b"
   }
 }

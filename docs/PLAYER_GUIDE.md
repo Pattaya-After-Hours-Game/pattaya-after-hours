@@ -14,6 +14,10 @@ Tab badges use green numbers for ready upgrades or active tours, a yellow **!**
 for available events, and a red **!** for no active tour agreements when seats are free.
 Double-click the rainbow duo in the bar, or tap them on a touchscreen, to see
 them kiss with a floating heart.
+Click or tap **Shotgun**, the bearded customer with the grey mohawk and blue
+shirt, to see him tuck into a rack of ribs and yell **“Shotgun BBQ!”**.
+His short reaction leaves your orders and business running normally; **Muted**
+silences his synthetic shout. He arrives through the normal customer rotation.
 
 ## Leaving the game running
 
