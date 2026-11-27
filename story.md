@@ -302,6 +302,8 @@ currently in open venues; it is a view of the business, not a new crowd reward.
 From the bar, Anong sees that neighbourhood through the same doorway: daylight,
 sunset and neon nights, with shadowy pedestrians and passing scooters and cars.
 The room stays familiar while the street outside changes around it.
+Faces approach the doorway; backs disappear down the soi, with headlights and
+taillights marking the passing traffic.
 
 Late takings come with attention. Operating after 1am raises heat; a raid fines
 the offending venue and shuts it until noon. This is separate from the warned

@@ -2,6 +2,15 @@
 
 ## Outdoor layers and animated traffic — 27 November 2026
 
+The bar's front/rear follow-up adds 56 authored frames across four walkers,
+two scooters and one car. Direction checks select native front rows on approach
+and rear rows on departure, with no horizontal mirroring. All 14 identity/view
+combinations are reachable; a single car also alternates direction. The district
+continues to select its original side-profile assets. The final isolated
+regression run passed after this direction change. All nine openings and motion
+were reviewed at 960×540 and 1280×720; the existing staff-service preview was
+recaptured. Original room and district sprite PNGs remain unchanged.
+
 The complete isolated `tools/test.sh` passes on pinned Godot 4.7.2, including
 all pacing suites. `street_activity_check.gd` covers all eight guest boundaries,
 multi-venue aggregation, owner/temporary/raid/scheduled closures, late permission,

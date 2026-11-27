@@ -257,6 +257,8 @@ count across open venues. The map keeps the same destinations and paths.
 From inside any bar, a reusable street underlay follows the game clock from
 daylight to neon nights. Animated shadowy walkers, scooters and cars show how
 busy the street is. The existing room artwork and final beer-bar terrace stay intact.
+Bar traffic uses front/rear views as it approaches or heads away; the district
+retains side-facing walkers and vehicles.
 
 Street events include Navy visits, inspections, floods, Songkran, viral crowds,
 low season, rival promotions, Rat Plague and Godzilla. When rats pour in from

@@ -83,6 +83,14 @@ the plates. The scoped packer preserves all existing room files byte-for-byte.
 Warming up / Steady / Lively / Busy / Buzzing / Packed at 0/1/3/6/10/16/24/36
 guests. A 0.4-second crossfade softens transitions. Four adult walking identities,
 two helmeted scooters and a compact car have four animation frames each.
+The district keeps these side-profile sheets. The bar has separate `*-depth`
+atlases: four front-facing and four rear-facing frames for each identity.
+Approaching traffic shows faces, headlights and front wheels; departing traffic
+shows backs and taillights. Crossings alternate direction, including when only
+one vehicle is present. They never mirror side art to suggest depth.
+The `street-*-depth.json` receipts contain the built-in ImageGen prompts and
+provenance. The walker source has authored row separators in `street-packing.json`
+to preserve heads and shoes before scale/baseline normalization.
 `street_view.gd` supplies deterministic motion and activity bands to both views.
 The district caps its ambient traffic at 36 walkers, six scooters and three cars.
 They disappear at zero activity and are not extra admitted customers. Animation

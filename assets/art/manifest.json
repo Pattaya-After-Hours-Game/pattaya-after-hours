@@ -711,6 +711,14 @@
     ],
     "sha256": "23a90380c820d1f64e5bf680335c2bd644e0942015e52b50a79b121e926b58ed"
   },
+  "street-cars-depth": {
+    "file": "res://assets/art/street-cars-depth.png",
+    "size": [
+      896,
+      224
+    ],
+    "sha256": "1676fef29aa1573ba0b15e7da0f790e5376d950fc03e48e1c3a80c1e31050c72"
+  },
   "street-cars": {
     "file": "res://assets/art/street-cars.png",
     "size": [
@@ -783,6 +791,14 @@
     ],
     "sha256": "00ec8bf7b901b351036f5f03480a13efadcc69cfbd22a381cd2fdcf580ebeb18"
   },
+  "street-scooters-depth": {
+    "file": "res://assets/art/street-scooters-depth.png",
+    "size": [
+      768,
+      576
+    ],
+    "sha256": "e65aa030eb61a0aaf4f090dd1416193d1eebc88eefbc13111b11035feb00c650"
+  },
   "street-scooters": {
     "file": "res://assets/art/street-scooters.png",
     "size": [
@@ -790,6 +806,14 @@
       288
     ],
     "sha256": "a816f4d22ca964a9efd57d900039d6d0427fee4dc25c28fb5a70dda79bf2c643"
+  },
+  "street-walkers-depth": {
+    "file": "res://assets/art/street-walkers-depth.png",
+    "size": [
+      384,
+      1024
+    ],
+    "sha256": "fd99f74c7471728d7e1e548130e4833b8e6a77ba70eac0061610b63a38a47ac5"
   },
   "street-walkers": {
     "file": "res://assets/art/street-walkers.png",

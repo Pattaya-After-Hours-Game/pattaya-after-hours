@@ -1,0 +1,14 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "assets/art/street-cars.png",
+  "prompt": "Use case: stylized-concept. Asset: production pixel-art transparent sprite animation sheet for Godot street traffic, matching attached compact charcoal hatchback reference identity and fine pixel-art style. Generate ONE new sprite sheet, exactly 4 equal columns by 2 equal rows, eight evenly spaced frames total, uniform cells and genuine transparent alpha background. Row 0: FOUR strictly FRONT HEAD-ON views of the SAME charcoal compact hatchback driving toward the viewer; centered grille, front bumper, both front headlights, windshield and dark adult driver silhouette visible. Row 1: FOUR strictly REAR views of that same car driving away; rear windshield, both red taillights, rear bumper visible. Camera on centerline: no side profile and NO three-quarter view in any frame. The four frames across each row show only subtle driving animation: tiny bob, lean or wheel rotation. Entire car including tires within every cell, identical car scale, centered aligned columns, consistent ground baseline and generous identical transparent padding. Match charcoal-purple paint, compact hatchback silhouette and blue-tinted glass of reference. No scenery, road, props, cast shadows, text, readable license plates, labels, grid lines, borders or watermark. Render individual crisp pixel clusters with dark outlines, no blur. Every background pixel must be fully transparent, no black background and no checkerboard baked into image.",
+  "source": "/var/home/rebellionrumco/.codex/generated_images/01a21a80-812c-7073-bd5a-e1b40e8557b9/exec-d8476c83-4f41-418f-9bf2-487f6750e58c.png",
+  "output": "art/sources/street-cars-depth.png",
+  "attempts": 1,
+  "dimensions": [
+    1774,
+    887
+  ],
+  "transparent_background": true,
+  "qa": "Eight frames: four strictly front-facing cars above four rear-facing cars. Genuine alpha verified 0–255. No scenery, readable text or shadows. Subtle vertical bob, consistent identity and apparent scale. Original generation dimensions are not divisible by grid columns/rows; runtime crop/packing should normalize uniform cells."
+}

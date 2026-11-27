@@ -94,6 +94,50 @@
         224,
         112
       ]
+    },
+    "street-walkers-depth": {
+      "grid": [
+        4,
+        8
+      ],
+      "cell": [
+        96,
+        128
+      ],
+      "row_order": "Each identity: four front frames, then four rear frames",
+      "source_row_boundaries": [
+        0,
+        254,
+        500,
+        730,
+        964,
+        1173,
+        1374,
+        1574,
+        1774
+      ]
+    },
+    "street-scooters-depth": {
+      "grid": [
+        4,
+        4
+      ],
+      "cell": [
+        192,
+        144
+      ],
+      "row_order": "Each identity: four front frames, then four rear frames"
+    },
+    "street-cars-depth": {
+      "grid": [
+        4,
+        2
+      ],
+      "cell": [
+        224,
+        112
+      ],
+      "row_order": "Each identity: four front frames, then four rear frames"
     }
   },
   "packing": "Shared scale per row, alpha threshold160, tiny-component removal, bottom baseline4px. See tools/prepare_street_art.py. Original room files untouched; Art.room_shell cuts only the outdoor mask."

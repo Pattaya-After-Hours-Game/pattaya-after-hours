@@ -94,11 +94,25 @@ func check_traffic(test: SceneTree) -> void:
 			var matches := later.filter(func(other: Dictionary) -> bool: return other.key==item.key)
 			var next: Dictionary = matches[0]
 			if item.tint.a>.5 and next.tint.a>.5:
-				test.check((next.foot.x<item.foot.x)==item.flip,"Pedestrians and vehicles face their travel direction in both views")
+				if closeup:
+					test.check((next.foot.y>item.foot.y)==(item.facing=="front") and not item.flip,"Bar traffic uses native front/rear views in its travel direction")
+					test.check(item.id.ends_with("-depth") and (item.frame/4)%2==int(item.facing=="back"),"Bar animation selects the matching front or rear row")
+				else:
+					test.check((next.foot.x<item.foot.x)==item.flip and not item.id.ends_with("-depth"),"District traffic retains its side-profile sprites")
 		for item in StreetView.traffic(4,4,closeup):
 			var matches := first.filter(func(other: Dictionary) -> bool: return other.key==item.key)
 			test.check(matches.size()==1 and matches[0]==item,"Busier bands add actors without teleporting existing traffic")
-		test.check(first.any(func(item: Dictionary) -> bool: return item.id=="street-cars") and first.any(func(item: Dictionary) -> bool: return item.id=="street-scooters"),"Busy streets include cars and scooters")
+		test.check(first.any(func(item: Dictionary) -> bool: return item.id.begins_with("street-cars")) and first.any(func(item: Dictionary) -> bool: return item.id.begins_with("street-scooters")),"Busy streets include cars and scooters")
+	var views := {}
+	for second in range(0,180,3):
+		for item in StreetView.traffic(7,second,true):
+			views["%s/%d" % [item.id,item.frame/4]] = true
+	test.check(views.size()==14,"All four walkers, two scooters and the car can appear in front and rear views")
+	var quiet_directions := {}
+	for second in range(0,60,3):
+		for item in StreetView.traffic(4,second,true):
+			if item.id=="street-cars-depth": quiet_directions[item.facing] = true
+	test.check(quiet_directions.size()==2,"Even a single car alternates approaching and departing crossings")
 
 func run_ui(test: SceneTree) -> void:
 	var app = load("res://main.tscn").instantiate()

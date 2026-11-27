@@ -1,5 +1,15 @@
 # Current implementation and release handoff
 
+## Front/rear traffic in the bar opening — 27 November 2026
+
+The bar now uses separate native front/rear walking and driving atlases for
+approaching/departing traffic. Each of the four adults, two scooters and car has
+four frames per view. Quiet traffic alternates direction between crossings.
+District traffic retains its side-profile sheets. Original rooms, outdoor
+underlays, density bands, ledgers and saves are unchanged. The updated bar motion
+preview is [here](street-motion.gif); prompt receipts and authored walker crop
+boundaries are in [the art guide](../art/README.md).
+
 ## Outdoor underlays and traffic — 27 November 2026
 
 Built on main, retaining the concurrent Linux AppImage work in `4ba103c`.

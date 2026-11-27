@@ -48,13 +48,14 @@ def clean_sprite(image):
     return image.crop(image.getbbox())
 
 
-def atlas(name, rows, cell, height):
+def atlas(name, rows, cell, height, row_bounds=None):
     source = Image.open(SRC/(name+'.png')).convert('RGBA')
     sheet = Image.new('RGBA', (cell[0]*4, cell[1]*rows))
     for row in range(rows):
+        top, bottom = row_bounds[row:row+2] if row_bounds else (
+            round(row*source.height/rows), round((row+1)*source.height/rows))
         frames = [clean_sprite(source.crop((round(i*source.width/4),
-                  round(row*source.height/rows), round((i+1)*source.width/4),
-                  round((row+1)*source.height/rows)))) for i in range(4)]
+                  top, round((i+1)*source.width/4), bottom))) for i in range(4)]
         # One scale per identity avoids pulsing bodies between walk phases.
         scale = min(height/max(im.height for im in frames),
                     (cell[0]-8)/max(im.width for im in frames))
@@ -77,6 +78,12 @@ def prepare():
     atlas('street-walkers', 4, (96,128), 120)
     atlas('street-scooters', 2, (192,144), 136)
     atlas('street-cars', 1, (224,112), 100)
+    # The native front/rear walker sheet has uneven row spacing. Authored
+    # separators preserve every shoe/head before ordinary cell normalization.
+    atlas('street-walkers-depth', 8, (96,128), 120,
+          [0,254,500,730,964,1173,1374,1574,1774])
+    atlas('street-scooters-depth', 4, (192,144), 136)
+    atlas('street-cars-depth', 2, (224,112), 100)
 
 
 if __name__ == '__main__':
@@ -87,4 +94,4 @@ if __name__ == '__main__':
         manifest[path.stem] = {'file':'res://assets/art/'+path.name,
             'size':list(image.size), 'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
     (OUT/'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
-    print('Packed 8 district plates, 8 time-of-day underlays and 3 outdoor atlases')
+    print('Packed 8 district plates, 8 time-of-day underlays and 6 outdoor atlases')

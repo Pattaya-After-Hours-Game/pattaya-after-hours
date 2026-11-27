@@ -44,6 +44,8 @@ Inside the bar, look through the left opening: the street background follows
 time of day, while animated walkers, scooters and cars reflect current activity.
 They stay outside, behind the existing doorway and furnishings. They are ambient
 traffic, separate from the actual guests and orders inside your venue.
+Walkers and vehicles face toward you when approaching and show their backs when
+heading away. The district keeps its side-facing traffic.
 
 ## Drink prices and restocking money
 

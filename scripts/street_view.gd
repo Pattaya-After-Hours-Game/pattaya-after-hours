@@ -39,7 +39,8 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 			var duration: float = [22.0,11.0,15.0][kind]*(1.0+.07*(i%4))
 			# Existing actors keep their route phase when a busier band adds more.
 			var phase := fposmod(time/duration+i*.61803398875+kind*.31,1.0)
-			var forward: bool = i%2==0
+			var cycle := floori(time/duration+i*.61803398875+kind*.31)
+			var forward: bool = (i+cycle)%2==0 if closeup else i%2==0
 			var depth := phase if forward else 1.0-phase
 			var foot: Vector2
 			var scale_value: float
@@ -58,10 +59,16 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 				scale_value = [.30,.30,.31][kind]
 			var id: String = ["street-walkers","street-scooters","street-cars"][kind]
 			var row: int = i%4 if kind==0 else i%2 if kind==1 else 0
+			if closeup:
+				id += "-depth"
+				# Front/rear are authored views, never mirrored side profiles.
+				# Change identity only at the invisible end of a crossing.
+				var identities: int = [4,2,1][kind]
+				row = posmod(i/2+cycle,identities)*2+(0 if forward else 1)
 			var frame := row*4+posmod(int(time*(7 if kind==0 else 5))+i,4)
 			var alpha := smoothstep(0,.07,phase)*(1-smoothstep(.93,1,phase))
 			var tint := Color(.48,.51,.59,alpha) if closeup and kind==0 else Color(1,1,1,alpha)
-			items.append({"key":"%d/%d" % [kind,i],"id":id,"frame":frame,"foot":foot,"scale":scale_value,"flip":forward if closeup else not forward,"tint":tint})
+			items.append({"key":"%d/%d" % [kind,i],"id":id,"frame":frame,"foot":foot,"scale":scale_value,"flip":false if closeup else not forward,"facing":("front" if forward else "back") if closeup else ("right" if forward else "left"),"tint":tint})
 	items.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.foot.y<b.foot.y)
 	return items
 
