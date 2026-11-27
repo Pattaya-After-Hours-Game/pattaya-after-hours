@@ -67,11 +67,13 @@ extra customer. Messages sit above the room so the floor remains visible.
 The customer cast includes older regulars and Indian, Korean, Black and Thai
 visitors, with outfits ranging from scruffy holiday wear to tailored clubwear.
 Looks stay consistent during each visit and do not determine spending behaviour.
-Every customer identity now has side/front/rear walking and idle, drinking,
-Chat and pool poses, including both companion groups. New arrivals walk to a
-stable place in the room; actual pool players walk to and from their table.
+Every customer identity has side/front/rear walking, seated and bar poses,
+including both companion groups. Guests approach the counter for real orders,
+return to a reserved seat after service, mingle with available visitors and watch
+a purchased sports screen. Real pool players walk to their assigned table.
 Their orders remain available during walking. The same cast also appears in
-ambient street traffic. [See the walking cast](docs/customer-walks.gif).
+ambient street traffic. [See the bar routine](docs/customer-routines.gif) or
+[the walking cast](docs/customer-walks.gif).
 The capybara blinks and settles onto its haunches before standing again.
 Double-click the rainbow duo or tap them on a touchscreen to see them kiss.
 Wall fans appear only after buying **Fans & comfortable seats**, including in

@@ -1,0 +1,31 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent four-pose sprite sheet for Pattaya After Hours. EXACT existing elderly male customer in reference: slender white adult man, neat swept silver hair, white moustache, black rectangular glasses, salmon polo with cream collar trim, beige belted knee shorts, cream socks, brown leather sandals, wristwatch. Preserve recognizable face, age, build and clothes consistently. EXACT 2 COLUMNS × 2 ROWS, equal cells with generous transparent gutters. Top left SEATED IDLE side/three-quarter facing RIGHT: upright torso, hips/knees bent90degrees, thighs extending near-horizontal to right, lower legs down, sandals near floor, hands relaxed on thighs. Top right SAME seated posture, drinking beer glass at mouth. Bottom left SAME seated posture, one open hand conversational gesture. Bottom right STANDING STILL REAR view, watching offcanvas screen: back of head/shirt, no face, BOTH feet flat sidebyside, empty hands low, not walking. Same body/head scale across all four, seated body is SHORTER than standing due bent legs; do not enlarge seated sprites. NO chair/stool drawn, existing game furniture supports them. No screen/props except beer in drinking pose. Actual transparent alpha, no floor/shadow/background/glow/text/gridlines. Fully visible head and shoes inside padded cells. Crisp illustrated pixel painted style, plum outlines, clustered warm shading, not chibi or photo.",
+  "reference": "art/sources/customer-silver-polo-motion.png",
+  "source": "art/sources/customer-silver-polo-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-9e1d588a-895a-4156-a023-48013e1611bd.png",
+  "columns": [
+    0,
+    543,
+    1086
+  ],
+  "rows": [
+    0,
+    700,
+    1448
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watching": 3
+  },
+  "model_version": null,
+  "seed": null
+}

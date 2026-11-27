@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. FOUR transparent production game sprites of exact existing adult man from supplied reference sheet, arranged 2 columns by 2 rows. Preserve broad stocky build, round face, short high black slick flat-top haircut shaved sides, dark charcoal highcollar buttonjacket with four pockets, matching trousers, plain black shoes. Preserve consistent face/hair/clothing, sixhead adult proportions and crisp pixelpainted illustrated rendering/plum outlines/warm shading. Reference sheet identity/style only. NEW POSES: TOPLEFT genuinely SEATED idle facing screenRIGHT; TOPRIGHT SEATED drinking beer glass touching mouth facingRIGHT; BOTTOMLEFT SEATED conversation facingRIGHT with open palm friendly gesture; BOTTOMRIGHT STANDING STILL fullREAR view watching offcanvas, both feet planted flat and parallel, empty hands down, no face, NOT walking. Sitting hips bent90degrees thighs nearhorizontal, knees bent, lowerlegs down with complete shoes nearfloor, as sitting on invisible barstool. No stool/chair/furniture drawn. Seated silhouette naturally shorter than standing at same body scale. Do not enlarge seated adult. Hands empty except beer glass topRIGHT. Allhead/hair/shoes fully inside eachcell, generous transparent gutters and outer margins, no overlap/cropping. Genuine transparent alpha canvas, no background/floor/shadow/checkerboard/screen/grid/labels/text/cue. Exactly FOUR fullbody figures, one per equalcell, same recognizable adult man.",
+  "references": [
+    "art/sources/customer-charcoal-sheet.png"
+  ],
+  "source": "art/sources/customer-charcoal-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-f608e141-2a97-4a85-aaea-33aff81fa765.png",
+  "columns": [
+    0,
+    609,
+    1218
+  ],
+  "rows": [
+    0,
+    620,
+    1292
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watch": 3
+  },
+  "seed": null,
+  "model_version": null
+}

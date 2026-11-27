@@ -1,0 +1,31 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent four-pose sprite sheet for Pattaya After Hours Godot game. Reference is exact existing adult stocky older white male customer: receding grey hair, grey stubble, warm tanned skin, round belly, faded distressed teal vest, sunglasses hanging at neck, beige cargo shorts, burgundy waist pouch, wristwatch and brown flip-flops. Preserve face, body, outfit, accessories and pixel-painted illustrated style in every cell. EXACT 2 COLUMNS × 2 ROWS, four separate full-body sprites with generous transparent gutters. Top left: SEATED IDLE facing RIGHT in side/three-quarter view, hips/knees bent about90degrees, thighs horizontal, lower legs down, shoes near floor, relaxed empty hands on thighs. Top right: SAME SEATED POSTURE drinking beer with glass touching mouth. Bottom left: SAME SEATED POSTURE chatting, one open hand gesture. Bottom right: STANDING STILL full rear view watching something offcanvas, BOTH feet flat sidebyside, empty hands low, no face visible, no gait. Seated figures MUST be visibly shorter than standing because hips/knees bend, same body scale/head size across poses, do not enlarge seated figure. NO stool/chair/furniture drawn; game renders supporting seat. Do not squat: sit upright with butt supported by imaginary bar stool, thighs extending right. True transparent alpha, no shadow/floor/background/glow/labels/text/grid/screen/furniture. Entire heads and shoes inside cells with padding. Crisp plum outlines, clustered pixel-painted shading, warm highlights, not chibi or photo.",
+  "reference": "art/sources/customer-sunfaded-regular-motion.png",
+  "source": "art/sources/customer-sunfaded-regular-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-7f1393fa-d12c-40be-bd1d-d41104bc4d28.png",
+  "columns": [
+    0,
+    512,
+    1024
+  ],
+  "rows": [
+    0,
+    750,
+    1536
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watching": 3
+  },
+  "model_version": null,
+  "seed": null
+}

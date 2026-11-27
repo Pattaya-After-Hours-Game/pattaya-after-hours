@@ -1,0 +1,31 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Transparent four-pose production sprite sheet for Pattaya After Hours. EXACT adult Indian male clubgoer in reference: warm brown skin, dark swept wavy hair, neat dark full short beard, plum collared open-neck shirt sleeves rolled to elbows, fitted charcoal trousers, dark belt gold buckle, gold wristwatch, oxblood polished loafers. Preserve same face/body/clothes/accessories in all 4. EXACT 2×2 equal cell grid, generous transparent padding, full heads/shoes entirely within every cell. Top left SEATED IDLE facing RIGHT three-quarter/side, upright torso, hips and knees bent90degrees, thighs near-horizontal extending right, lower legs down shoes at floor, empty hands relaxed on thighs. Top right SAME seated posture drinking beer glass touching mouth. Bottom left SAME seated posture gesturing openhand in conversation. Bottom right STANDING STILL full REAR watching screen offcanvas, both feet flat sidebyside, hands low empty, back of head and shirt no face, no gait. Seated figures shorter than standing because bentlegs, same head/body scale do not enlarge. Do NOT draw chair/stool/furniture: game renders supporting seats. No screen, scenery, labels, text, grids, shadows, floor or background glow; genuine transparent alpha. Match crisp pixel-painted illustration, plum outlines and warm clustered shading, adult proportions not chibi or photo.",
+  "reference": "art/sources/customer-plum-club-motion.png",
+  "source": "art/sources/customer-plum-club-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-050e2be0-8630-43f9-bf59-2f3b89bacf8e.png",
+  "columns": [
+    0,
+    624,
+    1247
+  ],
+  "rows": [
+    0,
+    615,
+    1261
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watching": 3
+  },
+  "model_version": null,
+  "seed": null
+}

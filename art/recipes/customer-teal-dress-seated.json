@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Create FOUR full-body production transparent game sprites of exact adult Thai woman from reference, in a 2 columns by 2 rows sheet. Preserve face, dark bob, teal wrap dress with cream tropical floral hem, tan sandals, circular woven shoulder bag, watch/earrings/necklace, proportions and sharp illustrated pixel-painted style with plum outlines warm highlights. REFERENCE SHEET IS IDENTITY ONLY. New poses DIFFERENT from reference: TOP LEFT woman SEATED idle facing screen RIGHT; TOP RIGHT woman SEATED drinking beer glass touching mouth facing RIGHT; BOTTOM LEFT woman SEATED having conversation facing RIGHT, one open palm gesturing; BOTTOM RIGHT woman STANDING STILL, full REAR view watching an offcanvas screen, both feet flat and parallel, hands down, no face, no walking. Seated poses truly sit on an invisible barstool: hips bent 90degrees, thighs near horizontal, knees bent, lower legs point down and complete sandals near floor. Seated head-to-shoe silhouette naturally shorter than standing at same body scale. Keep skirt draped modestly over bent legs. No chair or furniture drawn; game supplies stool. In seated idle/chat hands empty; beer only in drinking pose. Four full figures with all head/hair/feet visible, wide transparent margins each cell, no overlaps, no cropping. Same body size across poses, do not enlarge seated poses. Genuine transparent alpha, no background, shadows, ground, checkerboard, furniture, screen, props beyond drinking glass, text, grid or labels. Exactly 2by2, four distinct complete sprites.",
+  "references": [
+    "art/sources/customer-teal-dress-motion.png"
+  ],
+  "source": "art/sources/customer-teal-dress-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-271eac35-c56b-476e-8359-b8b2bc5a013a.png",
+  "columns": [
+    0,
+    600,
+    1199
+  ],
+  "rows": [
+    0,
+    620,
+    1312
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watch": 3
+  },
+  "seed": null,
+  "model_version": null
+}

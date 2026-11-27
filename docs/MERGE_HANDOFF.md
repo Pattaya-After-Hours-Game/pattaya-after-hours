@@ -1,5 +1,28 @@
 # Current implementation and release handoff
 
+## Customer social routines — 27 November 2026
+
+The customer animation follow-up adds real seated art for every identity and a
+presentation-only room routine. Ordinary pending orders approach the counter;
+service sends guests back to reserved chairs. Between rounds visitors can pair
+up to mingle or use two viewing places at a purchased sports screen. Active
+pool games and host rounds retain their model assignments. Long journeys use
+the clear floor aisle. A departing neighbour does not shuffle occupied chairs.
+
+Fifteen four-pose built-in ImageGen sheets add seated idle/drinking/conversation
+and a planted rear watcher. Prompts, sources, authored cuts, scoped packer and
+review tooling are committed alongside the runtime atlases. Existing art and
+save identities remain intact. Visual routes never gate service, create buyers,
+change budgets/timers/stock, extend visits or grant income/tips/loyalty.
+
+Rebased onto the concurrent shared-account change `65fe5c1`, preserving its
+schema-17 model and documentation. The full combined isolated `tools/test.sh`
+passed, including pacing; placement regressions also passed. Sixty new poses and 199
+in-engine captures at each of two resolutions were reviewed. See
+[verification](TESTING.md#customer-social-routines--27-november-2026).
+Device play and release publication remain unverified.
+
+
 ## One shared account and closing tips — 27 November 2026
 
 The user's requested simplification replaces separate tills, bank transfers and

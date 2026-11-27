@@ -148,6 +148,9 @@ static func atlas_specs() -> Dictionary:
 		specs["customer-motion-"+name] = [Vector2(width,192),16]
 		specs["street-customer-"+name] = [Vector2(192 if width>160 else 96,128),4]
 		specs["street-customer-"+name+"-depth"] = [Vector2(192 if width>160 else 96,128),8]
+	for name in CUSTOMER_MOTION_NAMES+["charcoal"]:
+		var width := 288 if name=="rainbow-duo" else 256 if name=="capybara" else 160
+		specs["customer-seated-"+name] = [Vector2(width,192),4]
 	return specs
 
 static func customer_sprite(customer_id: int, appearance: String = "") -> Array:
@@ -168,6 +171,10 @@ static func customer_motion_id(appearance: Array) -> String:
 		"patrons-rainbow-duo": name = "rainbow-duo"
 	return "customer-motion-"+name if not name.is_empty() else ""
 
+static func customer_seated_id(appearance: Array) -> String:
+	var id := customer_motion_id(appearance)
+	return "customer-seated-charcoal" if id=="patrons-charcoal" else id.replace("customer-motion-","customer-seated-")
+
 static func capybara_frame(time: float) -> int:
 	var phase := fposmod(time,8.0)
 	if phase>=1.50 and phase<1.68: return 1
@@ -185,6 +192,8 @@ static func cobalt_frame(time: float) -> int:
 
 # Semantic animation catalog. Contact frames are selected by the combat simulator.
 static func animation_frames(id: String, state: String) -> Array:
+	if id.begins_with("customer-seated-"):
+		return {"idle":[0],"drinking":[1],"chat":[2],"watch":[3]}.get(state,[0])
 	if id=="patrons-charcoal" or id.begins_with("customer-motion-"):
 		return {"idle":[12],"walk":[0,1,2,3],"walk_front":[4,5,6,7],"walk_back":[8,9,10,11],"drinking":[13],"chat":[14],"pool":[15]}.get(state,[12])
 	# Customer-specific poses are selected by the street scene.

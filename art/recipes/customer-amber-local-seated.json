@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Create a production transparent 2x2 four-pose sheet for this exact adult Thai male game customer. Preserve greying short swept-back hair, neat moustache, amber short-sleeved shirt with burgundy small diamond pattern, navy trousers, brown slip-on shoes, silver watch, face and adult proportions. Reference sheet specifies exact character and illustrated pixel-painted rendering style. Crisp plum outlines, clustered shading, warm amber highlights. EXACT two columns and two rows, even equal cells with generous transparent gutters. FOUR complete full-body figures, same body scale throughout. Top-left: SEATED idle facing RIGHT, hips and knees bent, thighs nearly horizontal, lower legs down, shoes at ground, hands resting on lap. Top-right: SEATED drinking facing RIGHT same seated posture, beer glass touching mouth. Bottom-left: SEATED chatting facing RIGHT same posture with one open conversational hand. Bottom-right: STANDING STILL rear view watching an offcanvas screen, back of greying head and patterned amber shirt visible, no face, BOTH feet flat and parallel at rest, empty hands down. First three poses actually seated as on a bar stool, visibly shorter than the standing adult; do NOT enlarge seated body to standing height. No chair or stool drawn; engine supplies seats. No screen, furniture, floor, shadow, scenery, glow, backdrop, grid, labels or text. Genuine transparent alpha background. All heads, shoes and hands fully inside each cell, no clipping or overlapping cells. Same adult identity and clothes all four poses.",
+  "references": [
+    "art/sources/customer-amber-local-motion.png"
+  ],
+  "source": "art/sources/customer-amber-local-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-5c3f-7802-a622-0e5e47fa4804/exec-1feb57f4-d3a0-4816-944e-2088b16a8491.png",
+  "rows": [
+    0,
+    656,
+    1312
+  ],
+  "columns": [
+    0,
+    600,
+    1199
+  ],
+  "frames": {
+    "seated_idle": [
+      0
+    ],
+    "seated_drinking": [
+      1
+    ],
+    "seated_chat": [
+      2
+    ],
+    "watching": [
+      3
+    ]
+  },
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "seed": null,
+  "model_version": null
+}

@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. FOUR transparent production game sprites of exact adult brown-haired woman in supplied reference, in 2 columns by 2 rows. Preserve her shoulder-length wavy brown hair, tan skin, gold/mustard short-sleeve collared shirt front pockets, olive belted cargo shorts, brown leather crossbody shoulder bag, brown sandals, gold hoop earrings and watch, sunglasses hanging neckline. Match face and sharp illustrated pixel-painted style/plum outlines/warm amber shading. Reference sheet IDENTITY ONLY; new poses: TOP LEFT genuinely SEATED idle facing screen RIGHT; TOP RIGHT SEATED drinking beer glass touching mouth facing RIGHT; BOTTOM LEFT SEATED conversation facing RIGHT with one open palm gesture; BOTTOM RIGHT STANDING STILL full REAR view watching offcanvas, empty hands down, both feet planted flat parallel, no face, not gait. All seated poses hips bent90degrees, thighs near horizontal, knees bent, lower legs down and all shoes near floor, as sitting on invisible bar stool. No stool/chair/furniture drawn. Seated silhouette shorter than standing at same body scale; keep size consistent and do not inflate seated adult. Hands empty except drinking glass top right. Entire head/hair/shoes fully visible each cell with generous empty alpha gutters/margins, no clipping or crosscell overlap. Exactly FOUR full-body people, one per cell, same individual. Genuine transparent alpha background; no floor/shadow/backdrop/checkerboard/grid/text/screen/cue/map or extra props.",
+  "references": [
+    "art/sources/customer-gold-blouse-motion.png"
+  ],
+  "source": "art/sources/customer-gold-blouse-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-ec0f0f7d-8575-4408-8759-4533c48c04a6.png",
+  "columns": [
+    0,
+    600,
+    1199
+  ],
+  "rows": [
+    0,
+    598,
+    1312
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watch": 3
+  },
+  "seed": null,
+  "model_version": null
+}

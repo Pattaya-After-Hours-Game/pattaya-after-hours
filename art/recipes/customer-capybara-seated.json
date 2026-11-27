@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. FOUR transparent production game GROUP sprites, 2 columns by 2 rows, exact adult man and capybara companion from reference. Preserve man's broad olive face, swept tousled salt-pepper hair, full grey-white beard, black T-shirt with tiny pale mark, navy knee shorts, black trainers/watch; tawny knee-high capybara teal harness burgundy leash held in man's hand. Both figures together in ALL FOUR cells, same identity/clothing/proportions/pixel-painted illustrated style/plum outlines/warm highlights. Reference sheet IDENTITY ONLY; new poses: TOP LEFT man genuinely SEATED idle facing screen RIGHT with capybara standing on ground beside him; TOP RIGHT man SEATED drinking beer glass at mouth facing RIGHT, capybara beside on ground; BOTTOM LEFT man SEATED conversation open hand facing RIGHT, capybara beside on ground; BOTTOM RIGHT man AND capybara STANDING STILL full REAR view watching offcanvas, man's hands down holding leash, both feet flat parallel, animal four paws down, no faces, not gait. Sitting man hips bend90degrees thighs near horizontal knees bent lowerlegs down shoes near floor as sitting on invisible barstool, naturally shorter silhouette than standing at same body scale. Animal remains quadruped, harness/leash connected every cell, never drinks or sits on lap. No chair/stool/furniture drawn. Hands empty except glass in top right and leash. Four complete groups, head/shoes/paws/leash all fully visible with generous transparent gutters/outer margins, no cropping/overlaps. Genuine transparent alpha, no floor/shadow/backdrop/checkerboard/grid/text/screen/extra props.",
+  "references": [
+    "art/sources/customer-capybara-motion.png"
+  ],
+  "source": "art/sources/customer-capybara-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-f412214f-afe1-498b-b566-46b9731ab907.png",
+  "columns": [
+    0,
+    656,
+    1312
+  ],
+  "rows": [
+    0,
+    576,
+    1199
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watch": 3
+  },
+  "seed": null,
+  "model_version": null
+}

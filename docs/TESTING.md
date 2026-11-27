@@ -1,5 +1,44 @@
 # Testing and release checks
 
+## Customer social routines — 27 November 2026
+
+The full isolated `tools/test.sh` passed on Godot 4.7.2 with zero failures across
+regressions and every pacing suite. The feature was rebased onto the concurrent
+schema-17 shared-account update, preserving its model, tests and documentation;
+the combined wrapper passed again. Final isolated regressions also passed after
+the hosted-round placement and packed counter-line refinements.
+
+`customer_routine_check.gd` exercises real counter orders, paid stock and sales,
+returning to seats, reserving adjacent places for the duo, stable chairs after
+reordering/departure, genuine partners, two-viewer limits, purchased-screen
+ownership, repeat orders interrupting leisure, service during walks, active
+pool/host priority, lone visitors, closure/departure cleanup, all nine layouts,
+public floor queues, aisle routes and exact campaign/RNG purity through complete
+social cycles. Existing service clocks, visits, save migrations and companion
+pointer/touch reactions remain covered by the combined regression suite.
+
+The fifteen new atlases add sixty nonempty padded poses with valid bounds,
+manifest hashes and smaller seated proportions. Two scoped packing runs produced
+identical hashes. Light/dark alpha-edge review and the full pose lineup preserve
+all identities and companions. No existing production PNG was changed.
+
+`preview_customer_routine.gd` produced 199 captures each at 960×540 and 1280×720:
+counter, seated, mingling, TV watching, repeat orders and no-screen states in all
+nine layouts; continuous arrival/return and actual paid-pool transitions; closure.
+All nine room comparisons were reviewed at both sizes. The documentation clip
+samples actual Godot captures and ends with seated/mingle/watch stills.
+
+```sh
+PATTAYA_PREVIEW_SCRIPT=tests/preview_customer_routine.gd tools/preview-art.sh /tmp/pattaya-routines
+python3 tools/review_customer_routine.py /tmp/pattaya-routine-review /tmp/pattaya-routines
+```
+
+[Routine animation](customer-routines.gif) · [Activity comparison](customer-routines.png).
+Exact built-in ImageGen prompts and receipts are in
+[the art guide](../art/README.md#customer-social-routines--27-november-2026).
+Device play and release publication remain unverified.
+
+
 ## One shared account and closing tips — 27 November 2026
 
 This revision supersedes the separate-finance and local-tour-funding records

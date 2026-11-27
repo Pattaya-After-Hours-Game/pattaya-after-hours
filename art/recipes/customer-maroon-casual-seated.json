@@ -1,0 +1,31 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent four-pose sprite sheet for Pattaya After Hours. Exact adult Indian male customer in reference: medium brown skin, thick curly black hair, short stubble, friendly face, rumpled maroon tee, olive cargo shorts, dark brown crossbody bag and strap, bead bracelet, brown buckle sandals. Same identity, body scale and clothes in every pose. EXACT 2 columns × 2 rows equally spaced cells. Top left SEATED IDLE facing RIGHT three-quarter/side, upright torso, hips/knees bent90degrees, thighs near horizontal extending right, lowerlegs down, sandals near floor, empty hands on thighs. Top right SAME seated pose drinking beer glass touching mouth. Bottom left SAME seated pose with one open hand conversational gesture. Bottom right STANDING STILL REAR watching offcanvas screen, back of hair/shirt no face, both feet flat next to eachother, empty hands low, NOT gait. Seated height shorter than standing, same head/body scale not enlarged. NO chair/stool/furniture drawn; game seat supports him. No screen. All complete heads/shoes with generous transparent padding and no cell overlap. True transparent alpha, no background/glow/floor/shadow/labels/text/grid. Match original crisp illustrated pixel-painted style, dark plum outlines, warm clustered shading, six-head adult proportions, not chibi or photo.",
+  "reference": "art/sources/customer-maroon-casual-motion.png",
+  "source": "art/sources/customer-maroon-casual-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-06a6578c-c172-4b06-aa47-298c6424d49e.png",
+  "columns": [
+    0,
+    512,
+    1024
+  ],
+  "rows": [
+    0,
+    760,
+    1536
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watching": 3
+  },
+  "model_version": null,
+  "seed": null
+}

@@ -1,0 +1,31 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Transparent four-pose production sprite sheet for Pattaya After Hours. Preserve EXACT adult Korean visitor from reference: light warm skin, tousled black hair, thin round dark glasses, clean-shaven friendly face, loose sage green tee, charcoal knee shorts, navy zipped waist pouch, white crew socks, worn white/grey trainers. Same adult identity/build/clothes/accessories all four sprites. EXACT2columns2rows equal cells, generous transparent padding, fully visible hair/shoes inside each cell no overlaps. Top left SEATED IDLE facing RIGHT three-quarter/side: upright torso, hips/knees bent90degrees, thighs near horizontal extending right, lowerlegs down, trainers near floor, relaxed empty hands on thighs. Top right SAME seated posture drinking beer glass touching mouth. Bottom left SAME seated posture openhand conversation. Bottom right STANDING STILL full REAR watching something offcanvas, back of hair/shirt no face, BOTH feet flat sidebyside, empty hands low, NOT gait. Same body/head scale every pose, seated is shorter than standing because bent legs not enlarged. NO chair/stool/furniture drawn, game furniture supports seat. No screen. True transparent alpha, no backdrop/glow/floor/shadows/labels/text/grid. Crisp original pixel-painted illustration with plum outlines and warm clustered shading, adult proportions not chibi or photograph.",
+  "reference": "art/sources/customer-sage-holiday-motion.png",
+  "source": "art/sources/customer-sage-holiday-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-2ce0cc5e-6000-4e10-b6da-ab69b19b8cd3.png",
+  "columns": [
+    0,
+    600,
+    1199
+  ],
+  "rows": [
+    0,
+    615,
+    1312
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watching": 3
+  },
+  "model_version": null,
+  "seed": null
+}

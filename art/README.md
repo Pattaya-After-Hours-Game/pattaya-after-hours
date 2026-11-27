@@ -12,6 +12,46 @@ Existing room plates and cast artwork remain unchanged. Nida appears at the
 entrance only while contracted, scheduled on and trading; benches appear only
 for purchased level-three beer-bar seating.
 
+## Customer social routines — 27 November 2026
+
+All fifteen customer identities have four additional authored poses: seated idle,
+seated drinking, seated conversation and a planted rear-view standing watcher.
+Fifteen `sources/customer-<name>-seated.png` sheets and matching
+`recipes/customer-<name>-seated.json` receipts contain exact built-in ImageGen
+prompts, identity references, provenance and authored cuts. Companions stay in
+all four cells, including the capybara's harness and the duo's carried dog.
+Original images and earlier sheets remain unchanged.
+
+`tools/prepare_customer_seated.py` creates fifteen `customer-seated-*` runtime
+atlases. Each contains four cells using the same widths as that customer's
+walking sheet. The seated trio shares a 140px normalization; the still watcher
+uses 180px. Bent adults keep their body proportions instead of being stretched
+to standing height. Cushions use authored torso pivots and the existing room
+stools; no placeholder furniture or room repainting is introduced. On tall
+stools, lower legs can sit behind the property dock like the illustrated legs.
+
+The presentation-only `customer_routine.gd` reserves physical chair positions
+per visitor (two adjacent places for the duo), walks longer journeys along the
+public aisle, sends ordinary pending orders to the counter, and returns served
+guests to seats. Between rounds, staggered dwell phases select paired mingling
+or a maximum of two TV viewers. Conversations require available actual guests;
+watching requires a purchased sports screen. Pool and hosted rounds retain their
+real model assignments; a pool queue never invents another game. Drinking seats
+alternate occasional sip poses with rest, without changing drinking deadlines.
+
+No route, seat, leisure phase or partner is saved. Closures/departures clear
+records, campaign changes reset them, and navigation/image reads do not mutate
+model state. Orders remain immediately serviceable during walks. The same
+ordinary sales, real pool games, budgets, finite visits and RNG own every result.
+
+[Routine preview](../docs/customer-routines.gif) · [Four activities](../docs/customer-routines.png).
+
+```sh
+python3 tools/prepare_customer_seated.py
+PATTAYA_PREVIEW_SCRIPT=tests/preview_customer_routine.gd tools/preview-art.sh /tmp/pattaya-routines
+python3 tools/review_customer_routine.py /tmp/pattaya-routine-review /tmp/pattaya-routines
+```
+
 ## Full customer animation cast — 27 November 2026
 
 Fourteen new reference-preserving sheets extend the existing charcoal sheet to

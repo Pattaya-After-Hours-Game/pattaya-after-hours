@@ -4,6 +4,7 @@ const Economy = preload("res://scripts/economy.gd")
 const Content = preload("res://scripts/street_content.gd")
 const RatSwarm = preload("res://scripts/rat_swarm.gd")
 const StreetView = preload("res://scripts/street_view.gd")
+const CustomerRoutine = preload("res://scripts/customer_routine.gd")
 const INK = Color("#21131e")
 const TEAL = Color("#73f5dc")
 const PINK = Color("#f37ab0")
@@ -293,7 +294,7 @@ static func person_scale(floor_y: float) -> float:
 	return clampf(.75+(floor_y-300)*.0022,.70,1.04)
 
 static func order_position(person: Dictionary) -> Vector2:
-	return person.foot-Vector2(0,180*person_scale(person.foot.y)+10)
+	return person.foot-Vector2(0,float(person.get("body_height",180))*person_scale(person.foot.y)+10)
 
 func _draw_person(person: Dictionary) -> void:
 	var foot: Vector2 = person.foot
@@ -332,16 +333,10 @@ func _draw_street(kind: int, stage: int) -> void:
 	StreetView.draw_traffic(self,StreetView.activity(street_state),clock,true,kind==0 and stage==3)
 
 static func customer_home(kind: int, slot: int) -> Vector2:
-	var columns := [300,440,580,370,510,650,720,790]
-	var row := slot/8
-	return Vector2(columns[slot%8]+(15 if row%2 else 0),366-row*9 if kind==2 else 362-row*19)
+	return CustomerRoutine.home(kind,slot)
 
 static func customer_pool_foot(bar: Dictionary, guest: Dictionary, home: Vector2) -> Vector2:
-	if guest.playing:
-		for game in bar.games:
-			var player: int = game.players.find(guest.id)
-			if player>=0: return Vector2(250+int(game.get("table",0))*200+player*205,355+int(game.get("table",0))*12)
-	return home
+	return CustomerRoutine.pool_foot(bar,guest,home)
 
 func update_customer_motion(delta: float) -> void:
 	if not is_same(motion_street,street_state):
@@ -359,30 +354,8 @@ func update_customer_motion(delta: float) -> void:
 	var first_view := not customer_motion.has(key)
 	if first_view: customer_motion[key] = {}
 	var records: Dictionary = customer_motion[key]
-	var ids: Array = bar.customers.map(func(g: Dictionary) -> int: return int(g.id))
-	for id in records.keys():
-		if not ids.has(id): records.erase(id)
-	var occupied := {}
-	for record in records.values(): occupied[int(record.slot)] = true
-	for i in bar.customers.size():
-		var guest: Dictionary = bar.customers[i]
-		var id := int(guest.id)
-		if not records.has(id):
-			var slot := 0
-			while occupied.has(slot): slot += 1
-			occupied[slot] = true
-			var home := customer_home(int(bar.type),slot)
-			var foot := customer_pool_foot(bar,guest,home) if first_view or changed_view else Vector2(242,362)
-			records[id] = {"slot":slot,"foot":foot,"direction":Vector2.ZERO,"moving":false}
-		var record: Dictionary = records[id]
-		var target := customer_pool_foot(bar,guest,customer_home(int(bar.type),int(record.slot)))
-		var offset: Vector2 = target-record.foot
-		record.moving = offset.length()>.5
-		if record.moving:
-			record.direction = offset.normalized()
-			record.foot = record.foot.move_toward(target,maxf(0.0,delta)*52.0)
-		else:
-			record.foot = target
+	var now := float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0))
+	CustomerRoutine.update(bar,records,delta,first_view or changed_view,now)
 
 func scene_people(bar: Dictionary) -> Array:
 	var people: Array = []
@@ -460,6 +433,21 @@ func scene_people(bar: Dictionary) -> Array:
 		if records.has(customer_id):
 			var record: Dictionary = records[customer_id]
 			person.foot = record.foot
+			person.activity = record.activity
+			person.partner = record.partner
+			if not record.moving:
+				var seated_id := Art.customer_seated_id(appearance)
+				if record.activity=="seat" or (record.activity=="chat" and record.get("seat",Vector2.ZERO)!=Vector2.ZERO and record.foot.distance_to(record.seat)<.5):
+					person.draw_who = seated_id
+					person.draw_pose = 2 if state=="chat" else 1 if state=="drinking" and fposmod(clock+customer_id*.37,6)<1.6 else 0
+					person.body_height = 140
+				elif record.activity=="watch":
+					person.draw_who = seated_id
+					person.draw_pose = 3
+					person.flip = false
+				elif record.activity=="mingle" and int(record.partner)>=0:
+					state = "chat" if fposmod(clock+customer_id*.7,4)<2 else "idle"
+					person.flip = person.foot.x>float(records[int(record.partner)].foot.x)
 			if record.moving:
 				var direction: Vector2 = record.direction
 				state = ("walk_front" if direction.y>0 else "walk_back") if absf(direction.y)>absf(direction.x) else "walk"
@@ -468,12 +456,16 @@ func scene_people(bar: Dictionary) -> Array:
 		# A kiss is allowed only while stationary; it never interrupts a walk.
 		var kissing: bool = appearance[0]=="patrons-rainbow-duo" and pose==1
 		var keep_idle: bool = state=="idle" and (appearance[0] in ["patrons-capybara","patrons-rainbow-duo"] or (appearance[0]=="patrons-men" and int(appearance[1])==Art.COBALT_IDLE))
-		if not keep_idle and not (kissing and not state.begins_with("walk")):
+		if not person.has("draw_who") and not keep_idle and not (kissing and not state.begins_with("walk")):
 			var motion_id := Art.customer_motion_id(appearance)
 			if not motion_id.is_empty():
 				person.draw_who = motion_id
 				person.draw_pose = Art.animation_frame(motion_id,state,clock+customer_id*.19,8)
-				if not state.begins_with("walk"): person.flip = customer_id%2==0
+				if not state.begins_with("walk") and person.get("activity","")!="mingle": person.flip = customer_id%2==0
+		if kissing and not state.begins_with("walk"):
+			person.draw_who = "patrons-rainbow-duo"
+			person.draw_pose = 1
+			person.body_height = 180
 		person.motion_state = state
 		people.back().visit_phase = bar.customers[i].get("visit_phase","legacy") if bar.has("customers") else "legacy"
 		people.back().costume = bar.has("customers") and bar.customers[i].get("costume",false)

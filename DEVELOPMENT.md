@@ -16,6 +16,15 @@ hit testing uses the displayed atlas and frame. Source receipts, authored crop
 cuts and deterministic packing are documented in [the art guide](art/README.md).
 `customer_motion_check.gd` covers position continuity and presentation purity.
 
+`scripts/customer_routine.gd` owns visible counter/seat/mingle/watch destinations,
+reserved physical chairs, bounded viewing places and floor-aisle routes. City
+stores its disposable records; none are serialized. Real orders interrupt leisure,
+paid service sends guests back to a seat, and active pool/host rounds retain
+priority. Leisure phases advance only through the visible scene's delta. Model
+admission, patience, drinking, pool fees, service clocks, budgets and RNG are
+unchanged. `customer_routine_check.gd` checks those boundaries and state purity.
+`tools/prepare_customer_seated.py` packs the new authored seated/watch poses.
+
 For the premise and cast, see [story.md](story.md). For gameplay help, see the
 [player guide](docs/PLAYER_GUIDE.md). [Testing and release checks](docs/TESTING.md)
 records coverage and remaining platform verification.

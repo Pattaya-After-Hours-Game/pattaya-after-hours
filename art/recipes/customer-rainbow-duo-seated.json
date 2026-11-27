@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent 2by2 game sprite sheet containing FOUR complete GROUPS of exact TWO adult men and one small orange fluffy dog from reference. Preserve shorter stocky man brown swept hair dark beard black glasses, rainbow open short-sleeve shirt over charcoal tee, blue jean shorts brown sandals, dog held in arms; taller broad ginger man ginger swept hair full beard orange/navy plaid open shirt with bear pocket over grey rainbowstripe tee, navy cargo shorts black sandals. Distinct faces/body heights/clothes/colors and illustrated pixelpainted plum outline warmhighlight style same allcells. Reference sheet IDENTITY ONLY; NEW poses: TOPLEFT BOTH MEN genuinely SEATED idle facing screenRIGHT, shorter man holding dog; TOPRIGHT BOTH SEATED RIGHT taller man drinks beer glass at mouth shorter man holds dog; BOTTOMLEFT BOTH SEATED RIGHT taller man openpalm conversation shorter man holds dog; BOTTOMRIGHT BOTH MEN STANDING STILL fullREAR view watching offcanvas, both feet flat parallel, no face, notwalking, dog still held safely by shorter man partly occluded by his body. Every seated man hips bent90degrees, thighs nearhorizontal and knees bent, lowerlegs down, shoes nearfloor as sitting on invisible stools. BOTH must be seated in first3 cells. No chairs/stools/furniture drawn. Sitting silhouettes naturally shorter than standing at same body scale. Dog remains carried in everycell; do not put onground or remove. Entire heads/hair/feet/dog contained with generous alpha gutters/margins, no clipping/overlap, render smaller tofit both. Genuine transparent alpha, no background/shadow/floor/checkerboard/grid/text/screen/cue/extra props. Exactly FOUR isolated groups in2cols2rows.",
+  "references": [
+    "art/sources/customer-rainbow-duo-motion.png"
+  ],
+  "source": "art/sources/customer-rainbow-duo-seated.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-df5d9e5d-cdec-4b25-8bab-f4b74a673c9f.png",
+  "columns": [
+    0,
+    768,
+    1536
+  ],
+  "rows": [
+    0,
+    495,
+    1024
+  ],
+  "frame_heights": [
+    140,
+    140,
+    140,
+    180
+  ],
+  "frames": {
+    "seated_idle": 0,
+    "seated_drinking": 1,
+    "seated_chat": 2,
+    "watch": 3
+  },
+  "notes": "Transparent RGB contains brown study backdrop colors; alpha160 cutout contains only group silhouettes. Dog carried by shorter man all poses, partly hidden from rear.",
+  "seed": null,
+  "model_version": null
+}

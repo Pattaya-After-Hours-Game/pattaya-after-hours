@@ -1198,5 +1198,125 @@
       256
     ],
     "sha256": "adc51b65c5419b5837c17caee7d5fe9909dc9f14fec8c53a403c2fd59963eca4"
+  },
+  "customer-seated-sunfaded-regular": {
+    "file": "res://assets/art/customer-seated-sunfaded-regular.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "05a1550a3c3628532ce0c0190bc29ee7eccadbf6a6abcb32c518e35a43a6c7f9"
+  },
+  "customer-seated-silver-polo": {
+    "file": "res://assets/art/customer-seated-silver-polo.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "bd9dfa4b9253a5dd2ef7b9451f003f731e1f98bf5ca4f3c906ad66143ef2df27"
+  },
+  "customer-seated-maroon-casual": {
+    "file": "res://assets/art/customer-seated-maroon-casual.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "1a2c5cd23cee17e12c00de9efc3b338f065f7d010a1076f0ad06ff56c37ad185"
+  },
+  "customer-seated-plum-club": {
+    "file": "res://assets/art/customer-seated-plum-club.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "8061078c50520bda0a10dddddc9eae54d4f3d4cba6b4c01e8c1390f4838f5dae"
+  },
+  "customer-seated-ivory-club": {
+    "file": "res://assets/art/customer-seated-ivory-club.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "8260391b579155a24dfddfc4a99f51922f910c4106f1ff47a399eaecd5da732e"
+  },
+  "customer-seated-cobalt-evening": {
+    "file": "res://assets/art/customer-seated-cobalt-evening.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "bfe116e88a3b12d960d6611a6b97a26bcf93a552d33db050fb24c33c482869ff"
+  },
+  "customer-seated-amber-local": {
+    "file": "res://assets/art/customer-seated-amber-local.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "49a6269ad63bcd80406ae3d6c6332ae105efd56287e4910fb4c65488eaadbbe6"
+  },
+  "customer-seated-teal-dress": {
+    "file": "res://assets/art/customer-seated-teal-dress.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "d045ccfd27c7d7b21e4ea61ec5ccef0cbed8996ffaeb91dfb796ea3c4ed49dd6"
+  },
+  "customer-seated-gold-blouse": {
+    "file": "res://assets/art/customer-seated-gold-blouse.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "6b531c2e3e10d4fefd13d0d57df0ce58fd7b83cd36ed67b98010a321b44e5f00"
+  },
+  "customer-seated-capybara": {
+    "file": "res://assets/art/customer-seated-capybara.png",
+    "size": [
+      1024,
+      192
+    ],
+    "sha256": "c5ab4a930e18317ae9bab5c8ebcc44ebae2f7e1763cfeae682fe07e712f7b9d0"
+  },
+  "customer-seated-sage-holiday": {
+    "file": "res://assets/art/customer-seated-sage-holiday.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "aa37584d92ac0bd592a017199da1f18b3ac3b4a0a7e755f83ac6d398361a1bfe"
+  },
+  "customer-seated-beard-glasses": {
+    "file": "res://assets/art/customer-seated-beard-glasses.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "3ecd50be32c76a6d54774559be2fdd8c79167feae7e87385ebe210cdad85cf59"
+  },
+  "customer-seated-navy-tourist": {
+    "file": "res://assets/art/customer-seated-navy-tourist.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "cdde4aca03a54c4d1a362cc52515ca060967bffff24bcfe82a1b2ee49611d3a9"
+  },
+  "customer-seated-rainbow-duo": {
+    "file": "res://assets/art/customer-seated-rainbow-duo.png",
+    "size": [
+      1152,
+      192
+    ],
+    "sha256": "2ea040c0f55ade39ff65b811b4e212b2699c4d1720b5f3c796ecfcf34d2fcaa5"
+  },
+  "customer-seated-charcoal": {
+    "file": "res://assets/art/customer-seated-charcoal.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "5e87fc1ec87aa65ce24454fe8f299cfc7ba75693cb69ca57879760030afa4659"
   }
 }
