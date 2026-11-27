@@ -6,6 +6,13 @@ build. On the startup menu, choose **New Game** to open your first bar or
 to confirm erasing the previous campaign, including its backup; **Cancel** keeps
 it. Resume is disabled when no readable save is available.
 
+The short animated welcome ends automatically after 2.6 seconds. Click, tap or
+press any key to skip it; that first input only skips, so it cannot start a game
+underneath. Resume leads when a save exists, with its day, money and venue count.
+Keyboard focus starts on the main action and on Cancel in the reset confirmation.
+Sound/Muted works from the title screen. The campaign stays paused until New Game
+or Resume; watching the animation never spends money or advances contracts.
+
 The selected bar’s name appears at the top left. Open **Tutorial** for a short practice shift.
 Buy a pack, serve an order, help an impatient guest, hire a bartender and close
 for the night. Practice uses its own till and does not change your save.

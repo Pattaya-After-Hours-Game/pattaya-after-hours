@@ -44,6 +44,7 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 			var depth := phase if forward else 1.0-phase
 			var foot: Vector2
 			var scale_value: float
+			var walk_distance: float
 			if closeup:
 				foot = Vector2(190,266).lerp(Vector2(117,372),depth)
 				if kind==0: foot.x += 10 if forward else -9
@@ -53,12 +54,19 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 				if terrace:
 					foot = Vector2(193,215).lerp(Vector2(183,281),depth)
 					scale_value *= .42
+				# Integrate screen travel / perspective scale, so the foreground
+				# walkers do not run in place as their bodies grow near the door.
+				var route_length := Vector2(73,106).length() if not terrace else Vector2(10,66).length()/.42
+				var start_scale := .27 if forward else 1.25
+				var scale_change := .98 if forward else -.98
+				walk_distance = route_length/scale_change*log((start_scale+scale_change*phase)/start_scale)
 			else:
 				var lane: int = i%3 if kind==0 else 1+i%2
 				var width: float = 274 if lane==0 else 900
 				foot = Vector2(30+depth*width,[177,346,510][lane])
 				if kind==0: foot.y -= 7+i%2*9
 				scale_value = [.30,.30,.31][kind]
+				walk_distance = phase*width/scale_value
 			var id: String = ["street-walkers","street-scooters","street-cars"][kind]
 			var row: int = i%5 if kind==0 else i%2 if kind==1 else 0
 			var charcoal: bool = kind==0 and row==4
@@ -83,7 +91,8 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 			elif charcoal:
 				id = "street-charcoal-depth" if closeup else "street-charcoal"
 				if not closeup: row = 0
-			var frame := row*4+posmod(int(time*(7 if kind==0 else 5))+i,4)
+			# Outdoor people are packed smaller: one cycle per 64 source pixels.
+			var frame := row*4+posmod(floori(walk_distance/16.0)+i,4) if kind==0 else row*4+posmod(int(time*5)+i,4)
 			var alpha := smoothstep(0,.07,phase)*(1-smoothstep(.93,1,phase))
 			var tint := Color(.48,.51,.59,alpha) if closeup and kind==0 else Color(1,1,1,alpha)
 			items.append({"key":"%d/%d" % [kind,i],"id":id,"frame":frame,"foot":foot,"scale":scale_value,"flip":false if closeup else not forward,"facing":("front" if forward else "back") if closeup else ("right" if forward else "left"),"tint":tint})

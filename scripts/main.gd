@@ -6,6 +6,7 @@ const StreetContent = preload("res://scripts/street_content.gd")
 const Local = preload("res://scripts/local_events.gd")
 const BedRaceCourse = preload("res://scripts/bed_race_course.gd")
 const City = preload("res://scripts/city.gd")
+const TitleScreen = preload("res://scripts/title_screen.gd")
 const District = preload("res://scripts/district.gd")
 const Art = preload("res://scripts/art.gd")
 const Fight = preload("res://scripts/fight.gd")
@@ -53,6 +54,8 @@ const GODZILLA_SECONDS = 10.0
 
 var model = Campaign.new()
 var boot_menu := true
+var title_clock := 0.0
+var title_screen: Control
 var resume_available := false
 var new_game_confirmation := false
 var campaign_before_tutorial: Campaign
@@ -193,37 +196,30 @@ func _ready() -> void:
 		if DisplayServer.get_name() != "headless": windows_updates.check()
 
 func render_boot_menu() -> void:
-	var background := TextureRect.new()
-	background.texture = Art.venue(0,1)
-	background.size = Vector2(960,540)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root_ui.add_child(background)
-	pane(root_ui,Rect2(0,0,960,540),Color("#170f18b8"),Color.TRANSPARENT)
-	var menu := pane(root_ui,Rect2(220,64,520,412),DARK,GOLD)
-	abs_text(menu,Rect2(28,20,464,24),"THE BLUE HOUR IS WAITING",14,TEAL)
-	abs_text(menu,Rect2(28,51,464,42),"PATTAYA AFTER HOURS",29,GOLD)
-	if new_game_confirmation:
-		abs_text(menu,Rect2(28,110,464,30),"Replace your saved campaign?",22,PINK)
-		abs_text(menu,Rect2(28,151,464,65),"All progress in your current game will be erased.\nYou will start again at the Blue Hour.\nThis cannot be undone.",16,WHITE)
-		at_button(menu,Rect2(28,242,464,48),"Erase progress & start new game",start_new_game)
-		at_button(menu,Rect2(28,304,464,48),"Cancel",cancel_new_game,true).grab_focus()
-	else:
-		var summary := "No saved campaign yet. Start your first bar."
-		if resume_available:
-			summary = "Day %d · %s total cash · %d venue%s" % [model.s.day,cash(model.street.finance.total()),model.s.street.bars.size(),"" if model.s.street.bars.size()==1 else "s"]
-		abs_text(menu,Rect2(28,111,464,28),summary,16,WHITE)
-		abs_text(menu,Rect2(28,148,464,48),"One street. One saved campaign.\nNew Game replaces your existing progress.",15,MUTED)
-		var resume := at_button(menu,Rect2(28,224,464,48),"Resume",resume_game,true)
-		resume.disabled = not resume_available
-		var fresh := at_button(menu,Rect2(28,286,464,48),"New Game",request_new_game)
-		if resume_available: resume.grab_focus()
-		else: fresh.grab_focus()
-	var notice := abs_text(menu,Rect2(28,359,464,36),message,14,PINK)
-	notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	at_button(root_ui,Rect2(848,14,98,40),"Muted" if muted else "Sound",set_sound)
+	title_screen = TitleScreen.new()
+	title_screen.clock = title_clock
+	title_screen.has_save = resume_available
+	title_screen.confirming = new_game_confirmation
+	title_screen.muted = muted
+	title_screen.notice = message
+	if resume_available:
+		title_screen.campaign_summary = "Day %d · %s · %d venue%s" % [model.s.day,cash(model.street.finance.total()),model.s.street.bars.size(),"" if model.s.street.bars.size()==1 else "s"]
+	title_screen.resume_requested.connect(resume_game)
+	title_screen.new_game_requested.connect(request_new_game)
+	title_screen.confirm_requested.connect(start_new_game)
+	title_screen.cancel_requested.connect(cancel_new_game)
+	title_screen.sound_requested.connect(set_sound)
+	title_screen.skip_requested.connect(skip_title_intro)
 	if windows_updates != null:
-		update_button = at_button(root_ui,Rect2(14,14,98,40),"Update",windows_updates.ask)
-		update_button.visible = not windows_updates.tag.is_empty()
+		title_screen.update_available = not windows_updates.tag.is_empty()
+		title_screen.update_requested.connect(windows_updates.ask)
+	root_ui.add_child(title_screen)
+	update_button = title_screen.update_button
+
+func skip_title_intro() -> void:
+	if not boot_menu: return
+	title_clock = maxf(title_clock,TitleScreen.INTRO_SECONDS)
+	if is_instance_valid(title_screen): title_screen.update_time(title_clock)
 
 func resume_game() -> void:
 	if not boot_menu or not resume_available: return
@@ -406,6 +402,7 @@ func render(keep_scroll: bool = false) -> void:
 	refresh_street = false
 	var previous := scroll.scroll_vertical if keep_scroll and is_instance_valid(scroll) else 0
 	var previous_ui := root_ui
+	var previous_city := city
 	root_ui = Control.new()
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
@@ -440,6 +437,7 @@ func render(keep_scroll: bool = false) -> void:
 	city.fridge_capacity = model.street.economy.stock_capacity(model.street.selected())
 	city.street_event = model.s.street.event
 	city.celebrating = model.street.economy.celebrating(model.street.selected())
+	city.restore_animation(previous_city)
 	root_ui.add_child(city)
 	if rats_active:
 		city.focus_mode = Control.FOCUS_ALL
@@ -1063,6 +1061,12 @@ func close_stat_tip() -> void:
 	stat_tip_key = ""
 
 func _input(event: InputEvent) -> void:
+	if boot_menu and is_instance_valid(title_screen) and title_screen.is_intro():
+		var skip: bool = (event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed) or (event is InputEventKey and event.pressed and not event.echo)
+		if skip:
+			skip_title_intro()
+			get_viewport().set_input_as_handled()
+		return
 	if event_game==Local.CART and cart_pointer_input(event):
 		get_viewport().set_input_as_handled()
 		return
@@ -2948,7 +2952,11 @@ func street_ui_state() -> Array:
 	return state
 
 func _process(delta: float) -> void:
-	if updater_worker or boot_menu: return
+	if updater_worker: return
+	if boot_menu:
+		title_clock += maxf(0,delta)
+		if is_instance_valid(title_screen): title_screen.update_time(title_clock)
+		return
 	scene_clock += delta
 	service_animation = maxf(0,service_animation-delta)
 	if model.street.afk_enabled() and campaign_before_tutorial==null:
@@ -3113,7 +3121,9 @@ func close_district() -> void:
 func _notification(what: int) -> void:
 	if updater_worker: return
 	if boot_menu:
-		if what == NOTIFICATION_WM_GO_BACK_REQUEST and new_game_confirmation: cancel_new_game()
+		if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+			if is_instance_valid(title_screen) and title_screen.is_intro(): skip_title_intro()
+			elif new_game_confirmation: cancel_new_game()
 		return
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if campaign_before_tutorial == null: save_state()

@@ -18,6 +18,47 @@ publication before treating it as a downloadable build. Concurrent title-screen
 and customer-graphics work in the shared checkout is preserved. See
 [the test record](TESTING.md#afk-mode--27-november-2026).
 
+## Blue Hour title and splash — local source, 27 November 2026
+
+The title now opens with a skippable pouring-glass/neon sequence and settles into
+a large title, gently swinging Blue Hour sign and Anong's welcome. Native buttons
+prioritise Resume for readable saves and New Game otherwise, with saved day,
+shared cash and venue count. Reset confirmation defaults to Cancel. The first
+mouse/touch/key input skips only; Sound and redraws retain the intro's progress.
+
+`title_screen.gd` receives display strings and emits actions; it has no campaign
+reference. Main advances only its visual clock on the boot menu. New Game,
+Resume, backup recovery, offline settlement and the Windows worker retain their
+existing ownership. No gameplay prices, save schema, production art or engine
+version changes belong to this title work.
+
+The earlier walking-continuity fixes remain in place. The complete isolated test
+wrapper passed, including all pacing suites. Concurrent AFK edits to the shared
+main checkout are preserved, and subsequent combined regressions pass. See
+[title verification](TESTING.md#animated-title-and-splash--27-november-2026) and
+the [preview](title-menu.png). This is local source, not a published
+release. Device play remains unverified.
+
+## Walking cadence and button continuity — local source, 27 November 2026
+
+Synced main to `7745ea7`, preserving its seated-customer routines. HUD rebuilds
+now retain the same campaign's transient movement, reserved seats, leisure dwell,
+gait and visual-effect clocks. Tabs, Back, Sound and Serve no longer discard
+in-progress walks. Real service retargets from the customer's current position.
+New campaigns still reset presentation records.
+
+Customer footsteps now follow travelled distance adjusted for sprite scale,
+reducing normal indoor gait from eight to roughly three frames per second.
+Outdoor pedestrians follow route distance and perspective too. Business clocks,
+orders, stock, saves and original production artwork are unchanged.
+
+All regression and pacing suites pass, with the four remaining balance scripts
+completed separately after the wrapper was interrupted. Two-resolution animation
+previews also pass; see
+[verification](TESTING.md#walking-cadence-and-button-continuity--27-november-2026).
+Changes are local and uncommitted; no release was published. Other worktrees and
+personal attachments are untouched. Device play remains unverified.
+
 ## Customer social routines — 27 November 2026
 
 The customer animation follow-up adds real seated art for every identity and a

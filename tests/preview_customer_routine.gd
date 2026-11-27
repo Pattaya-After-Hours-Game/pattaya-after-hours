@@ -78,10 +78,13 @@ func run() -> void:
 	for i in 96:
 		app.city.clock = i*.125
 		app.city.update_customer_motion(.125)
+		# Exercise the controls that used to cancel the arrival mid-stride.
+		if i==20: app.change_tab(0)
+		if i==24: app.close_drawer()
+		if i==34: app.set_sound()
 		if i==74:
-			app.model.street.economy.serve(bar)
-			app.render()
-			app.city.set_process(false)
+			app.street_action("serve")
+		app.city.set_process(false)
 		await capture(app,"routine-arrival-%03d" % i)
 	# Real pool starts charge the fee once through the normal model helper.
 	for guest in bar.customers: guest.pool = true

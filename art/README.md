@@ -1,5 +1,16 @@
 # Blue Hour production art
 
+## Optional bar staff collection — 27 November 2026
+
+[Staff pack v1](staff-pack-v1/README.md) contains eight new original adult
+character designs inspired by supplied nightlife references: four bartenders
+and four entertainers, with 40 poses and eight portraits. It follows the
+existing Gabby/Daisy frame indices, cell sizes, alpha cutoff and foot pivots.
+Sources, exact built-in ImageGen prompts, manifest, deterministic scoped packer
+and light/dark Godot previews are included. This is an authoring collection;
+the characters are not registered in the live roster or runtime catalog.
+Existing production art and gameplay are unchanged.
+
 This directory contains authoring material only. `.gdignore` and the export
 presets keep it out of the game. Runtime PNGs are in `assets/art/`; there are no
 concept-board textures in the runtime catalog.
@@ -11,6 +22,21 @@ a portrait, with [source receipts](recipes/nida-jobs.json). Her earlier
 Existing room plates and cast artwork remain unchanged. Nida appears at the
 entrance only while contracted, scheduled on and trading; benches appear only
 for purchased level-three beer-bar seating.
+
+## Blue Hour opening and title — 27 November 2026
+
+The title reuses `beer-1.png` and Anong's original service atlas. Engine-drawn
+lettering, a pouring glass, bubbles and a single sparkle introduce the game;
+the title settles left as the room appears. A hanging Blue Hour sign sways gently
+and Anong breathes beside her welcome card. There are no flashing loops.
+The diorama is separate from the live room and does not imply purchased equipment
+or admitted customers. No production textures or generated source images change.
+
+The 2.6-second sequence is immediately skippable with mouse, touch or keyboard.
+Fresh/saved campaigns, disabled Resume, reset confirmation and save errors use
+native Godot controls. The existing Sound/Muted setting remains authoritative.
+Preview with `PATTAYA_PREVIEW_SCRIPT=tests/preview_title.gd tools/preview-art.sh`.
+[Menu](../docs/title-menu.png) · [Opening animation](../docs/title-intro.gif).
 
 ## Customer social routines — 27 November 2026
 
@@ -43,6 +69,13 @@ No route, seat, leisure phase or partner is saved. Closures/departures clear
 records, campaign changes reset them, and navigation/image reads do not mutate
 model state. Orders remain immediately serviceable during walks. The same
 ordinary sales, real pool games, budgets, finite visits and RNG own every result.
+
+HUD button redraws retain these transient records and the scene's gesture clock.
+Indoor walking cycles cover 80 unscaled pixels (about three frames per second
+at the current movement speed); outdoor walking cycles cover 64 source pixels.
+Both account for perspective scale. The close-up street integrates distance
+through its changing scale, keeping the slower foreground walkers' feet in step.
+Vehicles keep their existing animation. Production atlases are unchanged.
 
 [Routine preview](../docs/customer-routines.gif) · [Four activities](../docs/customer-routines.png).
 

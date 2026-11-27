@@ -16,6 +16,13 @@ hit testing uses the displayed atlas and frame. Source receipts, authored crop
 cuts and deterministic packing are documented in [the art guide](art/README.md).
 `customer_motion_check.gd` covers position continuity and presentation purity.
 
+HUD rebuilds call `city.restore_animation` after binding the current street.
+It carries transient routes, chairs, dwell, gait and visual clocks only within
+the same campaign; changing campaigns discards them. Walking frames advance
+with travelled distance adjusted for sprite scale, not wall-clock time.
+`customer_motion_check.gd` exercises real navigation, Sound and Serve handlers
+mid-walk. No new save fields are introduced.
+
 `scripts/customer_routine.gd` owns visible counter/seat/mingle/watch destinations,
 reserved physical chairs, bounded viewing places and floor-aisle routes. City
 stores its disposable records; none are serialized. Real orders interrupt leisure,
@@ -115,6 +122,13 @@ legacy migration, host availability and announced events. These are headless che
 the affected screens when changing visuals, controls, audio, or mobile layout.
 
 ## Code map and gameplay
+
+`scripts/title_screen.gd` is a presentation-only opening diorama using the
+existing Blue Hour plate and Anong atlas. Main passes formatted save information
+and connects action signals; the title control has no campaign reference.
+`main.title_clock` advances the 2.6-second skippable intro while the boot-menu
+branch returns before simulation, offline claims and autosaves. HUD rebuilds
+retain this clock so Sound and confirmation do not replay the intro.
 
 | File | Responsibility |
 | --- | --- |

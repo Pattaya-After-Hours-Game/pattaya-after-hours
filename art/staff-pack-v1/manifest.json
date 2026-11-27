@@ -1,0 +1,709 @@
+{
+  "status": "authoring-only",
+  "characters": [
+    {
+      "id": "staff-copper",
+      "name": "Copper",
+      "role": "bartender",
+      "source": "sources/staff-copper.png",
+      "source_sha256": "4c4efd676ac6e23d05efacae91f3069a1a99d00558898639933c76dea4ec4467",
+      "source_grid": [
+        2,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          627,
+          627
+        ],
+        [
+          627,
+          0,
+          1254,
+          627
+        ],
+        [
+          0,
+          627,
+          627,
+          1254
+        ],
+        [
+          627,
+          627,
+          1254,
+          1254
+        ]
+      ],
+      "atlas": "atlases/staff-copper.png",
+      "sha256": "bc752e12fd39b09cc9435c9749a0f022e6a0fe906c7b775d166f696c04f881a4",
+      "cell": [
+        160,
+        192
+      ],
+      "columns": 4,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "walk-a",
+        "walk-b",
+        "serve"
+      ],
+      "foot_pivot": [
+        80,
+        188
+      ],
+      "portrait": "portraits/staff-copper.png",
+      "portrait_crop": [
+        245,
+        0,
+        410,
+        165
+      ],
+      "portrait_sha256": "f2328432db593973c62bd207fa7454bbb697a5e56453e3d4bc92f94729de4602",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "walk": [
+          1,
+          2
+        ],
+        "carry": [
+          3
+        ],
+        "serve": [
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "id": "staff-platinum",
+      "name": "Platinum",
+      "role": "bartender",
+      "source": "sources/staff-platinum.png",
+      "source_sha256": "e3eb7e56eecf2650531251041277c706f9bf02028244342d1d63c7c353f61063",
+      "source_grid": [
+        2,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          627,
+          627
+        ],
+        [
+          627,
+          0,
+          1254,
+          627
+        ],
+        [
+          0,
+          627,
+          627,
+          1254
+        ],
+        [
+          627,
+          627,
+          1254,
+          1254
+        ]
+      ],
+      "atlas": "atlases/staff-platinum.png",
+      "sha256": "92b2cfd27760193745b734471c7aa5f0f5dcc3f8edea36b297827d2feabcc447",
+      "cell": [
+        160,
+        192
+      ],
+      "columns": 4,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "walk-a",
+        "walk-b",
+        "serve"
+      ],
+      "foot_pivot": [
+        80,
+        188
+      ],
+      "portrait": "portraits/staff-platinum.png",
+      "portrait_crop": [
+        245,
+        0,
+        410,
+        165
+      ],
+      "portrait_sha256": "4222ee085ed3beba5ee75be264cceb06c534c48718f901eb2f10ae90462188f9",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "walk": [
+          1,
+          2
+        ],
+        "carry": [
+          3
+        ],
+        "serve": [
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "id": "staff-ruby",
+      "name": "Ruby",
+      "role": "bartender",
+      "source": "sources/staff-ruby.png",
+      "source_sha256": "e76d1ec2d5abe8e66419794d963fb091fc5920373eecf24a1031676abbd68a70",
+      "source_grid": [
+        2,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          627,
+          627
+        ],
+        [
+          627,
+          0,
+          1254,
+          627
+        ],
+        [
+          0,
+          627,
+          627,
+          1254
+        ],
+        [
+          627,
+          627,
+          1254,
+          1254
+        ]
+      ],
+      "atlas": "atlases/staff-ruby.png",
+      "sha256": "a6150b49174c56c0f268299497d2ce3bacfec5a8dc7ec622b5133d31d0d71961",
+      "cell": [
+        160,
+        192
+      ],
+      "columns": 4,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "walk-a",
+        "walk-b",
+        "serve"
+      ],
+      "foot_pivot": [
+        80,
+        188
+      ],
+      "portrait": "portraits/staff-ruby.png",
+      "portrait_crop": [
+        250,
+        0,
+        415,
+        165
+      ],
+      "portrait_sha256": "2e34beda72edd15972b21f3f54ad3fe25d123817e1cac5d17df1a2d9e8114af2",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "walk": [
+          1,
+          2
+        ],
+        "carry": [
+          3
+        ],
+        "serve": [
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "id": "staff-rose",
+      "name": "Rose",
+      "role": "bartender",
+      "source": "sources/staff-rose.png",
+      "source_sha256": "f8fd1b993ca453829c1a6b70d9355b6e5b3a733b416f633cb09cb5b91462c864",
+      "source_grid": [
+        2,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          627,
+          627
+        ],
+        [
+          627,
+          0,
+          1254,
+          627
+        ],
+        [
+          0,
+          627,
+          627,
+          1254
+        ],
+        [
+          627,
+          627,
+          1254,
+          1254
+        ]
+      ],
+      "atlas": "atlases/staff-rose.png",
+      "sha256": "1c77ef858f94a0dd5f8e3bd18ba360b07dbf87328ca8e7d38d542151b765079c",
+      "cell": [
+        160,
+        192
+      ],
+      "columns": 4,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "walk-a",
+        "walk-b",
+        "serve"
+      ],
+      "foot_pivot": [
+        80,
+        188
+      ],
+      "portrait": "portraits/staff-rose.png",
+      "portrait_crop": [
+        245,
+        0,
+        410,
+        165
+      ],
+      "portrait_sha256": "3125f73caafe92d7857e0df1e0e759556f54cde9c2ae0521539c824d7b67498a",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "walk": [
+          1,
+          2
+        ],
+        "carry": [
+          3
+        ],
+        "serve": [
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "id": "host-violet",
+      "name": "Violet",
+      "role": "entertainer",
+      "source": "sources/host-violet.png",
+      "source_sha256": "e453cfbf11491ee68841fc5990bbebdcabed751e1d7a2835e150c06c94489973",
+      "source_grid": [
+        3,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          512,
+          512
+        ],
+        [
+          512,
+          0,
+          1024,
+          512
+        ],
+        [
+          1024,
+          0,
+          1536,
+          512
+        ],
+        [
+          0,
+          512,
+          512,
+          1024
+        ],
+        [
+          512,
+          512,
+          1024,
+          1024
+        ],
+        [
+          1024,
+          512,
+          1536,
+          1024
+        ]
+      ],
+      "atlas": "atlases/host-violet.png",
+      "sha256": "5b21d14f7cef551264fd025e8a526abfafa686ba474fdb9b309b2e55db48eef2",
+      "cell": [
+        160,
+        256
+      ],
+      "columns": 6,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "greeting",
+        "dance-a",
+        "dance-b",
+        "walk-a",
+        "walk-b"
+      ],
+      "foot_pivot": [
+        80,
+        252
+      ],
+      "portrait": "portraits/host-violet.png",
+      "portrait_crop": [
+        220,
+        0,
+        380,
+        160
+      ],
+      "portrait_sha256": "9c00b38bae4ab5662252a2e280b2b5307117d28c59ff7f6b596089dde97ae9dc",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "carry": [
+          1
+        ],
+        "serve": [
+          1,
+          0
+        ],
+        "dance": [
+          2,
+          3
+        ],
+        "walk": [
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "id": "host-goldie",
+      "name": "Goldie",
+      "role": "entertainer",
+      "source": "sources/host-goldie.png",
+      "source_sha256": "672aa31416dbdf9b8d593f7dc55ef45347ee47129eedfd4d9ea9063b538d6fe6",
+      "source_grid": [
+        3,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          512,
+          512
+        ],
+        [
+          512,
+          0,
+          1024,
+          512
+        ],
+        [
+          1024,
+          0,
+          1536,
+          512
+        ],
+        [
+          0,
+          512,
+          512,
+          1024
+        ],
+        [
+          512,
+          512,
+          1024,
+          1024
+        ],
+        [
+          1024,
+          512,
+          1536,
+          1024
+        ]
+      ],
+      "atlas": "atlases/host-goldie.png",
+      "sha256": "f70edc4e917c35cb272ba8c741d6bb53fc412707d83b996975c967069f2d18a1",
+      "cell": [
+        160,
+        256
+      ],
+      "columns": 6,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "greeting",
+        "dance-a",
+        "dance-b",
+        "walk-a",
+        "walk-b"
+      ],
+      "foot_pivot": [
+        80,
+        252
+      ],
+      "portrait": "portraits/host-goldie.png",
+      "portrait_crop": [
+        175,
+        0,
+        345,
+        170
+      ],
+      "portrait_sha256": "0fd4cca91fb62eca9a1d7512fe798a8106a31fdd1209524c1131bcf54510544e",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "carry": [
+          1
+        ],
+        "serve": [
+          1,
+          0
+        ],
+        "dance": [
+          2,
+          3
+        ],
+        "walk": [
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "id": "host-scarlet",
+      "name": "Scarlet",
+      "role": "entertainer",
+      "source": "sources/host-scarlet.png",
+      "source_sha256": "ab505a44aef616488816613a3f5f4a71e588a0dccd7467a96f5356abeb723354",
+      "source_grid": [
+        3,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          512,
+          512
+        ],
+        [
+          512,
+          0,
+          1024,
+          512
+        ],
+        [
+          1024,
+          0,
+          1536,
+          512
+        ],
+        [
+          0,
+          512,
+          512,
+          1024
+        ],
+        [
+          512,
+          512,
+          1024,
+          1024
+        ],
+        [
+          1024,
+          512,
+          1536,
+          1024
+        ]
+      ],
+      "atlas": "atlases/host-scarlet.png",
+      "sha256": "613fea48c3254ebbe2fe53153d22b9126657abb7091ca7e3e4653926fb52be18",
+      "cell": [
+        160,
+        256
+      ],
+      "columns": 6,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "greeting",
+        "dance-a",
+        "dance-b",
+        "walk-a",
+        "walk-b"
+      ],
+      "foot_pivot": [
+        80,
+        252
+      ],
+      "portrait": "portraits/host-scarlet.png",
+      "portrait_crop": [
+        175,
+        0,
+        345,
+        170
+      ],
+      "portrait_sha256": "49ed594a8ada5cd30d02ef91e16fd9823d61edc373f7c087d209f26fa052f33a",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "carry": [
+          1
+        ],
+        "serve": [
+          1,
+          0
+        ],
+        "dance": [
+          2,
+          3
+        ],
+        "walk": [
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "id": "host-onyx",
+      "name": "Onyx",
+      "role": "entertainer",
+      "source": "sources/host-onyx.png",
+      "source_sha256": "3e0e89363d3200b858623cc4c517e11f515aab779fda3d47b1884b8ac678d8bd",
+      "source_grid": [
+        3,
+        2
+      ],
+      "source_cuts": [
+        [
+          0,
+          0,
+          512,
+          512
+        ],
+        [
+          512,
+          0,
+          1024,
+          512
+        ],
+        [
+          1024,
+          0,
+          1536,
+          512
+        ],
+        [
+          0,
+          512,
+          512,
+          1024
+        ],
+        [
+          512,
+          512,
+          1024,
+          1024
+        ],
+        [
+          1024,
+          512,
+          1536,
+          1024
+        ]
+      ],
+      "atlas": "atlases/host-onyx.png",
+      "sha256": "d4af942188d330239c32c97b83621bcae05a9ff15f12a766b94a90dd9f10b64e",
+      "cell": [
+        160,
+        256
+      ],
+      "columns": 6,
+      "rows": 1,
+      "frames": [
+        "idle",
+        "greeting",
+        "dance-a",
+        "dance-b",
+        "walk-a",
+        "walk-b"
+      ],
+      "foot_pivot": [
+        80,
+        252
+      ],
+      "portrait": "portraits/host-onyx.png",
+      "portrait_crop": [
+        195,
+        0,
+        375,
+        180
+      ],
+      "portrait_sha256": "7c04381f3f5f9e8cc097a898782b4655a10d32208a7313c9e25bff46f901b138",
+      "animations": {
+        "idle": [
+          0
+        ],
+        "carry": [
+          1
+        ],
+        "serve": [
+          1,
+          0
+        ],
+        "dance": [
+          2,
+          3
+        ],
+        "walk": [
+          4,
+          5
+        ]
+      }
+    }
+  ]
+}

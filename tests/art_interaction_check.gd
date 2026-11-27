@@ -81,6 +81,21 @@ func run(test: SceneTree) -> void:
 	app.muted = true
 	app.music.stop()
 	await click(test,test.find_button(app,"New Game"))
+	test.check(app.boot_menu and not app.new_game_confirmation and not app.title_screen.is_intro(),"The first pointer click skips the splash without activating the menu beneath")
+	app.title_clock = 0
+	app.render()
+	for down in [true,false]:
+		var tap := InputEventScreenTouch.new()
+		tap.position = Vector2(100,370)
+		tap.pressed = down
+		test.root.push_input(tap,true)
+	test.check(app.boot_menu and not app.new_game_confirmation and not app.title_screen.is_intro(),"A routed touch skips the splash without opening a new game")
+	app.title_clock = 0
+	app.render()
+	fight_key(test,KEY_ENTER,true)
+	fight_key(test,KEY_ENTER,false)
+	test.check(app.boot_menu and not app.new_game_confirmation and not app.title_screen.is_intro(),"A routed Enter skips the splash without activating Resume")
+	await click(test,test.find_button(app,"New Game"))
 	test.check(app.new_game_confirmation,"Pointer opens the new-game warning")
 	await click(test,test.find_button(app,"Cancel"))
 	test.check(app.boot_menu and not app.new_game_confirmation,"Pointer cancels without leaving the menu")

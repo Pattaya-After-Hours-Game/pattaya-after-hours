@@ -93,6 +93,7 @@ func run() -> void:
 	app.set_process(false)
 	app.muted = true
 	app.music.stop()
+	app.skip_title_intro()
 	await capture(app,"boot-new")
 	app.start_new_game()
 	app.boot_menu = true

@@ -56,6 +56,20 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
+func restore_animation(previous: Control) -> void:
+	# HUD buttons rebuild controls, not the visitors' routes, seats or gestures.
+	# A different campaign must never inherit transient state for reused IDs.
+	if not is_instance_valid(previous) or not is_same(previous.street_state,street_state): return
+	clock = previous.clock
+	customer_motion = previous.customer_motion
+	motion_street = previous.motion_street
+	motion_selected = previous.motion_selected
+	if selected_bar==previous.selected_bar:
+		fridge_install_flash = previous.fridge_install_flash
+		if godzilla==previous.godzilla:
+			arrival_time = previous.arrival_time
+			shot_flash = previous.shot_flash
+
 func _process(delta: float) -> void:
 	clock += delta
 	arrival_time += delta
@@ -291,7 +305,7 @@ static func pool_rect(table: int) -> Rect2:
 # All adult silhouettes are packed to 180px at rest. Use one perspective
 # rule for guests, staff and Anong, rather than a different size per role.
 static func person_scale(floor_y: float) -> float:
-	return clampf(.75+(floor_y-300)*.0022,.70,1.04)
+	return Art.person_scale(floor_y)
 
 static func order_position(person: Dictionary) -> Vector2:
 	return person.foot-Vector2(0,float(person.get("body_height",180))*person_scale(person.foot.y)+10)
@@ -460,7 +474,7 @@ func scene_people(bar: Dictionary) -> Array:
 			var motion_id := Art.customer_motion_id(appearance)
 			if not motion_id.is_empty():
 				person.draw_who = motion_id
-				person.draw_pose = Art.animation_frame(motion_id,state,clock+customer_id*.19,8)
+				person.draw_pose = Art.walk_frame(motion_id,state,float(records[customer_id].get("walk_distance",0.0))) if state.begins_with("walk") else Art.animation_frame(motion_id,state,clock+customer_id*.19)
 				if not state.begins_with("walk") and person.get("activity","")!="mingle": person.flip = customer_id%2==0
 		if kissing and not state.begins_with("walk"):
 			person.draw_who = "patrons-rainbow-duo"

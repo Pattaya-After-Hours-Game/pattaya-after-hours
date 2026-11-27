@@ -25,6 +25,37 @@ func run(test: SceneTree) -> void:
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 	var app := launch(test)
+	test.check(app.title_screen.is_intro(),"Boot begins with the short presentation-only splash")
+	var intro_state := JSON.stringify(app.model.s)
+	var intro_rng: int = app.model.rng.state
+	app._process(.8)
+	test.check(app.title_screen.clock==.8 and JSON.stringify(app.model.s)==intro_state and app.model.rng.state==intro_rng,"Splash animation advances without running the campaign or RNG")
+	for input_kind in 3:
+		app.title_clock = 0
+		app.render()
+		var skip: InputEvent
+		if input_kind==0:
+			var pointer := InputEventMouseButton.new()
+			pointer.button_index = MOUSE_BUTTON_LEFT
+			pointer.pressed = true
+			pointer.position = Vector2(100,370)
+			skip = pointer
+		elif input_kind==1:
+			var touch := InputEventScreenTouch.new()
+			touch.pressed = true
+			touch.position = Vector2(100,370)
+			skip = touch
+		else:
+			var key := InputEventKey.new()
+			key.keycode = KEY_ENTER
+			key.pressed = true
+			skip = key
+		app._input(skip)
+		test.check(app.boot_menu and not app.title_screen.is_intro() and not FileAccess.file_exists(Campaign.SAVE),"Mouse, touch and keyboard skip without starting a campaign")
+	test.check(app.title_screen.primary.text=="New Game" and app.title_screen.primary.has_focus(),"Fresh title focuses New Game after the intro")
+	app.set_sound()
+	test.check(not app.title_screen.is_intro(),"Sound redraw does not replay the splash")
+	test.check(JSON.stringify(app.model.s)==intro_state,"Skipping and title sound controls preserve the campaign")
 	test.check(app.boot_menu and test.find_button(app,"Resume").disabled,"Fresh boot offers New Game and disables Resume")
 	var state := JSON.stringify(app.model.s)
 	idle_at_menu(app)
@@ -42,11 +73,15 @@ func run(test: SceneTree) -> void:
 	var backup := FileAccess.get_file_as_string(Campaign.BACKUP)
 	app = launch(test)
 	test.check(app.resume_available and not test.find_button(app,"Resume").disabled,"Existing campaign enables Resume")
+	app.skip_title_intro()
+	test.check(app.title_screen.primary.text=="Resume" and app.title_screen.primary.has_focus(),"Returning players get Resume as the focused primary action")
+	test.check(app.title_screen.campaign_summary.contains("Day 7") and app.title_screen.campaign_summary.contains("4,321"),"Title displays the saved day and shared balance")
 	state = JSON.stringify(app.model.s)
 	idle_at_menu(app)
 	test.check(JSON.stringify(app.model.s)==state and FileAccess.get_file_as_string(Campaign.SAVE)==saved and FileAccess.get_file_as_string(Campaign.BACKUP)==backup,"Waiting at boot leaves both saved files and model untouched")
 	test.use_button(app,"New Game")
 	test.check(app.new_game_confirmation and FileAccess.get_file_as_string(Campaign.SAVE)==saved,"New Game warns before replacing existing progress")
+	test.check(app.title_screen.primary.text=="Cancel" and app.title_screen.primary.has_focus(),"Replacement confirmation defaults keyboard focus to Cancel")
 	test.use_button(app,"Cancel")
 	test.check(not app.new_game_confirmation and app.boot_menu,"Cancel returns to the boot menu")
 	test.use_button(app,"New Game")

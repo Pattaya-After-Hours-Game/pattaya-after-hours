@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-27",
+  "engine": "4.7.2",
+  "scope": "Standalone authoring assets; no live staff integration.",
+  "character_count": 8,
+  "frame_count": 40,
+  "portrait_count": 8,
+  "deterministic_repack": "passed: identical manifest and file hashes",
+  "atlas_validation": "passed: dimensions, nonempty cells, transparent padding, supporting-foot baselines",
+  "visual_review": "passed: all packed poses on light/dark backgrounds; Godot at 960x540 and 1280x720",
+  "test_wrapper": "passed: tools/test.sh exited 0 with isolated saves",
+  "unverified": [
+    "Live roster/hiring integration (not implemented)",
+    "Device play",
+    "Release publication"
+  ],
+  "suite_summaries": [
+    "PASS \u00b7 incident deck, endless year, street economy, chapters, migration, offline earnings, events, UI, arcade, tutorial, Godzilla, decision odds and Windows update checks",
+    "PACING \u00b7 0 failures across nine target campaigns and six no-chat comparisons",
+    "PROMOTER PACING \u00b7 0 failures across twelve feature/alternative campaigns",
+    "AUTOMATION PACING \u00b7 0 failures across twenty-one feature campaigns",
+    "CELEBRATION BALANCE \u00b7 0 failures across 60 paired trading-day scenarios",
+    "REGULARS CLUB BALANCE \u00b7 0 failures across 80 scenarios",
+    "PROFIT CYCLE \u00b7 0 failures across 120 paired scenarios and nine fresh campaigns",
+    "LEASE ROUTES \u00b7 0 failures across nine fresh expansion campaigns"
+  ]
+}

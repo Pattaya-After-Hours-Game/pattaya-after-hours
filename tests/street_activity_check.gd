@@ -76,6 +76,19 @@ func check_underlays(test: SceneTree) -> void:
 			test.check(original.get_image().get_data()==Art.venue(kind,stage,false,false,0).get_image().get_data(),"Creating the shell cannot change cached production art")
 
 func check_traffic(test: SceneTree) -> void:
+	var changes := [0,0,0]
+	var last := [-1,-1,-1]
+	for sample in 121:
+		var time := 4.0+sample/60.0
+		var district := StreetView.traffic(3,time)
+		var nearby := StreetView.traffic(1,time,true)
+		var walkers := [district.filter(func(p: Dictionary) -> bool: return p.key=="0/0")[0],district.filter(func(p: Dictionary) -> bool: return p.key=="0/1")[0],nearby[0]]
+		for i in 3:
+			var frame := int(walkers[i].frame)%4
+			if last[i]>=0 and last[i]!=frame: changes[i] += 1
+			last[i] = frame
+	test.check(changes[1]>changes[0]*2,"Longer street routes move faster and have proportionally faster footsteps")
+	test.check(changes[2]<=2,"Slow perspective walkers do not cycle their legs rapidly in place")
 	for closeup in [false,true]:
 		test.check(StreetView.traffic(0,4,closeup).is_empty(),"An empty street has no decorative crowd or vehicles")
 		var previous := 0

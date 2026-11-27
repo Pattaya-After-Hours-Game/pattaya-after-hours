@@ -23,6 +23,61 @@ PATTAYA_PREVIEW_FILTER='afk-*' PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd t
 Device play remains unverified. Release publication is tracked by the workflow,
 not inferred from the local source or previews.
 
+## Animated title and splash — 27 November 2026
+
+The complete isolated `tools/test.sh` passed on pinned Godot 4.7.2 with zero
+failures, including every pacing suite. A subsequent combined regression pass
+includes the concurrent AFK work and routed touch/key skip checks. The final
+transition-timing refinement also passed the focused boot-menu suite.
+
+`boot_menu_check.gd` covers the 2.6-second opening, mouse/touch/key skipping,
+focused New Game or Resume, saved summary, Cancel-first reset confirmation and
+Sound without replaying the intro. The existing checks retain exact campaign,
+RNG, primary save and backup purity while the menu animates, plus corruption
+recovery, replacement and repeat-safe offline claims on Resume. Real routed
+mouse, touch and Enter events in `art_interaction_check.gd` verify that skipping
+cannot activate the underlying button. The combined regression suite also
+passes with the concurrent AFK controls: saved AFK still does nothing at boot.
+
+The isolated title preview produced 43 captures each at 960×540 and 1280×720:
+continuous intro frames, fresh and saved menus, mute, reset confirmation, a long
+day/money summary and a save error. Inspected transitions keep menu text hidden
+until the moving title has settled. Original room/character art is reused.
+[Title menu](title-menu.png) · [Animation](title-intro.gif).
+
+```sh
+PATTAYA_PREVIEW_SCRIPT=tests/preview_title.gd tools/preview-art.sh /tmp/pattaya-title
+```
+
+Device input/audio playback and release publication remain unverified.
+
+## Walking cadence and button continuity — 27 November 2026
+
+The animation fix follows the integrated customer social routines at `7745ea7`.
+Regression checks exercise actual tab, Back, Sound and Serve handlers mid-walk,
+preserving position, frame, route, reserved chairs, dwell and gesture clocks.
+Serving can change a destination without teleporting the guest. New campaigns
+discard old transient records. Walking cadence follows distance, remains stable
+across frame rates and does not advance during stationary redraws. Outdoor
+checks distinguish short/long street routes and the slower perspective walkers.
+
+The isolated Godot 4.7.2 regression suite passes. The `tools/test.sh` process
+completed regressions, baseline, promoter and automation pacing before ending
+with signal 15. The four remaining balance suites then completed separately with
+isolated data/configuration directories: zero failures across 60 celebration
+pairs, 80 club scenarios, 120 profit-cycle pairs plus nine fresh campaigns, and
+nine lease routes. Every suite in the wrapper passed across these runs; the
+wrapper itself did not complete uninterrupted. Personal saves are untouched.
+
+`preview_customer_routine.gd` now opens/closes Service and toggles Sound during
+arrival, then invokes the actual Serve handler. Its 199 captures at each of
+960×540 and 1280×720 cover all nine layouts, walking through button redraws,
+seating, mingling, TV watching, pool and closure. Street activity previews at
+both sizes and the economy runner's `staff-ready-*` captures also pass. Reviewed
+sequential frames confirm continuity and slower gait; bartender sale feedback
+still follows actual service. No production texture or save schema changes.
+Device play and release publication remain unverified.
+
 ## Customer social routines — 27 November 2026
 
 The full isolated `tools/test.sh` passed on Godot 4.7.2 with zero failures across

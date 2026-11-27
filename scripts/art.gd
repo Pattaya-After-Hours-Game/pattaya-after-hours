@@ -209,6 +209,15 @@ static func animation_frame(id: String, state: String, time: float, fps: float =
 	var frames := animation_frames(id,state)
 	return frames[int(time*fps)%frames.size()]
 
+static func person_scale(floor_y: float) -> float:
+	return clampf(.75+(floor_y-300)*.0022,.70,1.04)
+
+static func walk_frame(id: String, state: String, distance: float) -> int:
+	# One full adult stride per 80 unscaled pixels, rather than a running
+	# animation on a slowly moving body. Pauses never advance this phase.
+	var frames := animation_frames(id,state)
+	return frames[posmod(floori(distance*frames.size()/80.0),frames.size())]
+
 static func event_treatment(id: int) -> String:
 	return ["blackout","shore-leave","inspection","flood","songkran","bar-crawl","low-season","rival-promotion","monster-arrival","festival"][clampi(id,0,9)]
 

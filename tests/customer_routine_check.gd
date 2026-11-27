@@ -11,6 +11,16 @@ func records(view: Control, bar: Dictionary) -> Dictionary:
 	return view.customer_motion[str(bar.name)]
 
 func run(test: SceneTree) -> void:
+	# Match steps to distance, independent of render rate or elapsed idle time.
+	var whole_step := {"foot":Vector2(300,368),"route":[Vector2(700,368)],"dwell":0.0}
+	var fine := whole_step.duplicate(true)
+	Routine.step(whole_step,1.0)
+	for frame in 60: Routine.step(fine,1.0/60.0)
+	test.check(whole_step.foot.distance_to(fine.foot)<.001 and absf(whole_step.walk_distance-fine.walk_distance)<.001,"Walking distance is independent of frame rate")
+	var gait := float(whole_step.walk_distance)
+	Routine.step(whole_step,0)
+	test.check(whole_step.walk_distance==gait,"Zero-time refreshes do not advance gait")
+	test.check(gait/20.0>2.5 and gait/20.0<4.0,"Normal walking uses a relaxed three-ish frames per second instead of eight")
 	for name in Art.CUSTOMER_MOTION_NAMES+["charcoal"]:
 		var id: String = "customer-seated-"+name
 		test.check(Art.atlas_specs()[id][1]==4,"Every customer has seated actions and a still rear watcher")

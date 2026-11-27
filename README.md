@@ -38,6 +38,12 @@ See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for the current rule
 
 ## Start playing
 
+The opening pours a little neon welcome, then settles into the Blue Hour title
+menu in 2.6 seconds. Click, tap or press a key to skip. **Resume** is highlighted
+when you have a saved street; otherwise **New Game** leads. The menu shows your
+saved day, shared money and venue count. Time and offline earnings wait until
+you choose to play. [See the opening animation](docs/title-intro.gif).
+
 Open `project.godot` in **Godot 4.7.2** and press **F5**, or run from the checkout:
 
 ```sh
@@ -72,7 +78,8 @@ including both companion groups. Guests approach the counter for real orders,
 return to a reserved seat after service, mingle with available visitors and watch
 a purchased sports screen. Real pool players walk to their assigned table.
 Their orders remain available during walking. The same cast also appears in
-ambient street traffic. [See the bar routine](docs/customer-routines.gif) or
+ambient street traffic. Walking steps follow distance travelled, and management
+buttons preserve ongoing walks and seated routines. [See the bar routine](docs/customer-routines.gif) or
 [the walking cast](docs/customer-walks.gif).
 The capybara blinks and settles onto its haunches before standing again.
 Double-click the rainbow duo or tap them on a touchscreen to see them kiss.
