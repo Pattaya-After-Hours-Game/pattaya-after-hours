@@ -342,9 +342,74 @@ func test_ui() -> void:
 	test_clock_ui(app)
 	test_tour_update(app)
 	test_purchase_ui(app)
+	await test_help_refresh(app)
 	app.queue_free()
 	await process_frame
 
+
+func test_help_refresh(app: Control) -> void:
+	app.set_process(false)
+	app.model = Campaign.new(72)
+	var bar: Dictionary = app.model.street.selected()
+	var eco = app.model.street.economy
+	bar.customers.clear()
+	eco.admit(bar,false,true)
+	eco.serve(bar)
+	bar.customers[0].next = 1
+	# The pending order and the half-hour HUD rebuild land on the same live tick.
+	app.model.s.street.minute = 749
+	app.live_seconds = 0.0
+	app.change_tab(1)
+	press_help(app,"About AFK mode")
+	press_help(app,"About Happy Hour")
+	await process_frame
+	await process_frame
+	var before: int = app.scroll.scroll_vertical
+	check(before>0 and eco.pending(bar)==0,"Events fixture starts scrolled with no waiting order")
+	var old_ui: Control = app.root_ui
+	app._process(1.0)
+	await process_frame
+	await process_frame
+	check(app.root_ui!=old_ui and eco.pending(bar)>0,"A live order arrives on the same tick as a HUD rebuild")
+	check(app.inline_help["AFK mode"].visible and app.inline_help["Happy Hour"].visible and not app.inline_help["Sports Night"].visible,"The rebuild preserves only the expanded Events explanations")
+	check(app.scroll.scroll_vertical==before,"The Events rebuild keeps the reading position")
+	press_help(app,"About Happy Hour")
+	app.render(true)
+	check(not app.inline_help["Happy Hour"].visible,"Clicking ? again closes an explanation across refreshes")
+	app.change_tab(0)
+	app.change_tab(1)
+	check(not app.inline_help["AFK mode"].visible,"Leaving Events clears its expanded explanations")
+
+	app.open_upgrades()
+	press_help(app,"About Auto-serve")
+	app.model.s.cash = 12000
+	app._process(1.0)
+	check(app.inline_help["auto_serve/0"].visible,"Affordability refresh keeps upgrade help expanded")
+	app.open_team_page("hire")
+	press_help(app,"Explain Hire bartender · ฿1,200")
+	await process_frame
+	await process_frame
+	var help_scroll: ScrollContainer = app.service_help_panel.get_node("HelpScroll")
+	help_scroll.scroll_vertical = 40
+	app.refresh_street = true
+	app._process(1.0)
+	check(is_instance_valid(app.service_help_panel) and app.service_help_panel.get_parent()==app.drawer and app.drawer_close_button.text=="Back","Live rebuild retains slide-out help and Back navigation")
+	check(is_instance_valid(help_scroll) and help_scroll.scroll_vertical==40,"Slide-out help keeps its reading position")
+	use_button(app,"Back")
+	check(app.service_help_panel==null and app.drawer_open,"Back closes slide-out help and leaves the drawer open")
+	use_button(app,"TIME")
+	app.refresh_street = true
+	app._process(1.0)
+	check(app.stat_tip_key=="TIME" and app.stat_tip.get_parent()==app.root_ui,"Live rebuild retains the tapped HUD tip")
+	app.change_tab(1)
+	check(app.stat_tip==null,"Changing tabs dismisses the HUD tip")
+
+func press_help(app: Control, tooltip: String) -> void:
+	for control: Button in app.column.find_children("*","Button",true,false):
+		if control.tooltip_text==tooltip:
+			control.pressed.emit()
+			return
+	check(false,"Missing help button "+tooltip)
 
 func test_tour_update(app: Control) -> void:
 	app.model = Campaign.new(48)

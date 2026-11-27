@@ -70,6 +70,9 @@ var offline_notice := 0
 var drawer_open := false
 var service_section := ""
 var service_help_panel: Panel
+var rendered_help_view := []
+var inline_help := {}
+var expanded_help := []
 var drawer_close_button: Button
 var drawer: Control
 var event_banner: Button
@@ -385,12 +388,20 @@ func change_tab(index: int) -> void:
 	render()
 
 func render(keep_scroll: bool = false) -> void:
-	close_service_help()
+	var help_view := [model.get_instance_id(),boot_menu,model.s.phase,model.s.street.selected,
+		drawer_open,tab,service_section,team_page,team_member,fridge_open,upgrades_open,upgrades_ready_only,guide]
+	expanded_help.clear()
+	if keep_scroll and rendered_help_view==help_view:
+		for key in inline_help:
+			if inline_help[key].visible: expanded_help.append(key)
+	else:
+		close_service_help()
+		close_stat_tip()
+	inline_help.clear()
+	rendered_help_view = help_view
 	drawer_close_button = null
 	live_labels.clear()
 	live_meters.clear()
-	stat_tip = null
-	stat_tip_key = ""
 	action_controls.clear()
 	skip_to_open = null
 	bartender_controls.clear()
@@ -728,6 +739,8 @@ func render(keep_scroll: bool = false) -> void:
 		abs_text(welcome,Rect2(24,96,500,26),"Demand and costs included · estimates in Journal",14,MUTED)
 		at_button(welcome,Rect2(24,142,512,40),"Back to the street",dismiss_offline,true)
 	if previous > 0: scroll.set_deferred("scroll_vertical",previous)
+	if is_instance_valid(service_help_panel): service_help_panel.reparent(drawer,false)
+	if is_instance_valid(stat_tip): stat_tip.reparent(root_ui,false)
 	draw_event_overlay()
 	update_reputation_hud()
 
@@ -1295,15 +1308,22 @@ func event_detail(control: Control, heading: String, detail: Callable) -> void:
 	column.add_child(row)
 	control.reparent(row,false)
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var copy := body("",MUTED,13)
-	copy.hide()
+	inline_detail(row,heading,heading,detail,13)
+
+func inline_detail(row: HBoxContainer, key: String, heading: String, detail: Callable, font_size: int, scroll_to_detail: bool = true) -> void:
+	var copy := body("",MUTED,font_size)
+	inline_help[key] = copy
+	copy.visible = key in expanded_help
 	var refresh := func() -> String: return detail.call() if copy.visible else ""
+	copy.text = refresh.call()
 	var info := button("?",func() -> void:
 		copy.visible = not copy.visible
 		copy.text = refresh.call()
-		if not copy.visible: return
+		if not copy.visible or not scroll_to_detail: return
 		await get_tree().process_frame
-		if is_instance_valid(copy) and copy.is_visible_in_tree(): scroll.ensure_control_visible(copy))
+		var expanded: Label = inline_help.get(key)
+		if is_instance_valid(expanded) and expanded.is_visible_in_tree():
+			scroll.ensure_control_visible(expanded))
 	info.custom_minimum_size.x = 38
 	info.tooltip_text = "About "+heading
 	row.add_child(info)
@@ -2104,7 +2124,8 @@ func marketing_panel() -> void:
 
 func upgrade_card(offer: Dictionary) -> void:
 	var status: Dictionary = offer.status
-	upgrade_quotes["%s/%d" % [offer.action,offer.index]] = status
+	var key := "%s/%d" % [offer.action,offer.index]
+	upgrade_quotes[key] = status
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",6)
 	column.add_child(row)
@@ -2131,12 +2152,7 @@ func upgrade_card(offer: Dictionary) -> void:
 			return status.reason
 		blocker.text = explain.call()
 		live_labels.append([blocker,explain])
-	var details := body(offer.help,MUTED,12)
-	details.hide()
-	var info := button("?",func() -> void: details.visible = not details.visible)
-	info.custom_minimum_size.x = 38
-	info.tooltip_text = "About "+offer.name
-	row.add_child(info)
+	inline_detail(row,key,offer.name,func() -> String: return offer.help,12,false)
 
 func street_panel() -> void:
 	var bar: Dictionary = model.street.selected()
@@ -3130,7 +3146,7 @@ func _process(delta: float) -> void:
 			update_lease_controls()
 			sync_event_badge()
 			if not is_instance_valid(fight) and not is_instance_valid(district): sync_upgrade_badge(true)
-			if refresh_street and model.s.phase in ["plan","guided","guided_choice","guided_report"] and not is_instance_valid(fight) and not is_instance_valid(district) and not is_instance_valid(service_help_panel): render(true)
+			if refresh_street and model.s.phase in ["plan","guided","guided_choice","guided_report"] and not is_instance_valid(fight) and not is_instance_valid(district): render(true)
 			for entry in live_labels:
 				if is_instance_valid(entry[0]): entry[0].text = entry[1].call()
 		if save_seconds >= 15.0:

@@ -20,6 +20,8 @@ The selected bar’s name appears at the top left. Open **Tutorial** for a short
 Buy a pack, serve an order, help an impatient guest, hire a bartender and close
 for the night. Practice uses its own till and does not change your save.
 Tap a top-bar stat on mobile or hover over it on desktop for a quick explanation.
+Tapped stat tips and open **?** explanations stay visible during live trading
+updates. Close the explanation or leave its view when you’re done.
 Tab badges use green numbers for ready upgrades or active tours, a yellow **!**
 for available events, and a red **!** for no active tour agreements when seats are free.
 Double-click the rainbow duo in the bar, or tap them on a touchscreen, to see
