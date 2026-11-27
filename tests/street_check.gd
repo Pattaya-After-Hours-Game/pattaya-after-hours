@@ -19,12 +19,12 @@ func test_rat_plague(test: SceneTree) -> void:
 	var eco = m.street.economy
 	var bar: Dictionary = m.street.selected()
 	var baseline: float = eco.traffic_rate()
-	var before := [bar.stock,m.street.selected().cash,bar.happy,bar.tip_visits]
+	var before := [bar.stock,m.s.cash,bar.happy,bar.tip_visits]
 	m.street.announce(Content.RAT_PLAGUE)
 	test.check(m.s.street.event.remaining==20 and eco.traffic_rate()==baseline,"The rat warning gives time to prepare without scaring guests off yet")
 	m.street.start_event()
 	test.check(bar.customers.is_empty() and eco.pending(bar)==0 and eco.is_trading(bar),"The swarm scares guests off without shutting down the bar")
-	test.check(before==[bar.stock,m.street.selected().cash,bar.happy,bar.tip_visits],"Running guests do not earn rewards or consume stock")
+	test.check(before==[bar.stock,m.s.cash,bar.happy,bar.tip_visits],"Running guests do not earn rewards or consume stock")
 	test.check(is_equal_approx(eco.traffic_rate(),baseline*.15) and eco.traffic_rate(true)==baseline,"The rats deter live walk-ins while offline estimates ignore them")
 	test.check(m.street.rat_targets().size()==Content.RAT_COUNT and not m.street.catch_rat(-1),"Only visible rats can be caught")
 	test.check(m.street.catch_rat(2) and not m.street.catch_rat(2),"Each rat can be caught once")
@@ -39,11 +39,10 @@ func test_rat_plague(test: SceneTree) -> void:
 	bar = m.street.selected()
 	m.street.announce(Content.RAT_PLAGUE)
 	var prep_cost: int = Content.EVENTS[Content.RAT_PLAGUE][3]
-	var opening_cash: int = m.street.selected().cash
-	m.street.finance.transfer(bar,prep_cost,true)
+	var opening_cash: int = m.s.cash
 	m.street.action("prepare")
 	m.street.start_event()
-	test.check(bar.customers.is_empty() and bar.cash==opening_cash-prep_cost and is_equal_approx(m.street.economy.traffic_rate(),baseline*.55),"Guests always flee, and the paid patrol protects some passing traffic")
+	test.check(bar.customers.is_empty() and m.s.cash==opening_cash-prep_cost and is_equal_approx(m.street.economy.traffic_rate(),baseline*.55),"Guests always flee, and the paid patrol protects some passing traffic")
 	test.check(m.street.rat_targets().size()==Content.RAT_COUNT,"The full swarm appears even when Bo is ready")
 	m.street.tick(6)
 	test.check(m.street.rat_targets().size()==Content.RAT_STRAGGLERS,"A prepared Bo sweeps the swarm down to the stragglers")
@@ -62,7 +61,6 @@ func test_rat_plague(test: SceneTree) -> void:
 	m.street.announce(Content.RAT_PLAGUE)
 	m.street.start_event()
 	m.street.catch_rat(Content.RAT_COUNT-1)
-	m.street.finance.transfer(m.street.selected(),prep_cost,true)
 	m.street.action("prepare")
 	m.street.tick(6)
 	test.check(not m.street.preparation_offer().enabled and m.street.rat_targets().size()==Content.RAT_STRAGGLERS and not m.street.rat_targets().has(Content.RAT_COUNT-1),"Bo can be called once while active and does not undo catches")
@@ -79,7 +77,6 @@ func test_rat_plague(test: SceneTree) -> void:
 		m.s.street.chapter = 2
 		m.s.cash = 50000
 		bar = m.street.selected()
-		bar.cash = 10000
 		m.street.action("hire",0)
 		m.street.action("serve")
 		m.street.action("buy",0)
@@ -97,7 +94,7 @@ func test_rat_plague(test: SceneTree) -> void:
 		m.street.action("close_for_rats")
 		test.check(m.s.day==next_day and m.s.street.minute==Content.OPEN_MINUTE and m.s.street.offline_cursor==Content.OPEN_MINUTE,"Leaving it to Bo reopens at the next noon")
 		test.check(m.s.street.event.is_empty() and m.s.street.events_survived==1 and bar.tip_visits==0,"Overnight cleanup finishes the plague and settles tips once")
-		test.check(bar.team[0].contract_left==contract_before-remaining_day and bar.stock_lots==paid_stock and m.street.finance.total()==cash_before+bar.last_tips.amount,"Skipped hours age contracts and settle earned tips without simulated trade")
+		test.check(bar.team[0].contract_left==contract_before-remaining_day and bar.stock_lots==paid_stock and m.street.finance.total()==cash_before+int(bar.last_tips.get("amount",0)),"Skipped hours age contracts and settle earned tips without simulated trade")
 		test.check(not bar.late_open and bar.open and not closed_bar.open,"Overnight cleanup preserves owners' closure choices and resets late trading")
 		var cash_after: int = m.street.finance.total()
 		m.street.action("close_for_rats")
@@ -111,19 +108,19 @@ func run(test: SceneTree) -> void:
 	var bar: Dictionary = m.street.selected()
 	test.check(bar.customers.size()==3 and eco.pending(bar)==3,"Opening rush supplies three real orders")
 	bar.customers.clear()
-	var before := [m.street.selected().cash,bar.stock,m.s.street.served]
+	var before := [m.s.cash,bar.stock,m.s.street.served]
 	m.street.action("serve")
-	test.check(before==[m.street.selected().cash,bar.stock,m.s.street.served],"No order means no sale or consumed stock")
-	m.street.selected().cash = 10000
+	test.check(before==[m.s.cash,bar.stock,m.s.street.served],"No order means no sale or consumed stock")
+	m.s.cash = 10000
 	m.street.action("hire",0)
 	m.street.action("hire",0)
 	m.s.street.pass_credit = -10000000
 	m.street.tick(60)
-	test.check(bar.sold==0 and m.street.selected().cash<7600,"Idle staff incur payroll without minting sales")
-	var paused_cash := int(m.street.selected().cash)
+	test.check(bar.sold==0 and m.s.cash<7600,"Idle staff incur payroll without minting sales")
+	var paused_cash := int(m.s.cash)
 	m.street.action("open")
 	m.street.tick(60)
-	test.check(m.street.selected().cash==paused_cash,"Closing pauses wages and overhead")
+	test.check(m.s.cash==paused_cash,"Closing pauses wages and overhead")
 	m.street.action("open")
 	m.street.economy.admit(bar)
 	bar.stock = 0
@@ -141,36 +138,36 @@ func run(test: SceneTree) -> void:
 	m = Campaign.new(4)
 	eco = m.street.economy
 	bar = m.street.selected()
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	bar.equipment.pool = 1
 	bar.customers.clear()
 	for _i in 2:
 		eco.admit(bar)
 		bar.customers.back().pool = true
-	var cash_start := int(m.street.selected().cash)
+	var cash_start := int(m.s.cash)
 	eco.pool_tick(bar)
-	test.check(m.street.selected().cash==cash_start+50 and bar.games.size()==1 and bar.pool_games==1 and bar.games[0].remaining==30,"A two-player thirty-second game pays exactly ฿50 once")
+	test.check(m.s.cash==cash_start+50 and bar.games.size()==1 and bar.pool_games==1 and bar.games[0].remaining==30,"A two-player thirty-second game pays exactly ฿50 once")
 	for _i in 29: eco.pool_tick(bar)
-	test.check(m.street.selected().cash==cash_start+50 and bar.games.size()==1,"An occupied table cannot collect another fee")
+	test.check(m.s.cash==cash_start+50 and bar.games.size()==1,"An occupied table cannot collect another fee")
 	m.save_game()
 	var loaded = Campaign.new(9)
 	test.check(loaded.load_game() and loaded.street.selected().games[0].remaining==1,"Pool timer survives save/reload")
 	loaded.street.economy.pool_tick(loaded.street.selected())
-	test.check(loaded.street.selected().cash==m.street.selected().cash and loaded.street.selected().games.is_empty(),"Finishing a saved game never charges twice")
+	test.check(loaded.s.cash==m.s.cash and loaded.street.selected().games.is_empty(),"Finishing a saved game never charges twice")
 	eco.pool_tick(bar)
 	bar.customers.clear()
 	for _i in 2:
 		eco.admit(bar)
 		bar.customers.back().pool = true
 	m.street.action("promotion",0)
-	cash_start = m.street.selected().cash
+	cash_start = m.s.cash
 	eco.pool_tick(bar)
-	test.check(m.street.selected().cash==cash_start and bar.games[0].fee==0 and bar.games[0].remaining==30 and bar.free_games==1,"Free pool charges zero at game start")
+	test.check(m.s.cash==cash_start and bar.games[0].fee==0 and bar.games[0].remaining==30 and bar.free_games==1,"Free pool charges zero at game start")
 	bar.promo.remaining = 1
 	m.street.tick(1)
-	cash_start = m.street.selected().cash
+	cash_start = m.s.cash
 	eco.pool_tick(bar)
-	test.check(bar.games[0].fee==0 and m.street.selected().cash==cash_start,"Promotion expiry never retroactively bills a free game")
+	test.check(bar.games[0].fee==0 and m.s.cash==cash_start,"Promotion expiry never retroactively bills a free game")
 	test.check(bar.promo_report.free_games==1 and bar.promo_cooldown==120,"Promotion records forgone fees and starts cooldown")
 	m.street.action("promotion",1)
 	test.check(bar.promo.is_empty(),"Promotions cannot stack or skip cooldown")
@@ -183,10 +180,10 @@ func run(test: SceneTree) -> void:
 	test.check(eco.price(bar)==base_price,"Navy traffic never multiplies the price of a drink")
 	# Welcoming has no direct income and uses a bounded public visitor budget.
 	m = Campaign.new(72)
-	cash_start = m.street.selected().cash
+	cash_start = m.s.cash
 	for _i in 100: m.street.action("welcome")
-	test.check(m.street.selected().cash==cash_start and m.street.selected().welcome==1,"Welcome clicks are rate-limited and never pay money")
-	m.street.selected().cash = 1000000
+	test.check(m.s.cash==cash_start and m.street.selected().welcome==1,"Welcome clicks are rate-limited and never pay money")
+	m.s.cash = 1000000
 	m.s.rep = 100
 	m.s.street.chapter = 1
 	load("res://tests/finance_fixture.gd").buy(m.street,0)
@@ -220,18 +217,18 @@ func run(test: SceneTree) -> void:
 	bar.stage = 2
 	m.street.action("hire",1)
 	m.street.action("hire",1)
-	cash_start = m.street.selected().cash
+	cash_start = m.s.cash
 	m.street.action("bar_fine",0)
-	test.check(m.street.selected().cash==cash_start and bar.away.is_empty(),"No customer request means no bar-fine income")
+	test.check(m.s.cash==cash_start and bar.away.is_empty(),"No customer request means no bar-fine income")
 	m.street.economy.admit(bar,false,false,2)
 	bar.host_requests = [int(bar.customers.back().id)]
 	m.street.action("bar_fine",1)
 	test.check(bar.away.is_empty(),"A host's refusal is respected")
 	m.street.action("bar_fine",0)
 	test.check(bar.away==[0] and bar.host_requests.is_empty(),"Accepted request consumes demand and removes availability")
-	cash_start = m.street.selected().cash
+	cash_start = m.s.cash
 	m.street.action("bar_fine",0)
-	test.check(m.street.selected().cash==cash_start,"Host absence prevents duplicate fees")
+	test.check(m.s.cash==cash_start,"Host absence prevents duplicate fees")
 	# Offline profit uses bounded demand, preserves state and cannot spend reserves.
 	m = Campaign.new(72)
 	bar = m.street.selected()
@@ -241,7 +238,7 @@ func run(test: SceneTree) -> void:
 	bar.equipment.sign = 1
 	bar.team = [{"role":0,"on":true,"host":-1}]
 	bar.crew = 1
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	m.s.street.last_seen = 1000
 	m.street.announce(3)
 	var event: Dictionary = m.s.street.event.duplicate(true)
@@ -256,20 +253,20 @@ func run(test: SceneTree) -> void:
 	bar.team = []
 	bar.equipment.pool = 0
 	m.s.street.last_seen = 0
-	cash_start = m.street.selected().cash
-	test.check(m.street.claim_offline(100)==0 and m.street.selected().cash==cash_start,"Unviable offline trading cannot consume the opening till")
+	cash_start = m.s.cash
+	test.check(m.street.claim_offline(100)==0 and m.s.cash==cash_start,"Unviable offline trading cannot consume the opening till")
 	# Empty tills close gently and retain a manual path to recovery.
 	m = Campaign.new(1)
-	m.street.selected().cash = 0
+	m.s.cash = 0
 	m.street.tick(4)
 	bar = m.street.selected()
 	test.check(not bar.open and m.s.debt==0,"Unaffordable overhead closes before creating debt")
 	bar.stock = 0
 	m.street.action("recovery")
-	test.check(bar.open and bar.stock==6 and m.street.selected().cash==0,"Recovery supplies are charged only when sold")
+	test.check(bar.open and bar.stock==6 and m.s.cash==0,"Recovery supplies are charged only when sold")
 	m.street.economy.admit(bar)
 	m.street.action("serve")
-	test.check(m.street.selected().cash==66 and bar.consignment==5,"Recovery still needs a buyer and pays the stock cost")
+	test.check(m.s.cash==66 and bar.consignment==5,"Recovery still needs a buyer and pays the stock cost")
 	# Guided shifts cannot accelerate time or create parallel sales.
 	m = Campaign.new(72)
 	m.start()
@@ -285,13 +282,13 @@ func run(test: SceneTree) -> void:
 		m.street.tick(40)
 		if m.s.phase=="guided_choice": m.pick(2)
 	test.check(m.s.phase=="guided_report" and m.s.day==current_day,"Guided report settles on the ordinary two-minute clock")
-	cash_start = m.street.selected().cash
+	cash_start = m.s.cash
 	m.next_day()
 	m.next_day()
-	test.check(m.street.selected().cash==cash_start and m.s.day==current_day,"Report dismissal cannot pay or advance twice")
+	test.check(m.s.cash==cash_start and m.s.day==current_day,"Report dismissal cannot pay or advance twice")
 	# Happy Hour quotes once, and reloading an active promotion cannot restart it.
 	m = Campaign.new(72)
-	m.street.selected().cash = 1000
+	m.s.cash = 1000
 	bar = m.street.selected()
 	var unchanged: Dictionary = bar.duplicate(true)
 	var estimate: Dictionary = m.street.economy.forecast(bar,false,1)
@@ -303,9 +300,9 @@ func run(test: SceneTree) -> void:
 	m.save_game()
 	loaded = Campaign.new(1)
 	test.check(loaded.load_game() and loaded.street.selected().promo.remaining==100,"Promotion keeps its remaining time across reload")
-	cash_start = loaded.street.selected().cash
+	cash_start = loaded.s.cash
 	loaded.street.action("promotion",1)
-	test.check(loaded.street.selected().cash==cash_start and loaded.street.selected().promo.remaining==100,"Repeated promotion clicks cannot restart or duplicate rewards")
+	test.check(loaded.s.cash==cash_start and loaded.street.selected().promo.remaining==100,"Repeated promotion clicks cannot restart or duplicate rewards")
 	# A second game's table identity survives the first table finishing and reload.
 	m = Campaign.new(2)
 	bar = m.street.selected()
@@ -348,9 +345,9 @@ func test_drink_stock(test: SceneTree) -> void:
 	var locals_mix: Array = eco.drink_popularity(bar)
 	test.check(eco.drink_demand_hint(bar,1,locals_mix[1])=="Local crowd boost","Low season explains higher demand for budget drinks")
 	test.check(eco.price(bar,2)-Content.DRINKS[2].cost>eco.price(bar)-Content.STOCK_COST,"Rum earns more per sale than house lager")
-	var cash_before := int(model.street.selected().cash)
+	var cash_before := int(model.s.cash)
 	model.street.action("buy_drink",3)
-	test.check(model.street.selected().cash==cash_before and not bar.drink_stock.has("mango"),"Premium stock requires a premium menu")
+	test.check(model.s.cash==cash_before and not bar.drink_stock.has("mango"),"Premium stock requires a premium menu")
 	var guest: Dictionary = bar.customers[0]
 	guest.opening = false
 	guest.order = false
@@ -364,42 +361,42 @@ func test_drink_stock(test: SceneTree) -> void:
 	test.check(guest.drink==2 and bar.shift.drink_requests.rum==1 and eco.stock_waiting(bar)==1,"Unstocked rum demand is recorded even with lager in the fridge")
 	model.street.action("serve")
 	test.check(guest.order and eco.stock_of(bar,0)==11,"An unavailable drink does not block the next guest's order")
-	cash_before = int(model.street.selected().cash)
+	cash_before = int(model.s.cash)
 	model.street.action("buy_drink",2)
-	test.check(eco.stock_of(bar,2)==6 and model.street.selected().cash==cash_before-114,"A delivery charges the selected drink's actual wholesale cost")
+	test.check(eco.stock_of(bar,2)==6 and model.s.cash==cash_before-114,"A delivery charges the selected drink's actual wholesale cost")
 	model.save_game()
 	var loaded = Campaign.new(11)
 	test.check(loaded.load_game(),"Drink stock saves and loads")
 	bar = loaded.street.selected()
 	eco = loaded.street.economy
 	test.check(eco.stock_of(bar,2)==6 and bar.customers[0].drink==2,"Reload preserves both stock and the pending order")
-	cash_before = int(loaded.street.selected().cash)
+	cash_before = int(loaded.s.cash)
 	bar.serve_ready = 0
 	loaded.street.action("serve")
-	test.check(eco.stock_of(bar,2)==5 and loaded.street.selected().cash==cash_before+98 and bar.shift.consumed_stock==57,"Serving a rum order consumes rum stock and settles the saved quote and its own cost")
+	test.check(eco.stock_of(bar,2)==5 and loaded.s.cash==cash_before+98 and bar.shift.consumed_stock==57,"Serving a rum order consumes rum stock and settles the saved quote and its own cost")
 	loaded.street.action("return_drink",2)
-	test.check(eco.stock_of(bar,2)==2 and loaded.street.selected().cash==cash_before+98+28,"Returning overstock frees fridge space at half wholesale")
+	test.check(eco.stock_of(bar,2)==2 and loaded.s.cash==cash_before+98+28,"Returning overstock frees fridge space at half wholesale")
 	bar.restock = true
 	test.check(eco.auto_drink(bar,2) and not eco.auto_drink(bar,1),"Automatic deliveries stick to the chosen drinks")
 	var next_guest: Dictionary = bar.customers[2]
 	next_guest.drink = 1
 	next_guest.quoted = 36
 	next_guest.lager_quote = 44
-	cash_before = int(loaded.street.selected().cash)
+	cash_before = int(loaded.s.cash)
 	eco.serve(bar)
-	test.check(loaded.street.selected().cash==cash_before+44 and eco.stock_of(bar,1)==0 and bar.shift.drink_misses.soda==1,"A player stocks around unmet demand even when a guest accepts quoted-price lager")
+	test.check(loaded.s.cash==cash_before+44 and eco.stock_of(bar,1)==0 and bar.shift.drink_misses.soda==1,"A player stocks around unmet demand even when a guest accepts quoted-price lager")
 	for _i in 2: eco.consume_stock(bar,2)
 	next_guest.order = true
 	next_guest.drink = 2
 	next_guest.quoted = 73
-	cash_before = int(loaded.street.selected().cash)
+	cash_before = int(loaded.s.cash)
 	eco.serve(bar)
-	test.check(loaded.street.selected().cash==cash_before+73-6*19 and eco.stock_of(bar,2)==5,"An automated rum delivery pays wholesale and fills the rum order")
+	test.check(loaded.s.cash==cash_before+73-6*19 and eco.stock_of(bar,2)==5,"An automated rum delivery pays wholesale and fills the rum order")
 	bar.restock = false
 	bar.manager = true
 	bar.manager_level = 1
 	bar.team = [{"role":0,"on":true,"host":-1,"contract_left":6000}]
-	loaded.street.selected().cash = 2000
+	loaded.s.cash = 2000
 	loaded.s.street.last_seen = 1000
 	var offline_gain: int = loaded.street.claim_offline(1600)
 	test.check(offline_gain>0 and eco.stock_of(bar,2)==0 and eco.stock_of(bar,1)==0,"A manager's offline estimate respects the stock limit of each drink")
@@ -415,9 +412,9 @@ func test_drink_stock(test: SceneTree) -> void:
 	model.save_game()
 	loaded = Campaign.new(11)
 	test.check(loaded.load_game() and loaded.street.economy.stock_of(loaded.street.selected(),0)==12,"Existing inventory becomes house lager without losing any units")
-	cash_before = int(loaded.street.selected().cash)
+	cash_before = int(loaded.s.cash)
 	loaded.street.action("serve")
-	test.check(loaded.street.selected().cash==cash_before+55,"Existing pending orders retain their original quote")
+	test.check(loaded.s.cash==cash_before+55,"Existing pending orders retain their original quote")
 
 func test_migration(test: SceneTree) -> void:
 	var legacy = Campaign.new(72,true)
@@ -448,7 +445,7 @@ func test_migration(test: SceneTree) -> void:
 	var model = Campaign.new(9)
 	test.check(model.load_game(),"Version-two save loads")
 	var bar: Dictionary = model.street.selected()
-	test.check(model.s.version==16 and model.street.finance.total()==9876 and bar.stage==2 and bar.team.size()==2,"Migration preserves money, stage and staff")
+	test.check(model.s.version==17 and model.street.finance.total()==9876 and bar.stage==2 and bar.team.size()==2,"Migration preserves money, stage and staff")
 	test.check(bar.equipment.pool==1 and bar.customers.is_empty(),"Existing illustrated pool table is granted; migration creates no buyers")
 	model.save_game()
 	model.save_game()
@@ -461,7 +458,7 @@ func pool_scenario(seed_value: int, free_pool: bool, full: bool) -> int:
 	var m = Campaign.new(seed_value)
 	var bar: Dictionary = m.street.selected()
 	var eco = m.street.economy
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	bar.equipment.pool = 1
 	bar.equipment.seating = 1
 	bar.restock = true
@@ -476,7 +473,7 @@ func pool_scenario(seed_value: int, free_pool: bool, full: bool) -> int:
 	for _i in 120:
 		eco.serve(bar,1,true)
 		m.street.tick(1)
-	return int(m.street.selected().cash)-10000-int(90-bar.stock)*38
+	return int(m.s.cash)-10000-int(90-bar.stock)*38
 
 func test_promotions(test: SceneTree) -> void:
 	var quiet_gain := 0

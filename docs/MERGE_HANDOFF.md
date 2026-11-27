@@ -1,5 +1,37 @@
 # Current implementation and release handoff
 
+## One shared account and closing tips — 27 November 2026
+
+The user's requested simplification replaces separate tills, bank transfers and
+purchase reserves. Work is in the shared main checkout, based on freshly synced
+upstream `eb96a48`. These source changes and the local Linux debug export are
+not a published release.
+
+- `s.cash` is the sole spendable account. All venues earn and pay from it;
+  venue reports retain attribution. The MONEY HUD opens Money & costs with
+  named rent, electricity, wages and recent transactions.
+- All purchases require their listed price alone. Leases no longer transfer
+  startup floats. Prices, physical gates, customer demand and production art
+  are preserved.
+- Close & count tips pays only the existing earned jar once, pauses running
+  costs and lets the player restock while closed. Existing consignment remains
+  for small jars. Recovery suspends collection of an unpaid bill without
+  deleting the bill or granting cash.
+- Schema 17 combines schema-16 bank, all venue tills and legacy reserve exactly;
+  earlier shared-account saves conserve cash plus reserve directly. No assets,
+  paid stock costs, visits or deadlines are reset, refunded or revalued.
+- The user approved accepting quicker purchasing while keeping prices unchanged:
+  active stage-two investment cadence now accepts a 2m20s median, previously
+  2m30s. The retained baseline measures 2m26s minimum. Other pacing bounds remain.
+
+See the [current plan](design/FINANCE_AND_GROWTH.md) and
+[verification record](TESTING.md#one-shared-account-and-closing-tips--27-november-2026).
+The complete isolated `tools/test.sh` passed with zero failures, including all
+66 fresh-campaign runs and the paired scenario suites. Two-resolution visual
+checks and an isolated Linux export startup also passed.
+Target-device play remains unverified. Older finance and tour-routing entries
+below are historical and are superseded by this record.
+
 ## Full customer animation cast — 27 November 2026
 
 Fourteen new reference-preserving sixteen-frame sheets complete all fifteen

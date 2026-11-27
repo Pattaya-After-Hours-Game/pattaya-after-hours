@@ -1,5 +1,62 @@
 # Testing and release checks
 
+## One shared account and closing tips — 27 November 2026
+
+This revision supersedes the separate-finance and local-tour-funding records
+below. It was built on main after syncing the latest upstream commit `eb96a48`,
+preserving the full customer animation cast. Verification uses pinned Godot 4.7.2
+and isolated saves; personal campaigns were not used as fixtures.
+
+The complete `tools/test.sh` passed with zero failures: gameplay/save/UI/art
+regressions, nine baseline campaigns and six no-chat comparisons, twelve promoter
+routes, twenty-one automation routes, sixty birthday pairs, eighty club scenarios,
+120 profit-cycle paired scenarios plus nine fresh campaigns, and nine expansion
+routes. The fresh-campaign suites total 66 runs.
+
+The finance regressions cover one shared starting balance, exact-price purchases
+without reserve gates, shared cross-venue receipts and costs, named cashbook
+entries and reconciliation, lease prices without floats, schema-16 bank/till/
+reserve conservation, earlier shared saves, and repeat-safe schema-17 reloads.
+Existing paid inventory, staff deadlines, earned bonuses and offline limits
+remain covered by the combined suite.
+
+The UI regression closes an empty bar with a real earned ฿240 tip jar, buys six
+drinks for ฿228 while shut, reopens with ฿12, and saves/reloads the resulting
+money, stock and empty jar. Repeated closing, ordinary nightly settlement and
+reload cannot duplicate tips. Closed venues stop running bills. An insufficient
+jar still permits existing consignment recovery; a carried unpaid bill pauses
+collection during cover and remains payable afterward.
+
+The user explicitly accepted faster investment cadence with unchanged prices.
+The stage-two active flagship median floor is now **140 seconds**, previously
+150; the retained baseline measures a minimum of **146 seconds**. This changes
+the acceptance target, not a game timer. Other milestone windows and exact
+saving-gap ceilings remain unchanged. Pacing policies use actual closing tips,
+stock purchases and existing consignment, with no money grants.
+
+Measured fresh click-heavy/balanced baseline ranges (six campaigns):
+
+| Measure | Actual elapsed time |
+| --- | --- |
+| First pool table | 13m42s–17m56s |
+| Stage two | 28m47s–32m56s |
+| Second property | 96m18s–110m04s |
+| Stage three | 129m54s–141m49s |
+| First-manager saving gap | 1m54s–3m12s |
+| Longest between-investment gap | 27m25s–29m31s |
+
+Eight finance/recovery previews were rendered through `tools/preview-art.sh` at
+960×540 and 1280×720 and visually inspected: shared account, transactions,
+upgrades, renovation, leases, marketing, empty fridge and counted tips.
+
+```sh
+PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='finance-*' tools/preview-art.sh /tmp/pattaya-shared-money
+```
+
+A local Linux debug export started successfully with isolated data/configuration.
+Target-device play and release publication remain unverified. The local build
+does not establish that release downloads contain these changes.
+
 ## Full customer animation cast — 27 November 2026
 
 The complete isolated `tools/test.sh` passed on pinned Godot 4.7.2 with zero
@@ -138,10 +195,10 @@ successfully exporting Linux. CI installs the complete templates and verifies
 all release checksums before publishing. These packaging checks do not establish
 compatibility across Linux distributions or replace a graphical playtest.
 
-## Separate finance and growth — 27 November 2026
+## Separate finance and growth — 27 November 2026 (superseded)
 
 The release gate remains the isolated `tools/test.sh` on pinned Godot 4.7.2,
-including all existing balance suites. Current acceptance windows remain stage 2
+including all existing balance suites. At that revision, acceptance windows were stage 2
 28–45 minutes, second property 75–115, stage 3 110–210, manager-saving gap ≤21,
 longest investment gap ≤38 and active profit-cycle median 2.5–5 minutes. Older
 measurements and acceptance windows below are historical.

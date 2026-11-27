@@ -6,7 +6,7 @@ const City = preload("res://scripts/city.gd")
 
 func fresh():
 	var m = Campaign.new(72)
-	m.street.selected().cash = 300000
+	m.s.cash = 300000
 	m.s.street.pass_credit = -10000000
 	return m
 
@@ -15,7 +15,7 @@ func run(test: SceneTree) -> void:
 	var b: Dictionary = m.street.selected()
 	var e = m.street.economy
 	m.street.action("equipment",8)
-	test.check(b.equipment.music==1 and m.street.selected().cash==298800,"Music costs 1200 with no free demand or orders")
+	test.check(b.equipment.music==1 and m.s.cash==298800,"Music costs 1200 with no free demand or orders")
 	b.customers = [b.customers[0]]
 	m.street.action("serve")
 	test.check(b.customers[0].next==25,"Music brings the next real order forward to 25 seconds")
@@ -32,9 +32,9 @@ func run(test: SceneTree) -> void:
 	m.street.advance(0.37)
 	m.street.action("serve")
 	var deadline: float = b.serve_ready
-	var before_auto: int = m.street.selected().cash
+	var before_auto: int = m.s.cash
 	m.street.action("auto_serve")
-	test.check(m.street.selected().cash==before_auto-3000,"Owner auto-serve costs exactly 3000")
+	test.check(m.s.cash==before_auto-3000,"Owner auto-serve costs exactly 3000")
 	test.check(b.auto_serve and b.serve_ready==deadline and e.action_cooldown(b,"serve")==10,"Buying auto-serve retains the manual deadline and speed")
 	for i in 10:
 		m.street.action("auto_serve")
@@ -58,7 +58,7 @@ func run(test: SceneTree) -> void:
 	test.check(b.serve_ready==deadline,"Rota toggles preserve cooldown after upgrading")
 	m.save_game()
 	var loaded = Campaign.new(1)
-	test.check(loaded.load_game() and loaded.s.version==16 and loaded.street.selected().auto_serve and loaded.street.selected().action_levels.pouring==4,"Schema fifteen preserves auto-serve and the new pouring tier")
+	test.check(loaded.load_game() and loaded.s.version==17 and loaded.street.selected().auto_serve and loaded.street.selected().action_levels.pouring==4,"Schema fifteen preserves auto-serve and the new pouring tier")
 	# Supplier buys and stock costs retain their own paid identities.
 	m = fresh()
 	b = m.street.selected()
@@ -69,19 +69,19 @@ func run(test: SceneTree) -> void:
 	b.stage = 3
 	for i in 3: m.street.action("restock")
 	test.check(b.supplier_level==5 and e.pack_price(b)==360,"Each supplier level reduces cost, down to 360 per twelve-drink delivery")
-	var cash_before: int = m.street.selected().cash
+	var cash_before: int = m.s.cash
 	m.street.action("restock")
-	test.check(m.street.selected().cash==cash_before,"Maxed supplier cannot charge repeatedly")
+	test.check(m.s.cash==cash_before,"Maxed supplier cannot charge repeatedly")
 	m.street.action("stock")
-	test.check(b.stock==24 and m.street.selected().cash==cash_before-360,"Discounted restocking still buys a complete twelve-drink delivery")
+	test.check(b.stock==24 and m.s.cash==cash_before-360,"Discounted restocking still buys a complete twelve-drink delivery")
 	for i in 12: test.check(Economy.consume_stock(b)==38,"Previously purchased drinks keep their old cost")
 	test.check(Economy.consume_stock(b)==30,"New discounted stock uses its actual purchase cost")
 	b.stock = 0
 	b.stock_lots.clear()
-	m.street.selected().cash = 360
-	test.check(not e.restock(b,true) and b.stock==0,"Discounted supplier retains the operating reserve")
-	m.street.selected().cash = 361
-	test.check(e.restock(b,true) and b.stock==12 and m.street.selected().cash==1,"Supplier settlement uses the discounted atomic pack price")
+	m.s.cash = 359
+	test.check(not e.restock(b,true) and b.stock==0,"Discounted supplier requires its full pack price")
+	m.s.cash = 361
+	test.check(e.restock(b,true) and b.stock==12 and m.s.cash==1,"Supplier settlement uses the discounted atomic pack price")
 	# Passive manager income is separate from real drinks and promotion results.
 	m = fresh()
 	b = m.street.selected()
@@ -90,9 +90,9 @@ func run(test: SceneTree) -> void:
 	b.healthy = 8
 	m.street.action("hire",0)
 	m.street.action("restock")
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	m.street.action("manager")
-	test.check(b.manager_level==1 and m.street.selected().cash==cash_before-2000,"Manager level one costs 2000 and retains its operating gates")
+	test.check(b.manager_level==1 and m.s.cash==cash_before-2000,"Manager level one costs 2000 and retains its operating gates")
 	b.customers.clear()
 	stock = b.stock
 	m.street.tick(5)
@@ -102,9 +102,9 @@ func run(test: SceneTree) -> void:
 	m.street.tick(4)
 	test.check(m.s.street.net_per_second==sampled,"Till rate remains stable between five-second updates")
 	m.street.action("open")
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	m.street.tick(10)
-	test.check(m.street.selected().cash==cash_before and m.s.street.net_per_second==0,"Closed venues earn no manager money and rate falls to zero")
+	test.check(m.s.cash==cash_before and m.s.street.net_per_second==0,"Closed venues earn no manager money and rate falls to zero")
 	b.stage = 3
 	m.street.action("manager")
 	m.street.action("manager")
@@ -122,13 +122,13 @@ func run(test: SceneTree) -> void:
 	b.stock_lots.clear()
 	b.auto_serve = true
 	m.s.street.last_seen = 1000
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	var live_sold: int = b.sold
 	var gain: int = m.street.claim_offline(1060)
-	test.check(gain==0 and m.street.selected().cash==cash_before+gain and b.sold==live_sold,"An empty offline fridge earns nothing without spending opening cash")
-	var once := [m.street.selected().cash,b.stock,b.commission_paid,b.stock_lots.duplicate(true)]
+	test.check(gain==0 and m.s.cash==cash_before+gain and b.sold==live_sold,"An empty offline fridge earns nothing without spending opening cash")
+	var once := [m.s.cash,b.stock,b.commission_paid,b.stock_lots.duplicate(true)]
 	m.street.claim_offline(1060)
-	test.check(once==[m.street.selected().cash,b.stock,b.commission_paid,b.stock_lots],"Offline manager, stock and commission settlement is repeat-safe")
+	test.check(once==[m.s.cash,b.stock,b.commission_paid,b.stock_lots],"Offline manager, stock and commission settlement is repeat-safe")
 	# Manager income must not turn unhealthy drink service into a milestone.
 	b.shift = Economy.ledger()
 	b.shift.merge({"revenue":1420,"manager_income":1200,"sales":4,"orders":4,"consumed_stock":56,"operating":200},true)
@@ -150,7 +150,7 @@ func run(test: SceneTree) -> void:
 		projection_model.s.street.last_seen = 1000
 	whole.street.claim_offline(1120)
 	for stamp in range(1010,1121,10): split.street.claim_offline(stamp)
-	test.check(whole.street.selected().cash==split.street.selected().cash and whole.street.selected().stock==split.street.selected().stock,"Splitting manager/auto-serve offline time cannot avoid costs or mint stock")
+	test.check(whole.s.cash==split.s.cash and whole.street.selected().stock==split.street.selected().stock,"Splitting manager/auto-serve offline time cannot avoid costs or mint stock")
 	# Real v6 shape migrates the already-paid supplier/manager appointments.
 	m = fresh()
 	b = m.street.selected()

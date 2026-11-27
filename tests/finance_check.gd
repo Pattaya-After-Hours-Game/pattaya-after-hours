@@ -7,99 +7,112 @@ func run(test: SceneTree) -> void:
 	var st = m.street
 	var e = st.economy
 	var bar: Dictionary = st.selected()
-	test.check(bar.cash==228 and m.s.cash==0 and st.finance.total()==228,"Fresh cash belongs to Blue Hour, not the bank")
-	var before := JSON.stringify(m.s)
-	test.check(not st.finance.transfer(bar,0,true) and not st.finance.transfer(bar,229,true) and not st.finance.transfer(bar,-1,false) and not st.finance.transfer(bar.duplicate(true),1,true) and JSON.stringify(m.s)==before,"Invalid or foreign transfers are rejected without any mutation")
-	st.finance.transfer(bar,100,true)
-	test.check(bar.cash==128 and m.s.cash==100 and st.finance.total()==228 and bar.shift.revenue==0 and bar.earnings_net==0,"Transfers conserve wealth and do not count as trading")
-	st.finance.transfer(bar,100,false)
-	m.s.cash = 700000
+	test.check(m.s.cash==228 and not bar.has("cash") and st.finance.total()==228,"Fresh campaign has exactly one shared 228-baht balance")
+	m.s.cash = 24000
 	m.s.rep = 100
 	m.s.street.chapter = 2
-	var bank_before: int = m.s.cash
+	var before := JSON.stringify(m.s)
+	var lease: Dictionary = st.lease_quote(1)
+	test.check(lease.enabled and lease.required==24000 and lease.reserve==0 and JSON.stringify(m.s)==before,"Lease quote needs exactly its price and is read-only")
 	st.action("buy",1)
 	var other: Dictionary = st.selected()
-	test.check(other.cash==st.opening_reserve(1) and m.s.cash==bank_before-24000-other.cash and bar.cash==228,"Leases spend bank money, fund the new till and leave other tills untouched")
-	var total: int = st.finance.total()
-	other.cash = 0
+	test.check(m.s.cash==0 and not other.has("cash") and m.s.street.bars.size()==2,"Lease spends the shared balance once without a startup float")
+	e.income(bar,100)
+	e.cost(other,20,"fines")
+	test.check(m.s.cash==80 and bar.shift.revenue==100 and other.shift.fines==20,"Either venue uses the shared balance while reports retain attribution")
+	m.s.cash = 18000
 	var quote: Dictionary = st.funded_offer("upgrade")
+	test.check(quote.enabled and quote.required==quote.price,"Renovation requires no reserve")
+	st.fund_and_buy("upgrade",0,18000)
+	test.check(other.stage==2 and m.s.cash==0,"Exact-price renovation works with zero cash left")
 	before = JSON.stringify(m.s)
-	test.check(quote.enabled and quote.transfer==quote.required and JSON.stringify(m.s)==before,"A rich company can quote a new venue renovation without local milestones or side effects")
-	total = st.finance.total()
-	st.fund_and_buy("upgrade")
-	test.check(other.stage==2 and st.finance.total()==total-18000 and other.cash==e.operating_rate(other)*2 and other.happy==0,"Fund-and-buy transfers only the shortfall and charges the renovation once")
-	m.s.cash = 0
-	before = JSON.stringify(m.s)
-	st.fund_and_buy("upgrade")
-	test.check(JSON.stringify(m.s)==before,"An unfunded compound purchase makes no partial transfer or stage change")
-	other.cash = 10000
-	e.income(other,100)
-	e.cost(other,20,"operating")
-	test.check(other.cash==10080 and bar.cash==228 and m.s.cash==0,"Venue receipts and expenses never borrow from another account")
-	other.cash = 0
-	other.customers.clear()
-	m.s.street.pass_credit = -10000000
-	st.tick(5)
-	test.check(not other.open and m.s.debt==0 and bar.cash<=228,"An insolvent venue closes without creating debt or draining a neighbour")
-	other.open = true
-	other.cash = 100000
-	other.manager = true
-	other.manager_level = 3
-	other.manager_bonus_carry = 0
-	test.check(e.bonus_amount(other,42)==31 and other.manager_bonus_carry==50 and e.bonus_amount(other,42)==32 and other.manager_bonus_carry==0,"Bonuses preserve fractional carry and use earned margin")
-	other.manager_bonus_carry = 0
-	other.shift = e.ledger()
-	other.stock = 30
-	other.stock_lots = [{"units":30,"cost":38,"drink":0}]
-	e.admit(other,false,true)
-	var guest: Dictionary = other.customers.back()
-	guest.drink = 0
-	guest.quoted = 80
-	guest.order = true
-	total = other.cash
-	e.serve(other)
-	test.check(other.cash==total+111 and other.shift.manager_income==31 and other.shift.sales==1 and m.s.cash==0,"A real discounted drink earns the margin bonus separately from its customer receipt")
-	other.customers.clear()
-	var bonus: int = other.shift.manager_income
-	st.tick(5)
-	test.check(other.shift.manager_income==bonus,"Empty trading cannot produce manager bonuses")
-	other.happy = 70
-	other.regulars = 10
-	other.healthy = 8
-	test.check(e.loyalty_rank(other)==1,"Local milestones earn the first loyalty rank")
-	other.happy = 450
-	other.regulars = 70
-	other.healthy = 40
-	test.check(e.loyalty_rank(other)==2,"Second loyalty rank replaces rather than stacks the first")
-	m.s.cash = 750000
-	var traffic: float = e.base_traffic()
-	for i in 10: st.buy_marketing()
-	test.check(m.s.street.marketing_level==10 and m.s.cash==0 and is_equal_approx(e.base_traffic(),traffic+105),"Ten marketing purchases cost 750000 and add exactly 105 bounded potential visitors/min")
-	before = JSON.stringify(m.s)
-	st.buy_marketing()
-	test.check(JSON.stringify(m.s)==before,"Completed marketing cannot be purchased again")
-	# Migrate a real pre-finance shape; neither the total nor the paid assets change.
-	m.s.cash = 700000
-	m.s.reserve = 500
-	for venue in m.s.street.bars:
-		for key in e.Finance.fields(): venue.erase(key)
-	m.s.version = 15
-	m.s.street.erase("marketing_level")
+	st.fund_and_buy("upgrade",0,18000)
+	test.check(JSON.stringify(m.s)==before,"Stale purchase cannot buy the next stage")
+	# All purchase offers expose only the payable cost, retaining other gates.
+	m.s.cash = 100000
+	st.action("hire",0)
+	st.action("restock")
+	for offer in [e.manager_offer(other),e.supplier_offer(other),e.hire_offer(other,1),e.training_offer(other,0,false),e.equipment_offer(other,0),e.action_upgrade_status(other,0),e.auto_serve_offer(other),e.auto_bar_fine_offer(other),e.auto_hosted_offer(other),e.club_offer(other)]:
+		test.check(offer.required==offer.price,"Purchase quote has no hidden working-cash requirement")
+	other.stock = 0
+	other.stock_lots = []
+	m.s.cash = e.pack_price(other)
+	test.check(e.restock(other,true) and m.s.cash==0,"Automatic supplier can spend exactly the pack price")
+	# Old bank, tills and reserve consolidate exactly once; paid assets survive.
+	m.s.version = 16
+	m.s.cash = 321
+	m.s.reserve = 17
+	bar.cash = 222
+	other.cash = 444
 	m.save_game()
 	var loaded = Campaign.new(4)
-	test.check(loaded.load_game() and loaded.street.finance.total()==700500 and loaded.street.selected().manager_level==3 and loaded.street.selected().stage==2,"Schema sixteen migration conserves old till plus reserve and all paid levels")
-	total = loaded.street.finance.total()
+	test.check(loaded.load_game() and loaded.s.version==17 and loaded.s.cash==1004 and loaded.s.reserve==0 and loaded.street.selected().stage==2,"Schema sixteen balances merge without gifts, loss or asset changes")
 	loaded.save_game()
 	var again = Campaign.new(5)
-	test.check(again.load_game() and again.street.finance.total()==total and again.s.street.bars==loaded.s.street.bars,"Finance migration and allocation are repeat-safe")
-	# With too little money, stable proportional allocation preserves every baht.
-	var poor = Campaign.new(9)
-	poor.s.cash = 1
-	poor.s.version = 15
-	poor.street.finance.migrate(poor.street.economy,false)
-	test.check(poor.street.finance.total()==1 and poor.street.selected().cash==1,"Low-cash migration cannot mint a working float")
-
+	test.check(again.load_game() and again.s.cash==1004 and not again.street.selected().has("cash"),"Shared account migration is repeat-safe")
+	loaded.s.version = 15
+	loaded.s.cash = 1
+	loaded.s.reserve = 7
+	loaded.save_game()
+	test.check(again.load_game() and again.s.cash==8,"Pre-sixteen cash plus reserve conserves every baht without allocation")
+	run_recovery(test)
 	run_growth(test)
+
+func run_recovery(test: SceneTree) -> void:
+	var m = Campaign.new(82)
+	var e = m.street.economy
+	var b: Dictionary = m.street.selected()
+	m.s.cash = 0
+	b.stock = 0
+	b.stock_lots = []
+	b.tip_visits = 23
+	b.bonus_tips = 5
+	var revenue: int = b.shift.revenue
+	m.street.action("close_and_count")
+	test.check(not b.open and m.s.cash==235 and b.tip_visits==0 and b.bonus_tips==0 and b.shift.revenue==revenue and b.earnings_net==0,"Early closing counts earned tips once outside customer trading")
+	m.street.tick(10)
+	test.check(m.s.cash==235,"Closed venue stops rent, electricity and wages")
+	m.save_game()
+	var loaded = Campaign.new(9)
+	loaded.load_game()
+	loaded.street.action("close_and_count")
+	test.check(loaded.s.cash==235,"Reload and repeat closing cannot duplicate paid tips")
+	loaded.street.action("stock")
+	test.check(loaded.s.cash==7 and loaded.street.selected().stock==6,"Closing tips can buy a complete stock pack while shut")
+	m.s.street.minute = C.CLOSE_MINUTE
+	e.settle_tips()
+	test.check(m.s.cash==235,"Nightly settlement cannot repay an early counted jar")
+	# An unpaid rounded bill must not immediately close a zero-cash recovery shift.
+	var stranded = Campaign.new(24)
+	var empty: Dictionary = stranded.street.selected()
+	stranded.s.cash = 0
+	empty.open = false
+	empty.stock = 0
+	empty.stock_lots = []
+	empty.cost_credit = 70
+	stranded.street.action("recovery")
+	stranded.street.tick(1)
+	test.check(empty.open and empty.recovery==119 and empty.cost_credit==70 and stranded.s.cash==0,"Recovery defers an unpaid operating bill instead of immediately reclosing")
+	stranded.street.economy.admit(empty,false,true)
+	stranded.street.action("serve")
+	test.check(stranded.s.cash==66 and empty.consignment==5,"Zero-cash recovery earns only a real sale less consignment repayment")
+	empty.recovery = 1
+	stranded.street.tick(1)
+	test.check(stranded.s.cash==65 and empty.cost_credit==28 and empty.open,"Earned cash pays the carried bill when recovery ends, with exact remainder")
+	var before := JSON.stringify(m.s)
+	e.operating_breakdown(b)
+	e.operating_description(b)
+	test.check(JSON.stringify(m.s)==before,"Cost descriptions do not charge or change the model")
+	b.open = true
+	m.s.street.minute = C.OPEN_MINUTE
+	m.s.street.pass_credit = -100000
+	m.street.tick(60)
+	test.check(m.s.cash==217 and b.shift.operating==18,"Opening charges exactly the existing 12 rent plus 6 electricity per minute")
+	var movements := 0
+	for entry in m.s.street.cashbook:
+		movements += int(entry.amount)
+		test.check(not entry.reason.is_empty(),"Every recorded cash movement names its cause")
+	test.check(movements==m.s.cash,"Recorded tips and operating outgoings reconcile to cash")
 
 func run_ui(test: SceneTree) -> void:
 	var app = load("res://main.tscn").instantiate()
@@ -108,24 +121,33 @@ func run_ui(test: SceneTree) -> void:
 	app.set_process(false)
 	app.start_new_game()
 	app.show_tutorial_hint = false
-	app.model.s.cash = 700000
-	app.model.s.rep = 100
-	app.model.s.street.chapter = 2
-	app.model.street.action("buy",1)
-	var bar: Dictionary = app.model.street.selected()
-	bar.cash = 0
+	app.model.s.cash = 18000
+	app.model.street.selected().type = 1
 	app.open_upgrades(true)
 	var control: Button = app.column.find_child("Upgrade_renovate",true,false)
-	test.check(control!=null and not control.disabled and control.text.contains("Fund & buy"),"A rich player's renovation clearly offers company funding")
-	var total: int = app.model.street.finance.total()
+	test.check(control!=null and not control.disabled and not control.text.contains("Fund & buy"),"Renovation offers a direct purchase at the exact shared balance")
 	control.pressed.emit()
-	test.check(bar.stage==2 and app.model.street.finance.total()==total-18000,"The funding control charges one renovation through the model")
+	test.check(app.model.street.selected().stage==2 and app.model.s.cash==0,"Visible purchase charges the shared account once")
 	var snapshot := JSON.stringify(app.model.s)
 	app.open_service_section("finance")
-	test.check(test.find_button(app,"Deposit surplus")!=null and app.column.find_child("TransferAmount",true,false)!=null and JSON.stringify(app.model.s)==snapshot,"Cash & Bank exposes explicit transfers without changing funds just by opening")
-	app.model.s.street.selected = 0
-	app.open_service_section("finance")
-	test.check(app.model.street.selected().cash==228,"Switching accounts preserves the original venue till")
+	test.check(not test.panel_has_text(app,"Deposit surplus") and app.column.find_child("TransferAmount",true,false)==null and JSON.stringify(app.model.s)==snapshot,"Money view is read-only and contains no transfer controls")
+	test.check(test.find_button(app,"Close & count tips")!=null,"Money view exposes closing-tip recovery")
+	app.model = Campaign.new(82)
+	var bar: Dictionary = app.model.street.selected()
+	app.model.s.cash = 0
+	bar.stock = 0
+	bar.stock_lots = []
+	bar.tip_visits = 24
+	app.open_fridge()
+	test.find_button(app,"Close & count tips").pressed.emit()
+	test.check(not bar.open and app.model.s.cash==240 and bar.tip_visits==0,"The empty-fridge closing control credits only the earned jar")
+	test.find_button(app,"Buy 6 · ฿228").pressed.emit()
+	test.check(bar.stock==6 and app.model.s.cash==12 and not bar.open,"The real fridge control buys stock with counted tips while closed")
+	app.open_service_section("hours")
+	test.find_button(app,"Enable opening").pressed.emit()
+	test.check(bar.open and app.model.s.cash==12,"The real opening control resumes the restocked venue without an extra payment")
+	var loaded = Campaign.new(9)
+	test.check(loaded.load_game() and loaded.s.cash==12 and loaded.street.selected().stock==6 and loaded.street.selected().tip_visits==0,"UI recovery checkpoints stock, money and the paid jar together")
 	app.queue_free()
 	await test.process_frame
 
@@ -165,25 +187,24 @@ func run_growth(test: SceneTree) -> void:
 		guest.played = false
 		guest.playing = false
 		guest.budget = 500
-	var cash_before: int = b.cash
+	var cash_before: int = m.s.cash
 	e.pool_tick(b)
 	var bonus: int = b.shift.manager_income
 	e.pool_tick(b)
-	test.check(b.cash==cash_before+87 and bonus==37 and b.shift.manager_income==bonus and b.pool_income==50,"A paid game settles one fee and one fractional management bonus")
+	test.check(m.s.cash==cash_before+87 and bonus==37 and b.shift.manager_income==bonus and b.pool_income==50,"A paid game settles one fee and one fractional management bonus")
 	b.games.clear()
 	for guest in b.customers:
 		guest.played = false
 		guest.playing = false
 	b.promo = {"kind":0,"pool_revenue":0,"free_games":0}
 	e.pool_tick(b)
-	test.check(b.cash==cash_before+87 and b.shift.manager_income==bonus and b.free_games==1,"Free pool cannot earn a management bonus")
+	test.check(m.s.cash==cash_before+87 and b.shift.manager_income==bonus and b.free_games==1,"Free pool cannot earn a management bonus")
 	b.promo.clear()
 	snapshot = JSON.stringify(m.s)
-	st.finance.transfer(b,1,true)
 	e.sample_earnings()
-	test.check(b.earnings_net==87,"Transfers do not enter the local trading sample")
+	test.check(b.earnings_net==87,"Only real trading enters the local trading sample")
 	# A managed claim credits only its own till, never company cash or neighbours.
-	b.cash = 10000
+	m.s.cash = 10000
 	b.restock = true
 	b.supplier_level = 1
 	st.action("hire",0)
@@ -192,21 +213,20 @@ func run_growth(test: SceneTree) -> void:
 	b.stock_lots = [{"units":30,"cost":38,"drink":0}]
 	b.equipment.pool = 0
 	m.s.street.last_seen = 1000
-	var bank: int = m.s.cash
-	var other: int = m.s.street.bars[1].cash
-	cash_before = b.cash
+	cash_before = m.s.cash
 	var earned: int = e.offline(1060,28800)
-	test.check(earned>0 and b.cash==cash_before+earned and m.s.cash==bank and m.s.street.bars[1].cash==other,"Offline managed trade credits only the earning venue and protects other accounts")
-	test.check(e.offline(1060,28800)==0 and b.cash==cash_before+earned,"Offline credits are repeat-safe")
+	test.check(earned>0 and m.s.cash==cash_before+earned,"Offline managed trade credits shared cash without spending opening cash")
+	test.check(e.offline(1060,28800)==0 and m.s.cash==cash_before+earned,"Offline credits are repeat-safe")
 	m.save_game()
 	var path := "user://invalid-finance.json"
 	for field in ["cash","manager_bonus_carry"]:
 		var invalid: Dictionary = m.s.duplicate(true)
-		invalid.street.bars[0][field] = -1
+		if field=="cash": invalid.cash = -1
+		else: invalid.street.bars[0][field] = -1
 		var file := FileAccess.open(path,FileAccess.WRITE)
 		file.store_string(JSON.stringify(invalid))
 		file.close()
-		test.check(m._read(path)==null,"Schema sixteen rejects invalid "+field)
+		test.check(m._read(path)==null,"Schema seventeen rejects invalid "+field)
 
 	var recovery = Campaign.new(11)
 	var recovered: Dictionary = recovery.street.selected()
@@ -215,14 +235,14 @@ func run_growth(test: SceneTree) -> void:
 	recovered.stock = 6
 	recovered.consignment = 6
 	recovered.stock_lots = [{"units":6,"cost":14,"drink":0}]
-	var opening: int = recovered.cash
+	var opening: int = recovery.s.cash
 	recovery.street.economy.serve(recovered)
-	test.check(recovered.cash==opening+80-14+49 and recovered.manager_bonus_carry==50,"Consignment repayment is deducted once, not again as a prepaid stock cost")
+	test.check(recovery.s.cash==opening+80-14+49 and recovered.manager_bonus_carry==50,"Consignment repayment is deducted once, not again as a prepaid stock cost")
 
 	var returns = Campaign.new(72)
 	var returned: Dictionary = returns.street.selected()
 	returned.manager = true
 	returned.manager_level = 3
-	var cash_start: int = returned.cash
+	var cash_start: int = returns.s.cash
 	returns.street.action("return_drink",0)
-	test.check(returned.cash==cash_start+57 and returned.earnings_net==57 and returned.shift.manager_income==0 and returned.manager_bonus_carry==0,"Paid stock returns enter only that till's cashflow and earn no manager bonus")
+	test.check(returns.s.cash==cash_start+57 and returned.earnings_net==57 and returned.shift.manager_income==0 and returned.manager_bonus_carry==0,"Paid stock returns enter only that till's cashflow and earn no manager bonus")

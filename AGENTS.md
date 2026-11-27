@@ -51,14 +51,14 @@ claiming behaviour exists; update the relevant documentation when it changes.
   Compact-layout recovery applies at seating >=3. Hostess/gogo frontage also uses the 1/3/5 tier caps, ฿900 per tier number and +2 appeal; other venue tracks stay unchanged.
   Base traffic is 7.3 + 2 × max(0, highest owned beer sign − 1), one shared pool.
   Advice and visit details are read-only. Customer contribution uses consumed paid
-  stock and excludes manager income, tips and investments; keep the till cashflow
-  sample unchanged. See [profit-cycle rules](docs/design/PROFIT_CYCLE.md).
+  stock and excludes manager income, tips and investments; keep the trading
+  sample's accounting rules. See [profit-cycle rules](docs/design/PROFIT_CYCLE.md).
 - Venue type 1 is labelled Hostess bar; numeric identity and production art stay
   unchanged. Lease bases are ฿12,000/24,000/60,000. Each earlier same-type purchase
   adds 25% of base, excluding the inherited slot-zero beer bar. Never refund old
   purchases. Every fourteenth day has a visible 10% offer, rotating hostess/beer/
   gogo. `street.lease_quote()` owns price, retained opening cash, affordability and
-  cost estimates. Leases spend company-bank cash and transfer the quoted startup float into the new venue.
+  cost estimates. Leases spend only their listed price from shared cash.
   Keep renovation prices and physical stage gates; customer milestones now earn loyalty.
 - Pool costs **฿50 per game per table**, charged once at game start; new games last 30 seconds.
   Preserve saved remaining time for games already underway, including older 45-second games. Free Pool
@@ -75,7 +75,7 @@ claiming behaviour exists; update the relevant documentation when it changes.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.
   Bartender contracts cost ฿1,200; host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped/offline
   time. Switching a bartender to a specialist role charges the positive contract
-  price difference prorated to the remaining term, with a shift reserve; no refund
+  price difference prorated to the remaining term, with no reserve requirement; no refund
   for switching back. Training belongs to the person and survives expiry/rehire. Base bartender
   service starts ready: sell one real order, then recover for 25 seconds, improving
   to 20/15 through training costing ฿400/800; stage two adds 12/10 seconds
@@ -97,12 +97,12 @@ claiming behaviour exists; update the relevant documentation when it changes.
   Welcome and promoter attraction never stack. Faster Welcome only helps while
   the promoter is off duty/expired; it does not speed Chat or boost her appeal. Audience training is stage-gated,
   separate from service training, and persists after rehire. Keep renewal visible
-  in the frontage section, with exact payroll/stock reserve and shortfall. Expiry
+  in the frontage section, with the exact contract-price shortfall. Expiry
   must refresh controls independently of history text; never duplicate her slot.
 - Buy stock in complete packs requiring cash and room: six for ฿228 at supplier
   levels 0/1, twelve for ฿432/408/384/360 at levels 2/3/4/5. Supplier upgrades
   cost ฿900/1,200/2,400/4,800/9,600. Preserve inventory purchase costs; discounts never refund old stock. Supplier
-  automation retains its next operating charge. Bo’s consignment remains the
+  automation needs only the complete pack price. Bo’s consignment remains the
   recovery exception. Each fridge tier earns +1 extra reputation per ten happy
   departures, capped at 100, with no purchase/reload reward. Third beer-bar seating must hold twelve with pool and fans.
   The schema-7 migration preserves paid manager/supplier appointments as level 1 and grants no
@@ -111,20 +111,20 @@ claiming behaviour exists; update the relevant documentation when it changes.
   less FIFO paid stock and consignment repayments, preserving fractional bonus carry.
   Includes hosted drinks; excludes bar fines, tips, transfers, returns and event rewards.
   No independent timer income. Keep bonuses separate from healthy-service progress.
-  Stage gates remain 2/3/3, with a bartender, deliveries and reserve; no healthy-shift gate.
+  Stage gates remain 2/3/3, with a bartender and deliveries; no healthy-shift gate.
 - Music costs ฿1,200 for 35→25-second repeats; stage-two better sound costs
   ฿2,400 and reaches 18 seconds (party 14). Beer-bar stage three adds ฿3,600/4,800
   tiers for 14/11 seconds (party 11/8). Preserve existing drinking deadlines,
   including the final round.
   Regulars Club has stage-two tiers ฿600/1,200/2,400, requiring 10/20/35 local
-  regulars plus a stock-pack/operating reserve. New visitors join at 35/65/100%,
+  regulars, with no additional cash reserve. New visitors join at 35/65/100%,
   adding one planned round and its house-price budget allowance, capped at three.
   Birthday and club never stack past three. Schema 13 saves visit plans/phases; pre-13 guests retain their legacy visit rules;
   old guests receive no extra round and old managers receive no refund. All
   sales still need orders, budgets, stock and service; membership persists per visit.
   Music preserves budgets and visit limits. Auto-serve costs ฿3,000 per venue and uses the SAME
   Serve deadline as manual clicks. Never award extra service for toggles/reloads.
-  Till ฿/s is a five-second sample of actual net trading, excluding investments
+  Money ฿/s is a five-second sample of actual street-wide net trading, excluding investments
   and offline claims; no simulation or accounting belongs in the HUD.
 - Day seven's Blue Hour opening hosts Anong's Birthday, noon to normal 1am close.
   Later seventh-day openings rotate reunions, mixtape and thank-you nights. Keep
@@ -139,7 +139,7 @@ claiming behaviour exists; update the relevant documentation when it changes.
   timers. Use fresh campaigns for balance tests; preserve existing owned progress.
 - Offline drink earnings remain demand/cost limited; manager income is separate.
   All offline earnings remain repeat-safe and capped at eight
-  hours. They must not spend the opening cash reserve, replay promotions or
+  hours. They must not drain the opening shared balance, replay promotions or
   advance unseen disasters. Label estimates separately from actual revenue.
 - Keep Anong, the existing cast, district exploration and optional Toybox fights.
   Tours and crypto are not core progression requirements. Chapters replace a
@@ -151,36 +151,42 @@ claiming behaviour exists; update the relevant documentation when it changes.
   pool states and closures. Do not replace production assets with placeholders
   or decorative crowds that contradict the model.
 
-## Separate finance and growth (approved 27 November 2026)
+## Shared money and clear costs (revised 27 November 2026)
 
-- `s.cash` is the company bank; `bar.cash` is the venue till. Local income/costs,
-  tips, staff and upgrades use that till. Leases, street marketing and unattributed
-  legacy/company actions use the bank. Never silently cover a shortfall.
-- Cash & Bank offers explicit transfers. Fund & buy transfers only the shortfall
-  for a quoted local upgrade and reserve, then purchases once. Navigation is pure.
-  Recommended working cash is two packs plus two minutes of operating costs.
-- New leases retain their existing prices. Transfer a startup float of ฿1,200 +
-  ฿228 + two minutes of new overhead and one bartender's wage into the new till.
-- Schema 16 conserves old `cash + reserve` exactly, allocating working floats and
-  leaving surplus in the bank. Insufficient cash is apportioned proportionally
-  with stable integer remainders. Preserve all owned assets; no refunds or gifts.
-  Fresh campaigns put ฿228 in Blue Hour and zero in the company bank.
-- Street marketing requires any stage-two venue. Ten incremental bank-funded
-  prices: 2000/4000/8000/16000/30000/50000/80000/120000/180000/260000.
-  Traffic increments: 2/3/4/6/8/10/12/15/20/25 potential visitors/minute.
-  Each additional open property adds two potential visitors/minute, maximum seven.
-  All compete for one bounded audience; forecasts never create actual sales.
-- HUD Till and its five-second net sample belong to the selected venue. Transfers,
-  investments, tips and offline claims do not enter the trading sample. Offline
-  bonuses require estimated customer trade and protect each opening cash balance.
-- See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for account routing.
+The user rejected separate tills and protected purchase reserves. This section
+supersedes the earlier separate-finance approval.
+
+- `s.cash` is the only account. Every venue and street action earns/spends from it.
+  Venue ledgers attribute results but hold no money. Remove transfer/Fund & buy UI.
+- All purchases require only their listed price, never a stock/payroll reserve
+  or lease startup float. Keep prices and physical/staff/regular/consent gates.
+- Schema 17 consolidates schema-16 bank + all venue tills + old reserve exactly;
+  earlier saves use cash + reserve. Remove venue cash fields and clear reserve.
+  Preserve owned assets, paid stock costs and deadlines; no gifts or refunds.
+  Fresh campaigns have ฿228 shared money and twelve drinks.
+- Money & costs names every outgoing. Existing ongoing totals are rent 12/30/60
+  plus base electricity 6/15/30 by type, comfort electricity 4/tier, manager
+  wages 12 and on-duty bartender/host/dancer wages 24/20/36 per real minute.
+  Closed venues pause these costs; fractional accrual and contract ageing remain.
+- Close & count tips closes the selected venue and settles its real unpaid jar
+  immediately, including after cash-shortage closure. A repeat, reload or nightly
+  count cannot pay it twice. Buy packs while closed; Bo's consignment remains if
+  tips are insufficient. Closing does not grant customers, tips or cash.
+- Street marketing keeps its stage-two gate, ten prices and traffic increments:
+  2000/4000/8000/16000/30000/50000/80000/120000/180000/260000;
+  +2/3/4/6/8/10/12/15/20/25 potential visitors/minute. Each additional open
+  property adds two, maximum seven. All share bounded demand.
+- HUD MONEY and its five-second net sample cover the whole street. Tips,
+  investments and offline claims stay outside trading samples. Keep local reports,
+  loyalty appeal and earned manager bonuses. Navigation is read-only.
+- See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for current rules.
 
 ## Implementation boundaries
 
 This is a Godot/GDScript project, not a web app. Use the engine version pinned in
 `.godot-version`; do not add a server or change the engine merely for convenience.
 
-- `scripts/finance.gd` owns explicit transfers, total wealth and schema-16 cash allocation.
+- `scripts/finance.gd` owns shared money movements, recent transaction history and schema-17 consolidation.
 - `scripts/economy.gd` owns customers, orders, pool, promotions, costs and forecasts.
 - `scripts/street.gd` owns the shared live clock, properties, chapters and events.
 - `scripts/street_content.gd` holds balance, equipment, promotion and story data.
@@ -235,9 +241,10 @@ existing gates. Current active pacing bounds keep stage two at 28–45 minutes,
 second property at 75–115 and stage three at 110–210. Measure the saving gaps as
 well: first-manager wait at most 21 minutes and longest between-investment gap
 at most 38 in baseline active policies. Stage-two flagship investment cadence
-targets a 2.5–5-minute median in active
-profit-cycle policies. The user confirmed these faster lower bounds while keeping
-prices unchanged. These are balance checks, not wait timers.
+targets a 2m20s–5-minute median in active
+profit-cycle policies. The no-reserve revision accepts slightly faster investment
+cadence (the previous floor was 2m30s); milestone windows and saving-gap ceilings
+stay unchanged. These are balance checks, not wait timers.
 
 Nightly street closure starts a free 15-second clean-up/countdown for all venues.
 The model owns the automatic noon skip and cancellation; UI only presents/input.
@@ -248,9 +255,9 @@ No countdown on the menu/offline, or while district/arcade hides the cancel
 control. Preserve normal skip contract ageing, owner closures, stock and dates.
 
 Nightly tips are ฿10 per real served visit, once on its first drink. Use saved
-customer.drinks and bar.tip_visits; ordinary close/open, pool, manager and offline
-income never earn/pay tips. Count jars once per night before clean-up (or manual
-night skip), retaining paid reports and the settlement marker in schema 11.
+customer.drinks and bar.tip_visits; pool, manager and offline income never earn
+tips. Closing counts only a real existing jar. Count unpaid jars before clean-up (or manual
+night skip), and on explicit early closing, retaining paid reports and the settlement marker in schema 11.
 Keep tip receipts out of commission, drink counters, healthy-service margins and
 the five-second trading sample. Older saves get no retroactive tips. Expose the
 existing six-drink consignment recovery beside unaffordable empty stock; preserve

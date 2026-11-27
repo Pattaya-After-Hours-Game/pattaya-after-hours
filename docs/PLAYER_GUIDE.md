@@ -15,24 +15,24 @@ for available events, and a red **!** for no active tour agreements when seats a
 Double-click the rainbow duo in the bar, or tap them on a touchscreen, to see
 them kiss with a floating heart.
 
-## Cash & Bank
+## Money & costs
 
-**Till** shows only the selected bar’s money. Tap it for Cash & Bank. Deposit
-surplus to the company bank, or withdraw a chosen amount into the current bar.
-**Deposit surplus** leaves two stock packs and two minutes of scheduled costs.
-Transfers do not count as profit. A venue that runs out of operating cash closes;
-it never silently takes another venue’s money.
+**MONEY** is the shared balance for your whole street. Every sale, bill and
+purchase uses it. Tap it to see named rent, electricity and wages for each venue,
+plus recent money in and out. A purchase requires only its listed price.
+There are no transfers, per-bar balances or protected reserves.
 
-Upgrades can **Fund & buy** using the bank for the exact shortfall. Normal stock,
-hiring and running costs use the local till: withdraw funds first if needed.
-**Empire → Street marketing** spends bank cash to attract a larger shared street
-audience. It unlocks after your first stage-two venue and has ten permanent tiers.
-Forecasts show estimated demand and automatic net before/after; a full or slow
-bar may gain little. Marketing never guarantees sales.
+If cash and stock run out, use **Close & count tips** in Hours, Money & costs or
+beside the empty fridge. Closing pauses that venue's costs and counts its earned
+jar once. Buy a full pack while closed, then enable opening. If the tips are not
+enough, Bo's existing consignment recovery is still available. Other venues keep
+trading; their running costs also use the shared balance.
 
-Leases use the bank for the rent and transfer a separately displayed starting
-float into the new till. Old saves retain all their cash: working floats go to
-the venues and the remainder goes to the bank. See the [finance rules](design/FINANCE_AND_GROWTH.md).
+**Empire → Street marketing** unlocks after your first stage-two venue and has
+ten permanent tiers. It attracts one shared audience; more traffic still needs
+seats, service and stock. Leases require only their displayed price.
+Old tills, bank and reserve combine without losing money or granting a refund.
+See the [finance rules](design/FINANCE_AND_GROWTH.md).
 
 ## See the street get busy
 
@@ -99,7 +99,7 @@ street-wide story even when you have another property selected.
 
 Final renovations now cost ฿40,000 for a beer bar, ฿65,000 for a Hostess bar and
 ฿120,000 for a gogo, plus operating cash. The old customer thresholds earn
-loyalty appeal instead of blocking renovations. Fund a new bar from your bank
+loyalty appeal instead of blocking renovations. Pay for a new bar from shared money
 while it builds its own following. The first renovation and ordinary drink prices are unchanged.
 
 ## Try a faster shift
@@ -135,8 +135,8 @@ Bed Race take over the game screen until you finish or leave.
 
 Open **Tours**, choose a guide, then assign a route. The guide recommends your
 street for the current trading shift. Use **Back** to return to the guide list.
-Tap **Assign** to pay the guide from the selected bar’s till and start the tour
-in one action. The route shows any till shortfall. Keep enough local money for
+Tap **Assign** to pay the guide from the shared account and start the tour
+in one action. The route shows any cash shortfall. You can plan ahead for
 stock and running costs. Cancelling an agreement does not refund guide pay.
 When a referral gets a seat, the top-left update names the guide and venue.
 The badge above **Tours** counts active agreements. A red **!** appears when
@@ -223,10 +223,11 @@ At ฿39, three ordinary ฿80 beers leave ฿237 after repaying Bo: enough for 
 retain Owner-run recovery; raids/closed hours must finish before reopening.
 
 **Nightly tips:** one served visit adds ฿10 pending, regardless of how many rounds
-that guest buys. All bars' jars are counted once after the last nightly closure,
+that guest buys. Unpaid jars are counted after the last nightly closure,
 before clean-up. Service and Journal show the amounts. No customer served means
 no tip. Pool and manager income do not tip; offline estimates never add tips.
-The pending jar is not spendable until counted. Keep stock money aside meanwhile.
+The pending jar is not spendable until counted. **Close & count tips** counts the
+selected venue early, so earned tips can fund stock without waiting for night.
 
 ## Your first shift
 
@@ -258,8 +259,8 @@ capacity cannot sell drinks to customers who are not there.
 
 ## Pick what to stock
 
-A dimmed purchase shows what you still need in the till, such as **฿178 short**.
-That figure includes any operating reserve the purchase requires.
+A dimmed purchase shows how much more shared money you need, such as **฿178 short**.
+That figure is the gap between shared money and the listed price.
 
 Tap **Stock** to open the drink list. If a stocked fridge can’t fill any
 waiting orders, Serve names the missing drink, for example **Need Rum & cola**.
@@ -278,7 +279,7 @@ drinks you already carry when orders come in and stock runs low. Returned stock
 pays back half its purchase cost.
 
 Bo occasionally offers **12 discounted specialty drinks** in the afternoon.
-The popup shows your wholesale saving, the till after buying, and how far that
+The popup shows your wholesale saving, shared money after buying, and how far that
 would leave you from your current cash goal. Tap **Not now** to pass. You can
 reopen the deal from **Fridge** until 3:15pm.
 
@@ -292,8 +293,7 @@ the venue reaches that stage and meets each purchase’s other requirements.
 Choose **Ready only** to filter purchases, or **Show all** to restore the list.
 
 Tap **Renovate to stage** near the top to jump to that venue’s renovation.
-Pay the price and retain operating reserve; **Fund & buy** can supply the
-shortfall from your company bank. Local loyalty is separate: **70 happy visits,
+Pay the listed price from shared money. Local loyalty is separate: **70 happy visits,
 10 regulars and 8 healthy shifts** earns +5% appeal; **450 / 70 / 40** earns
 +10% total. It does not block construction.
 
@@ -312,7 +312,7 @@ Bartenders keep serving while your own Serve button refills.
 
 Near the top of **Service**, **Faster pouring** and **Better welcoming** each have
 three purchases: **10 → 8 → 6 → 4 seconds**, costing **฿900 / ฿1,400 / ฿2,800**.
-The menu shows cash still needed, including the next shift’s operating reserve.
+The menu shows cash still needed, with no additional reserve requirement.
 Buying a level changes the next use; it does not clear an active refill. Individual
 staff training improves bartenders separately and survives rehiring.
 
@@ -411,7 +411,7 @@ The **Serve** button shows how many orders are waiting.
 | Empty stock and lost orders | Buy stock; consider a bigger fridge and automatic deliveries |
 | Sales but negative recent net | Check inventory purchases, wages and promotion costs in the shift report |
 | Dancers but no automatic sales | Hire or reassign a bartender; dancers attract customers, not serve drinks |
-| Plenty of money but a locked upgrade | Check physical stage, staff or local-regular requirements; Fund & buy covers a till shortfall |
+| Plenty of money but a locked upgrade | Check physical stage, staff or local-regular requirements; all venues share your money |
 
 Recent net records actual cash movements. A large stock delivery can make the
 current report look worse even though some inventory will sell next shift.
@@ -472,7 +472,7 @@ Adult hosts and dancers attract their audience and use the same contracts; they
 do not serve drinks. Use each person's rota to pause wages, not their contract.
 At Hostess bars and gogos, role reassignment changes service and payroll. Switching
 a bartender to a host/dancer charges the contract-price difference for the
-remaining term, keeping training and requiring the next shift’s reserve. Switching
+remaining term, keeping training and charging only the prorated fee. Switching
 back does not refund it.
 The **Good Company** card lets hosts earn from guests who want conversation,
 music or pool. An interested guest who has bought a first drink can sponsor one
@@ -520,28 +520,24 @@ More appeal improves the venue's share of finite street customers, rather than
 guaranteeing arrivals. Training stays with the person after expiry or rehire;
 it does not change a fee already paid or shorten an active booking. Colleagues
 who decline bookings can train their appeal without changing that preference.
-Purchases retain a shift's operating reserve. Private activity stays off-screen.
+Private activity stays off-screen.
 
 New bookings retain their exact return time across reports and reloads. Older
 saved bookings retain their original end-of-shift return, with no extra payment.
 
 Automatic deliveries are a paid supplier agreement. They buy one complete delivery at your supplier price
-when stock is below the delivery quantity and orders are waiting, retaining the next operating
-charge. They cannot buy a partial pack or fill an idle bar speculatively. A manager needs stage 2, an on-duty bartender and deliveries, plus the hiring fee and operating reserve. Managers enable the offline
+when stock is below the delivery quantity and orders are waiting. They cannot buy a partial pack or fill an idle bar speculatively. A manager needs stage 2, an on-duty bartender and deliveries, plus the manager purchase price. Managers enable the offline
 estimate. Check the current prices and requirements in **Service**.
 
-Renovations need cash and reserve. Local customer milestones earn loyalty appeal;
-company funding can pay for the building but cannot buy those loyalty ranks. **Empire** shows
-leases and their opening reserves. Finish the Blue Hour opening chapter before
+Renovations need their listed price. Local customer milestones earn loyalty appeal;
+shared money can pay for the building but cannot buy those loyalty ranks. **Empire** shows
+leases and their running costs. Finish the Blue Hour opening chapter before
 buying a second venue. Hostess bars require 20 reputation; gogos require 45.
 
-Fresh active-play checks reach pool around 13–18 minutes, stage 2 around
-29–34 minutes, a second property around 97–109 minutes and stage 3 around
-132–144 minutes. After stage 2, the policy improves the current bottleneck and
-explicitly banks expansion money.
-First purchased leases are ฿12,000/24,000/60,000 for beer/hostess/gogo, plus
-retained opening cash. Each earlier same-type purchase adds 25% of base; the
-inherited Blue Hour does not count. Empire displays payment, retained float and
+Fresh campaign pacing is checked with real purchases and closing-tip recovery.
+See [verification](TESTING.md) for measured results; targets are not wait timers.
+First purchased leases are ฿12,000/24,000/60,000 for beer/hostess/gogo. Each earlier same-type purchase adds 25% of base; the
+inherited Blue Hour does not count. Empire displays purchase prices and
 ongoing costs separately. Every fourteenth day has a visible 10% retiring-owner
 offer, rotating hostess/beer/gogo. These are
 simulation results for a particular investment strategy, not timers or promises
@@ -549,11 +545,12 @@ for every play style. [Economy details](ECONOMY.md) include the full measurement
 
 ## If money runs out
 
-Use **Close venue** to pause its payroll and overhead. Off-duty staff do not
+Use **Close & count tips** to pause rent, electricity and payroll and collect the
+earned jar. Buy stock while closed when the money covers a full pack. Off-duty staff do not
 charge wages. If an operating charge becomes unaffordable, the venue closes
 before adding new idle debt, while keeping its staff records and upgrades. Contracts still count down.
 
-At an empty till, a closed venue can take an **Owner-run recovery shift**. Anong
+At an empty shared balance, a closed venue can take an **Owner-run recovery shift**. Anong
 covers two minutes of overhead and the team is scheduled off. If the fridge is
 empty, Bo provides six recovery drinks whose stock cost is taken only when a
 customer buys one. Welcome and serve manually, then reopen with a sustainable
@@ -571,7 +568,7 @@ time away from eligible trading time and reports the estimate and limiting facto
 Owned stock is consumed; further whole deliveries must be funded by earnings from that
 claim, never your opening cash. Manager income can fund that next pack;
 leaving stock in the fridge lets drink service begin sooner.
-Commission is included. Short claims retain fractional sales and costs, although
+Nida earns no commission. Short claims retain fractional sales and costs, although
 restarting a claim can reduce available pack working capital.
 
 **Open managed shift** offers decisions across the same live two-minute shift.
@@ -622,8 +619,7 @@ Her rota stops new attraction. She takes no commission, including on old waiting
 orders or offline sales. Previously paid commission remains historical; unpaid
 commitments and fractional carry are cancelled without a cash refund. At expiry,
 rehire the same person for ฿1,200. Find **Rehire Nida** directly under Frontage
-promoter. Keep the displayed payroll and one-pack reserve after the fee; the
-control shows exactly how much cash is missing. If her contract is active but
+promoter. The control shows exactly how much of her contract fee is missing. If her contract is active but
 she is off duty, use her rota instead. Closed/skipped/offline time counts toward her term.
 
 At venue stage two, train Nida or a dancer for ฿800; stage three unlocks a second
@@ -642,7 +638,7 @@ Happy one-drink visitors can become regulars too.
 **Your profit cycle** shows the last completed shift's actual customer profit,
 manager income separately, its sample duration, and distinct arrival/order/sale/
 completed-visit counts. Before the first report it uses the current shift.
-This uses the cost of stock sold; the till's five-second cashflow also counts
+This uses the cost of stock sold; the street's five-second cashflow also counts
 whole stock deliveries, so the two figures can differ. Neither is a reward button.
 
 - Turned-away guests: add seats or improve drinking turnover with music.
@@ -660,8 +656,7 @@ a stage does not buy them for you. Check the
 ## Getting past the stage-two saving gap
 
 Open **Service → Upgrades** for the **Regulars Club**. It costs ฿600, then
-฿1,200 and ฿2,400, requiring 10/20/35 regulars at that venue. Keep a full pack's
-cost and the next shift's operating costs in reserve. At each tier, 35/65/100%
+฿1,200 and ฿2,400, requiring 10/20/35 regulars at that venue. At each tier, 35/65/100%
 of new arrivals join: they plan and budget for an extra round, capped at three. Visitors already in the bar are unchanged. Birthday and club still cap
 at three drinks. The offer's estimated net change is not a guaranteed payout.
 
@@ -696,12 +691,12 @@ bought drinks keep their paid cost in profit reports.
 Managers cost ฿2,000, then ฿6,000 and ฿18,000. They add a separate bonus of
 25% / 50% / 75% of actual drink and paid-pool gross margin. Empty rooms earn
 no bonus. Level one needs stage two, a bartender and deliveries; later levels
-need stage three. All retain operating reserve. Managers keep their cleaning
+need stage three. Managers keep their cleaning
 and offline duties and cost ฿12/minute overhead.
 
-The **฿/s under the till** refreshes every five foreground seconds. It covers net
-trading at the selected venue, including stock purchases, wages, commission and
-fines. It excludes transfers, tips, one-off investments and offline payouts. Buying a pack can
+The **฿/s under MONEY** refreshes every five foreground seconds. It covers net
+trading across all venues, including stock purchases, wages, commission and
+fines. It excludes tips, one-off investments and offline payouts. Buying a pack can
 make one sample negative; look at several samples and the full shift report.
 
 ## Saves and versions
@@ -710,8 +705,8 @@ There is one local campaign slot. New Game saves immediately; later saves happen
 after decisions, every fifteen seconds, and on normal close or application pause,
 with a backup retained. Waiting on the startup menu does not run the business,
 write saves or claim offline estimates. Resume claims eligible time away once.
-Current schema 16 adds separate tills, company bank, marketing and saved bonus
-carry while retaining sponsored orders, paid rounds, guest interests and Buzz.
+Current schema 17 combines tills, bank and reserve into one exact balance,
+adds recent money movements and retains sponsored orders, paid rounds, guest interests and Buzz.
 Schema 14 also retains host training, auto-accept and fractional booking
 return deadlines. Schema 13 visit plans/phases, beer-bar tiers and personal
 training are preserved. Existing visitors finish their old saved visit rules; new arrivals use

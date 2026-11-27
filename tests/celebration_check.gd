@@ -14,12 +14,12 @@ func run(test: SceneTree) -> void:
 	m.street.tick(1)
 	test.check(m.s.day==6 and m.s.street.history.front()=="Tomorrow: Anong's Birthday at the Blue Hour.","The calendar announces the birthday one day ahead")
 	m.s.street.minute = 1439
-	var original: int = m.street.selected().cash
+	var original: int = m.s.cash
 	m.street.tick(1)
 	test.check(m.s.day==7 and not e.celebrating(b) and m.street.celebration_info().day==7,"Birthday waits for day-seven noon, not midnight")
 	m.s.street.minute = 719
 	m.street.tick(1)
-	test.check(e.celebrating(b) and m.street.selected().cash<=original and m.s.street.celebration.report.sales==0,"Noon begins a free celebration without awarding money or sales")
+	test.check(e.celebrating(b) and m.s.cash<=original and m.s.street.celebration.report.sales==0,"Noon begins a free celebration without awarding money or sales")
 	var snapshot := JSON.stringify(m.s)
 	for i in 10: m.street.celebration_info()
 	test.check(JSON.stringify(m.s)==snapshot,"Countdown reads never advance or reward the event")
@@ -65,7 +65,7 @@ func run(test: SceneTree) -> void:
 	m.s.street.bars.pop_back()
 	m.save_game()
 	var loaded = Campaign.new(11)
-	test.check(loaded.load_game() and loaded.s.version==16 and JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reload preserves one active party ledger")
+	test.check(loaded.load_game() and loaded.s.version==17 and JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reload preserves one active party ledger")
 	loaded.street.celebration_tick()
 	test.check(JSON.stringify(loaded.s.street.celebration.report)==snapshot,"Reloading cannot restart or clear party results")
 	m.s.day = 8
@@ -74,9 +74,9 @@ func run(test: SceneTree) -> void:
 	m.s.street.minute = 60
 	m.street.celebration_tick()
 	test.check(not e.celebrating(b) and m.s.street.celebration.report.is_empty() and m.s.street.celebration.last_report.sales==2,"Normal 1am close finalises the report exactly once")
-	original = m.street.selected().cash
+	original = m.s.cash
 	m.street.celebration_tick()
-	test.check(m.street.selected().cash==original and m.street.celebration_info().day==14,"Reading or finishing the party never pays a duplicate bonus")
+	test.check(m.s.cash==original and m.street.celebration_info().day==14,"Reading or finishing the party never pays a duplicate bonus")
 	m.s.day = 14
 	m.s.street.minute = 60
 	m.street.action("skip")
@@ -101,7 +101,7 @@ func run(test: SceneTree) -> void:
 	snapshot = JSON.stringify(party.s.street.celebration)
 	regular.street.claim_offline(1700)
 	party.street.claim_offline(1700)
-	test.check(regular.street.selected().cash==party.street.selected().cash and regular.street.selected().stock==party.street.selected().stock and JSON.stringify(party.s.street.celebration)==snapshot,"Offline claims neither replay nor consume birthday bonuses")
+	test.check(regular.s.cash==party.s.cash and regular.street.selected().stock==party.street.selected().stock and JSON.stringify(party.s.street.celebration)==snapshot,"Offline claims neither replay nor consume birthday bonuses")
 	# Existing campaigns retain ownership/cash and get no retroactive celebration.
 	m = Campaign.new(72)
 	load("res://tests/finance_fixture.gd").legacy(m)

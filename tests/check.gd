@@ -152,8 +152,8 @@ func test_ui() -> void:
 		check(badge.get_script()==preload("res://scripts/status_badge.gd") and badge.size==Vector2(21,21),"Tab notifications share one compact component and size")
 	check(app.event_badge.get_theme_stylebox("normal").bg_color!=badges[2].get_theme_stylebox("normal").bg_color,"Warnings and missing-agreement alerts remain visually distinct")
 	test_tuning(app)
-	use_button(app,"TILL")
-	check(app.service_section=="finance","Tapping Till opens Cash & Bank")
+	use_button(app,"MONEY")
+	check(app.service_section=="finance","Tapping Money opens Money & costs")
 	use_button(app,"Back")
 	use_button(app,"×")
 	for stat in ["REPUTATION","HEAT","TIME"]:
@@ -172,19 +172,19 @@ func test_ui() -> void:
 	use_button(app,"Back")
 	var bar: Dictionary = app.model.street.selected()
 	var original_stock: int = bar.stock
-	var original_cash: int = app.model.street.selected().cash
-	app.model.street.selected().cash = original_cash-1
+	var original_cash: int = app.model.s.cash
+	app.model.s.cash = original_cash-1
 	use_button(app,"STOCK")
 	var pack := find_button(app,"Buy 6 · ฿228")
 	check(pack.disabled and pack.text.ends_with("฿1 short"),"Fridge shows the exact cash shortfall")
-	app.model.street.selected().cash = original_cash
+	app.model.s.cash = original_cash
 	app._process(1.0)
 	check(not find_button(app,"Buy 6 · ฿228").disabled,"Fridge purchases unlock when the till reaches the pack price")
 	use_button(app,"Back")
 	bar.stock = 0
 	app.update_action_controls()
 	use_button(app,"Restock fridge")
-	check(app.fridge_open and bar.stock==0 and app.model.street.selected().cash==original_cash and app.model.s.street.served==0,"Serve stockout opens the fridge without buying or selling")
+	check(app.fridge_open and bar.stock==0 and app.model.s.cash==original_cash and app.model.s.street.served==0,"Serve stockout opens the fridge without buying or selling")
 	bar.stock = 30
 	var original_customers: Array = bar.customers.duplicate(true)
 	for customer in bar.customers:
@@ -195,7 +195,7 @@ func test_ui() -> void:
 	check(app.fridge_open and panel_has_text(app,"NEEDED NOW") and panel_has_text(app,"Return spare stock to free 6 slots."),"Wrong-stock shortcut highlights demand and explains how to make space")
 	var demand_card: Control = app.column.get_node("Drink_rum")
 	var house_card: Control = app.column.get_node("Drink_lager")
-	check(demand_card.get_index()<house_card.get_index() and panel_has_text(app,"OTHER DRINKS") and bar.stock==30 and app.model.street.selected().cash==original_cash,"The missing drink is separated from regular stock; opening the fridge is free")
+	check(demand_card.get_index()<house_card.get_index() and panel_has_text(app,"OTHER DRINKS") and bar.stock==30 and app.model.s.cash==original_cash,"The missing drink is separated from regular stock; opening the fridge is free")
 	check(find_button(app,"Buy 6 · ฿114").disabled and demand_card.find_children("*","TextureRect",true,false).size()==1,"The needed drink has an icon and its purchase is blocked while the fridge is full")
 	bar.stock = original_stock
 	bar.customers = original_customers
@@ -204,15 +204,15 @@ func test_ui() -> void:
 	use_button(app,"Tutorial")
 	check(FileAccess.get_file_as_string(Campaign.SAVE)==initial_save,"Opening a tutorial leaves the new campaign save untouched")
 	use_button(app,"Exit")
-	var opening_cash := int(app.model.street.selected().cash)
+	var opening_cash := int(app.model.s.cash)
 	use_button(app,"Serve a drink")
-	check(app.model.s.street.served == 1 and app.model.street.selected().cash > opening_cash,"Main clicker button serves and earns")
+	check(app.model.s.street.served == 1 and app.model.s.cash > opening_cash,"Main clicker button serves and earns")
 	var hiring: Dictionary = app.model.street.economy.hire_offer(bar,0)
-	app.model.street.selected().cash = hiring.required-1
+	app.model.s.cash = hiring.required-1
 	use_button(app,"Team")
 	var hire := find_button(app,"Hire bartender · ฿1,200")
 	check(hire.disabled and hire.text.ends_with("Need ฿1 more"),"Team hiring includes the payroll reserve in the visible shortfall")
-	app.model.street.selected().cash = 50000
+	app.model.s.cash = 50000
 	app._process(1.0)
 	use_button(app,"Hire bartender · ฿1,200")
 	app.model.street.tick(25)
@@ -231,6 +231,7 @@ func test_ui() -> void:
 	use_button(app,"Raise stock & share pumps · ฿450")
 	check(app.model.s.street.event.prepared,"Event preparation works through the UI")
 	app.model.s.street.event = {}
+	app.model.s.cash = 50000
 	app.change_tab(0)
 	use_button(app,"Team")
 	use_button(app,"Train Bartender 1 · ฿400 · 20s")
@@ -243,15 +244,15 @@ func test_ui() -> void:
 	var nida: Dictionary = app.model.street.selected().team.back()
 	nida.contract_left = 1
 	nida.audience_training = 1
-	app.model.street.selected().cash = 1200
+	app.model.s.cash = 1199
 	app.render()
 	var renewal_state: Array = app.street_ui_state()
 	app._process(1.0)
 	check(renewal_state!=app.street_ui_state(),"Contract expiry invalidates Service controls directly")
-	check(find_button(app,"Rehire Nida · ฿1,200").disabled,"Nida renewal disables for insufficient cash including reserve")
-	app.model.street.selected().cash = 50000
+	check(find_button(app,"Rehire Nida · ฿1,200").disabled,"Nida renewal disables for insufficient cash below the contract price")
+	app.model.s.cash = 50000
 	app._process(1.0)
-	check(not find_button(app,"Rehire Nida · ฿1,200").disabled,"Earning the missing reserve enables renewal without reopening the drawer")
+	check(not find_button(app,"Rehire Nida · ฿1,200").disabled,"Earning the missing fee enables renewal without reopening the drawer")
 	use_button(app,"Rehire Nida · ฿1,200")
 	check(nida.on and nida.contract_left>0 and nida.audience_training==1,"Nida renews through frontage UI after live expiry with training retained")
 	for i in 5:
@@ -328,7 +329,7 @@ func test_ui() -> void:
 
 func test_tour_update(app: Control) -> void:
 	app.model = Campaign.new(48)
-	app.model.street.selected().cash = 1000
+	app.model.s.cash = 1000
 	app.change_tab(2)
 	check(app.root_ui.get_node("TourBadge").text=="!","The Tours tab flags an empty agreement list")
 	var fern: Button = app.column.get_node("TourGuide_2")
@@ -357,7 +358,7 @@ func test_tour_update(app: Control) -> void:
 	app.model.save_game()
 	var restored = Campaign.new(48)
 	check(restored.load_game() and restored.s.street.expired_tours=={"2":0} and restored.s.bookings.is_empty(),"The expired route survives reload without reactivating")
-	app.model.street.selected().cash = 1000
+	app.model.s.cash = 1000
 	app.model._add_staff(4)
 	app.model.booking(2,0)
 	app.model.booking(3,1)
@@ -394,7 +395,7 @@ func test_tour_update(app: Control) -> void:
 func test_purchase_ui(app: Control) -> void:
 	app.model = Campaign.new(72)
 	app.model.s.cash = 0
-	app.model.street.selected().cash = 0
+	app.model.s.cash = 0
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	app.model.street.announce(3)
@@ -408,12 +409,12 @@ func test_purchase_ui(app: Control) -> void:
 	var route: Button = app.column.get_node("TourRoute_0")
 	check(route.disabled and route.text.ends_with("Need ฿145 more"),"Tours show the selected till's shortfall")
 	app.model.s.cash = 1000
-	check(not app.model.booking_offer(2,0).enabled,"Company wealth does not silently fund a local tour")
-	bar.cash = 144
+	check(app.model.booking_offer(2,0).enabled,"Shared money funds a tour at the selected venue")
+	app.model.s.cash = 144
 	var before: String = JSON.stringify(app.model.s)
 	app.model.booking(2,0)
 	check(JSON.stringify(app.model.s)==before,"Insufficient local funds cannot move money or start a tour")
-	bar.cash = 670
+	app.model.s.cash = 670
 	before = JSON.stringify(app.model.s)
 	app.render()
 	check(JSON.stringify(app.model.s)==before,"Opening Tours does not transfer money or book a route")
@@ -424,17 +425,16 @@ func test_purchase_ui(app: Control) -> void:
 	app.model.booking(2,0)
 	check(JSON.stringify(app.model.s)==before,"Local cash cannot bypass guide eligibility")
 	app.model.s.staff[2].work = true
-	app.model.s.cash = 0
 	var costs: int = app.model.s.weekly.costs
 	var sample: int = bar.earnings_net
 	route.pressed.emit()
-	check(app.model.s.bookings.get("2",-1)==0 and app.model.s.cash==0 and bar.cash==525,"One tap starts the tour and charges only the selected till")
+	check(app.model.s.bookings.get("2",-1)==0 and app.model.s.cash==525,"One tap starts the tour and charges shared money once")
 	check(app.model.s.weekly.costs==costs+145 and bar.earnings_net==sample,"Guide pay is recorded once and excluded from the trading sample")
 	app.column.get_node("TourRoute_0").pressed.emit()
-	check(not app.model.s.bookings.has("2") and bar.cash==525,"Cancelling does not charge again or refund guide pay")
+	check(not app.model.s.bookings.has("2") and app.model.s.cash==525,"Cancelling does not charge again or refund guide pay")
 
 	app.model.s.cash = 0
-	bar.cash = 0
+	app.model.s.cash = 0
 	app.change_tab(3)
 	var lease: Button = app.column.get_node("Lease_0")
 	check(lease.disabled and lease.text.ends_with("Need %s more" % app.cash(app.model.street.lease_quote(0).required)),"Leases include the opening reserve even before chapter unlock")
@@ -456,7 +456,7 @@ func test_clock_ui(app: Control) -> void:
 	app.model = Campaign.new(72)
 	app.offline_notice = 0
 	app.model.s.cash = 10000
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.change_tab(0)
 	var bar: Dictionary = app.model.street.selected()
 	use_button(app,"Hours")

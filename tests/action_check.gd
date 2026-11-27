@@ -49,23 +49,23 @@ func cooldowns(test: SceneTree) -> void:
 	test.check(e.action_time()==now,"Skipping to noon never refills actions")
 	m.street.action("open")
 	b.customers.clear()
-	var before: Array = [m.street.selected().cash,b.stock,b.serve_ready]
+	var before: Array = [m.s.cash,b.stock,b.serve_ready]
 	m.street.action("serve")
-	test.check(before==[m.street.selected().cash,b.stock,b.serve_ready],"No-order attempt consumes neither stock nor cooldown")
+	test.check(before==[m.s.cash,b.stock,b.serve_ready],"No-order attempt consumes neither stock nor cooldown")
 	e.admit(b)
 	b.stock = 0
-	before = [m.street.selected().cash,b.serve_ready]
+	before = [m.s.cash,b.serve_ready]
 	m.street.action("serve")
-	test.check(before==[m.street.selected().cash,b.serve_ready],"Stockout attempt does not consume cooldown")
+	test.check(before==[m.s.cash,b.serve_ready],"Stockout attempt does not consume cooldown")
 	b.restock = true
-	m.street.selected().cash = C.STOCK_COST
+	m.s.cash = C.STOCK_COST
 	test.check(not e.action_status(b,"serve").enabled,"Automatic delivery availability includes its required operating cash")
-	m.street.selected().cash = 1000
+	m.s.cash = 1000
 	m.street.action("serve")
 	test.check(b.sold==3 and b.stock>0,"Paid automatic delivery can fulfil a manual order")
 	m = fresh()
 	b = m.street.selected()
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	m.street.action("hire",0)
 	m.street.advance(20)
 	m.street.action("serve")
@@ -74,13 +74,13 @@ func cooldowns(test: SceneTree) -> void:
 	# Owner-run recovery remains viable without chat, upgrades or free income.
 	m = fresh()
 	b = m.street.selected()
-	m.street.selected().cash = 0
+	m.s.cash = 0
 	m.street.tick(4)
 	b.stock = 0
 	m.street.action("recovery")
 	m.street.economy.admit(b)
 	m.street.action("serve")
-	test.check(m.street.selected().cash==66 and b.consignment==5,"Recovery still earns only a real sale less its consignment cost")
+	test.check(m.s.cash==66 and b.consignment==5,"Recovery still earns only a real sale less its consignment cost")
 
 func chat(test: SceneTree) -> void:
 	var m = fresh()
@@ -92,10 +92,10 @@ func chat(test: SceneTree) -> void:
 	b.customers[2].wait = 40
 	var guest: Dictionary = b.customers[1]
 	var life := int(guest.life)
-	var before: Array = [m.street.selected().cash,b.stock,b.happy,b.regulars,b.sold,b.welcome]
+	var before: Array = [m.s.cash,b.stock,b.happy,b.regulars,b.sold,b.welcome]
 	m.street.action("chat")
 	test.check(guest.chatted and not b.customers[0].chatted and guest.life==life+10 and e.patience(b,guest)==55,"Chat targets the guest nearest departure and adds ten seconds once")
-	test.check(before==[m.street.selected().cash,b.stock,b.happy,b.regulars,b.sold,b.welcome],"Chat grants no sales, satisfaction, regulars or attraction")
+	test.check(before==[m.s.cash,b.stock,b.happy,b.regulars,b.sold,b.welcome],"Chat grants no sales, satisfaction, regulars or attraction")
 	m.street.action("chat")
 	m.street.action("welcome")
 	test.check(b.welcome==0 and guest.life==life+10 and is_equal_approx(b.welcome_ready,20),"Chat locks both social actions for twenty seconds")
@@ -124,25 +124,25 @@ func upgrades(test: SceneTree) -> void:
 	var m = fresh()
 	var b: Dictionary = m.street.selected()
 	var e = m.street.economy
-	m.street.selected().cash = C.ACTION_UPGRADE_COSTS[0]+e.operating_rate(b)*2-1
+	m.s.cash = C.ACTION_UPGRADE_COSTS[0]-1
 	m.street.action("action_upgrade",0)
-	test.check(b.action_levels.pouring==0,"Action purchase preserves next shift's reserve")
-	m.street.selected().cash += 1
+	test.check(b.action_levels.pouring==0,"Action purchase rejects one baht below price")
+	m.s.cash += 1
 	m.street.action("serve")
 	var deadline: float = b.serve_ready
 	var duration: float = b.serve_duration
 	m.street.action("action_upgrade",0)
 	test.check(b.action_levels.pouring==1 and b.serve_ready==deadline and b.serve_duration==duration,"Buying an upgrade does not shorten or reset the running refill")
-	m.street.selected().cash = 100000
+	m.s.cash = 100000
 	for level in range(1,4):
 		if level>1: m.street.action("action_upgrade",0)
 		m.street.action("action_upgrade",1)
 		test.check(e.action_cooldown(b,"serve")==C.ACTION_COOLDOWNS[level] and e.action_cooldown(b,"welcome")==C.ACTION_COOLDOWNS[level],"Both tracks apply the chosen tier %d" % level)
-	var cash_before := int(m.street.selected().cash)
+	var cash_before := int(m.s.cash)
 	m.street.action("action_upgrade",0)
 	m.street.action("action_upgrade",1)
 	m.street.action("action_upgrade",9)
-	test.check(m.street.selected().cash==cash_before,"Maxed and invalid upgrade purchases cannot charge")
+	test.check(m.s.cash==cash_before,"Maxed and invalid upgrade purchases cannot charge")
 	m.street.advance(10)
 	m.street.action("serve")
 	m.street.action("welcome")
@@ -168,7 +168,7 @@ func saves(test: SceneTree) -> void:
 	m.street.action("chat")
 	m.street.action("serve")
 	m.street.advance(2.17)
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	m.street.action("action_upgrade",0)
 	m.save_game()
 	var loaded = Campaign.new(9)
@@ -195,7 +195,7 @@ func saves(test: SceneTree) -> void:
 	file.store_string(JSON.stringify(m.s))
 	file.close()
 	loaded = Campaign.new(9)
-	test.check(loaded.load_game() and loaded.s.version==16,"A genuine v4 campaign migrates to v15")
+	test.check(loaded.load_game() and loaded.s.version==17,"A genuine v4 campaign migrates to v15")
 	b = loaded.street.selected()
 	test.check(b.serve_ready==1 and b.welcome_ready==10 and b.action_levels.pouring==0 and b.games==games and b.customers.size()==3 and not b.customers[0].chatted,"Migration preserves pending deadlines and paid games without granting upgrades or resetting customers")
 	loaded.save_game()
@@ -253,18 +253,18 @@ func run_ui(test: SceneTree) -> void:
 	app.update_action_controls()
 	test.check(chat_fill.color==demand_green and chat_fill.size.x==same_width and chat_caption.text.contains("19s"),"An urgent guest turns the existing Chat refill green without resetting it")
 	social_bar.customers[2].wait = original_wait
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.sync_upgrade_badge(true)
 	test.check(app.upgrade_badge.visible and int(app.upgrade_badge.text)>0,"The upgrade badge appears when cash makes an upgrade affordable")
 	app.upgrade_badge.pressed.emit()
 	var pouring := app.column.find_child("Upgrade_pouring",true,false) as Button
 	var locked_club := app.column.find_child("Upgrade_club",true,false) as Button
 	test.check(app.upgrades_open and not app.upgrades_ready_only and locked_club!=null and locked_club.disabled and not pouring.disabled and pouring.icon!=null and pouring.text.contains("10s → 8s"),"The badge opens the full list with both locked and ready upgrades")
-	app.model.street.selected().cash = 0
+	app.model.s.cash = 0
 	app.sync_upgrade_badge(true)
 	pouring = app.column.find_child("Upgrade_pouring",true,false) as Button
 	test.check(not app.upgrade_badge.visible and pouring!=null and pouring.disabled and pouring.icon!=null and pouring.text.contains("Need"),"An upgrade that becomes unaffordable stays visible with its cash shortfall")
-	app.model.street.selected().cash = 1800
+	app.model.s.cash = 1800
 	app.change_tab(0)
 	app.upgrades_entry.pressed.emit()
 	var ready_seating: Button = app.column.find_child("Upgrade_seating",true,false)
@@ -278,11 +278,11 @@ func run_ui(test: SceneTree) -> void:
 	var expected := positions.duplicate()
 	expected.sort()
 	test.check(positions==expected and app.column.get_child(renovation.get_index()-1) is HSeparator,"Current upgrades, renovation and future upgrades appear in budget order")
-	app.model.street.selected().cash = 7999
+	app.model.s.cash = 7999
 	app.sync_upgrade_badge(true)
 	future_manager = app.column.find_child("Upgrade_manager",true,false)
 	var ready_before: Array = app.upgrade_ready.duplicate()
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.sync_upgrade_badge(true)
 	var funded_manager: Button = app.column.find_child("Upgrade_manager",true,false)
 	test.check(funded_manager.disabled and not funded_manager.text.contains("Need"),"Crossing a future upgrade's cash threshold refreshes its group while the venue stage still locks it")
@@ -302,9 +302,9 @@ func run_ui(test: SceneTree) -> void:
 	serve = test.find_button(app,"Serve a drink")
 	var serve_fill: ColorRect = app.action_controls[0][1]
 	test.check(serve.disabled and serve_caption.text.contains("Waiting for orders") and serve_fill.size.x>0 and serve_fill.color.s==0,"Without orders Serve shows its continuing refill in grey")
-	var before_sale := [bar.stock,bar.serve_ready,app.model.street.selected().cash]
+	var before_sale := [bar.stock,bar.serve_ready,app.model.s.cash]
 	app.model.street.action("serve")
-	test.check(before_sale==[bar.stock,bar.serve_ready,app.model.street.selected().cash],"Serving without an order cannot affect the till or stock")
+	test.check(before_sale==[bar.stock,bar.serve_ready,app.model.s.cash],"Serving without an order cannot affect the till or stock")
 	bar.serve_ready = eco.action_time()
 	bar.customers.clear()
 	eco.admit(bar)

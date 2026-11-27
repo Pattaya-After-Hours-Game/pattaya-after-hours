@@ -55,7 +55,7 @@ not an automatic price rise every time the owner buys new chairs.
 
 Bo's ordinary supply starts at ฿38 per drink, reducing to ฿30 with the best
 agreement. A fresh Blue Hour opens with twelve drinks and ฿228 for a full
-six-pack. Existing owners keep their till and fridge. His emergency consignment
+six-pack. Existing owners keep all their money and fridge stock. His emergency consignment
 remains a subsidised ฿14-per-sale favour, not an ordinary wholesale deal.
 
 ## A reason to stay for another round
@@ -80,7 +80,7 @@ not additional character quests or automatic rewards.
 The first management appointment costs ฿2,000. Dao earns 25% of real drink
 and paid-pool margin as a separate management bonus, while the owner chooses between better visits,
 faster service and the next building. Anong still insists on stock and payroll
-reserves: an empty fridge cannot serve an encore.
+planning: an empty fridge cannot serve an encore.
 
 ## The next problem is a better problem
 
@@ -112,8 +112,8 @@ systems, not new personal quests or promises of an endless customer stream.
 
 > **Anong:** “The Blue Hour can buy the paint. It cannot buy Neon Mango's regulars.”
 
-Each bar keeps its own till. Anong moves surplus to the company bank, then
-funds renovations, a new lease or street marketing. Money can buy the building;
+Anong keeps one account for the whole street. Drinks go in; stock, staff,
+renovations, leases and marketing come out. Money can buy the building;
 it cannot instantly buy a following. Happy visits, regulars and healthy shifts
 earn local loyalty and more appeal. They no longer stop construction.
 
@@ -121,10 +121,11 @@ Dao's manager bonus now comes from real drink and paid-pool margins. An empty
 venue earns none. Better management matters when the bar has customers to serve.
 Pim can sell the sound; Nida can sell the welcome; neither can conjure a tab.
 
-> **Anong:** “Seven tills. One bank. If Neon Mango needs money, write down why.”
+> **Anong:** “One balance. If money goes out, tell me what we bought.”
 
-Tour guides are paid upfront from the bar arranging their tour. One tap pays
-from that venue’s till and starts the agreement.
+Tour guides are paid upfront from the shared account. One tap pays and starts
+the agreement. If the fridge is empty and money is short, close, count the earned
+tips and buy stock when the jar covers a pack. The same coins cannot be counted twice.
 
 Street marketing progresses from small campaigns toward a district audience.
 Every new open property adds a little street draw, but all venues share those
@@ -184,8 +185,7 @@ it does not replace the colleague's own clock or create buyers. Quiet orders
 belong to the bartender. Owner automation steps in when the queue outgrows the
 on-duty team, or a guest would leave before anyone recovers. Without a bartender,
 the owner covers normal service. Nida's return is a clear contract renewal at the
-door: her skills stay, and Anong insists on keeping payroll and a delivery in
-reserve after paying her fee.
+door: her skills stay, and the listed fee is all you need to bring her back.
 
 > **Anong:** “She's ready. Give her an order, not another stopwatch.”
 
@@ -278,7 +278,8 @@ It turns out to contain money, not another set of keys that fits nothing.
 > **Anong:** “Ten baht from someone you actually served. Count the customers,
 > not how many times you pressed the button. Tomorrow needs cold beer too.”
 
-Each served visit adds ฿10 to the house tip jar, counted once when the street
+Each served visit adds ฿10 to the house tip jar, counted once on early closing
+or when the street
 finishes its night. Another round from the same guest does not add another tip.
 The closing countdown shows the money counted; Service and Journal keep the
 receipt. These are actual live customers, not an offline attendance bonus.
@@ -348,9 +349,8 @@ never asks for a login streak or pays the same congratulations twice. She keeps
 an ambition visible while the player chooses equipment, staff and promotions.
 
 Training is a smaller investment in a colleague; the first manager is within
-reach sooner. Final renovations still need hundreds of satisfied visits and a
-local following, but the player spends less time with a finished business waiting
-for one more number. No ordinary drinks become more expensive because the bar
+reach sooner. Final renovations need their listed cash price; satisfied visits and a
+local following earn loyalty appeal. No ordinary drinks become more expensive because the bar
 has a new sign.
 
 ## The people on the street

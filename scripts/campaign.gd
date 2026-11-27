@@ -71,10 +71,10 @@ func _forecast() -> void:
 	s.forecast = rng.randi_range(-4, 10) + (10 if weekday() in ["Fri","Sat"] else 0)
 	s.market = clampi(int(s.market) + rng.randi_range(-23, 25), 38, 210)
 
-func spend(cost: int) -> bool:
-	if s.cash < cost:
+func spend(cost: int, reason: String = "Legacy purchase") -> bool:
+	if cost<0 or s.cash < cost:
 		return false
-	s.cash -= cost
+	Street.Economy.Finance.change(s,-cost,reason)
 	s.weekly.costs += cost
 	return true
 
@@ -119,8 +119,8 @@ func booking_offer(index: int, route_id: int) -> Dictionary:
 	if s.phase!="plan": reason = "Bookings are closed."
 	elif reason.is_empty() and s.pay==0 and C.ROUTES[route_id][2]==2:
 		reason = "The guide asks for standard split or better on long routes."
-	var available: int = s.cash if legacy_mode() else street.selected().cash
-	if reason.is_empty() and available<required: reason = "Not enough money in this bar’s till."
+	var available: int = s.cash
+	if reason.is_empty() and available<required: reason = "Not enough money for the guide."
 	return {"required":required,"available":available,"reason":reason,"enabled":reason.is_empty()}
 
 func booking(index: int, route_id: int) -> String:
@@ -134,7 +134,7 @@ func booking(index: int, route_id: int) -> String:
 	var offer := booking_offer(index,route_id)
 	if not offer.enabled: return offer.reason
 	if not legacy:
-		street.selected().cash -= int(offer.required)
+		Street.Economy.Finance.change(s,-int(offer.required),"Tour guide pay",str(street.selected().name))
 		s.weekly.costs += int(offer.required)
 	s.bookings[key] = route_id
 	if legacy: return "Confirmed. Guide pay ฿%d." % guide_pay(route_id)
@@ -143,7 +143,7 @@ func booking(index: int, route_id: int) -> String:
 
 func action(id: String, index: int = 0) -> String:
 	if not legacy_mode() and id in ["reserve","draw"]:
-		return "Transferred ฿500." if street.finance.transfer(street.selected(),500,id=="reserve") else "Not enough cash in the source account."
+		return "All money is already in one shared account."
 	if not legacy_mode() and id in ["buy","hire","rota","train","reno"]:
 		return street.action({"buy":"stock","hire":"hire","rota":"rota","train":"train_staff","reno":"upgrade"}[id],index)
 	if s.phase != "plan":
@@ -152,7 +152,7 @@ func action(id: String, index: int = 0) -> String:
 		"buy":
 			var amount := mini(30, 105 + int(s.level) * 20 - int(s.stock))
 			if amount <= 0: return "Storage is full."
-			if not spend(amount * stock_price()): return "The till can't cover the delivery."
+			if not spend(amount * stock_price(),"Legacy stock delivery"): return "The till can't cover the delivery."
 			s.stock += amount
 			s.supplier = mini(100, s.supplier + 2)
 			return "%d stock delivered." % amount
@@ -167,14 +167,14 @@ func action(id: String, index: int = 0) -> String:
 			var staff: Dictionary = s.staff[index]
 			if staff.skill >= 8: return "Already fully trained."
 			if staff.hurt > 0: return "Let them recover first."
-			if not spend(410): return "Training costs ฿410."
+			if not spend(410,"Legacy staff training"): return "Training costs ฿410."
 			staff.skill += 1
 			if staff.guide > 0: staff.guide = mini(8, int(staff.guide) + 1)
 			staff.morale = mini(100, staff.morale + 5)
 			return "Session booked and paid."
 		"hire":
 			if s.staff.size() >= C.STAFF.size(): return "All six posts are filled."
-			if not spend(980): return "Recruitment costs ฿980."
+			if not spend(980,"Legacy recruitment"): return "Recruitment costs ฿980."
 			_add_staff(s.staff.size())
 			return "%s joined the team." % C.STAFF[s.staff.back().id][0]
 		"reno":
@@ -185,13 +185,13 @@ func action(id: String, index: int = 0) -> String:
 			return result
 		"repair":
 			if s.condition == 100: return "Everything is working."
-			if not spend(CASH_ACTION_COSTS.repair): return "Repairs cost ฿500."
+			if not spend(CASH_ACTION_COSTS.repair,"Repairs"): return "Repairs cost ฿500."
 			s.condition = mini(100, s.condition + 20)
 			s.safety = mini(100, s.safety + 4)
 			return "Repairs complete."
 		"food":
 			if s.food: return "Nok's small plates are already on the menu."
-			if not spend(1050): return "A food counter costs ฿1,050."
+			if not spend(1050,"Food counter"): return "A food counter costs ฿1,050."
 			s.food = 1
 			return "Small plates increase spend and keep quiet shifts viable."
 		"venue":
@@ -199,13 +199,13 @@ func action(id: String, index: int = 0) -> String:
 		"rig":
 			if s.rig > 0: return "The rig is already installed."
 			if s.day < 12 or s.rep < 25: return "Available from day 12 with 25 reputation."
-			if not spend(5600): return "A starter rig costs ฿5,600."
+			if not spend(5600,"Mining rig"): return "A starter rig costs ฿5,600."
 			s.rig = 88
 			return "The rig is installed. Watch the power bill and cooling."
 		"cool":
 			if s.rig == 0: return "Install the rig first."
 			if s.rig >= 100: return "Cooling is already at full condition."
-			if not spend(CASH_ACTION_COSTS.cool): return "Maintenance costs ฿680."
+			if not spend(CASH_ACTION_COSTS.cool,"Cooling maintenance"): return "Maintenance costs ฿680."
 			s.rig = mini(100, int(s.rig) + 32)
 			return "Cooling serviced."
 		"mine_switch":
@@ -226,13 +226,13 @@ func action(id: String, index: int = 0) -> String:
 			s.cash += amount
 			return "฿%d released from reserve." % amount
 		"paper":
-			if not spend(CASH_ACTION_COSTS.paper): return "Admin time costs ฿330."
+			if not spend(CASH_ACTION_COSTS.paper,"Paperwork"): return "Admin time costs ฿330."
 			s.license = mini(100, int(s.license) + 12)
 			s.visa = mini(100, int(s.visa) + 16)
 			s.heat = maxi(0, int(s.heat) - 4)
 			return "Anong and Dao check the folders."
 		"rival":
-			if not spend(CASH_ACTION_COSTS.rival): return "The joint neighborhood night costs ฿420."
+			if not spend(CASH_ACTION_COSTS.rival,"Neighbourhood promotion"): return "The joint neighborhood night costs ฿420."
 			s.rival = maxi(0, int(s.rival) - 14)
 			s.trust = mini(100, int(s.trust) + 4)
 			return "Anton agrees to share festival dates."
@@ -256,7 +256,7 @@ func start() -> String:
 	if workers == 0:
 		return "Put at least one available team member on the rota."
 	var event: Array = C.EVENTS[int(s.event)]
-	if not spend(event[1]):
+	if not spend(event[1],"Event fee"):
 		return "The till can't cover the booking. Try regular service."
 	s.night = {"wave":0,"cash":-event[1],"demand":0,"capacity":0,"tour":0,"mine":100,"guests":0,
 		"event_live":s.event,"gross":0,"sold":0,"turned":0,"tours":0,"wages":0,"fees":0,"fight":0,"notes":[]}
@@ -430,7 +430,7 @@ func _apply(effects: Dictionary, target: Dictionary) -> Dictionary:
 		var before: int = values[key]
 		match key:
 			"cash":
-				values.cash += amount
+				Street.Economy.Finance.change(values,amount,"Incident response")
 				target.night.cash += amount
 				if amount < 0: target.weekly.costs -= amount
 				else: target.weekly.revenue += amount
@@ -514,7 +514,7 @@ func _service() -> void:
 	var price: int = [57,47,53,58][int(s.promo)] + int(s.food) * 12 + int(s.level) * 4
 	var revenue: int = served * price + (served * (10 if live_event == 1 else 9) if live_event > 0 else 0)
 	s.stock -= units
-	s.cash += revenue
+	Street.Economy.Finance.change(s,revenue,"Legacy drink sales")
 	n.gross += revenue
 	n.cash += revenue
 	n.sold += units
@@ -538,8 +538,8 @@ func _service() -> void:
 	else:
 		_close()
 
-func _bill(amount: int) -> void:
-	s.cash -= amount
+func _bill(amount: int, reason: String) -> void:
+	Street.Economy.Finance.change(s,-amount,reason)
 	s.night.cash -= amount
 	s.weekly.costs += amount
 
@@ -574,16 +574,16 @@ func _close() -> void:
 			staff.fatigue = mini(100, int(staff.fatigue) + int(route[2]) * 6)
 			staff.morale = mini(100, int(staff.morale) + int(s.pay) * 2)
 	tour_net = maxi(0,tour_net)
-	s.cash += tour_net
+	Street.Economy.Finance.change(s,tour_net,"Legacy tour income")
 	n.cash += tour_net
 	s.weekly.revenue += tour_net
 	n.wages = wage
-	_bill(wage)
+	_bill(wage,"Staff wages")
 	var security_fee: int = 0 if rest_night else [0,480,255][int(s.security)]
 	s.safety = clampi(int(s.safety) + [0,4,2][int(s.security)] - int(n.turned / 25.0),0,100)
 	s.heat = clampi(int(s.heat) + int(C.EVENTS[int(n.event_live)][4]) + (2 if s.hours == 2 else -2) + (3 if s.security == 2 else -1 if s.security == 1 else 0) - int(s.license / 45.0),0,100)
 	n.fees = security_fee + 380 + 260 * (int(s.venue) - 1)
-	_bill(n.fees)
+	_bill(n.fees,"Security and premises")
 	if s.rig > 0 and s.contract > 0:
 		var output := maxi(0, int((int(s.market) * 9 + rng.randi_range(-170,220)) * int(s.rig) * maxi(0,int(n.mine)) / 10000.0))
 		var power := 560 + (150 if s.weather == 6 else 0)
@@ -592,16 +592,16 @@ func _close() -> void:
 			power += 110
 			s.heat = mini(100, int(s.heat) + 4)
 			s.rival = mini(100, int(s.rival) + 3)
-		s.cash += output
+		Street.Economy.Finance.change(s,output,"Mining output")
 		n.cash += output
 		s.weekly.revenue += output
-		_bill(power)
+		_bill(power,"Mining electricity")
 		s.rig = maxi(1, int(s.rig) - rng.randi_range(2,5))
 		n.notes.append("Rig output ฿%d · power ฿%d" % [output,power])
 	if not rest_night: s.condition = maxi(5, int(s.condition) - (2 if n.guests > 110 else 1))
 	s.license = maxi(0, int(s.license) - (2 if s.heat >= 65 else 0))
 	if s.heat >= 74 and rng.randf() < 0.45:
-		_bill(900)
+		_bill(900,"Compliance fine")
 		n.notes.append("Surprise compliance visit · ฿900 fine")
 	s.rival = clampi(int(s.rival) + (2 if n.guests > 105 else -1),0,100)
 	s.weekly.guests += n.guests
@@ -611,7 +611,7 @@ func _close() -> void:
 	if int(s.day) % 7 == 0:
 		var recurring := 2850 * int(s.venue) + 640 + mini(1200,int(s.debt))
 		s.debt = maxi(0, int(s.debt) - 1200)
-		_bill(recurring)
+		_bill(recurring,"Rent, permits and debt instalment")
 		s.license = maxi(0, int(s.license) - 7)
 		s.visa = maxi(0, int(s.visa) - 9)
 		n.notes.append("Tuesday rent, permits and installments · ฿%d" % recurring)
@@ -625,7 +625,7 @@ func _close() -> void:
 		n.notes.append("Unpaid balance carried forward · ฿%d" % -int(s.cash))
 		s.cash = 0
 	if s.visa == 0:
-		_bill(450)
+		_bill(450,"Lapsed paperwork")
 		if s.cash < 0:
 			s.debt -= s.cash
 			s.cash = 0
@@ -657,6 +657,9 @@ func next_day() -> void:
 	s.event = 0
 	s.card = -1
 	s.legacy_shift = false
+	if not s.get("practice",false) and s.reserve>0:
+		Street.Economy.Finance.change(s,int(s.reserve),"Legacy reserve returned to shared money")
+		s.reserve = 0
 	_forecast()
 
 func save_checkpoint() -> void:
@@ -695,7 +698,7 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
-	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] and parsed.has("staff") and parsed.has("phase"):
+	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
@@ -753,6 +756,7 @@ func _read(path: String) -> Variant:
 				if not parsed.street.has(key): return null
 			for bar in parsed.street.bars:
 				var defaults := Street.Economy.new_fields()
+				if int(parsed.version)==16: defaults["cash"] = 0
 				if int(parsed.version)<16:
 					for key in Street.Economy.Finance.fields(): defaults.erase(key)
 				if int(parsed.version)<15:
@@ -870,11 +874,21 @@ func _read(path: String) -> Variant:
 					if float(party[field][key])!=floorf(party[field][key]): return null
 				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
+		if int(parsed.version)>=17:
+			if not parsed.street.get("cashbook") is Array or parsed.street.cashbook.size()>60: return null
+			for entry in parsed.street.cashbook:
+				if not entry is Dictionary or not entry.get("reason") is String or entry.reason.is_empty() or not entry.get("venue") is String: return null
+				for key in ["day","minute","amount"]:
+					if not _finite_number(entry.get(key),-1e15 if key=="amount" else 0,1e15) or float(entry[key])!=floorf(float(entry[key])): return null
+			if not _finite_number(parsed.get("reserve",0),0,1e15): return null
+			if parsed.get("reserve",0)!=0 and not parsed.get("legacy_shift",false) and not parsed.get("practice",false): return null
+			for bar in parsed.street.bars:
+				if bar.has("cash"): return null
 		if int(parsed.version)>=16:
 			if not _finite_number(parsed.cash,0,1e15) or float(parsed.cash)!=floorf(float(parsed.cash)): return null
 			if not _finite_number(parsed.street.get("marketing_level"),0,10) or float(parsed.street.marketing_level)!=floorf(float(parsed.street.marketing_level)): return null
 			for bar in parsed.street.bars:
-				for key in ["cash","manager_bonus_carry","earnings_net","earnings_seconds"]:
+				for key in (["cash"] if int(parsed.version)==16 else [])+["manager_bonus_carry","earnings_net","earnings_seconds"]:
 					if not _finite_number(bar.get(key),-1e15 if key=="earnings_net" else 0,99 if key=="manager_bonus_carry" else 4 if key=="earnings_seconds" else 1e15) or float(bar[key])!=floorf(float(bar[key])): return null
 				if not _finite_number(bar.get("net_per_second"),-1e15,1e15): return null
 		if int(parsed.version)>=15:

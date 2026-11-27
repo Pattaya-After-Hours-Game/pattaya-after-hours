@@ -8,14 +8,14 @@ func advance(m: RefCounted, seconds: int) -> void:
 
 func run(test: SceneTree) -> void:
 	var m = Campaign.new(72)
-	m.street.selected().cash = 200000
+	m.s.cash = 200000
 	var bar: Dictionary = m.street.selected()
 	var eco = m.street.economy
 	m.street.action("hire",0)
 	var person: Dictionary = bar.team[0]
-	test.check(m.street.selected().cash==198800 and person.contract_left==14400,"A ten-day contract costs exactly 1,200 once")
+	test.check(m.s.cash==198800 and person.contract_left==14400,"A ten-day contract costs exactly 1,200 once")
 	m.street.action("rehire",0)
-	test.check(m.street.selected().cash==198800,"An active contract cannot be bought twice")
+	test.check(m.s.cash==198800,"An active contract cannot be bought twice")
 	bar.customers.clear()
 	m.s.street.pass_credit = -10000000
 	eco.admit(bar,false,true)
@@ -31,9 +31,9 @@ func run(test: SceneTree) -> void:
 	test.check(person.training==1 and bar.team[1].training==0 and eco.service_seconds(person)==20,"Training belongs only to the selected bartender")
 	m.street.action("train_staff",0)
 	test.check(person.training==2 and eco.service_seconds(person)==15,"Second training level gives a 15-second service interval")
-	var cash_before := int(m.street.selected().cash)
+	var cash_before := int(m.s.cash)
 	m.street.action("train_staff",0)
-	test.check(m.street.selected().cash==cash_before,"Maxed training cannot be charged again")
+	test.check(m.s.cash==cash_before,"Maxed training cannot be charged again")
 	bar.team[1].on = false
 	bar.customers.clear()
 	var existing_deadline: float = person.service_ready
@@ -65,9 +65,9 @@ func run(test: SceneTree) -> void:
 	test.check(eco.service_rate(bar)==0 and eco.operating_rate(bar)==C.OVERHEAD[0],"Departed staff provide no service and incur no wages")
 	m.street.action("rota",0)
 	test.check(not person.on,"Rota cannot reactivate an expired contract")
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	m.street.action("rehire",0)
-	test.check(m.street.selected().cash==cash_before-1200 and bar.team.size()==2 and person.training==2 and person.on and person.contract_left==14400,"Rehire keeps identity, training and a fresh ten-day contract")
+	test.check(m.s.cash==cash_before-1200 and bar.team.size()==2 and person.training==2 and person.on and person.contract_left==14400,"Rehire keeps identity, training and a fresh ten-day contract")
 	person.contract_left = 650
 	m.s.street.minute = 60
 	m.street.action("skip")
@@ -99,7 +99,7 @@ func run(test: SceneTree) -> void:
 	test.check(loaded.team[0].contract_left==0 and loaded.team[0].training==2 and loaded.team[1].service_clock==9,"Reload preserves expiry, training and partial service")
 	# One minute of a remaining contract cannot power an eight-hour projection.
 	m = Campaign.new(72)
-	m.street.selected().cash = 100000
+	m.s.cash = 100000
 	bar = m.street.selected()
 	m.street.action("hire",0)
 	bar.manager = true
@@ -112,9 +112,9 @@ func run(test: SceneTree) -> void:
 	var expected: int = short.street.claim_offline(1060)
 	test.check(expected>0 and m.street.claim_offline(1000+28800)==expected,"Offline income stops serving at the exact staff expiry")
 	test.check(bar.team[0].contract_left==0 and not bar.team[0].on,"Offline absence expires contracts")
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	m.street.claim_offline(1000+28800)
-	test.check(m.street.selected().cash==cash_before,"Repeated offline claims cannot renew or duplicate contracts")
+	test.check(m.s.cash==cash_before,"Repeated offline claims cannot renew or duplicate contracts")
 	# Intermittent empty queues and UI redraws cannot spam the alert.
 	var alert = Alert.new()
 	test.check(not alert.tick(false,1) and alert.tick(true,0),"First waiting order requests a chime")

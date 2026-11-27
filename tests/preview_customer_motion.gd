@@ -23,7 +23,7 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.show_tutorial_hint = false
 	var bar: Dictionary = app.model.street.selected()
-	bar.cash = 999999
+	app.model.s.cash = 999999
 	bar.stage = 3
 	bar.equipment.seating = 7
 	bar.customers.clear()

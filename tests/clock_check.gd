@@ -8,7 +8,7 @@ func advance(m: RefCounted, seconds: int) -> void:
 
 func managed() -> RefCounted:
 	var m = Campaign.new(72)
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	var bar: Dictionary = m.street.selected()
 	bar.manager = true
 	bar.restock = true
@@ -37,7 +37,7 @@ func clock_and_closures(test: SceneTree) -> void:
 	m.s.street.minute = 1439
 	m.street.tick(1)
 	test.check(m.s.day==8 and m.street.clock_text()=="12:00am" and not m.s.last_week.is_empty(),"Midnight advances the day and closes weekly accounts once")
-	m.street.selected().cash = 200000
+	m.s.cash = 200000
 	m.s.rep = 100
 	m.s.street.chapter = 1
 	load("res://tests/finance_fixture.gd").buy(m.street,1)
@@ -47,14 +47,14 @@ func clock_and_closures(test: SceneTree) -> void:
 	m.street.tick(1)
 	test.check(not m.street.economy.is_trading(bar) and m.street.economy.is_trading(second),"1am closes ordinary venues but preserves a venue's nightly extension")
 	test.check(not m.street.can_skip(),"An operating late venue prevents skipping")
-	var before := [bar.cash,bar.stock,bar.sold,bar.pool_income]
+	var before := [m.s.cash,bar.stock,bar.sold,bar.pool_income]
 	m.s.street.selected = 0
 	m.street.action("serve")
 	m.street.action("welcome")
 	m.street.action("promotion",1)
 	m.street.action("late")
 	m.street.economy.pool_tick(bar)
-	test.check(before==[bar.cash,bar.stock,bar.sold,bar.pool_income] and not bar.late_open and bar.promo.is_empty(),"Closed venues cannot serve, promote, charge pool or opt in after 1am")
+	test.check(before==[m.s.cash,bar.stock,bar.sold,bar.pool_income] and not bar.late_open and bar.promo.is_empty(),"Closed venues cannot serve, promote, charge pool or opt in after 1am")
 	var forecast: Dictionary = m.street.economy.forecast(bar)
 	test.check(forecast.arrivals==0 and forecast.sales==0 and forecast.costs==0 and forecast.net==0,"Closed forecast has no trading revenue or payroll")
 	m.s.street.minute = 179
@@ -63,9 +63,9 @@ func clock_and_closures(test: SceneTree) -> void:
 	m.street.announce(3)
 	var event: Dictionary = m.s.street.event.duplicate(true)
 	var day := int(m.s.day)
-	before = [m.street.selected().cash,m.s.heat,m.s.street.elapsed,m.s.street.served,bar.healthy]
+	before = [m.s.cash,m.s.heat,m.s.street.elapsed,m.s.street.served,bar.healthy]
 	m.street.action("skip")
-	test.check(before==[m.street.selected().cash,m.s.heat,m.s.street.elapsed,m.s.street.served,bar.healthy] and m.s.street.event==event and m.s.day==day,"Skip changes no economy, heat, event, milestone or extra day")
+	test.check(before==[m.s.cash,m.s.heat,m.s.street.elapsed,m.s.street.served,bar.healthy] and m.s.street.event==event and m.s.day==day,"Skip changes no economy, heat, event, milestone or extra day")
 	test.check(m.s.street.minute==720 and not second.late_open and m.street.any_trading(),"Skip opens at noon and clears nightly permission")
 	m.street.action("open")
 	second.open = false
@@ -76,7 +76,7 @@ func clock_and_closures(test: SceneTree) -> void:
 	# Closing discards outstanding orders/games without another fee or service loss.
 	m = Campaign.new(4)
 	bar = m.street.selected()
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	bar.equipment.pool = 1
 	bar.customers.clear()
 	for _i in 2:
@@ -148,14 +148,14 @@ func cleaning(test: SceneTree) -> void:
 	test.check(bar.clean_remaining==0 and bar.dirt==80,"Natural noon opening also cancels unfinished cleaning")
 	m.street.action("open")
 	var stock := int(bar.stock)
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	m.street.action("stock")
-	test.check(bar.stock==stock+6 and m.street.selected().cash==10000-228,"Closed-hour restocking pays the real stock cost")
+	test.check(bar.stock==stock+6 and m.s.cash==10000-228,"Closed-hour restocking pays the real stock cost")
 
 func raids(test: SceneTree) -> void:
 	var m = Campaign.new(72)
 	var bar: Dictionary = m.street.selected()
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	m.street.action("late")
 	m.s.street.minute = 60
 	m.s.heat = 5
@@ -171,7 +171,7 @@ func raids(test: SceneTree) -> void:
 	while (seed_value*48271)%2147483647%1000>=220: seed_value += 1
 	m = Campaign.new(72)
 	bar = m.street.selected()
-	m.street.selected().cash = 450
+	m.s.cash = 450
 	bar.stage = 2
 	m.street.action("late")
 	m.s.street.minute = 74
@@ -180,23 +180,23 @@ func raids(test: SceneTree) -> void:
 	m.s.street.economy_seed = seed_value
 	var costs := int(m.s.weekly.costs)
 	m.street.tick(1)
-	test.check(bar.raided and m.street.selected().cash==0 and m.s.debt==0,"A raid caps its fine at available cash without debt")
+	test.check(bar.raided and m.s.cash==0 and m.s.debt==0,"A raid caps its fine at available cash without debt")
 	test.check(m.s.weekly.costs==costs+450 and bar.last_shift.fines==450 and bar.last_shift.net==-450,"Raid fine appears once in venue and weekly books")
 	var loaded = Campaign.new(9)
-	test.check(loaded.load_game() and loaded.street.selected().raided and loaded.street.selected().cash==0 and loaded.s.street.minute==75,"Raid outcome is saved immediately at the completed tick")
+	test.check(loaded.load_game() and loaded.street.selected().raided and loaded.s.cash==0 and loaded.s.street.minute==75,"Raid outcome is saved immediately at the completed tick")
 	loaded.street.action("open")
 	loaded.street.action("open")
 	loaded.street.action("recovery")
-	test.check(not loaded.street.any_trading() and loaded.street.selected().cash==0,"Reopening and recovery cannot bypass a raid closure")
+	test.check(not loaded.street.any_trading() and loaded.s.cash==0,"Reopening and recovery cannot bypass a raid closure")
 	advance(loaded,5)
-	test.check(loaded.street.selected().cash==0 and loaded.s.weekly.costs==costs+450,"Reloading and waiting cannot repeat a raid fine")
+	test.check(loaded.s.cash==0 and loaded.s.weekly.costs==costs+450,"Reloading and waiting cannot repeat a raid fine")
 	loaded.street.action("skip")
 	loaded.street.action("open") # Close the empty-till venue, then recover.
 	loaded.street.action("recovery")
 	test.check(not loaded.street.selected().raided and loaded.street.selected().recovery==120,"Raid victims retain owner-run recovery after noon")
 	# Two late venues contribute independently; owner/event closures do not.
 	m = managed()
-	m.street.selected().cash = 200000
+	m.s.cash = 200000
 	m.s.rep = 100
 	m.s.street.chapter = 1
 	m.street.action("late")
@@ -224,7 +224,7 @@ func raids(test: SceneTree) -> void:
 	loaded.load_game()
 	m.street.tick(1)
 	loaded.street.tick(1)
-	test.check(m.s.street==loaded.s.street and m.street.selected().cash==loaded.street.selected().cash,"Raid decision is deterministic across a pre-check save/reload")
+	test.check(m.s.street==loaded.s.street and m.s.cash==loaded.s.cash,"Raid decision is deterministic across a pre-check save/reload")
 
 func offline(test: SceneTree) -> void:
 	test.check(Economy.legal_open_minutes(720,780)==780 and Economy.legal_open_minutes(60,660)==0,"Offline legal window is noon through 1am")
@@ -270,7 +270,7 @@ func saves(test: SceneTree) -> void:
 	# Genuine old field shape, including a paid pool game and active promotion.
 	m = Campaign.new(72)
 	bar = m.street.selected()
-	m.street.selected().cash = 9876
+	m.s.cash = 9876
 	m.s.day = 47
 	bar.equipment.pool = 1
 	for customer in bar.customers: customer.pool = true
@@ -290,7 +290,7 @@ func saves(test: SceneTree) -> void:
 	var migrated = Campaign.new(9)
 	test.check(migrated.load_game(),"Version-three save without new fields loads")
 	var restored: Dictionary = migrated.street.selected()
-	test.check(migrated.s.version==16 and migrated.s.day==47 and migrated.street.finance.total()==9926 and migrated.s.street.minute==720,"Migration preserves day and money and introduces noon")
+	test.check(migrated.s.version==17 and migrated.s.day==47 and migrated.street.finance.total()==9926 and migrated.s.street.minute==720,"Migration preserves day and money and introduces noon")
 	for guest in customers: guest.merge(Economy.visit_fields(),true)
 	test.check(restored.customers==customers and restored.games==games and restored.closed==9 and not restored.promo.is_empty() and restored.dirt==0,"Migration preserves queues, paid games, promotions and event closures")
 	migrated.save_game()

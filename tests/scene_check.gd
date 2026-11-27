@@ -18,7 +18,7 @@ func run(test: SceneTree) -> void:
 	test.check(not City.fan_owned(bar),"Failed comfort purchase does not display a fan")
 	bar.stage = 3
 	test.check(not City.fan_owned(bar),"Renovation alone does not grant a fan")
-	model.street.selected().cash = 10000
+	model.s.cash = 10000
 	model.street.action("equipment",1)
 	test.check(City.fan_owned(bar),"Comfort purchase installs the fan")
 	var saved_bar: Dictionary = JSON.parse_string(JSON.stringify(bar))
@@ -29,10 +29,10 @@ func run(test: SceneTree) -> void:
 	bar.equipment.comfort = 0
 	# A purchase, not a renovation, enables the sports screen; existing save
 	# ownership works without another payment or a new save field.
-	model.street.selected().cash = 0
+	model.s.cash = 0
 	model.street.action("equipment",5)
 	test.check(not City.screen_owned(bar),"Failed TV purchase leaves the room unequipped")
-	model.street.selected().cash = 10000
+	model.s.cash = 10000
 	model.street.action("equipment",5)
 	test.check(City.screen_owned(bar),"Buying a sports screen enables its artwork")
 	model.save_game()

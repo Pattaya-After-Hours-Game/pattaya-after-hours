@@ -5,7 +5,7 @@ const E = preload("res://scripts/economy.gd")
 
 func fresh():
 	var m = Campaign.new(72)
-	m.street.selected().cash = 100000
+	m.s.cash = 100000
 	m.s.street.pass_credit = -100000000
 	m.s.street.event_wait = 1000000
 	m.street.selected().customers.clear()
@@ -67,7 +67,7 @@ func run(test: SceneTree) -> void:
 		b.customers.back().planned_rounds = 1
 		b.customers.back().pool = true
 	e.pool_tick(b)
-	var cash_before: int = m.street.selected().cash
+	var cash_before: int = m.s.cash
 	e.serve(b,2)
 	m.street.tick(11)
 	test.check(b.customers.size()==2 and b.games.size()==1 and b.customers[0].visit_phase=="finished","Finished drinkers wait for their paid pool game")
@@ -93,9 +93,9 @@ func run(test: SceneTree) -> void:
 			var cap: int = C.BEER_CAPS[id][stage-1]
 			while b.equipment[id]<cap:
 				var quote: Dictionary = e.equipment_offer(b,index)
-				cash_before = m.street.selected().cash
+				cash_before = m.s.cash
 				m.street.action("equipment",index)
-				test.check(m.street.selected().cash==cash_before-quote.price,"Beer-bar tier settles its published price")
+				test.check(m.s.cash==cash_before-quote.price,"Beer-bar tier settles its published price")
 			var quote: Dictionary = e.equipment_offer(b,index)
 			test.check(not quote.enabled and (quote.maxed if stage==3 else not quote.maxed and quote.reason.contains("stage")),"Stage cap leaves a locked next-tier offer")
 		b.equipment[id] = 0
@@ -152,7 +152,7 @@ func run(test: SceneTree) -> void:
 	b.erase("completed")
 	m.save_game()
 	loaded = Campaign.new(4)
-	test.check(loaded.load_game() and loaded.s.version==16 and loaded.street.finance.total()==m.street.finance.total(),"Schema-twelve campaign migrates with no cash or inventory gift")
+	test.check(loaded.load_game() and loaded.s.version==17 and loaded.street.finance.total()==m.street.finance.total(),"Schema-twelve campaign migrates with no cash or inventory gift")
 	var old: Dictionary = loaded.street.selected().customers[0]
 	test.check(old.visit_phase=="legacy" and old.next==35 and old.drinks==1 and old.budget==g.budget and old.quoted==g.quoted,"Legacy visit retains quote, budget, drink and departure commitments")
 	for audience in 3:

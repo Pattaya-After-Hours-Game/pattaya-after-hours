@@ -178,17 +178,18 @@ func settle_tips() -> Dictionary:
 	# The street calls this only at a real nightly closure or explicit night skip.
 	s.street.tip_night = int(s.day)
 	for bar in s.street.bars:
-		var visits := int(bar.tip_visits)
-		var bonus := int(bar.bonus_tips)
-		var amount := visits*C.TIP_PER_VISIT+bonus
-		bar.last_tips = {"day":maxi(1,int(s.day)-1),"visits":visits,"amount":amount,"bonus":bonus}
-		bar.tip_visits = 0
-		bar.bonus_tips = 0
-		report.bonus += bonus
-		bar.tips_total += amount
-		report.visits += visits
-		report.amount += amount
-		bar.cash += amount
+		var counted := count_tips(bar,maxi(1,int(s.day)-1))
+		for key in report: report[key] += counted[key]
+	return report
+
+func count_tips(bar: Dictionary, day: int) -> Dictionary:
+	var report := {"visits":int(bar.tip_visits),"bonus":int(bar.bonus_tips),"amount":int(bar.tip_visits)*C.TIP_PER_VISIT+int(bar.bonus_tips)}
+	if report.amount==0: return report
+	bar.last_tips = {"day":day,"visits":report.visits,"amount":report.amount,"bonus":report.bonus}
+	bar.tip_visits = 0
+	bar.bonus_tips = 0
+	bar.tips_total += report.amount
+	Finance.change(s,report.amount,"Counted tips",str(bar.name))
 	s.weekly.revenue += report.amount
 	s.street.earned += report.amount
 	return report
@@ -201,7 +202,7 @@ func tips_text(bar: Dictionary) -> String:
 	return text
 
 func emergency_stock_available(bar: Dictionary) -> bool:
-	return bar.stock==0 and bar.cash<pack_price(bar) and int(bar.recovery)==0 and bar.closed==0 and not bar.raided and scheduled(bar,int(s.street.minute))
+	return bar.stock==0 and s.cash<pack_price(bar) and int(bar.recovery)==0 and bar.closed==0 and not bar.raided and scheduled(bar,int(s.street.minute))
 
 static func automation_fields() -> Dictionary:
 	return {"auto_serve":false,"auto_serve_on":true,"supplier_level":0,"stock_lots":[],"manager_level":0}
@@ -279,11 +280,8 @@ func management_bonus(bar: Dictionary, margin: int) -> void:
 	if not is_trading(bar): return
 	var amount := bonus_amount(bar,margin)
 	if amount<=0: return
-	income(bar,amount)
+	income(bar,amount,"Earned manager bonus")
 	bar.shift.manager_income += amount
-
-func working_cash(bar: Dictionary) -> int:
-	return 2*pack_price(bar)+2*operating_rate(bar)
 
 static func loyalty_rank(bar: Dictionary) -> int:
 	var rank := 0
@@ -296,18 +294,18 @@ func manager_offer(bar: Dictionary) -> Dictionary:
 	var required_stage: int = C.MANAGER_STAGES[mini(level,C.MANAGER_STAGES.size()-1)]
 	var reason := ""
 	var amount := int(C.MANAGER_PRICES[level]) if level<C.MANAGER_PRICES.size() else 0
-	var required := amount+(operating_rate(bar)+(12 if not bar.manager else 0))*2
+	var required := amount
 	if level>=3: reason = "Manager fully developed."
 	else:
 		if bar.stage<required_stage: reason = "Needs venue stage %d." % required_stage
 		elif level==0 and (on_duty(bar,0)<1 or not bar.restock): reason = "Needs an on-duty bartender and automatic deliveries."
-		elif bar.cash<required: reason = "Keep the next shift's operating reserve."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"rate":C.MANAGER_BONUS_PERCENT[mini(level+1,3)]}
+		elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"rate":C.MANAGER_BONUS_PERCENT[mini(level+1,3)]}
 
 func buy_manager(bar: Dictionary) -> String:
 	var offer := manager_offer(bar)
 	if not offer.enabled: return offer.reason
-	bar.cash -= offer.price
+	Finance.change(s,-int(offer.price),"Manager appointment",str(bar.name))
 	s.weekly.costs += offer.price
 	bar.manager = true
 	bar.manager_level += 1
@@ -318,18 +316,18 @@ func supplier_offer(bar: Dictionary) -> Dictionary:
 	var required_stage: int = C.SUPPLIER_STAGES[mini(level,C.SUPPLIER_STAGES.size()-1)]
 	var reason := ""
 	var amount := int(C.SUPPLIER_PRICES[level]) if level<C.SUPPLIER_PRICES.size() else 0
-	var required := amount+operating_rate(bar)*2
+	var required := amount
 	if level>=C.SUPPLIER_PRICES.size(): reason = "Best supplier agreement reached."
 	else:
 		if bar.stage<required_stage: reason = "Needs venue stage %d." % required_stage
-		elif bar.cash<required: reason = "Keep the next shift's operating reserve."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"quantity":12 if level>=1 else 6,"pack":(12 if level>=1 else 6)*C.SUPPLIER_UNIT_COSTS[mini(level+1,5)]}
+		elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"quantity":12 if level>=1 else 6,"pack":(12 if level>=1 else 6)*C.SUPPLIER_UNIT_COSTS[mini(level+1,5)]}
 
 func buy_supplier(bar: Dictionary) -> String:
 	ensure_stock_lots(bar)
 	var offer := supplier_offer(bar)
 	if not offer.enabled: return offer.reason
-	bar.cash -= offer.price
+	Finance.change(s,-int(offer.price),"Supplier agreement",str(bar.name))
 	s.weekly.costs += offer.price
 	bar.supplier_level += 1
 	bar.restock = true
@@ -415,16 +413,15 @@ func commit_orders(bar: Dictionary) -> void:
 func stock_offer(bar: Dictionary, automatic: bool = false, drink: int = 0) -> Dictionary:
 	return stock_quote(bar,pack_quantity(bar),drink_cost(bar,drink),automatic)
 
-func stock_quote(bar: Dictionary, quantity: int, unit_cost: int, automatic: bool = false) -> Dictionary:
+func stock_quote(bar: Dictionary, quantity: int, unit_cost: int, _automatic: bool = false) -> Dictionary:
 	var amount := quantity*unit_cost
 	var room := stock_capacity(bar)-int(bar.stock)
-	var reserve := ceili(operating_rate(bar)/60.0) if automatic else 0
-	var required := amount+reserve
+	var required := amount
 	var reason := ""
 	if cart_delivery_blocked(bar): reason = "Cart Jam: clear Bo’s route in Events."
 	elif room<quantity: reason = "Need %d free spaces; you have %d." % [quantity,room]
-	elif bar.cash<required: reason = "Need ฿%d%s; you have ฿%d." % [amount+reserve," including next operating charge" if automatic else "",bar.cash]
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"quantity":quantity,"room":room,"remaining_cash":int(bar.cash)-amount}
+	elif s.cash<required: reason = "Need ฿%d; you have ฿%d." % [amount,s.cash]
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"quantity":quantity,"room":room,"remaining_cash":int(s.cash)-amount}
 
 static func ledger() -> Dictionary:
 	return {"hosted_drinks":0,"hosted_income":0,"hosted_matches":0,"bar_fine_income":0,"bar_fines":0,"completed":0,"waiting_seconds":0,"drinking_seconds":0,"revenue":0,"stock_cost":0,"drink_requests":{},"drink_misses":{},"operating":0,"promo_cost":0,"fines":0,"commission":0,"consumed_stock":0,"manager_income":0,"arrivals":0,"orders":0,"sales":0,"happy":0,"lost_full":0,"lost_service":0,"lost_stock":0,"open_seconds":0,"occupied_seconds":0,"pool_income":0,"free_games":0}
@@ -542,19 +539,36 @@ func rehire_offer(bar: Dictionary, index: int) -> Dictionary:
 	if index<0 or index>=bar.team.size(): return {"enabled":false,"reason":"Unknown team member.","price":0,"reserve":0,"required":0}
 	var person: Dictionary = bar.team[index]
 	var amount := contract_cost(int(person.role))
-	var reserve := (operating_rate(bar)+(0 if contracted(person) and person.on else int(C.ROLE_WAGES[int(person.role)])))*2+(pack_price(bar) if person.role==3 else 0)
-	var required := amount+reserve
+	var reserve := 0
+	var required := amount
 	var reason := "Ready to rehire; training is retained."
 	if contracted(person): reason = "Contract still active. Use On duty / Off duty to resume work."
-	elif bar.cash<required: reason = "Need ฿%d more: ฿%d fee + ฿%d reserve = ฿%d cash required." % [required-bar.cash,amount,reserve,required]
-	return {"available":int(bar.cash),"enabled":not contracted(person) and bar.cash>=required,"reason":reason,"price":amount,"reserve":reserve,"required":required}
+	elif s.cash<required: reason = "Need ฿%d more for the contract." % (required-s.cash)
+	return {"available":int(s.cash),"enabled":not contracted(person) and s.cash>=required,"reason":reason,"price":amount,"reserve":reserve,"required":required}
+
+func operating_breakdown(bar: Dictionary, offset: int = 0) -> Dictionary:
+	if bar.get("recovery",0)>0: return {}
+	var overhead := int(C.OVERHEAD[int(bar.type)])
+	var bills := {"Rent":overhead*2/3,"Electricity":overhead/3+int(bar.equipment.comfort)*4}
+	if bar.manager: bills["Manager wages"] = 12
+	for person in bar.team:
+		if contracted(person,offset) and person.on:
+			var wage := int(C.ROLE_WAGES[int(person.role)])
+			if wage>0:
+				var label := str(C.ROLE_NAMES[int(person.role)])+" wages"
+				bills[label] = int(bills.get(label,0))+wage
+	return bills
 
 func operating_rate(bar: Dictionary, offset: int = 0) -> int:
-	if bar.get("recovery",0)>0: return 0
-	var amount := int(C.OVERHEAD[int(bar.type)]) + int(bar.equipment.comfort)*4 + (12 if bar.manager else 0)
-	for person in bar.team:
-		if contracted(person,offset) and person.on: amount += C.ROLE_WAGES[int(person.role)]
+	var amount := 0
+	for rate in operating_breakdown(bar,offset).values(): amount += int(rate)
 	return amount
+
+func operating_description(bar: Dictionary) -> String:
+	var parts: Array[String] = []
+	var bills := operating_breakdown(bar)
+	for label in bills: parts.append("%s ฿%d" % [label,bills[label]])
+	return " + ".join(parts)+" / min"
 
 func price(bar: Dictionary, drink: int = 0, offline: bool = false) -> int:
 	var amount := int(C.TYPES[int(bar.type)].drink) + int(C.DRINKS[drink].offset)
@@ -812,14 +826,14 @@ func club_offer(bar: Dictionary) -> Dictionary:
 	var required_stage := 2
 	var level := int(bar.club_level)
 	var amount := 0 if level==3 else int(C.CLUB_PRICES[level])
-	var reserve := operating_rate(bar)*2+pack_price(bar)
-	var required := amount+reserve
+	var reserve := 0
+	var required := amount
 	var reason := ""
 	if level==3: reason = "Regulars Club fully established."
 	elif bar.stage<required_stage: reason = "Needs venue stage %d." % required_stage
 	elif bar.regulars<C.CLUB_REGULARS[level]: reason = "Needs %d local regulars; you have %d." % [C.CLUB_REGULARS[level],bar.regulars]
-	elif bar.cash<required: reason = "Need ฿%d more, keeping ฿%d for stock and the next shift." % [amount+reserve-int(bar.cash),reserve]
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"reserve":reserve,"chance":C.CLUB_CHANCE[mini(3,level+1)]}
+	elif s.cash<required: reason = "Need ฿%d more." % (required-int(s.cash))
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"level":level,"price":amount,"required":required,"required_stage":required_stage,"reserve":reserve,"chance":C.CLUB_CHANCE[mini(3,level+1)]}
 
 func club_forecast(bar: Dictionary) -> Dictionary:
 	var proposed := bar.duplicate(true)
@@ -849,8 +863,8 @@ func pending(bar: Dictionary) -> int:
 	return count
 
 func cost(bar: Dictionary, amount: int, category: String) -> bool:
-	if bar.cash < amount: return false
-	bar.cash -= amount
+	if s.cash < amount: return false
+	Finance.change(s,-amount,operating_description(bar) if category=="operating" else {"stock_cost":"Stock purchase / consignment repayment","promo_cost":"Promotion fee","fines":"Trading fine","commission":"Sales commission"}.get(category,category),str(bar.name))
 	s.weekly.costs += amount
 	s.street.earnings_net -= amount
 	bar.earnings_net -= amount
@@ -858,10 +872,10 @@ func cost(bar: Dictionary, amount: int, category: String) -> bool:
 	if category in ["operating","promo_cost","fines"]: party_add(bar,category,amount)
 	return true
 
-func income(bar: Dictionary, amount: int) -> void:
+func income(bar: Dictionary, amount: int, reason: String = "Drink sales") -> void:
 	s.street.earnings_net += amount
 	bar.earnings_net += amount
-	bar.cash += amount
+	Finance.change(s,amount,reason,str(bar.name))
 	s.weekly.revenue += amount
 	s.street.earned += amount
 	bar.shift.revenue += amount
@@ -1152,9 +1166,9 @@ func action_upgrade_status(bar: Dictionary, index: int) -> Dictionary:
 	var price := 0 if level==cap else int(C.ACTION_UPGRADE_COSTS[level])
 	var required_stage := 2 if index==0 and level==3 else 1
 	var stage_ok: bool = bar.stage>=required_stage
-	var required := price+operating_rate(bar)*2
-	var shortfall := maxi(0,required-int(bar.cash))
-	return {"available":int(bar.cash),"level":level,"price":price,"required":required,"shortfall":shortfall,"enabled":level<cap and shortfall==0 and stage_ok,"maxed":level==cap,"stage_ok":stage_ok,"required_stage":required_stage,
+	var required := price
+	var shortfall := maxi(0,required-int(s.cash))
+	return {"available":int(s.cash),"level":level,"price":price,"required":required,"shortfall":shortfall,"enabled":level<cap and shortfall==0 and stage_ok,"maxed":level==cap,"stage_ok":stage_ok,"required_stage":required_stage,
 		"current":C.ACTION_COOLDOWNS[level],"next":C.ACTION_COOLDOWNS[mini(cap,level+1)]}
 
 func buy_action_upgrade(bar: Dictionary, index: int) -> String:
@@ -1162,9 +1176,9 @@ func buy_action_upgrade(bar: Dictionary, index: int) -> String:
 	var state := action_upgrade_status(bar,index)
 	if state.maxed: return "Already at the fastest cooldown."
 	if not state.stage_ok: return "Two-second pouring needs venue stage 2."
-	if not state.enabled: return "Need ฿%d more, including next shift's operating reserve." % state.shortfall
+	if not state.enabled: return "Need ฿%d more." % state.shortfall
 	var item: Dictionary = C.ACTION_UPGRADES[index]
-	bar.cash -= state.price
+	Finance.change(s,-int(state.price),"Owner action training",str(bar.name))
 	s.weekly.costs += state.price
 	bar.action_levels[item.id] += 1
 	return "%s: %ds → %ds on the next use." % [item.name,state.current,state.next]
@@ -1231,7 +1245,7 @@ func pool_tick(bar: Dictionary) -> void:
 		bar.pool_income += fee
 		party_add(bar,"pool_income",fee)
 		bar.shift.pool_income += fee
-		income(bar,fee)
+		income(bar,fee,"Pool game")
 		management_bonus(bar,fee)
 		if fee == 0:
 			bar.free_games += 1
@@ -1242,13 +1256,13 @@ func pool_tick(bar: Dictionary) -> void:
 
 func promotion_offer(bar: Dictionary, kind: int) -> Dictionary:
 	var item: Dictionary = C.PROMOTIONS[kind]
-	var required := int(item.fee)+operating_rate(bar)*2
+	var required := int(item.fee)
 	var reason := ""
 	if not is_trading(bar): reason = status(bar)
 	elif not bar.promo.is_empty() or bar.promo_cooldown>0: reason = "Finish this promotion and its one-shift cooldown first."
 	elif not str(item.requires).is_empty() and bar.equipment[item.requires] == 0: reason = "Buy the %s first." % item.requires
-	elif bar.cash<required: reason = "Keep a shift's operating reserve after the promotion fee."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"required":required}
+	elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"required":required}
 
 func start_promotion(bar: Dictionary, kind: int) -> String:
 	if kind<0 or kind>=C.PROMOTIONS.size(): return "Unknown promotion."
@@ -1269,7 +1283,7 @@ func equipment_offer(bar: Dictionary,index: int) -> Dictionary:
 	var id: String = item.id
 	var amount := int(item.cost)*(int(bar.equipment[id])+1)
 	var maxed: bool = int(bar.equipment[id])>=equipment_limit(bar,id,int(item.max))
-	var required := amount+operating_rate(bar)*2
+	var required := amount
 	var reason := ""
 	if id=="training": reason = "Choose an individual team member to train in Service."
 	elif maxed: reason = "Already fully equipped."
@@ -1277,30 +1291,30 @@ func equipment_offer(bar: Dictionary,index: int) -> Dictionary:
 	elif id=="pool" and bar.equipment.pool>=bar.stage: reason = "Upgrade the venue before adding another table."
 	elif bar.stage<equipment_stage(bar,id,int(bar.equipment[id])+1): reason = "Needs venue stage %d." % equipment_stage(bar,id,int(bar.equipment[id])+1)
 	elif id=="menu" and bar.stage<2: reason = "Premium menus unlock at stage 2."
-	elif bar.cash<required: reason = "Keep the next shift's operating reserve after this purchase."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"maxed":maxed,"required_stage":equipment_stage(bar,id,int(bar.equipment[id])+1)}
+	elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"maxed":maxed,"required_stage":equipment_stage(bar,id,int(bar.equipment[id])+1)}
 
 func buy_equipment(bar: Dictionary, index: int) -> String:
 	if index<0 or index>=C.EQUIPMENT.size(): return "Unknown equipment."
 	var offer := equipment_offer(bar,index)
 	if not offer.enabled: return offer.reason
 	var item: Dictionary = C.EQUIPMENT[index]
-	bar.cash -= offer.price
+	Finance.change(s,-int(offer.price),"Equipment: "+str(C.EQUIPMENT[index].name),str(bar.name))
 	s.weekly.costs += offer.price
 	bar.equipment[item.id] += 1
 	return "%s installed. %s" % [item.name,item.help]
 
 func auto_serve_offer(bar: Dictionary) -> Dictionary:
-	var required: int = C.AUTO_SERVE_COST+operating_rate(bar)*2
-	var enabled: bool = bar.cash>=required
-	return {"available":int(bar.cash),"enabled":enabled,"price":C.AUTO_SERVE_COST,"required":required,"reason":"" if enabled else "Keep the next shift's reserve after the ฿3,000 auto-serve purchase."}
+	var required: int = C.AUTO_SERVE_COST
+	var enabled: bool = s.cash>=required
+	return {"available":int(s.cash),"enabled":enabled,"price":C.AUTO_SERVE_COST,"required":required,"reason":"" if enabled else "Not enough money for this purchase."}
 
 func training_offer(bar: Dictionary,index: int,audience: bool) -> Dictionary:
 	var person: Dictionary = bar.team[index]
 	var level := int(person.get("audience_training" if audience else "training",0))
 	var amount := (C.AUDIENCE_TRAINING_COST if audience else C.STAFF_TRAINING_COST)*(level+1)
 	var maxed := level>=(2 if audience else training_limit(bar))
-	var required := amount+operating_rate(bar)*2
+	var required := amount
 	var reason := ""
 	if not contracted(person): reason = "Rehire this team member before training."
 	elif audience and not int(person.role) in [2,3]: reason = "Audience training is for promoters and dancers."
@@ -1309,42 +1323,39 @@ func training_offer(bar: Dictionary,index: int,audience: bool) -> Dictionary:
 	elif not audience and level>=4 and bar.stage<3: reason = "Advanced service training needs venue stage 3."
 	elif not audience and level>=2 and bar.stage<2: reason = "Advanced service training needs venue stage 2."
 	elif audience and bar.stage<level+2: reason = "Needs venue stage %d." % (level+2)
-	elif bar.cash<required: reason = "Keep a shift's operating reserve after training."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"maxed":maxed,"level":level,"required_stage":level+2 if audience else 1 if level<2 else 2 if level<4 else 3}
+	elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"maxed":maxed,"level":level,"required_stage":level+2 if audience else 1 if level<2 else 2 if level<4 else 3}
 
 func upgrade_required_cash(bar: Dictionary) -> int:
-	return int(C.RENOVATIONS[int(bar.type)][int(bar.stage)-1])+operating_rate(bar)*2
+	return int(C.RENOVATIONS[int(bar.type)][int(bar.stage)-1])
 
 func upgrade_reason(bar: Dictionary) -> String:
 	if bar.stage>=3: return "Final stage reached."
-	if bar.cash<upgrade_required_cash(bar): return "Save the renovation price plus one shift of operating costs."
+	if s.cash<upgrade_required_cash(bar): return "Not enough money for this purchase."
 	return ""
 
 func hire_offer(bar: Dictionary, role: int) -> Dictionary:
 	var amount := contract_cost(role)
-	var required := amount+(operating_rate(bar)+int(C.ROLE_WAGES[role]))*2+(pack_price(bar) if role==3 else 0)
+	var required := amount
 	var reason := ""
 	if role==1 and bar.type!=1: reason = "Hosts work in Hostess bars."
 	elif role==2 and bar.type!=2: reason = "Dancers work in gogos."
 	elif role==3 and promoter_index(bar)>=0: reason = "Rehire your existing promoter instead."
 	elif role!=3 and floor_staff(bar)>=int(bar.stage)*2: reason = "Upgrade for more team positions."
-	elif bar.cash<required: reason = "Keep a shift's payroll after hiring."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required}
+	elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required}
 
 func role_change_required_cash(bar: Dictionary, index: int) -> int:
 	var fee := role_change_fee(bar,index)
 	if fee==0: return 0
-	var person: Dictionary = bar.team[index]
-	var next_role := int(bar.type) if person.role==0 else 0
-	var next_cost := operating_rate(bar)+(int(C.ROLE_WAGES[next_role])-int(C.ROLE_WAGES[int(person.role)])) if person.on else operating_rate(bar)
-	return fee+next_cost*2
+	return fee
 
 func action(bar: Dictionary, id: String, index: int) -> String:
 	match id:
 		"regulars_club":
 			var offer := club_offer(bar)
 			if not offer.enabled: return offer.reason
-			bar.cash -= offer.price
+			Finance.change(s,-int(offer.price),"Regulars club",str(bar.name))
 			s.weekly.costs += offer.price
 			bar.club_level += 1
 			return "Regulars Club %d: %d%% of new visitors stay for up to three drinks. Stock and service still matter." % [bar.club_level,offer.chance]
@@ -1354,7 +1365,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 				return "Auto-serve %s. The existing Serve cooldown is unchanged." % ("on" if bar.auto_serve_on else "off")
 			var offer := auto_serve_offer(bar)
 			if not offer.enabled: return offer.reason
-			bar.cash -= C.AUTO_SERVE_COST
+			Finance.change(s,-int(C.AUTO_SERVE_COST),"Owner auto-serve",str(bar.name))
 			s.weekly.costs += C.AUTO_SERVE_COST
 			bar.auto_serve = true
 			bar.auto_serve_on = true
@@ -1395,7 +1406,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			var refunded_cost := 0
 			for _i in units: refunded_cost += consume_stock(bar,index,true)
 			var refund := refunded_cost/2
-			bar.cash += refund
+			Finance.change(s,refund,"Stock return",str(bar.name))
 			s.weekly.costs -= refund
 			s.street.earnings_net += refund
 			bar.earnings_net += refund
@@ -1410,13 +1421,20 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			bar.clean_remaining = C.CLEAN_SECONDS
 			bar.clean_auto_started = true
 			return "Cleaning started: 15 seconds. Skipping leaves unfinished work."
+		"close_and_count":
+			bar.open = false
+			bar.close_reason = "Closed by owner"
+			close_customers(bar)
+			var counted := count_tips(bar,trading_day())
+			return "Closed. Counted ฿%d in tips. Buy stock when affordable, then enable opening." % counted.amount
 		"open":
 			if bar.open:
 				bar.open = false
 				bar.close_reason = "Closed by owner"
+				var counted := count_tips(bar,trading_day())
 				close_customers(bar)
-				return "Closed. Staff and overhead charges pause."
-			if bar.cash < ceili(operating_rate(bar)/60.0): return "You need enough cash for the next operating charge."
+				return "Closed. Counted ฿%d in tips. Rent, electricity and wages pause; you can buy stock now." % counted.amount
+			if s.cash < ceili(operating_rate(bar)/60.0): return "You need enough cash for the next operating charge."
 			bar.open = true
 			bar.close_reason = ""
 			if is_trading(bar): bar.clean_remaining = 0
@@ -1424,7 +1442,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 		"recovery", "emergency_stock":
 			if id=="emergency_stock" and not emergency_stock_available(bar): return "Recovery delivery needs an empty fridge, insufficient pack cash and a legal opening; existing recovery must finish first."
 			if id=="recovery" and bar.open: return "Close the venue before taking an owner-run recovery shift."
-			if bar.cash>=maxi(120,pack_price(bar)): return "You have enough cash to reopen normally; recovery cover is for an empty till."
+			if s.cash>=maxi(120,pack_price(bar)): return "You have enough cash to reopen normally; recovery cover is for an empty till."
 			if bar.recovery>0: return "Recovery cover is already running."
 			if bar.closed>0 or bar.raided or not scheduled(bar,int(s.street.minute)): return "Wait until the venue is allowed to open."
 			for member in bar.team: member.on = false
@@ -1452,8 +1470,8 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if not contracted(person): return "Rehire this team member first."
 			if person.role==3: return "Promoters have their own frontage contract and cannot change role."
 			var fee := role_change_fee(bar,index)
-			if fee>0 and bar.cash<role_change_required_cash(bar,index): return "Role change needs ฿%d plus the next shift's operating reserve." % fee
-			bar.cash -= fee
+			if fee>0 and s.cash<role_change_required_cash(bar,index): return "Role change costs ฿%d." % fee
+			Finance.change(s,-int(fee),"Staff contract role adjustment",str(bar.name))
 			s.weekly.costs += fee
 			person.service_clock = 0
 			person.role = int(bar.type) if person.role==0 else 0
@@ -1481,7 +1499,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			var hire := hire_offer(bar,index)
 			if not hire.enabled: return hire.reason
 			var amount: int = hire.price
-			bar.cash -= amount
+			Finance.change(s,-int(amount),"New "+str(C.ROLE_NAMES[index])+" contract",str(bar.name))
 			s.weekly.costs += amount
 			var host := free_host(bar) if index==1 else -1
 			bar.team.append({"role":index,"on":true,"host":host,"training":0,"audience_training":0,"host_training":0,"host_return":0.0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES})
@@ -1496,7 +1514,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			var offer := rehire_offer(bar,index)
 			if not offer.enabled: return offer.reason
 			var amount: int = offer.price
-			bar.cash -= amount
+			Finance.change(s,-int(amount),"Renew "+str(C.ROLE_NAMES[int(person.role)])+" contract",str(bar.name))
 			s.weekly.costs += amount
 			person.contract_left = C.STAFF_CONTRACT_MINUTES
 			person.on = true
@@ -1509,7 +1527,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			var offer := training_offer(bar,index,audience)
 			if not offer.enabled: return offer.reason
 			var person: Dictionary = bar.team[index]
-			bar.cash -= offer.price
+			Finance.change(s,-int(offer.price),"Audience training" if audience else "Bartender training",str(bar.name))
 			s.weekly.costs += offer.price
 			if audience:
 				person.audience_training = int(offer.level)+1
@@ -1519,7 +1537,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 		"train_host":
 			var offer := host_training_offer(bar,index)
 			if not offer.enabled: return offer.reason
-			bar.cash -= offer.price
+			Finance.change(s,-int(offer.price),"Host training",str(bar.name))
 			s.weekly.costs += offer.price
 			bar.team[index].host_training = int(offer.level)+1
 			return "Host training improved appeal and future bar-fine fees. Skills stay after rehire."
@@ -1529,7 +1547,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 				return "Automatic bar fines " + ("on." if bar.auto_bar_fine_on else "off.")
 			var offer := auto_bar_fine_offer(bar)
 			if not offer.enabled: return offer.reason
-			bar.cash -= offer.price
+			Finance.change(s,-int(offer.price),"Automatic host bookings",str(bar.name))
 			s.weekly.costs += offer.price
 			bar.auto_bar_fine = true
 			bar.auto_bar_fine_on = true
@@ -1542,7 +1560,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 				return "Auto-host rounds " + ("on." if bar.auto_host_drinks_on else "off.")
 			var offer := auto_hosted_offer(bar)
 			if not offer.enabled: return offer.reason
-			bar.cash -= offer.price
+			Finance.change(s,-int(offer.price),"Automatic hosted rounds",str(bar.name))
 			s.weekly.costs += offer.price
 			bar.auto_host_drinks = true
 			bar.auto_host_drinks_on = true
@@ -1562,17 +1580,17 @@ func host_training_offer(bar: Dictionary, index: int) -> Dictionary:
 	var level := int(person.get("host_training",0))
 	var maxed := level>=C.HOST_TRAINING_PRICES.size()
 	var amount := 0 if maxed else int(C.HOST_TRAINING_PRICES[level])
-	var required := amount+operating_rate(bar)*2
+	var required := amount
 	var reason := ""
 	if person.get("role",-1)!=1 or bar.type!=1: reason = "Choose an adult Soi host."
 	elif not contracted(person): reason = "Rehire this host before training."
 	elif maxed: reason = "Already fully trained."
 	elif bar.stage<level+2: reason = "Needs venue stage %d." % (level+2)
-	elif bar.cash<required: reason = "Keep the next shift's operating reserve after training."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"level":level,"maxed":maxed,"required_stage":level+2}
+	elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"price":amount,"required":required,"level":level,"maxed":maxed,"required_stage":level+2}
 
 func auto_bar_fine_offer(bar: Dictionary) -> Dictionary:
-	var required: int = C.AUTO_BAR_FINE_COST+operating_rate(bar)*2
+	var required: int = C.AUTO_BAR_FINE_COST
 	var reason := ""
 	var willing := false
 	for person in bar.team:
@@ -1580,8 +1598,8 @@ func auto_bar_fine_offer(bar: Dictionary) -> Dictionary:
 	if bar.type!=1: reason = "Bar fines belong to Hostess bars."
 	elif bar.get("auto_bar_fine",false): reason = "Already installed."
 	elif not willing: reason = "Hire a host who accepts bar-fine requests first."
-	elif bar.cash<required: reason = "Keep the next shift's operating reserve after auto-accept."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"price":C.AUTO_BAR_FINE_COST,"required":required}
+	elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"price":C.AUTO_BAR_FINE_COST,"required":required}
 
 func bar_fine_offer(bar: Dictionary, index: int) -> Dictionary:
 	var person: Dictionary = bar.team[index] if index>=0 and index<bar.team.size() else {}
@@ -1620,7 +1638,7 @@ func accept_bar_fine(bar: Dictionary, index: int) -> String:
 		while int(offer.request) in bar.host_requests: bar.host_requests.erase(int(offer.request))
 		bar.away.append(index)
 		bar.team[index].host_return = action_time()+C.BAR_FINE_SECONDS
-		income(bar,int(offer.fee))
+		income(bar,int(offer.fee),"Host booking")
 		bar.shift.bar_fine_income += int(offer.fee)
 		bar.shift.bar_fines += 1
 		return "%s accepted · ฿%d received · back in %ds. Appeal is lower while away." % [C.HOSTS[int(bar.team[index].host)][0],offer.fee,C.BAR_FINE_SECONDS]
@@ -1741,13 +1759,15 @@ func tick() -> void:
 		if not is_trading(bar): continue
 		bar.recovery = maxi(0,int(bar.recovery)-1)
 		bar.cost_credit += operating_rate(bar)
-		var charge := int(bar.cost_credit)/60
+		# Recovery suspends collection as well as accrual. Retain an unpaid
+		# fractional bill until trading has earned cash, rather than reclosing at zero.
+		var charge := 0 if bar.recovery>0 else int(bar.cost_credit)/60
 		if not cost(bar,charge,"operating"):
 			bar.open = false
-			bar.close_reason = "Operating cash ran out"
+			bar.close_reason = "Cannot pay rent, electricity or on-duty wages. Close and count tips to restock."
 			close_customers(bar)
 			continue
-		bar.cost_credit = int(bar.cost_credit)%60
+		if bar.recovery==0: bar.cost_credit = int(bar.cost_credit)%60
 		bar.shift.open_seconds += 1
 		bar.shift.occupied_seconds += bar.customers.size()
 		for customer in bar.customers.duplicate():
@@ -1884,7 +1904,7 @@ func offline(now: int, cap_seconds: int) -> int:
 		for key in ["stock","stock_lots","consignment","commission_carry","offline_sales_credit","offline_cost_pending","offline_pool_pending","manager_bonus_carry"]:
 			bar[key] = projection[key]
 		bar.commission_paid += commission_total
-		bar.cash += bank
+		Finance.change(s,bank,"Offline trade estimate (after stock, premises and wages)",str(bar.name))
 		net += bank
 		gross += venue_gross
 		expenses += venue_cost
@@ -2093,13 +2113,13 @@ func hosted_tick(bar: Dictionary) -> void:
 		bar.host_rounds.erase(round)
 
 func auto_hosted_offer(bar: Dictionary) -> Dictionary:
-	var required: int = C.AUTO_HOST_DRINK_COST+operating_rate(bar)*2
+	var required: int = C.AUTO_HOST_DRINK_COST
 	var reason := ""
 	if bar.type!=1: reason = "Hosted rounds belong to hostess bars."
 	elif bar.get("auto_host_drinks",false): reason = "Already installed."
 	elif on_duty(bar,1)==0: reason = "Put a contracted host on duty first."
-	elif bar.cash<required: reason = "Keep the next shift's operating reserve."
-	return {"available":int(bar.cash),"enabled":reason.is_empty(),"reason":reason,"price":C.AUTO_HOST_DRINK_COST,"required":required}
+	elif s.cash<required: reason = "Not enough money for this purchase."
+	return {"available":int(s.cash),"enabled":reason.is_empty(),"reason":reason,"price":C.AUTO_HOST_DRINK_COST,"required":required}
 
 func auto_hosted(bar: Dictionary) -> void:
 	if not bar.get("auto_host_drinks",false) or not bar.get("auto_host_drinks_on",true) or not is_trading(bar): return

@@ -16,6 +16,18 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 	times.cycle_purchases = []
 	times.established_investments = []
 	for second in minutes*60:
+		# Use actual closing tips, then Bo's existing recovery if the jar is too small.
+		for slot in model.s.street.bars.size():
+			var venue: Dictionary = model.s.street.bars[slot]
+			model.s.street.selected = slot
+			if not venue.open or venue.stock==0 and model.s.cash<eco.pack_price(venue):
+				st.action("close_and_count")
+				if venue.stock==0: st.action("stock")
+				if venue.stock==0 or model.s.cash<ceili(eco.operating_rate(venue)/60.0): st.action("recovery")
+				if venue.stock>0 and not venue.open: st.action("open")
+			if venue.recovery==0:
+				for member in venue.team.size():
+					if eco.contracted(venue.team[member]) and not venue.team[member].on: st.action("rota",member)
 		# Real player prep actions; seconds spent cleaning count toward pacing.
 		if st.can_skip():
 			var ready := true
@@ -35,7 +47,7 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		elif second%(10 if style=="click-heavy" else 30 if style=="balanced" else 120)==0 and eco.action_status(bar,"welcome").enabled:
 			st.action("welcome")
 		if not bar.open: st.action("open")
-		if bar.stock<8 and model.street.selected().cash>150: eco.restock(bar)
+		if bar.stock<8 and model.s.cash>150: eco.restock(bar)
 		# Buy small capacity upgrades before the first renovation; no free money.
 		var next_item := -1
 		var owner_first := opening=="manual" and style!="mostly-idle"
@@ -47,12 +59,12 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		elif bar.equipment.sign==0: next_item = 0
 		elif owner_first and bar.equipment.seating==0: next_item = 4
 		elif owner_first and bar.equipment.pool==0: next_item = 3
-		elif not owner_first and bar.team.is_empty() and model.street.selected().cash>=C.BARTENDER_CONTRACT_COST+1000: st.action("hire",0)
-		elif not bar.restock and model.street.selected().cash>=1100 and (not owner_first or bar.stage>=2): st.action("restock")
+		elif not owner_first and bar.team.is_empty() and model.s.cash>=C.BARTENDER_CONTRACT_COST+1000: st.action("hire",0)
+		elif not bar.restock and model.s.cash>=1100 and (not owner_first or bar.stage>=2): st.action("restock")
 		elif bar.equipment.seating==0: next_item = 4
 		elif bar.equipment.pool==0: next_item = 3
 		elif bar.equipment.fridge==0 and (not owner_first or bar.stage>=2): next_item = 2
-		if next_item>=0 and model.street.selected().cash >= int(C.EQUIPMENT[next_item].cost)+eco.operating_rate(bar)*2:
+		if next_item>=0 and model.s.cash >= int(C.EQUIPMENT[next_item].cost)+eco.operating_rate(bar)*2:
 			st.action("equipment",next_item)
 			if bar.equipment[C.EQUIPMENT[next_item].id]>0 and times.first<0: times.first = second
 		if bar.equipment.pool>0 and times.pool<0: times.pool = second
@@ -89,7 +101,7 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if owner_first and bar.stage>=2 and bar.action_levels.pouring<3:
 			st.action("action_upgrade",0)
 		# A contract is a late investment: do not block smaller purchases while saving.
-		if bar.stage>=2 and model.street.selected().cash>=C.BARTENDER_CONTRACT_COST+1000:
+		if bar.stage>=2 and model.s.cash>=C.BARTENDER_CONTRACT_COST+1000:
 			if eco.floor_staff(bar)==0: st.action("hire",0)
 			else:
 				for member in bar.team.size():
@@ -97,24 +109,23 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		if eco.floor_staff(bar)>0:
 			if times.hire<0: times.hire = second
 			for member in bar.team.size():
-				if bar.team[member].role==0 and int(bar.team[member].get("training",0))<2 and model.street.selected().cash>2500: st.action("train_staff",member)
-		if bar.stage>=2 and not bar.manager and model.street.selected().cash>2000: st.action("manager")
+				if bar.team[member].role==0 and int(bar.team[member].get("training",0))<2 and model.s.cash>2500: st.action("train_staff",member)
+		if bar.stage>=2 and not bar.manager and model.s.cash>2000: st.action("manager")
 		if bar.manager and feature!="profit-cycle" and second%10==0: cycle_purchase(model,style!="mostly-idle")
 		if bar.manager and opening=="manual" and style!="mostly-idle" and bar.action_levels.welcoming==0:
 			st.action("action_upgrade",1)
-		if model.s.street.bars.size()==1 and model.s.street.chapter>=1 and model.street.selected().cash>=st.purchase_cost(expansion)+st.opening_reserve(expansion):
-			st.finance.transfer(bar,st.purchase_cost(expansion)+st.opening_reserve(expansion),true)
+		if model.s.street.bars.size()==1 and model.s.street.chapter>=1 and model.s.cash>=st.purchase_cost(expansion)+st.opening_reserve(expansion):
 			st.action("buy",expansion)
 			if model.s.street.bars.size()>1: times.second = second
 		if model.s.street.bars.size()>1:
 			model.s.street.selected = 1
 			var other: Dictionary = st.selected()
-			if model.street.selected().cash>=C.BARTENDER_CONTRACT_COST+eco.operating_rate(other)*2+48:
+			if model.s.cash>=C.BARTENDER_CONTRACT_COST+eco.operating_rate(other)*2+48:
 				if other.team.is_empty(): st.action("hire",0)
 				elif not eco.contracted(other.team[0]): st.action("rehire",0)
-			if not other.team.is_empty() and int(other.team[0].get("training",0))<2 and model.street.selected().cash>2500: st.action("train_staff",0)
-			if not other.restock and model.street.selected().cash>1100: st.action("restock")
-			if other.stock<8 and model.street.selected().cash>150: eco.restock(other)
+			if not other.team.is_empty() and int(other.team[0].get("training",0))<2 and model.s.cash>2500: st.action("train_staff",0)
+			if not other.restock and model.s.cash>1100: st.action("restock")
+			if other.stock<8 and model.s.cash>150: eco.restock(other)
 			model.s.street.selected = 0
 			if bar.stage==2 and eco.upgrade_reason(bar).is_empty(): st.action("upgrade")
 		if bar.manager and times.manager<0:
@@ -134,15 +145,11 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		var event: Dictionary = model.s.street.event
 		if event.get("id",-1)==C.RAT_PLAGUE:
 			if not event.prepared:
-				var missing := maxi(0,int(st.preparation_offer().required)-int(model.s.cash))
-				if missing>0: st.finance.transfer(bar,missing,true)
 				if st.preparation_offer().enabled: st.action("prepare")
 			var targets: Array = st.rat_targets()
 			if not targets.is_empty() and (not event.prepared or targets.size()<=C.RAT_STRAGGLERS) and second%click_interval==0:
 				st.catch_rat(targets.front())
-		elif event.get("phase","")=="warning" and bar.cash>700 and event.id in [0,3] and not event.prepared:
-			var missing := maxi(0,int(st.preparation_offer().required)-int(model.s.cash))
-			if missing>0: st.finance.transfer(bar,missing,true)
+		elif event.get("phase","")=="warning" and model.s.cash>700 and event.id in [0,3] and not event.prepared:
 			st.action("prepare")
 
 		st.tick(1)
@@ -151,7 +158,7 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 	times.music = st.selected().equipment.music
 	times.auto_serve = st.selected().auto_serve
 	times.supplier = st.selected().supplier_level
-	times.cash = model.street.selected().cash
+	times.cash = model.s.cash
 	times.happy = st.selected().happy
 	times.regulars = st.selected().regulars
 	times.healthy = st.selected().healthy
@@ -198,7 +205,7 @@ func cycle_purchase(model, owner_active: bool) -> Dictionary:
 	var level := int(model.s.street.marketing_level)
 	if level<C.MARKETING_PRICES.size():
 		var price := int(C.MARKETING_PRICES[level])
-		if b.cash+model.s.cash>=price+e.working_cash(b):
+		if model.s.cash>=price+2*e.pack_price(b)+2*e.operating_rate(b):
 			var view: Dictionary = e.forecast(b,false,-1,-1,0,owner_active,{},float(C.MARKETING_TRAFFIC[level]))
 			candidates.append({"action":"marketing","index":0,"name":"marketing","price":price,"gain":view.net-baseline.net})
 	var best := {}
@@ -207,8 +214,6 @@ func cycle_purchase(model, owner_active: bool) -> Dictionary:
 		if best.is_empty() or candidate.gain/candidate.price>best.gain/best.price: best = candidate
 	if best.is_empty(): return {}
 	if best.action=="marketing":
-		var missing := maxi(0,int(best.price)-int(model.s.cash))
-		if missing>0: model.street.finance.transfer(b,missing,true)
 		model.street.buy_marketing()
 	else:
 		model.street.action(best.action,best.index)

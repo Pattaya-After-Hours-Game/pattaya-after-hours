@@ -88,7 +88,7 @@ func run() -> void:
 	if filter.begins_with("badges-"):
 		app.show_tutorial_hint = false
 		app.drawer_open = false
-		app.model.street.selected().cash = 6000
+		app.model.s.cash = 6000
 		await capture(app,"badges-warning-alert")
 		app.model.booking(2,0)
 		await capture(app,"badges-green-counts")
@@ -117,7 +117,7 @@ func run() -> void:
 		app.change_tab(1)
 		await capture(app,"timers-event-details")
 		app.model.s.street.event = {}
-		bar.cash = 10000
+		app.model.s.cash = 10000
 		app.model.street.action("promotion",1)
 		bar.promo.remaining = 60
 		await capture(app,"timers-promotion-half","Venue promotions")
@@ -140,14 +140,14 @@ func run() -> void:
 	if filter.begins_with("tour-funding-"):
 		app.show_tutorial_hint = false
 		app.model.s.cash = 0
-		app.model.street.selected().cash = 670
+		app.model.s.cash = 670
 		app.change_tab(2)
 		await capture(app,"tour-funding-guides","",false)
 		app.guide = 2
 		await capture(app,"tour-funding-ready")
 		app.column.get_node("TourRoute_0").pressed.emit()
 		await capture(app,"tour-funding-active","",false)
-		app.model.street.selected().cash = 100
+		app.model.s.cash = 100
 		app.guide = 1
 		await capture(app,"tour-funding-short")
 		app.queue_free()
@@ -162,18 +162,34 @@ func run() -> void:
 		app.model.street.selected().stage = 3
 		for kind in [1,1,2]: app.model.street.action("buy",kind)
 		app.model.s.street.selected = 2
-		app.model.street.selected().cash = 1234
 		app.open_service_section("finance")
 		await capture(app,"finance-accounts","",false)
+		var history := find_text(app.column,"RECENT MONEY IN / OUT")
+		if history: app.scroll.scroll_vertical = int(history.position.y)
+		await capture(app,"finance-transactions","",false)
 		app.open_upgrades()
 		await capture(app,"finance-upgrades","",false)
 		app.open_upgrades(true)
 		await capture(app,"finance-renovation","",false)
 		app.change_tab(3)
+		await capture(app,"finance-leases","Lease Hostess bar",false)
 		await process_frame
 		var marketing := find_text(app.column,"STREET MARKETING")
 		if marketing: app.scroll.scroll_vertical = int(marketing.position.y)
 		await capture(app,"finance-marketing","",false)
+		app.model = Campaign.new(72)
+		app.model.s.cash = 0
+		var empty: Dictionary = app.model.street.selected()
+		empty.stock = 0
+		empty.stock_lots = []
+		empty.tip_visits = 24
+		app.change_tab(0)
+		app.open_fridge()
+		await capture(app,"finance-empty-fridge","Close & count tips",false)
+		app.street_action("close_and_count")
+		app.open_fridge()
+		await capture(app,"finance-tips-counted","",false)
+
 		app.queue_free()
 		await process_frame
 		quit()
@@ -195,7 +211,7 @@ func run() -> void:
 		return
 	if filter.begins_with("blue-hour-fridge-"):
 		app.show_tutorial_hint = false
-		app.model.street.selected().cash = 20000
+		app.model.s.cash = 20000
 		var bar: Dictionary = app.model.street.selected()
 		await capture(app,"blue-hour-fridge-0")
 		bar.stage = 3
@@ -220,7 +236,7 @@ func run() -> void:
 		for kind in 3:
 			app.model.street.action("buy",kind)
 			var bar: Dictionary = app.model.street.selected()
-			bar.cash = 20000
+			app.model.s.cash = 20000
 			for stage in range(1,4):
 				bar.stage = stage
 				for tier in [0,2]:
@@ -233,7 +249,7 @@ func run() -> void:
 		quit()
 		return
 	await capture(app,"opening")
-	app.model.street.selected().cash = 50
+	app.model.s.cash = 50
 	app.open_fridge()
 	await capture(app,"purchase-fridge")
 	app.open_service_section("team")
@@ -245,7 +261,7 @@ func run() -> void:
 
 	app.model.s.street.served = 10
 	app.model.street.selected().regulars = 1
-	app.model.street.selected().cash = 4900
+	app.model.s.cash = 4900
 	app.model.s.street.minute = 840
 	app.model.street.supplier_deal_tick()
 	app.open_supplier_special()
@@ -254,7 +270,7 @@ func run() -> void:
 	if filter.begins_with("renovation-"):
 		app.model = Campaign.new(72)
 		app.show_tutorial_hint = false
-		app.model.street.selected().cash = 659000
+		app.model.s.cash = 659000
 		app.model.s.rep = 100
 		app.model.s.street.chapter = 2
 		load("res://tests/finance_fixture.gd").buy(app.model.street,1)
@@ -274,10 +290,10 @@ func run() -> void:
 		venue.happy = 70
 		venue.regulars = 10
 		venue.healthy = 8
-		app.model.street.selected().cash = app.model.street.economy.upgrade_required_cash(venue)-1
+		app.model.s.cash = app.model.street.economy.upgrade_required_cash(venue)-1
 		app.open_upgrades(false)
 		await capture(app,"renovation-cash-reserve")
-		app.model.street.selected().cash = 1800
+		app.model.s.cash = 1800
 		await capture(app,"renovation-future-upgrades","STAGE 2 UPGRADES")
 		quit()
 		return
@@ -289,7 +305,7 @@ func run() -> void:
 	await capture(app,"service-team-help","TEAM & PAYROLL")
 	app.open_fridge()
 	await capture(app,"fridge-overview")
-	app.model.street.selected().cash = 2000
+	app.model.s.cash = 2000
 	app.model.street.action("restock")
 	await capture(app,"fridge-auto-restock")
 	app.model = Campaign.new(72)
@@ -302,7 +318,7 @@ func run() -> void:
 	app.show_tutorial_hint = false
 	app.model.s.street.chapter = 1
 	app.model.s.rep = 100
-	app.model.street.selected().cash = 100000
+	app.model.s.cash = 100000
 	app.change_tab(3)
 	await capture(app,"lease-first","Lease Beer bar")
 	await capture(app,"lease-hostess","Lease Hostess bar")
@@ -312,7 +328,7 @@ func run() -> void:
 	await capture(app,"lease-hostess-owned")
 	app.change_tab(3)
 	load("res://tests/finance_fixture.gd").buy(app.model.street,0)
-	app.model.street.selected().cash = 1000
+	app.model.s.cash = 1000
 	await capture(app,"lease-repeat-shortfall","Lease Beer bar")
 	app.model.s.day = 14
 	await capture(app,"lease-retirement-offer","Lease Hostess bar")
@@ -388,7 +404,7 @@ func run() -> void:
 	app.show_tutorial_hint = false
 	app.drawer_open = true
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	var cycle_bar: Dictionary = app.model.street.selected()
 	cycle_bar.equipment.seating = 3
 	await capture(app,"cycle-stage-one-lock","Cycle seating")
@@ -431,7 +447,7 @@ func run() -> void:
 	await capture(app,"cycle-finishing-pool","Hide visit plans")
 	app.visit_plans_open = false
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	await capture(app,"gabby-hire","Hire Gabby")
 	app.model.street.action("hire_gabby")
 	await capture(app,"gabby-roster","+฿5 tip")
@@ -453,7 +469,7 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.model.s.day = 8
 	app.model.s.rep = 100
-	app.model.street.selected().cash = 2611
+	app.model.s.cash = 2611
 	var club_bar: Dictionary = app.model.street.selected()
 	club_bar.stage = 2
 	club_bar.regulars = 40
@@ -463,7 +479,7 @@ func run() -> void:
 	app.model.street.action("regulars_club")
 	app.model.street.action("regulars_club")
 	await capture(app,"club-next-level","Regulars Club")
-	app.model.street.selected().cash = 5000
+	app.model.s.cash = 5000
 	app.model.street.action("equipment",8)
 	app.model.street.action("hire",0)
 	club_bar.team[0].training = 2
@@ -502,17 +518,17 @@ func run() -> void:
 	await capture(app,"fridge-happy-hour","Rum & cola")
 	app.change_tab(0)
 	app.model = Campaign.new(72)
-	var start_cash: int = app.model.street.selected().cash
-	app.model.street.selected().cash = 1800
+	var start_cash: int = app.model.s.cash
+	app.model.s.cash = 1800
 	await capture(app,"upgrades-badge")
 	app.open_upgrades()
 	await capture(app,"upgrades-all")
-	app.model.street.selected().cash = start_cash
+	app.model.s.cash = start_cash
 	await capture(app,"upgrades-locked")
-	app.model.street.selected().cash = 1800
+	app.model.s.cash = 1800
 	app.open_upgrades(true)
 	await capture(app,"upgrades-ready")
-	app.model.street.selected().cash = start_cash
+	app.model.s.cash = start_cash
 	app.upgrades_open = false
 	app.upgrades_ready_only = false
 	app.model.street.action("buy_drink",2)
@@ -539,7 +555,7 @@ func run() -> void:
 	await capture(app,"actions-chat-feedback")
 	app.drawer_open = true
 	await capture(app,"actions-upgrades","YOUR ACTION UPGRADES")
-	app.model.street.selected().cash = 250000
+	app.model.s.cash = 250000
 	for i in 3:
 		app.model.street.action("action_upgrade",0)
 		app.model.street.action("action_upgrade",1)
@@ -556,7 +572,7 @@ func run() -> void:
 	# Full roster, mixed availability and the shared bonus jar, without new art.
 	var empty_model = app.model
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 100000
+	app.model.s.cash = 100000
 	var hud_bar: Dictionary = app.model.street.selected()
 	hud_bar.stage = 3
 	app.model.street.action("hire_gabby")
@@ -577,7 +593,7 @@ func run() -> void:
 	hud_bar.open = false
 	await capture(app,"staff-ready-venue-closed")
 	app.model = empty_model
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.model.street.action("hire",0)
 	await capture(app,"staff-ready-waiting-order")
 	app.model.street.tick(1)
@@ -597,18 +613,18 @@ func run() -> void:
 	app.drawer_open = true
 	await capture(app,"staff-ready-price","YOUR ACTION UPGRADES")
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.model.street.action("hire",0)
 	app.model.street.action("hire",3)
 	app.model.street.action("auto_serve")
 	app.model.street.economy.advance_contracts(14400)
-	app.model.street.selected().cash = 1200
+	app.model.s.cash = 1200
 	await capture(app,"staff-ready-nida-shortfall","FRONTAGE PROMOTER")
-	app.model.street.selected().cash = 2000
+	app.model.s.cash = 2000
 	await capture(app,"staff-ready-nida-renew","FRONTAGE PROMOTER")
 	app.model.street.action("rehire",1)
 	await capture(app,"staff-ready-nida-renewed","FRONTAGE PROMOTER")
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.model.street.action("rehire",0)
 	app.model.street.selected().customers.clear()
 	app.model.street.economy.admit(app.model.street.selected())
@@ -621,7 +637,7 @@ func run() -> void:
 	app.model.street.selected().happy = 28
 	app.model.street.selected().healthy = 4
 	await capture(app,"guidance-renovation","ANONG'S NEXT STEP")
-	app.model.street.selected().cash = 7000
+	app.model.s.cash = 7000
 	app.model.street.action("hire",0)
 	app.model.street.action("restock")
 	app.model.street.selected().stage = 2
@@ -646,7 +662,7 @@ func run() -> void:
 	app.drawer_open = false
 	await capture(app,"night-prep-noon")
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 39
+	app.model.s.cash = 39
 	app.model.s.street.minute = 1045
 	app.model.street.selected().stock = 0
 	app.drawer_open = true
@@ -676,7 +692,7 @@ func run() -> void:
 	app.model.s.street.minute = 719
 	await capture(app,"party-opening-day")
 	app.model.s.street.minute = 720
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.model.street.action("equipment",2)
 	app.model.street.action("equipment",8)
 	app.model.street.action("hire",0)
@@ -705,7 +721,7 @@ func run() -> void:
 	app.drawer_open = true
 	app.model = Campaign.new(72)
 	app.tab = 0
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	await capture(app,"bulk-hiring","TEAM & PAYROLL")
 	app.model.street.action("hire",3)
 	await capture(app,"bulk-welcome","YOUR ACTION UPGRADES")
@@ -716,14 +732,14 @@ func run() -> void:
 	app.model.street.selected().stock = 19
 	await capture(app,"bulk-no-space","Buy 12 drinks")
 	app.model.street.selected().stock = 18
-	app.model.street.selected().cash = 431
+	app.model.s.cash = 431
 	await capture(app,"bulk-no-cash","Buy 12 drinks")
-	app.model.street.selected().cash = 432
+	app.model.s.cash = 432
 	await capture(app,"bulk-ready","Buy 12 drinks")
 	app.model.street.action("stock")
 	await capture(app,"bulk-delivered","Buy 12 drinks")
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 50000
+	app.model.s.cash = 50000
 	app.model.street.action("hire",0)
 	await capture(app,"staff-base","Train Bartender 1")
 	app.model.street.action("train_staff",0)
@@ -735,7 +751,7 @@ func run() -> void:
 	app.model.street.action("rehire",0)
 	app.drawer_open = true
 	await capture(app,"staff-rehired","Train Bartender 1")
-	app.model.street.selected().cash = 250000
+	app.model.s.cash = 250000
 	var first: Dictionary = app.model.street.selected()
 	app.drawer_open = false
 	await capture(app,"fan-before-purchase")
@@ -783,10 +799,10 @@ func run() -> void:
 	await capture(app,"pool-not-open")
 	app.drawer_open = true
 	first.open = false
-	app.model.street.selected().cash = 0
+	app.model.s.cash = 0
 	await capture(app,"economy-recovery")
 	first.open = true
-	app.model.street.selected().cash = 250000
+	app.model.s.cash = 250000
 	app.model.s.rep = 80
 	app.model.s.street.chapter = 4
 	app.show_tutorial_hint = false
@@ -824,7 +840,7 @@ func run() -> void:
 	await capture(app,"festival-complete")
 	# Promoter controls and compact layout use the real paid actions.
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 50000
+	app.model.s.cash = 50000
 	app.drawer_open = false
 	app.tab = 0
 	app.message = ""
@@ -871,7 +887,7 @@ func run() -> void:
 	await capture(app,"promoter-closed")
 	# Purchased automation, supply and management use model operations.
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 300000
+	app.model.s.cash = 300000
 	app.drawer_open = false
 	app.tab = 0
 	var automated: Dictionary = app.model.street.selected()
@@ -909,7 +925,7 @@ func run() -> void:
 	await capture(app,"automation-closed")
 	# Clock and prep scenes use the same live actions/state as the game.
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.tab = 0
 	app.drawer_open = true
 	app.message = ""

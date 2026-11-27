@@ -8,14 +8,14 @@ func run(test: SceneTree) -> void:
 	var e = m.street.economy
 	var before := JSON.stringify(m.s)
 	m.street.action("hire_gabby")
-	test.check(b.team.is_empty() and m.street.selected().cash==228,"Gabby hire respects contract cash and reserve")
-	m.street.selected().cash = 10000
+	test.check(b.team.is_empty() and m.s.cash==228,"Gabby hire respects contract cash and reserve")
+	m.s.cash = 10000
 	m.street.action("hire_gabby")
 	var p: Dictionary = b.team[0]
-	test.check(p.identity=="gabby" and p.role==0 and m.street.selected().cash==8800 and Art.worker_id(b,0)=="gabby","Gabby uses a paid bartender slot and her own artwork")
+	test.check(p.identity=="gabby" and p.role==0 and m.s.cash==8800 and Art.worker_id(b,0)=="gabby","Gabby uses a paid bartender slot and her own artwork")
 	before = JSON.stringify(b.team)
 	m.street.action("hire_gabby")
-	test.check(JSON.stringify(b.team)==before and m.street.selected().cash==8800,"A second hire cannot duplicate Gabby or charge again")
+	test.check(JSON.stringify(b.team)==before and m.s.cash==8800,"A second hire cannot duplicate Gabby or charge again")
 	e.staff_service(b)
 	test.check(p.drinks_served==1 and p.service_ready==25 and b.bonus_tips==5 and b.tip_visits==1,"Gabby earns five extra baht only after a real sale")
 	var revenue: int = b.shift.revenue
@@ -51,19 +51,19 @@ func run(test: SceneTree) -> void:
 	test.check(b.bonus_tips==10 and p.drinks_served==2,"A later real sale earns the next bonus")
 	loaded.s.day = 2
 	loaded.s.street.minute = 60
-	var money: int = loaded.street.selected().cash
+	var money: int = loaded.s.cash
 	var expected: int = b.tip_visits*10+b.bonus_tips
 	e.settle_tips()
-	test.check(loaded.street.selected().cash==money+expected and b.bonus_tips==0 and b.last_tips.bonus==10,"Nightly settlement includes Gabby's actual tips")
+	test.check(loaded.s.cash==money+expected and b.bonus_tips==0 and b.last_tips.bonus==10,"Nightly settlement includes Gabby's actual tips")
 	loaded.save_game()
 	var paid = Campaign.new(1)
 	test.check(paid.load_game(),"Gabby's settled receipt reloads")
-	money = paid.street.selected().cash
+	money = paid.s.cash
 	paid.street.economy.settle_tips()
-	test.check(paid.street.selected().cash==money,"Reload cannot pay Gabby's settled tips twice")
+	test.check(paid.s.cash==money,"Reload cannot pay Gabby's settled tips twice")
 	# Matched-drink tips and Gabby's service bonus are separate entitlements.
 	m = Campaign.new(72)
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	b = m.street.selected()
 	e = m.street.economy
 	m.street.action("hire_gabby")
@@ -102,12 +102,12 @@ func run_ui(test: SceneTree) -> void:
 	app.muted = true
 	app.start_new_game()
 	app.show_tutorial_hint = false
-	app.model.street.selected().cash = 10000
+	app.model.s.cash = 10000
 	app.change_tab(0)
 	test.use_button(app,"Team")
 	test.use_button(app,"Hire Gabby · ฿1,200")
 	var b: Dictionary = app.model.street.selected()
-	test.check(b.team.size()==1 and b.team[0].identity=="gabby" and app.model.street.selected().cash==8800,"Gabby's visible hiring button uses the paid model action")
+	test.check(b.team.size()==1 and b.team[0].identity=="gabby" and app.model.s.cash==8800,"Gabby's visible hiring button uses the paid model action")
 	test.use_button(app,"Gabby · On duty")
 	test.check(not b.team[0].on,"Gabby's named rota control updates her own slot")
 	b.team[0].contract_left = 0

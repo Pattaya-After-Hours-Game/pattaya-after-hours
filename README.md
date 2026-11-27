@@ -17,26 +17,24 @@ waiting-order dots turn red as patience runs out. Source and release downloads
 are tracked separately; the download links above select the latest published build.
 See [the current handover](docs/MERGE_HANDOFF.md) for chat and branch status.
 
-## Your bar's money, your company's money
+## One balance for the whole street
 
-Every bar has its own till and five-second **฿/s** figure. Tap **Till** for
-**Cash & Bank**: transfer money explicitly or deposit surplus while retaining
-working cash. A rich company can **Fund & buy** a local upgrade directly from
-Upgrades. Leases and **Empire → Street marketing** use company-bank money.
-Tours pay guides directly from the selected bar’s till. Tap a route to pay and
-start its agreement in one action.
+All money goes into and out of one shared account. Tap **MONEY** for
+**Money & costs**: see rent, electricity, on-duty wages and recent transactions.
+Purchases require only the listed price; there are no transfers or cash reserves.
 
-Renovations now require cash and operating reserve. Happy visits, regulars and
-healthy shifts earn **loyalty appeal**, rather than stopping a wealthy owner
-from building. Hostess and gogo frontage now has five tiers across three stages.
-Street marketing adds a bounded audience shared by all your venues: more seats,
-faster service and adequate stock still matter.
+If you cannot afford stock, **Close & count tips** pauses that venue's running
+costs and counts its earned jar immediately. Buy a full pack while closed, then
+enable opening. Repeated closing and reload never pay the same tips twice.
+Bo's consignment recovery remains available if the jar is too small.
 
-Managers cost **฿2,000 / ฿6,000 / ฿18,000** and earn **25% / 50% / 75%** of
-real drink and paid-pool gross margin. An empty room pays no bonus. Existing
-levels stay owned. Schema 16 preserves every baht of old till plus reserve,
-allocates working floats to venues and puts the balance in the bank.
-See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for the complete rules.
+Renovations use cash; happy visits, regulars and healthy shifts earn loyalty
+appeal. Street marketing attracts one bounded audience shared by all venues.
+Managers cost **฿2,000 / ฿6,000 / ฿18,000** and earn **25% / 50% / 75%** of real
+drink and paid-pool gross margin. Empty rooms earn no bonus.
+
+Schema 17 combines saved tills, bank and reserve without losing or adding money.
+See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for the current rules.
 
 ## Start playing
 
@@ -121,7 +119,7 @@ A two-note bell alerts you to waiting orders at the selected venue, repeating at
 most once every ten seconds. **Sound / Muted** controls it along with game audio.
 Staff cost money while on duty, even when the bar is quiet. Use the rota or temporarily close if
 costs outrun sales. An owner-run recovery shift offers a way back from an empty
-till. Renovations need their purchase price and operating cash. Local satisfied
+till. Renovations need their listed purchase price. Local satisfied
 customers, regulars and healthy shifts earn loyalty appeal instead of blocking construction. **Upgrades** lists current-stage purchases by budget,
 then shows the next renovation and the upgrades it opens. The **Renovate to stage**
 shortcut jumps to the renovation’s live requirements and purchase. **Ready only**
@@ -189,9 +187,9 @@ Hour is excluded from the repeat premium. Each earlier purchase of the same type
 adds **25% of that type's base price**, without compounding: beer bars cost
 ฿12,000, ฿15,000, ฿18,000, then ฿21,000. Renovation prices stay unchanged.
 
-Empire separates **pay now**, **keep in till**, **total opening cash**, running
-costs and estimated house-drink break-even. The reserve is not a second fee.
-Shared street traffic and local renovation milestones still apply.
+Empire shows the lease price, running costs and estimated house-drink break-even.
+The lease price is the entire purchase requirement.
+Shared street traffic and chapter/reputation lease requirements still apply.
 
 Retiring-owner offers are explicit: every fourteenth game day, one venue type
 gets 10% off leases for that day, rotating Hostess → Beer → Gogo. Empire shows
@@ -213,7 +211,7 @@ drink commission. It stops on closure and does not grant satisfied customers.
 Operating costs still apply. Managed offline estimates include it during legal
 opening windows. Existing appointments are retained as level 1.
 
-The **฿/s beneath the till** refreshes every five foreground seconds and shows
+The **฿/s beneath MONEY** refreshes every five foreground seconds and shows
 net street trading: receipts minus stock purchases, operating costs, commission
 and fines. It excludes equipment/contract purchases, nightly tip counts and offline lump sums.
 Nida now faces toward the street; a purchased music system has a playing/off
@@ -296,7 +294,7 @@ paused on the menu, and offline estimates are claimed only when you resume.
 
 The game autosaves after decisions and every fifteen seconds, and on normal
 close or application pause. New games are saved immediately. Older campaigns
-retain money, staff, venues and owned stages when migrated to save schema 16.
+retain money, staff, venues and owned stages when migrated to save schema 17.
 Schema 15 retains sponsored orders, paid rounds and Room Buzz. Old visitors keep
 their budgets and plans and receive no new hosted-drink invitation.
 Schema 14 saves host training, auto-accept and thirty-second booking deadlines.
@@ -390,8 +388,8 @@ She attracts visitors; bartenders serve their orders.
 
 This update adds ten-day staff contracts, individual training that survives
 rehiring, measured 25/20/15-second service, and a waiting-order bell. Hiring and
-rehiring now cost ฿1,200 for bartenders (hosts/dancers remain ฿4,500); leases now follow the Beer/Hostess/Gogo ladder documented above, with room reserved for
-the new hiring reserve and training costs. Existing hires and training migrate,
+rehiring now cost ฿1,200 for bartenders (hosts/dancers remain ฿4,500); leases follow the Beer/Hostess/Gogo ladder documented above. All purchases
+require only their advertised price. Existing hires and training migrate,
 and offline projections stop crediting staff service at contract expiry. See the
 [player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).
 
@@ -463,9 +461,8 @@ remain available and share the owner's unchanged cooldown. The price stays
 ฿3,000 while this division of work is evaluated.
 
 Nida's **Rehire** button now sits directly under **Frontage promoter**, with the
-full cash requirement and exact shortfall. Her ฿1,200 renewal also requires a
-reserve for two minutes of payroll and one current-price delivery. For a basic
-bar without other staff this means ฿1,464 cash: ฿1,200 paid, ฿264 retained.
+full cash requirement and exact shortfall. Her renewal requires exactly ฿1,200
+from shared money, without an extra stock or payroll reserve.
 Active contracts cannot be renewed early; use her rota if she is off duty.
 Expiry refreshes the controls, and rehiring retains her training and roster slot.
 
@@ -478,7 +475,7 @@ section without spending anything. Progress is read from the existing save;
 there is no checklist payout or extra compulsory purchase.
 
 Bartender training costs **฿400 / ฿800**, then **฿1,200 / ฿1,600** from stage two. The first manager costs **฿2,000** and earns a bonus from actual customer margins. Stage-three renovations cost **฿40,000 / ฿65,000 / ฿120,000** for
-beer / hostess / gogo venues, plus the operating reserve. The old customer
+beer / hostess / gogo venues, with no additional cash reserve. The old customer
 thresholds now earn loyalty ranks (+5% / +10% appeal); they do not block renovation. Existing upgrades stay owned, with no retroactive refunds.
 
 Regulars Club starts at **฿600** from stage two, giving regular visitors a reason

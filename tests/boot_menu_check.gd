@@ -30,9 +30,9 @@ func run(test: SceneTree) -> void:
 	idle_at_menu(app)
 	test.check(JSON.stringify(app.model.s)==state and not FileAccess.file_exists(Campaign.SAVE),"Menu, pause, resume and exit never simulate or create a save")
 	test.use_button(app,"New Game")
-	test.check(not app.boot_menu and app.show_tutorial_hint and app.model.street.selected().cash==228,"New Game opens the fresh Blue Hour")
+	test.check(not app.boot_menu and app.show_tutorial_hint and app.model.s.cash==228,"New Game opens the fresh Blue Hour")
 	test.check(FileAccess.file_exists(Campaign.SAVE),"New Game persists immediately")
-	app.model.street.selected().cash = 4321
+	app.model.s.cash = 4321
 	app.model.s.day = 7 # The pending birthday must not start on the menu.
 	app.model.street.selected().equipment.pool = 1
 	app.save_state()
@@ -59,7 +59,7 @@ func run(test: SceneTree) -> void:
 	app._unhandled_key_input(escape)
 	test.check(not app.new_game_confirmation,"Escape cancels replacement")
 	test.use_button(app,"Resume")
-	test.check(not app.boot_menu and app.model.street.selected().cash==4321 and app.model.s.day==7 and app.model.street.selected().equipment.pool==1,"Resume restores money, date and equipment")
+	test.check(not app.boot_menu and app.model.s.cash==4321 and app.model.s.day==7 and app.model.street.selected().equipment.pool==1,"Resume restores money, date and equipment")
 	var resumed := JSON.stringify(app.model.s)
 	app.resume_game()
 	test.check(JSON.stringify(app.model.s)==resumed,"Repeated Resume cannot claim or reload twice")
@@ -71,16 +71,16 @@ func run(test: SceneTree) -> void:
 	app = launch(test)
 	test.check(app.resume_available,"A valid backup enables Resume")
 	test.use_button(app,"Resume")
-	test.check(app.model.street.selected().cash==4321,"Resume recovers the backup")
+	test.check(app.model.s.cash==4321,"Resume recovers the backup")
 	close(app)
 	app = launch(test)
 	test.use_button(app,"New Game")
 	test.use_button(app,"Erase progress & start new game")
-	test.check(not app.boot_menu and app.model.street.selected().cash==228 and app.model.s.day==1 and app.model.street.selected().equipment.pool==0,"Confirmed New Game clears previous progress")
+	test.check(not app.boot_menu and app.model.s.cash==228 and app.model.s.day==1 and app.model.street.selected().equipment.pool==0,"Confirmed New Game clears previous progress")
 	test.check(not FileAccess.file_exists(Campaign.BACKUP),"New Game removes the previous backup")
 	close(app)
 	var restored := Campaign.new()
-	test.check(restored.load_game() and restored.street.selected().cash==228 and restored.s.day==1,"A new run survives an immediate relaunch")
+	test.check(restored.load_game() and restored.s.cash==228 and restored.s.day==1,"A new run survives an immediate relaunch")
 	broken = FileAccess.open(Campaign.SAVE,FileAccess.WRITE)
 	broken.store_string("broken")
 	broken.close()
@@ -91,12 +91,12 @@ func run(test: SceneTree) -> void:
 	test.check(app.new_game_confirmation,"Even an unreadable existing save requires replacement confirmation")
 	test.use_button(app,"Erase progress & start new game")
 	# In-game restart uses the same replacement semantics.
-	app.model.street.selected().cash = 6789
+	app.model.s.cash = 6789
 	app.save_state()
 	app.save_state()
 	app.restart()
 	app.restart()
-	test.check(app.model.street.selected().cash==228 and not FileAccess.file_exists(Campaign.BACKUP),"In-game restart also removes the erased backup")
+	test.check(app.model.s.cash==228 and not FileAccess.file_exists(Campaign.BACKUP),"In-game restart also removes the erased backup")
 	saved = FileAccess.get_file_as_string(Campaign.SAVE)
 	app.start_tutorial()
 	app.start_new_game()
@@ -113,7 +113,7 @@ func run(test: SceneTree) -> void:
 	bar.team = [{"role":0,"on":true,"host":-1}]
 	for person in bar.team: managed.street.economy.ensure_staff_service(person)
 	bar.crew = 1
-	managed.street.selected().cash = 10000
+	managed.s.cash = 10000
 	managed.s.street.last_seen = int(Time.get_unix_time_from_system())-3600
 	managed.s.rng = str(managed.rng.state)
 	var fixture := FileAccess.open(Campaign.SAVE,FileAccess.WRITE)
@@ -122,13 +122,13 @@ func run(test: SceneTree) -> void:
 	saved = FileAccess.get_file_as_string(Campaign.SAVE)
 	app = launch(test)
 	idle_at_menu(app)
-	test.check(app.model.street.selected().cash==10000 and app.offline_notice==0 and FileAccess.get_file_as_string(Campaign.SAVE)==saved,"Managed offline profit waits for Resume")
+	test.check(app.model.s.cash==10000 and app.offline_notice==0 and FileAccess.get_file_as_string(Campaign.SAVE)==saved,"Managed offline profit waits for Resume")
 	test.use_button(app,"Resume")
-	test.check(app.offline_notice>0 and app.model.street.selected().cash==10000+app.offline_notice,"Resume claims the eligible managed profit")
-	var credited := int(app.model.street.selected().cash)
+	test.check(app.offline_notice>0 and app.model.s.cash==10000+app.offline_notice,"Resume claims the eligible managed profit")
+	var credited := int(app.model.s.cash)
 	var claimed_at := int(app.model.s.street.last_seen)
 	close(app)
 	restored = Campaign.new()
-	test.check(restored.load_game() and restored.street.selected().cash==credited and restored.street.claim_offline(claimed_at)==0,"Resume persists offline credit without replaying it")
+	test.check(restored.load_game() and restored.s.cash==credited and restored.street.claim_offline(claimed_at)==0,"Resume persists offline credit without replaying it")
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)

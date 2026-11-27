@@ -18,38 +18,38 @@ func run(test: SceneTree) -> void:
 	test.check(st.next_goal().tab==1,"Reopening guidance sends player to Events")
 	m.s.street.events_survived = 1
 	test.check(st.next_goal().focus=="TEAM & PAYROLL","Management guidance explains the bartender prerequisite")
-	m.street.selected().cash = 50000
+	m.s.cash = 50000
 	st.action("hire",0)
 	var person: Dictionary = bar.team[0]
 	e.staff_service(bar)
 	var deadline: float = person.service_ready
-	var money: int = m.street.selected().cash
+	var money: int = m.s.cash
 	st.action("train_staff",0)
-	test.check(m.street.selected().cash==money-400 and e.service_seconds(person)==20 and person.service_ready==deadline,"First training costs 400, improves future service and keeps current recovery")
+	test.check(m.s.cash==money-400 and e.service_seconds(person)==20 and person.service_ready==deadline,"First training costs 400, improves future service and keeps current recovery")
 	st.action("train_staff",0)
-	test.check(m.street.selected().cash==money-1200 and e.service_seconds(person)==15,"Full bartender training costs 1200 in total")
+	test.check(m.s.cash==money-1200 and e.service_seconds(person)==15,"Full bartender training costs 1200 in total")
 	test.check(st.next_goal().focus=="SUPPLIER AGREEMENT","Guidance finds delivery automation before management")
 	st.action("restock")
 	bar.healthy = 8
 	test.check(st.next_goal().focus=="MANAGEMENT" and st.next_goal().detail.contains("฿2000"),"Manager target quotes the current price")
-	var reserve: int = (e.operating_rate(bar)+12)*2
-	m.street.selected().cash = 2000+reserve-1
+	var reserve: int = 0
+	m.s.cash = 2000+reserve-1
 	st.action("manager")
-	test.check(not bar.manager,"Cheaper manager still requires the operating reserve")
-	m.street.selected().cash += 1
+	test.check(not bar.manager,"Manager requires its full listed price")
+	m.s.cash += 1
 	st.action("manager")
-	test.check(bar.manager and m.street.selected().cash==reserve and m.s.street.chapter==1,"Exact manager threshold unlocks existing chapter through the shared rules")
-	test.check(st.next_goal().tab==3 and st.next_goal().detail.contains("Reputation"),"Expansion guidance shows lease reserve and reputation rather than granting another crowd")
+	test.check(bar.manager and m.s.cash==reserve and m.s.street.chapter==1,"Exact manager threshold unlocks existing chapter through the shared rules")
+	test.check(st.next_goal().tab==3 and st.next_goal().detail.contains("Reputation"),"Expansion guidance shows lease price and reputation rather than granting another crowd")
 	m.save_game()
 	var loaded = Campaign.new(8)
-	test.check(loaded.load_game() and loaded.street.selected().cash==m.street.selected().cash and loaded.street.selected().team[0].training==2 and loaded.street.selected().manager,"Existing save schema retains purchased training/management with no price-change refund")
+	test.check(loaded.load_game() and loaded.s.cash==m.s.cash and loaded.street.selected().team[0].training==2 and loaded.street.selected().manager,"Existing save schema retains purchased training/management with no price-change refund")
 	for kind in 3:
 		bar.type = kind
 		bar.stage = 2
 		bar.happy = 449
 		bar.regulars = 70
 		bar.healthy = 40
-		m.street.selected().cash = 1000000
+		m.s.cash = 1000000
 		test.check(e.upgrade_reason(bar).is_empty() and e.loyalty_rank(bar)==1,"Money buys renovation while happy visits earn the second loyalty rank")
 		bar.happy = 450
 		bar.regulars = 69
@@ -58,9 +58,9 @@ func run(test: SceneTree) -> void:
 		bar.healthy = 39
 		test.check(e.upgrade_reason(bar).is_empty() and e.loyalty_rank(bar)==1,"Healthy shifts affect loyalty rather than construction")
 		bar.healthy = 40
-		money = m.street.selected().cash
+		money = m.s.cash
 		st.action("upgrade")
-		test.check(bar.stage==3 and m.street.selected().cash==money-C.RENOVATIONS[kind][1],"Final renovation charges its venue-specific price after local gates")
+		test.check(bar.stage==3 and m.s.cash==money-C.RENOVATIONS[kind][1],"Final renovation charges its venue-specific price after local gates")
 	for chapter in range(2,6):
 		m.s.street.chapter = chapter
 		before = JSON.stringify(m.s)

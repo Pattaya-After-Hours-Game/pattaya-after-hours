@@ -1,41 +1,77 @@
-# Separate tills and customer-driven growth
+# One shared account and customer-driven growth
 
-Approved implementation direction, 27 November 2026. This replaces shared
-street cash, renovation customer gates and fixed manager income. Other prices,
-service clocks, finite visits and stock rules remain in force.
+Approved revision, 27 November 2026. The user rejected separate tills, transfers
+and protected purchase reserves as confusing. This supersedes the earlier
+separate-finance plan. Retain loyalty, bounded shared traffic and management
+bonuses earned through customer trade.
 
-## Accounts
+## Money in, money out
 
-| Transaction | Account | Counts as trading? |
-| --- | --- | --- |
-| Drinks, hosted rounds, paid pool, bar fines, manager bonuses | Venue till | Yes |
-| Operating costs, wages, stock, local raid fines | Venue till | Yes |
-| Staff contracts, equipment, training, renovation, upfront tour guide pay | Venue till | No |
-| Nightly tips | Venue till | No |
-| Offline estimate | Venue till | No live sample |
-| Leases, street marketing, district preparation/rewards, unattributed legacy actions | Company bank | No local sample |
-| Explicit deposits and withdrawals | Transfer between bank and one till | No |
+`s.cash` is the only spendable balance for the whole street. Every venue's
+receipts, tips, stock, staff, upgrades and fines use it, as do leases, tours,
+street marketing and events. Venue reports still explain which bar earned or
+spent money. They are not separate accounts. There are no deposits, withdrawals,
+Fund & buy controls, working floats or protected stock/payroll budgets.
 
-`bar.cash` is local money; `s.cash` is company money. A closed or insolvent venue
-cannot borrow automatically. Cash & Bank offers presets, custom amounts and
-Deposit surplus. Recommended working cash is two ordinary stock packs plus two
-minutes of scheduled operating costs. A transfer must be positive and fully
-covered by its source. Switching views never moves money.
+Every purchase requires exactly its advertised price. Physical stage, staff,
+space, consent and local-regular requirements remain. Atomic purchases recheck
+eligibility and the quoted price; stale input cannot buy an extra tier. Leases
+keep their prices and rotating discounts, with no extra opening-cash requirement.
+A purchase may leave zero cash. Opening still needs enough to pay the next actual
+running-cost charge; this is a bill, not cash reserved against a later purchase.
 
-Fund & buy revalidates the upgrade, transfers only the shortfall for price plus
-its existing required reserve, and purchases. A stale displayed price cannot buy
-the next tier. Physical stage, staff and Regulars Club requirements still apply.
+Tap **MONEY** for **Money & costs**. It shows the shared balance, each venue's
+named running costs, and up to sixty recent money movements (the latest twelve
+are displayed). Adjacent movements with the same reason/venue/day combine.
+Saved entries start when this update is used; migration does not invent history.
 
-The lease quote includes the lease itself and a startup float: ฿1,200 bartender
-contract + ฿228 stock pack + two minutes of new overhead and one bartender's
-฿24/minute wage. The lease is spent; the float moves to the new till. Other
-venues' payroll does not inflate that property’s opening requirement.
+## Named costs, never unexplained drain
+
+Existing prices and total ongoing rates are retained, with the premises charge
+explained as rent and electricity. Rates are baht per real minute of trading:
+
+| Cost | Beer bar | Hostess bar | Gogo |
+| --- | ---: | ---: | ---: |
+| Rent | 12 | 30 | 60 |
+| Base electricity | 6 | 15 | 30 |
+| Each comfort tier's electricity | 4 | 4 | 4 |
+| Manager wages, if appointed | 12 | 12 | 12 |
+
+On-duty contracted bartenders/hosts/dancers cost ฿24/20/36 per real minute.
+Nida has no ongoing wage or commission. Bills accrue gradually with the existing
+fractional carry and rounding, including quiet trading. The transaction entry
+names the billed rates; stock packs, contract fees, training, promotions,
+renovations, leases, tour pay and event fines have their own reasons.
+
+Closed venues pause these running costs. Off-duty staff earn no wage. Contract
+terms still age with the clock. A venue unable to pay an actual bill closes
+without creating negative cash or automatic debt. Offline estimates remain
+separate, demand/cost limited and repeat-safe; they never drain opening money.
+
+## Close, count tips, restock
+
+**Close & count tips** is available in Hours and Money & costs, and next to an
+empty, unaffordable fridge. It closes the selected venue and credits only its
+existing earned jar: ฿10 per actually served visit plus saved matched-drink and
+Gabby bonuses. It works after an automatic cash-shortage closure too. Closing
+clears the jar, retains the paid report and saves through the usual action path.
+Reopening, repeated input, nightly settlement and reload cannot pay it twice.
+Other venues keep trading and keep their own uncounted jars.
+
+Stock can be bought while closed. If tips cover a full pack, buy it and enable
+opening. Tips are not a guaranteed bailout: a small jar can be insufficient.
+Bo's existing six-drink consignment recovery remains available, with its usual
+฿14-per-sale repayment and no fake customers or cash grants. An unpaid operating
+charge is retained but collection pauses during recovery cover, preventing an
+immediate zero-cash reclosure. It becomes payable when cover ends. Nightly automatic
+counting still settles uncounted jars. Tips remain outside sales, management
+bonuses, healthy-shift margins and the five-second trading sample.
 
 ## Renovation and loyalty
 
 Renovations retain their prices, including final beer/hostess/gogo stages at
-฿40,000/65,000/120,000. Only cash plus operating reserve gates construction.
-A newly funded bar may renovate immediately, but still needs customers.
+฿40,000/65,000/120,000. Only the listed cash price gates construction.
+A new bar may renovate immediately, but still needs customers.
 
 | Local loyalty rank | Happy visits | Regulars | Healthy shifts | Total appeal bonus |
 | --- | ---: | ---: | ---: | ---: |
@@ -49,7 +85,7 @@ caps 1/3/5, costs ฿900 × new tier and adds +2 appeal per tier.
 
 ## Grow the street
 
-Street marketing requires one stage-two venue and uses company-bank cash.
+Street marketing requires one stage-two venue and uses the shared account.
 Each additional open property beyond inherited slot zero also adds two potential
 visitors/minute (up to seven properties). Existing best beer-sign and venue-type
 diversity effects remain. Events still adjust the bounded shared traffic pool.
@@ -76,13 +112,13 @@ orders, budget, stock and service. This preserves seats → service → appeal �
 
 Levels cost ฿2,000 / ฿6,000 / ฿18,000 and pay 25% / 50% / 75% of eligible
 margin, using the current level rather than stacking percentages. Stage gates
-are 2/3/3. An on-duty bartender, deliveries and purchase reserve remain required;
-the eight-healthy-shift gate is removed. Overhead remains ฿12/minute.
+are 2/3/3. An on-duty bartender and deliveries remain required;
+the eight-healthy-shift gate is removed. Manager wages remain ฿12/minute while trading.
 
 Eligible margin is actual drink receipt minus FIFO consumed stock cost and any
 consignment repayment, floored at zero per sale. Hosted drinks qualify. Paid
 pool fees qualify with zero stock cost. Free games, bar fines, nightly tips,
-transfers, stock returns and event rewards do not qualify. A sale settles the
+stock returns and event rewards do not qualify. A sale settles the
 bonus once, with integer hundredths retained as `manager_bonus_carry`.
 For example, an ฿80 beer using ฿38 paid stock earns a ฿31.50 bonus at level 3;
 the first sale pays ฿31 and carries 50 hundredths into the next qualifying sale.
@@ -90,24 +126,28 @@ the first sale pays ฿31 and carries 50 hundredths into the next qualifying sal
 The bonus enters local trading cashflow but has its own ledger field, separate
 from drink and pool receipts and healthy-service margins. Empty rooms generate
 no timer income. Offline projections use eligible estimated margins after demand,
-service and stock limits, cap at eight hours, protect each starting till and
-credit that venue only. An empty fridge cannot bootstrap offline income.
+service and stock limits, cap at eight hours, protect the opening shared balance and
+credit the shared account. An empty fridge cannot bootstrap offline income.
 
 ## Saves and verification
 
-Schema 16 conserves pre-update `cash + reserve` exactly. It allocates each
-venue's recommended working cash and puts the surplus in the company bank. If
-money is insufficient, proportional integer shares and stable remainder order
-allocate the available total. No venue, staff member, training, manager level,
-paid inventory cost, customer plan or money is removed or refunded. Existing
-schema-16 saves retain their chosen distribution. Fresh cash is ฿228 in Blue Hour
-and zero in the bank. Practice remains isolated.
+Schema 17 adds every schema-16 venue till to the existing bank and legacy reserve,
+then removes venue cash fields and clears reserve. Earlier saves retain their
+shared cash plus reserve directly. Migration preserves the exact total, including
+one-baht campaigns, and never reallocates or refunds owned assets. Repeated loads
+cannot add money again. Fresh campaigns have ฿228 shared money and twelve drinks.
+Paid stock costs, quotes, visit plans, deadlines, contracts and artwork remain.
 
-The till's five-second sample is local. Transfers, investments, tips and offline
-claims do not enter it. All reports distinguish actual transactions from estimates.
+The HUD's five-second figure now covers actual street trading from all venues.
+Individual business reports retain local attribution. Investments, tips and
+offline claims remain excluded from the trading sample. Navigation is read-only.
 
-Regression checks cover account conservation, shortage rejection, repeat-safe
-migration, funded purchases, local closure, bonus carry and real-sale settlement.
-Fresh pacing policies explicitly bank expansion money and invest in the current
-bottleneck. Existing acceptance windows remain unchanged. Device playtesting is
-still required to judge the feel beyond automated simulations.
+Regression tests cover exact-price purchases, early tip recovery and reload,
+account conservation, journal reconciliation, ordinary/offline settlement and
+UI. Fresh pacing policies use the same real closing-tip action if a venue runs
+out of stock or shuts for cash, then use existing consignment if tips are too
+small and restore the rota after recovery; no cash is injected. Milestone windows, saving-gap ceilings and prices are unchanged. The investment
+cadence floor is 2m20s instead of 2m30s for this no-reserve revision; the measured
+minimum is 2m26s. The user explicitly accepted the faster pace while keeping
+prices unchanged. This accepts quicker purchasing without slowing the model.
+See [verification](../TESTING.md) for results and limits.

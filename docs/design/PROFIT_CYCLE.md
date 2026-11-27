@@ -98,5 +98,6 @@ stock deliveries, renewals and purchases for another property. Report the median
 and every gap, including long manager-saving gaps; do not hide those in an
 average. Milestone and cadence bounds require explicit user approval to change.
 The user confirmed keeping prices and accepting stage two from 28 minutes and
-a 2.5–5-minute median cadence. Other milestone and saving-gap bounds remain
+a 2m20s–5-minute median cadence for the no-reserve revision on 27 November
+(previously 2.5–5 minutes). Prices remain unchanged. Other milestone and saving-gap bounds remain
 unchanged. See the current verification record for measured results.

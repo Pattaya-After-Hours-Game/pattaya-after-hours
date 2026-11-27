@@ -30,23 +30,23 @@ func run(test: SceneTree) -> void:
 	test.check(before==JSON.stringify(m.s),"Hosted offers, matching and Buzz reads consume neither state nor RNG")
 	test.check(e.hosted_offer(b,1).price==220 and e.hosted_offer(b,2).price==180,"Chat specialist earns the advertised forty-baht match premium")
 	var appeal: float = e.attraction(b)
-	var cash_before: int = m.street.selected().cash
+	var cash_before: int = m.s.cash
 	var stock_before: int = b.stock
 	m.street.action("host_drink",1)
-	test.check(b.host_rounds.size()==1 and e.pending(b)==1 and m.street.selected().cash==cash_before and b.stock==stock_before,"Choosing company creates one real order; only service earns cash or consumes stock")
+	test.check(b.host_rounds.size()==1 and e.pending(b)==1 and m.s.cash==cash_before and b.stock==stock_before,"Choosing company creates one real order; only service earns cash or consumes stock")
 	test.check(e.attraction(b)==appeal and b.away.is_empty(),"Hosted-drinks-only colleague stays present and keeps her appeal")
 	m.street.action("host_drink",0)
 	test.check(b.host_rounds.size()==1,"One guest cannot sponsor two hosts")
 	m.street.action("train_host",1)
 	test.check(b.host_rounds[0].quote==220,"Training never reprices an accepted sponsored order")
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	var drinks_before: int = g.drinks
 	var original_deadline: float = b.host_rounds[0].host_deadline
 	b.host_rounds[0].host_deadline = e.action_time()+5
-	test.check(e.serve(b,0)==0 and m.street.selected().cash==cash_before,"A zero-sized service request cannot sell an urgent hosted order")
+	test.check(e.serve(b,0)==0 and m.s.cash==cash_before,"A zero-sized service request cannot sell an urgent hosted order")
 	b.host_rounds[0].host_deadline = original_deadline
 	m.street.action("serve")
-	test.check(m.street.selected().cash==cash_before+220 and b.stock==stock_before-1 and g.fine_budget==380,"Serving the sponsored order spends real entertainment budget and paid stock")
+	test.check(m.s.cash==cash_before+220 and b.stock==stock_before-1 and g.fine_budget==380,"Serving the sponsored order spends real entertainment budget and paid stock")
 	test.check(b.shift.hosted_income==220 and b.shift.hosted_drinks==1 and b.shift.hosted_matches==1 and b.shift.consumed_stock==38,"Hosted receipts and consumed stock are separately reported in the actual ledger")
 	test.check(g.drinks==drinks_before and b.tip_visits==0 and b.bonus_tips==0 and b.host_rounds[0].state=="drinking","Host's drink does not grant the sponsor another personal round or duplicate first-visit tips")
 	before = JSON.stringify(m.s)
@@ -56,7 +56,7 @@ func run(test: SceneTree) -> void:
 	test.check(b.team[1].role==1,"Role switching cannot bypass a hosted round")
 	m.save_game()
 	var loaded = Campaign.new(9)
-	test.check(loaded.load_game() and loaded.s.version==16 and loaded.street.selected().host_rounds[0].state=="drinking" and is_equal_approx(loaded.street.selected().host_rounds[0].host_deadline,20.37),"Schema fifteen saves paid hosted rounds and fractional deadlines")
+	test.check(loaded.load_game() and loaded.s.version==17 and loaded.street.selected().host_rounds[0].state=="drinking" and is_equal_approx(loaded.street.selected().host_rounds[0].host_deadline,20.37),"Schema fifteen saves paid hosted rounds and fractional deadlines")
 	loaded.street.advance(20)
 	test.check(loaded.street.selected().host_rounds.is_empty() and loaded.street.selected().host_cheers==1,"A paid round completes once, including across reload")
 	loaded.street.advance(1)
@@ -69,10 +69,10 @@ func run(test: SceneTree) -> void:
 	g = guest(m)
 	m.street.action("host_drink",1)
 	b.stock = 0
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	test.check(not e.action_status(b,"serve").enabled and e.blocking_drink(b)==0,"Hosted-only queue correctly asks for house lager when empty")
 	m.street.action("serve")
-	test.check(m.street.selected().cash==cash_before and b.shift.hosted_drinks==0,"No stock means no hosted sale")
+	test.check(m.s.cash==cash_before and b.shift.hosted_drinks==0,"No stock means no hosted sale")
 	m.street.advance(30)
 	test.check(b.host_rounds.is_empty() and b.host_cheers==0 and b.lost_stock==1,"Unserved hosted order expires without cash, Buzz or endless guest retention")
 	m = BarFine.new().fixture(2)
@@ -92,10 +92,10 @@ func run(test: SceneTree) -> void:
 		guest(m,C.HOST_TOPICS[int(b.team[i].host)])
 		m.street.action("host_drink",i)
 		e.serve(b)
-	cash_before = m.street.selected().cash
+	cash_before = m.s.cash
 	m.s.street.elapsed = 20
 	e.hosted_tick(b)
-	test.check(b.host_cheers==0 and b.host_buzz_until==50 and m.street.selected().cash==cash_before,"Three paid completions trigger exactly thirty seconds of Room Buzz without a cash award")
+	test.check(b.host_cheers==0 and b.host_buzz_until==50 and m.s.cash==cash_before,"Three paid completions trigger exactly thirty seconds of Room Buzz without a cash award")
 	var with_buzz: float = e.attraction(b)
 	var supply: float = e.traffic_rate()
 	b.host_buzz_until = 0.0

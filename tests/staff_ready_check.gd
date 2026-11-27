@@ -4,7 +4,7 @@ const E = preload("res://scripts/economy.gd")
 
 func run(test: SceneTree) -> void:
 	var m = Campaign.new(72)
-	m.street.selected().cash = 100000
+	m.s.cash = 100000
 	m.s.street.pass_credit = -10000000
 	var b: Dictionary = m.street.selected()
 	var e = m.street.economy
@@ -69,13 +69,13 @@ func run(test: SceneTree) -> void:
 	p.service_clock = 9
 	m.save_game()
 	loaded = Campaign.new(11)
-	test.check(loaded.load_game() and loaded.s.version==16,"V8 staff records migrate without changing owned progress")
+	test.check(loaded.load_game() and loaded.s.version==17,"V8 staff records migrate without changing owned progress")
 	lb = loaded.street.selected()
 	test.check(lb.team[0].service_ready==loaded.s.street.elapsed+16 and lb.team[0].drinks_served==0,"Legacy partial work retains its remaining sixteen seconds; historical sales are not invented")
 
 	# Fractional foreground clocks survive serialization without an early serve.
 	m = Campaign.new(72)
-	m.street.selected().cash = 10000
+	m.s.cash = 10000
 	m.street.advance(0.37)
 	m.street.action("hire",0)
 	b = m.street.selected()
@@ -88,7 +88,7 @@ func run(test: SceneTree) -> void:
 
 	# Owner automation is relief for a staffed bar, not competition for quiet orders.
 	m = Campaign.new(72)
-	m.street.selected().cash = 20000
+	m.s.cash = 20000
 	m.s.street.pass_credit = -10000000
 	b = m.street.selected()
 	e = m.street.economy
@@ -130,7 +130,7 @@ func run_ui(test: SceneTree) -> void:
 	await test.process_frame
 	app.set_process(false)
 	app.start_new_game()
-	app.model.street.selected().cash = 100000
+	app.model.s.cash = 100000
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	bar.stage = 3

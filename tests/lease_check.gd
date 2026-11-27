@@ -18,10 +18,10 @@ func run(test: SceneTree) -> void:
 		m.s.cash = quote.required-1
 		var count: int = m.s.street.bars.size()
 		st.action("buy",kind)
-		test.check(m.s.street.bars.size()==count,"Lease requires the full opening reserve")
+		test.check(m.s.street.bars.size()==count,"Lease requires the listed price")
 		m.s.cash = quote.required
 		st.action("buy",kind)
-		test.check(m.s.street.bars.size()==count+1 and m.s.cash==0 and st.selected().cash==quote.reserve,"Lease price is spent and the operating float transfers into the new till")
+		test.check(m.s.street.bars.size()==count+1 and m.s.cash==0 and quote.reserve==0,"Lease price is spent once with no operating float")
 		test.check(st.purchase_cost(kind)==int(C.LEASES[kind])*125/100,"Next same-type lease adds 25 percent of base, never compounds")
 		st.action("buy",kind)
 		test.check(m.s.street.bars.size()==count+1,"Repeated unaffordable purchase cannot duplicate a venue")

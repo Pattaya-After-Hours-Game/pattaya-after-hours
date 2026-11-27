@@ -31,7 +31,7 @@ func capture(app: Control, name_text: String, rebuild: bool = true) -> void:
 
 func fresh(app: Control) -> void:
 	app.model = Campaign.new(72)
-	app.model.street.selected().cash = 999999
+	app.model.s.cash = 999999
 	app.model.s.cash = 999999
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 4

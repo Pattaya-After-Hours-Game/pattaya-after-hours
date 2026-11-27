@@ -44,7 +44,7 @@ func check_venue_fridges(test: SceneTree, app: Control) -> void:
 	for slot in app.model.s.street.bars.size():
 		app.model.s.street.selected = slot
 		var bar: Dictionary = app.model.street.selected()
-		bar.cash = 20000
+		app.model.s.cash = 20000
 		app.render()
 		var property_name := "Property%d" % slot
 		var thumbnail := app.find_child(property_name,true,false).get_child(0) as TextureRect
@@ -186,11 +186,11 @@ func run(test: SceneTree) -> void:
 	await click(test,test.find_button(app,"Fridge"))
 	app.scroll.scroll_vertical = 1000
 	await test.process_frame
-	var cash_before: int = app.model.street.selected().cash
+	var cash_before: int = app.model.s.cash
 	await click(test,test.find_button(app,"View auto-restock upgrade  ›"))
 	await test.process_frame
 	var supplier: Control = app.column.find_child("Upgrade_supplier",true,false)
-	test.check(app.upgrades_open and supplier!=null and app.scroll.get_global_rect().intersects(supplier.get_global_rect()) and app.model.street.selected().cash==cash_before,"Fridge opens the supplier upgrade without spending the till")
+	test.check(app.upgrades_open and supplier!=null and app.scroll.get_global_rect().intersects(supplier.get_global_rect()) and app.model.s.cash==cash_before,"Fridge opens the supplier upgrade without spending the till")
 	await click(test,app.drawer_close_button)
 	fridge_bar.equipment.menu = 0
 	fridge_bar.stock = saved_stock
@@ -200,7 +200,7 @@ func run(test: SceneTree) -> void:
 	var before := int(app.model.s.street.served)
 	await click(test,test.find_button(app,"Serve a drink"))
 	test.check(app.model.s.street.served==before+1,"Serve remains accessible with drawer closed")
-	app.model.street.selected().cash = 1000
+	app.model.s.cash = 1000
 	app.sync_upgrade_badge(true)
 	await click(test,app.upgrade_badge)
 	test.check(app.upgrades_open and not app.upgrades_ready_only,"The Service notification opens the full list with a pointer tap")
@@ -208,7 +208,7 @@ func run(test: SceneTree) -> void:
 	await test.process_frame
 	app.scroll.ensure_control_visible(pouring)
 	await click(test,pouring)
-	test.check(app.model.street.selected().cash==100 and app.model.street.selected().action_levels.pouring==1 and not app.upgrade_badge.visible,"Buying from the upgrade card updates cash, speed and the badge")
+	test.check(app.model.s.cash==100 and app.model.street.selected().action_levels.pouring==1 and not app.upgrade_badge.visible,"Buying from the upgrade card updates cash, speed and the badge")
 	app.close_drawer()
 	app.model.s.cash = 999999
 	app.model.s.rep = 100

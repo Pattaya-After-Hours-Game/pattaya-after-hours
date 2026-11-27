@@ -5,30 +5,30 @@ const Art = preload("res://scripts/art.gd")
 
 func run(test: SceneTree) -> void:
 	var m = Campaign.new(72)
-	m.street.selected().cash = 200000
+	m.s.cash = 200000
 	m.s.rep = 100
 	m.s.street.chapter = 2
 	var b: Dictionary = m.street.selected()
 	m.street.action("hire_daisy")
-	test.check(b.team.is_empty() and m.street.selected().cash==200000,"Daisy cannot be hired into a beer bar")
+	test.check(b.team.is_empty() and m.s.cash==200000,"Daisy cannot be hired into a beer bar")
 	load("res://tests/finance_fixture.gd").buy(m.street,1)
 	b = m.street.selected()
 	var e = m.street.economy
-	m.street.selected().cash = 4500+(e.operating_rate(b)+C.ROLE_WAGES[1])*2-1
-	var money: int = m.street.selected().cash
+	m.s.cash = 4499
+	var money: int = m.s.cash
 	m.street.action("hire_daisy")
-	test.check(b.team.is_empty() and m.street.selected().cash==money,"Daisy retains the exact host payroll reserve")
-	m.street.selected().cash += 1
-	money = m.street.selected().cash
+	test.check(b.team.is_empty() and m.s.cash==money,"Daisy requires the full host contract price")
+	m.s.cash += 1
+	money = m.s.cash
 	m.street.action("hire_daisy")
 	var p: Dictionary = b.team[0]
-	test.check(p.host==C.DAISY_HOST and p.role==1 and m.street.selected().cash==money-4500 and Art.worker_id(b,0)=="daisy","Daisy uses a paid host slot and her own artwork")
-	money = m.street.selected().cash
+	test.check(p.host==C.DAISY_HOST and p.role==1 and m.s.cash==money-4500 and Art.worker_id(b,0)=="daisy","Daisy uses a paid host slot and her own artwork")
+	money = m.s.cash
 	m.street.action("hire_daisy")
-	test.check(b.team.size()==1 and m.street.selected().cash==money,"Daisy cannot be duplicated or charged twice")
+	test.check(b.team.size()==1 and m.s.cash==money,"Daisy cannot be duplicated or charged twice")
 	m.street.action("role",0)
 	test.check(p.role==1 and p.host==C.DAISY_HOST,"Daisy keeps her entertainer identity")
-	m.street.selected().cash = 200000
+	m.s.cash = 200000
 	m.street.action("hire_gabby")
 	test.check(b.team.size()==2 and b.team[1].identity=="gabby" and Art.worker_id(b,1)=="gabby","Daisy and Gabby remain separate people with separate roles")
 	b.team[1].on = false
@@ -61,9 +61,9 @@ func run(test: SceneTree) -> void:
 	test.check(b.team.size()==2 and p.host==C.DAISY_HOST and p.host_training==1 and p.contract_left==14400 and p.host_return==30,"Renewal keeps Daisy's slot, training and return deadline")
 	load("res://tests/finance_fixture.gd").buy(loaded.street,1)
 	var other: Dictionary = loaded.street.selected()
-	money = loaded.street.selected().cash
+	money = loaded.s.cash
 	loaded.street.action("hire_daisy")
-	test.check(other.team.is_empty() and loaded.street.selected().cash==money,"Daisy has only one roster place across the street")
+	test.check(other.team.is_empty() and loaded.s.cash==money,"Daisy has only one roster place across the street")
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 
@@ -75,7 +75,7 @@ func run_ui(test: SceneTree) -> void:
 	app.muted = true
 	app.start_new_game()
 	app.show_tutorial_hint = false
-	app.model.street.selected().cash = 200000
+	app.model.s.cash = 200000
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 2
 	load("res://tests/finance_fixture.gd").buy(app.model.street,1)

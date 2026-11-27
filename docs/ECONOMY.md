@@ -9,8 +9,8 @@ serviceable while walking. Animation never changes admission, timers, budgets,
 stock, finances, saves or gameplay RNG.
 
 The current account and growth rules are defined in
-[Finance and growth](design/FINANCE_AND_GROWTH.md). Schema 16 replaces shared
-cash, renovation loyalty gates and timer-based manager income. Older dated
+[Finance and growth](design/FINANCE_AND_GROWTH.md). Schema 17 restores one shared
+account and removes purchase reserves. Loyalty and earned manager bonuses remain. Older dated
 balance records below describe previous releases, not current purchase rules.
 
 The live street is authoritative. `scripts/economy.gd` owns visitors, orders,
@@ -40,17 +40,13 @@ campaign outcomes appear below.
 
 ## Current finance and pacing — 27 November 2026
 
-Venue tills are independent; the company bank funds leases and street marketing.
-Fund & buy explicitly covers upgrade shortfalls. Renovations cost money and
-reserve; the old milestones earn local loyalty appeal. Management pays a bonus
-only on earned customer margins. [Finance and growth](design/FINANCE_AND_GROWTH.md)
-defines exact prices, account routing and schema-16 migration.
-
-Fresh active baselines reach the first pool table in 13–18 minutes, stage two
-in 29–34, a second property in 97–109 and stage three in 132–144. Manager saving
-gaps are 2m16s–3m20s and the longest investment gaps 19m35s–23m08s. These use
-real cash transfers and reinvestment, not a mandatory wait. See the
-[current verification record](TESTING.md) for exact timings and acceptance limits.
+One shared balance pays every venue and street action. There are no purchase
+reserves or opening floats. Close & count tips settles the selected real jar
+immediately and pauses costs. Named rent, electricity and payroll retain their
+existing combined rates; the Money view records recent cash movements.
+[Finance and growth](design/FINANCE_AND_GROWTH.md) defines exact routing,
+schema-17 conservation and closing recovery. Prior separate-account timings
+are historical; current verification is in [TESTING](TESTING.md).
 
 ## Current profit-cycle rules — 26 November 2026
 
@@ -118,9 +114,10 @@ offline estimates remain limited by demand, service, supply and operating costs.
 Current active pacing acceptance: stage two **28–45 min**, second property
 **75–115**, stage three **110–210**; manager saving gap **≤21 min**, longest
 investment gap **≤38 min**. Milestones use nearest-minute comparisons; gaps use
-exact seconds. Active profit-cycle routes target a **2.5–5-minute median** between
+exact seconds. Active profit-cycle routes target a **2m20s–5-minute median** between
 flagship investments at stage two. The user confirmed the faster lower bounds
-without changing prices. The following dated pricing/bonus/balance sections document prior
+without changing prices, including the quicker no-reserve cadence approved on
+27 November. The following dated pricing/bonus/balance sections document prior
 passes; their historical timings do not override these targets.
 
 ## Earlier venue pricing pass — 26 November 2026
@@ -178,11 +175,12 @@ independent of traffic RNG. Substitutes earn the base tip only.
 Tips are never earned by arrivals alone, pool, managers or offline estimates.
 
 The street counts all jars at final nightly closure, or an explicit legal night
-skip. Daytime close/open toggles and short business reports do not count them.
+skip. Explicit early closing also counts the selected venue’s unpaid jar; short
+business reports do not. Reopening alone never counts tips.
 `street.tip_night` prevents a second settlement on the same night, and pending
 counts clear atomically into each bar's `last_tips` and `tips_total`. If a player
 reopens a late venue after its jar was counted, newly earned tips remain pending
-until the next nightly count. Waiting for a late venue to finish does not multiply
+until explicit closing or the next nightly count. Waiting for a late venue to finish does not multiply
 the bonus. Cancellation of the clean-up jump does not undo or repay tips.
 
 Cash, weekly revenue and total street earnings receive the payout. Drink/pool
@@ -319,7 +317,7 @@ It runs per venue during live ticks, including guided play; it does not stack a
 second owner timer, reset an active deadline or advance through paused screens.
 Its toggle changes scheduling, never speed. Managed offline forecasts include
 its capacity without replaying saved live orders or advancing the live deadline.
-Purchases preserve the next shift’s operating reserve and affect subsequent uses,
+Purchases charge only their price and affect subsequent uses,
 never shorten an active refill. They do not change staff training or demand caps.
 
 Have a chat targets the eligible guest nearest departure, with at most ten seconds
@@ -413,7 +411,7 @@ the third seating level recovers up to three furniture places. Thus every legal
 stage-one combination holds twelve. At seating tier three, stage two holds eighteen with one table and
 comfort, sixteen with two. Tiers four/five add two more each. The layout recovery
 applies to all seating tiers from three onward. Other venue types retain two seating upgrades.
-Purchases preserve the next shift's operating reserve and show actual capacity.
+Purchases charge only their price and show actual capacity.
 
 `pack_quantity`, `stock_offer` and `restock` settle six drinks for ฿228 at supplier
 levels 0/1, then twelve drinks at level 2 and above (initially ฿432). Neither
@@ -452,7 +450,7 @@ or rewriting of historical profitability. Schema 12 remains compatible; legacy
 commission fields stay in the save and validators for historical reporting.
 
 Hire previews show post-hire cash and the required
-one-shift payroll plus one current-price pack reserve, arrivals, unattended and owner-active net,
+the exact contract-price shortfall, arrivals, unattended and owner-active net,
 and whole-street impact. These are capacity estimates, not promises of revenue;
 they account for other properties losing some shared visitors. Hiring more
 attraction into a service bottleneck can reduce net profit.
@@ -533,7 +531,7 @@ refresh rather than stack duration. Fractional foreground deadlines, quotes,
 progress and guest flags survive reload; menu/offline time cannot advance them.
 Ordinary forecasts/offline estimates exclude hosted transactions and Buzz.
 
-**฿1,500 auto-host rounds** needs an on-duty host and the next shift's reserve.
+**฿1,500 auto-host rounds** needs an on-duty host and its listed price.
 It prefers matches and gives hosted-drinks-only colleagues first choice in ties.
 Auto-barfines, if enabled, run first; auto-hosting then invites remaining guests.
 Purchasing/toggling pays no receipt. The saved toggle affects future invitations.
@@ -571,13 +569,12 @@ The newly integrated bed-race runner keeps its separate event return rule.
 Host training is personal, independent of bartender/audience training, and
 survives expiry, renewal and reassignment. Levels 0/1/2 supply base appeal
 **0.6/1.2/1.8** and future fees **฿500/750/1,000**. Training costs **฿1,500/3,000**
-and needs venue stage **2/3** respectively, an active contract and the next
-shift's operating reserve. Non-booking hosts may train appeal without changing
+and needs venue stage **2/3** respectively, an active contract and the listed price. Non-booking hosts may train appeal without changing
 consent. Appeal competes for the same shared traffic; it creates no extra buyers.
 Training never changes an already-paid fee or its return deadline.
 
 **฿3,000 auto-accept** is a permanent per-Soi-venue purchase requiring a contracted
-willing host and the operating reserve. Its saved toggle defaults on when bought.
+willing host and the listed price. Its saved toggle defaults on when bought.
 Live ticks use the same acceptance action after service; purchasing or toggling
 it does not itself accept anything. It adds no offline booking income.
 
@@ -602,10 +599,9 @@ serve, attract, accept bar fines, draw wages or be reactivated through the rota.
 Rehire starts a fresh term without resetting training or an outstanding cooldown.
 Role changes retain training and remaining term; service training only benefits
 bartenders. A switch to a more expensive role charges the positive contract-price
-difference × remaining minutes / 14,400, rounded up, and requires a full shift’s
-operating reserve afterward. Switching back grants no refund. This prevents
+difference × remaining minutes / 14,400, rounded up. There is no additional reserve requirement. Switching back grants no refund. This prevents
 cheap bartender contracts from bypassing host/dancer pricing. Training
-and rehire require the next shift's operating reserve. Rosters retain at most two
+and rehire charge only their listed price. Rosters retain at most two
 floor workers per stage, plus one frontage promoter; rehire an expired slot
 rather than replacing its person. Promoters cannot be reassigned into cheaper
 bartender/dancer hires.
@@ -643,8 +639,7 @@ actual timing and losses determine whether music improves sales.
 Level zero has no automated deliveries and the same ฿38 unit cost as level one.
 Discounts apply to both manual and automatic future packs; no retroactive refund.
 Automatic deliveries still require waiting orders, stock below the current delivery quantity, space and
-cash for a complete pack plus the next operating charge. Supplier purchases
-preserve one shift's operating reserve. Pre-lot inventory migrates at ฿14 per unit; recorded lots retain their paid costs.
+cash for a complete pack. Supplier purchases require only their listed price. Pre-lot inventory migrates at ฿14 per unit; recorded lots retain their paid costs.
 Consignment drinks retain Bo's original ฿14 repayment regardless of supplier tier.
 
 | Manager level | Incremental purchase | Bonus on earned margin | Minimum venue stage |
@@ -653,7 +648,7 @@ Consignment drinks retain Bo's original ฿14 repayment regardless of supplier t
 | 2 | ฿6,000 | 50% | 3 |
 | 3 | ฿18,000 | 75% | 3 |
 
-Purchases require an on-duty bartender, deliveries and operating reserve, without
+Purchases require an on-duty bartender, deliveries and their listed price, without
 healthy-shift gates. Management adds ฿12/minute overhead and enables offline
 operation and cleaning. Bonuses use the current percentage, not stacked levels.
 Each real drink (including hosted rounds) earns a bonus on its actual receipt
@@ -700,7 +695,7 @@ not additional revenue. Late purchases from attributed guests update the report.
 
 ## Renovation and expansion
 
-Renovations require the unchanged price plus operating reserve. Local milestones
+Renovations require only the unchanged price. Local milestones
 now earn loyalty: 70 satisfied visits / 10 regulars / eight healthy shifts gives
 +5% appeal; 450 / 70 / forty gives +10% total, not an additional 10%.
 These milestones do not gate construction.
@@ -709,15 +704,12 @@ has positive operating margin after stock consumed, payroll, promotion costs, fi
 The cash report separately records inventory purchases when paid. Manager
 income and nightly tips do not qualify a healthy shift.
 
-Upgrades groups each stage’s offers by whether the till and explicit company
-funding can cover the price and reserve. The next renovation separates current-stage purchases from later-stage
-previews and shows the selected venue’s till, bank and cash target. Loyalty counts appear separately.
+Upgrades groups each stage’s offers by whether shared money covers the price. The next renovation separates current-stage purchases from later-stage
+previews and shows the shared money and selected renovation price. Loyalty counts appear separately.
 The top shortcut jumps to that section. Ready only keeps renovation progress
 visible while filtering purchase cards.
 
-Loyalty belongs to the venue. Renovation requires its fee and the next
-shift's operating reserve. Beer-bar renovations cost ฿4,800 and ฿40,000. New
-leases additionally require a float for a ฿1,200 bartender contract, stock and two minutes of the new venue’s overhead plus one bartender’s wages.
+Loyalty belongs to the venue. Renovation requires only its fee. Beer-bar renovations cost ฿4,800 and ฿40,000. New leases require no additional float.
 First purchased leases cost ฿12,000/24,000/60,000 for beer/hostess/gogo. Each
 prior same-type purchase adds 25% of its base lease, never compounded. The original
 beer bar in slot zero is excluded even if renamed. Existing owned venues count
@@ -727,14 +719,12 @@ Every fourteenth game day offers an advertised 10% lease discount on one type,
 rotating hostess/beer/gogo from day fourteen. It applies after the repeat premium,
 to purchases during that day only. No reward is claimed or replayed; quotes derive
 from the saved date and current ownership. The menu does not advance the offer.
-The reopening, reputation, eight-property cap and full cash reserve gates remain.
+The reopening, reputation, eight-property cap and listed-price affordability gates remain.
 The retirement story no longer silently discounts every first hostess property.
 
-`street.lease_quote()` owns price, base/repeat/offer breakdown, retained reserve,
+`street.lease_quote()` owns price, base/repeat/offer breakdown,
 total affordability, overhead and one-bartender house-drink break-even. Empire
-presents the same quote that purchase settlement uses. The reserve includes a
-bartender contract, a future stock pack and two minutes of new overhead plus one
-bartender’s wages. It transfers from the bank to the new venue’s till. Forecast
+presents the same quote that purchase settlement uses. There is no startup float. Forecast
 break-even excludes pool and manager receipts and does not promise demand.
 Money earned elsewhere can fund the building but cannot buy its loyal clientele.
 There are no mandatory waiting timers. Renovation adds space, staffing positions
@@ -895,9 +885,8 @@ separate from the automated regressions and desktop renders.
 
 ## Renewal availability
 
-`rehire_offer` supplies the action and UI with the same fee and reserve quote.
-Nida's reserve is two minutes of current payroll plus one delivery at the current
-supplier tier. The cash stays in the till; only the contract fee is charged.
+`rehire_offer` supplies the action and UI with the same exact contract-fee quote.
+No additional payroll or stock reserve is required.
 The frontage section always exposes her renewal control after the first hire,
 with a live shortfall/active-contract explanation. Roster expiry explicitly
 invalidates the UI, independently of history notices. Full floor staffing never
@@ -926,7 +915,7 @@ The date already advanced at midnight, so the jump does not add another day.
 ## Gabby's service tips
 
 Gabby is an optional named adult bartender: ฿1,200 for ten game days, standard
-bartender wages, training, reserve and floor-slot limits. Only one roster place
+bartender wages, training and floor-slot limits. Only one roster place
 across the street can belong to her, including expired contracts. She remains
 a bartender; renewal preserves her identity, training and service deadline.
 
@@ -942,7 +931,7 @@ campaigns receive no hire, identity replacement or retroactive tips.
 
 Daisy is an optional named adult entertainer available only in Hostess bars.
 Her ฿4,500 ten-day contract delegates to normal host hiring: one floor slot,
-host wages and the same payroll reserve. She uses existing host attraction,
+host wages and exact contract price. She uses existing host attraction,
 training, consent and booking rules, with Chat as her hosted-drink topic.
 She never serves orders or earns Gabby's bartender bonus. Only one roster place
 across the street belongs to Daisy, including expired contracts. Renewal retains

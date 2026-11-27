@@ -22,15 +22,15 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Separate tills, company funding, loyalty and customer-driven growth |
-| Status | COMPLETE — implementation and local verification |
+| Active feature | One shared account, no cash reserves, named costs and closing-tip recovery |
+| Status | DONE in shared checkout — combined automated and visual checks passed; unpublished |
 | Implementer | Codex in shared main |
 | Reviewer / playtester | Automated regression, balance and visual checks; device play pending |
 | Shared claim location | This table |
-| Working branch / chat / PR | main, synced through 4cfc7e4 |
+| Working branch / chat / PR | main, synced through eb96a48 |
 | Scope and owned files | Finance/economy/street/save/UI, tests, previews and documentation |
-| Acceptance | Approved separate-finance plan; conserve saved wealth, bounded demand, earned management bonuses, unchanged pacing acceptance |
-| Next handoff / blocker | Local regression, all balance suites and visuals passed; main workflow verifies publication |
+| Acceptance | Shared money in/out; conserve all saved cash; no reserve gates; close and count real tips once; explain every expense |
+| Next handoff / blocker | See current handover; device play and release publication remain unverified |
 | Recommended next, when free | Await user direction |
 | Last updated | 2026-11-27 |
 
@@ -122,7 +122,8 @@ The combined game starts with ฿200 and real orders. Ten-second owner actions c
 be upgraded, Chat can save an urgent order, and ฿4,500 staff contracts last ten
 game days. Bartenders begin at 25 seconds per drink; personal training persists.
 Demand, space, service and stock all limit sales. Pool costs ฿50 per game.
-Clock/closing, costs, regulars, healthy shifts and reserves govern expansion.
+Clock/closing and named costs govern operations; listed prices govern expansion.
+The shared-money revision removes purchase reserves and adds early tip counting.
 
 We now have a paused New Game / Resume menu, schema-five saves, backup recovery,
 per-venue forecasts, offline breakdowns and fifteen policy simulations. These

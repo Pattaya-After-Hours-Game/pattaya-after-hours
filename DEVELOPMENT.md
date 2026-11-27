@@ -1,7 +1,7 @@
 # Developer setup and handover
 
 The optional customer `appearance: "charcoal"` field is cosmetic and remains
-compatible with schema 16. Only `economy.admit` assigns it to new ID-24-mod-48
+compatible with schema 17. Only `economy.admit` assigns it to new ID-24-mod-48
 visits, without RNG; absent fields keep legacy looks. Campaign validation
 accepts only that identity. `city.scene_people` reads actual visit phase, saved
 Chat deadline and active pool state for poses. Packing and provenance are in
@@ -186,7 +186,7 @@ per-customer chat state. Action deadlines are fractional foreground seconds;
 Do not run both `advance` and `tick` for the same elapsed interval.
 
 Changes to the save dictionary need compatibility handling; the current schema
-version is 15. Promoter roster/commission fields and fractional offline accounting
+version is 17. Promoter roster/commission fields and fractional offline accounting
 are migrated without granting purchases. Keep whole-pack delivery and commission
 settlement inside `economy.gd`; UI/animation code must not mint receipts.
 Manager income is a separate model-owned receipt, not a drink. Stock lots retain
@@ -411,7 +411,7 @@ No save schema change is needed for these rules.
 readiness. `next_goal` is read-only guidance; `main.gd::show_next_goal` navigates
 and scrolls only. The balance runner records manager timing and gaps between
 purchases that improve the business (excluding routine stock and renewals).
-`tests/balance_guidance_check.gd` covers price/reserve boundaries, saved ownership,
+`tests/balance_guidance_check.gd` covers exact-price boundaries, saved ownership,
 local milestones, guidance purity and UI navigation. No schema change is needed.
 
 `street.gd::night_prep_tick` owns nightly clean-up and the delayed noon skip.
@@ -513,7 +513,7 @@ settlement. Repeat counts exclude the slot-zero inherited beer bar; ordinary
 owned venues count even if loaded from older saves. Type 1's display label is
 Hostess bar without changing numeric save IDs or artwork. Prices/offers derive
 from existing ownership/date fields, so this feature needs no schema bump.
-`lease_check.gd` checks reserve boundaries, exact settlement, repeats, live offer
+`lease_check.gd` checks exact-price boundaries, exact settlement, repeats, live offer
 expiry, save preservation, manager gates and the real UI. `lease_balance.gd`
 compares fresh beer/hostess/gogo expansion routes with bounded street demand.
 Economy previews use `lease-*` at ordinary and wide resolutions.
@@ -533,7 +533,7 @@ JSON absence indices are normalized before matching against roster indices.
 Older saves receive zero levels/ownership and retain legacy absence timing.
 
 `tests/bar_fine_check.gd` covers pure offers, fees, demand/budgets, consent,
-availability, thirty-second return/reload, stage/reserve gates, upgrades,
+availability, thirty-second return/reload, stage/price gates, upgrades,
 automation, expiry/rehire, offline exclusion, old-save migration, validation,
 UI acceptance and compatibility with the bed-race runner. Use `barfine-*` with
 the economy preview runner for the room card, Service and upgrade controls.
@@ -553,22 +553,27 @@ stock, matching, saved quotes, limits, cooldowns, timeouts, Buzz, automation,
 offline exclusion, migration and visible controls. Preview with `hosted-*` in
 the economy runner. Forecasts remain ordinary-trade estimates.
 
-## Schema 16: venue tills, company bank and growth
+## Schema 17: shared account and named costs
 
-`finance.gd` owns exact transfers, total cash and migration allocation. It never
-reports a transfer as income. `economy.gd` settles local transactions and each
-venue’s five-second cashflow sample; `street.gd` quotes compound Fund & buy and
-company-funded marketing. UI controls only consume those operations.
+`finance.gd` owns shared cash movements, bounded recent transaction history and
+migration. Schema-16 bank + venue tills + reserve consolidate into `s.cash`;
+pre-16 shared cash + reserve retain their total. Venue cash fields are removed.
+No money or assets are granted. Schema validation accepts earlier saves and
+validates current history, integer cash and bonus carry. Practice is isolated.
 
-Old shared cash plus reserve is conserved and allocated deterministically to
-working floats, with remainder in the company bank. Existing schema-16 balances
-are not reallocated. Validation rejects negative/fractional balances, invalid
-marketing tiers and invalid fractional bonus carry. Practice remains isolated.
-`manager_bonus_carry` stores hundredths; bonus computation uses actual receipt,
-FIFO consumed cost and consignment repayment. Offline claims credit each bar and
-never debit its opening balance or fabricate customer milestones.
+`economy.gd` keeps venue reporting while charging/crediting shared cash. Its
+`operating_breakdown` explains the unchanged rate as rent, electricity and
+on-duty wages; quotes require only the listed purchase price. `count_tips`
+clears an earned venue jar once; `close_and_count` and normal nightly closure
+share it. Paid tips remain outside trading samples and manager bonuses.
 
-`tests/finance_check.gd` covers model and UI account boundaries. Existing fixture
-setups now fund local tills explicitly; legacy-save fixtures intentionally combine
-wealth back into the old shared shape. Balance policies use real explicit
-transfers and purchases, not the fixture helper. See [finance and growth](docs/design/FINANCE_AND_GROWTH.md).
+The Money HUD shows the shared balance and existing street-wide five-second
+sample. Money & costs reads model history and named rates. Navigating never
+moves money, settles tips or charges a bill. `street.fund_and_buy` retains its
+internal callable name for existing callers but performs one direct purchase,
+with no transfer. The quoted price guard prevents stale tier purchases.
+
+Use `tests/finance_check.gd` through the isolated wrapper for conservation,
+exact-price boundaries, tip recovery, named transactions and UI. The finance
+preview group covers shared money, renovations, leases and an empty-fridge
+recovery. See [finance rules](docs/design/FINANCE_AND_GROWTH.md).
