@@ -1391,7 +1391,11 @@ permission, guide/weather refusals, remembered routes, expiry, repeat-safe
 payment, separate trained appeal, manual discounted fees, save round-trips,
 malformed optional fields, old saves, tuning copies, live ticking, menu/offline
 isolation and real UI purchase/toggle controls. The focused isolated runner
-passed with zero failures. The combined `tools/test.sh` includes this suite.
+passed with zero failures. Full `tools/test.sh` also passed with zero failures
+in a clean snapshot of tour commit `50d7a55`, including all gameplay, pacing and
+balance suites. Snapshot gameplay/test sources were checked against that commit.
+The shared checkout's separate incident-recovery work produced a 128-second
+cadence against the 140-second floor; it is excluded from this tour commit.
 
 `PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='tour-manager-*' tools/preview-art.sh`
 produces unlock, level-two management, guide detail and fully trained states.

@@ -22,7 +22,9 @@ the same bounded arrival draw. Saved agreements are never charged again.
 Optional schema-17 fields preserve the toggle, levels and last routes; missing
 fields grant nothing. Navigation, startup menus and offline claims never book.
 
-Verification and remaining platform limits are recorded in
+The full isolated `tools/test.sh` passed on tour commit `50d7a55`, including
+all pacing and balance suites; focused checks and two-resolution previews also
+passed. Verification and remaining platform limits are recorded in
 [testing](TESTING.md#tour-manager-and-guide-training--27-november-2026).
 Concurrent Shotgun and incident-recovery work in the shared checkout is preserved.
 The main release workflow determines when source changes reach downloads.
