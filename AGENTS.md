@@ -197,6 +197,22 @@ completion repeat-safe. Optional schema-17 `street.afk` and `person.renew_on` mu
 validate as booleans. No AFK activity on menu, offline, practice, or explicit
 interactive decisions; UI/status reads never purchase or advance time.
 
+## Discoverable staff — 27 November 2026
+
+Ordinary paid hires draw common/uncommon/rare/legendary staff at initial
+70/24/5/1% odds. Eight named identities use `STAFF_TALENTS`; preserve their
+service multipliers, personal appeal and real-sale tip rules in
+[staff talents](docs/design/STAFF_TALENTS.md). Owned identities stay unique,
+including expired contracts; renewals keep identity/training/current deadlines.
+No roll on read, failed purchase, renewal, menu, practice or offline activity.
+Optional schema-17 `hiring_seed`, `talent_tips` and paid receipt talent amounts
+must validate and grant no migration rewards. Tips settle once in the real jar,
+separate from trading samples and manager margins. Dancers apply only the best
+eligible first-drink set bonus; hosts/dancers never serve ordinary orders.
+Legendary staff may beat the 140-second investment-cadence floor only with a
+matched ordinary-crew control still meeting 140–300 seconds; retain the existing
+expansion milestone windows and saving-gap ceilings for the lucky run.
+
 ## Implementation boundaries
 
 This is a Godot/GDScript project, not a web app. Use the engine version pinned in

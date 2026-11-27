@@ -55,7 +55,7 @@ func run() -> void:
 	app.model.s.street.selected = app.model.s.street.bars.size()-1
 	app.model.street.selected().stage = 3
 	for id in ["host-violet","host-goldie"]: discover(app,1,id)
-	await capture(app,"talents-goldie-card","Goldie")
+	await capture(app,"talents-goldie-card","Goldie\nAttracts")
 	app.drawer_open = false
 	await capture(app,"talents-hostess-room")
 	app.model.street.action("buy",2)

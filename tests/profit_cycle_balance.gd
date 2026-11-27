@@ -36,6 +36,7 @@ func bottleneck_case(seed_value: int, kind: String, upgrade: String) -> Dictiona
 
 func run() -> void:
 	var failures := 0
+	var controls := 0
 	for kind in ["seating","music","service","appeal"]:
 		var totals := [0,0,0]
 		var sales := [0,0,0]
@@ -51,20 +52,32 @@ func run() -> void:
 	for style in ["click-heavy","balanced","mostly-idle"]:
 		for seed_value in [11,72,291]:
 			var result := simulate(seed_value,style,600,"manual",true,"profit-cycle")
-			var gaps := []
-			var previous: int = result.stage2
-			for investment in result.established_investments:
-				gaps.append(int(investment)-previous)
-				previous = investment
-			var sorted := gaps.duplicate()
-			sorted.sort()
-			result.cycle_median = (float(sorted[(sorted.size()-1)/2])+float(sorted[sorted.size()/2]))/2.0 if not sorted.is_empty() else -1
-			result.cycle_gaps = gaps
+			measure_cadence(result)
 			print(JSON.stringify(result))
 			if result.stage3<0 or result.cash<0 or result.sales>result.orders or result.arrivals>result.offered+3: failures += 1
-			# No-reserve purchases intentionally shorten the old 150-second floor.
-			if style!="mostly-idle" and (result.cycle_median<140 or result.cycle_median>300):
+			# The requested exceptional staff can beat the ordinary cadence floor.
+			# Keep that floor on a matched ordinary-crew control and all macro gates
+			# on the lucky run; never suppress random hiring in the normal policies.
+			if style!="mostly-idle" and result.cycle_median<140 and "staff-platinum" in result.talents:
+				var control := simulate(seed_value,style,600,"manual",true,"profit-cycle",1,true)
+				measure_cadence(control)
+				controls += 1
+				print("LEGENDARY CADENCE · %s seed %d · lucky %.1fs / common control %.1fs" % [style,seed_value,result.cycle_median,control.cycle_median])
+				if control.cycle_median<140 or control.cycle_median>300 or result.cycle_median>=control.cycle_median: failures += 1
+				if roundi(result.stage2/60.0)<28 or roundi(result.stage2/60.0)>45 or roundi(result.second/60.0)<75 or roundi(result.second/60.0)>115 or roundi(result.stage3/60.0)<110 or roundi(result.stage3/60.0)>210 or result.manager_saving_gap>21*60 or result.longest_investment_gap>38*60: failures += 1
+			elif style!="mostly-idle" and (result.cycle_median<140 or result.cycle_median>300):
 				printerr("CYCLE CADENCE FAIL: %s seed %d median %ds" % [style,seed_value,result.cycle_median])
 				failures += 1
-	print("PROFIT CYCLE · %d failures across 120 paired scenarios and nine fresh campaigns" % failures)
+	print("PROFIT CYCLE · %d failures across 120 paired scenarios, nine random-hire campaigns and %d ordinary controls" % [failures,controls])
 	quit(1 if failures else 0)
+
+func measure_cadence(result: Dictionary) -> void:
+	var gaps := []
+	var previous: int = result.stage2
+	for investment in result.established_investments:
+		gaps.append(int(investment)-previous)
+		previous = investment
+	var sorted := gaps.duplicate()
+	sorted.sort()
+	result.cycle_median = (float(sorted[(sorted.size()-1)/2])+float(sorted[sorted.size()/2]))/2.0 if not sorted.is_empty() else -1
+	result.cycle_gaps = gaps

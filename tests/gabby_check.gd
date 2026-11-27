@@ -91,6 +91,13 @@ func run(test: SceneTree) -> void:
 	m.s.street.last_seen = 1000
 	m.street.claim_offline(1100)
 	test.check(b.bonus_tips==15 and b.team[0].drinks_served==2,"Managed offline estimates cannot invent Gabby service tips or actual-sale counts")
+	m.save_game()
+	var repeat_save = Campaign.new(1)
+	test.check(repeat_save.load_game() and repeat_save.street.selected().bonus_tips==15,"Gabby's repeated-sale and matched-drink bonuses can exceed five baht per visit and still reload")
+	repeat_save.street.action("close_and_count")
+	repeat_save.save_game()
+	var receipt = Campaign.new(1)
+	test.check(receipt.load_game() and receipt.street.selected().last_tips.bonus==15,"Gabby's counted repeat-service receipt also survives reload")
 	for path in [Campaign.SAVE,Campaign.BACKUP]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 

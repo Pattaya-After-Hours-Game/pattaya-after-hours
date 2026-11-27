@@ -30,7 +30,9 @@ func scenario(seed_value: int, level: int, slow: bool = false, music_level: int 
 	e.ensure_stock_lots(b)
 	var opening: int = m.s.cash+b.stock*e.stock_unit_cost(b)
 	for second in 600: st.tick(1)
-	return {"sales":b.sold,"orders":b.orders,"cash":m.s.cash,"profit":m.s.cash+b.stock*e.stock_unit_cost(b)-opening}
+	# One untrained recruit can now be a faster discovery. Bound actual service,
+	# keeping the same random hire in each matched club scenario.
+	return {"sales":b.sold,"orders":b.orders,"cash":m.s.cash,"profit":m.s.cash+b.stock*e.stock_unit_cost(b)-opening,"service_cap":1+600/e.service_seconds(b.team[0])}
 
 func run() -> void:
 	var failures := 0
@@ -48,7 +50,7 @@ func run() -> void:
 			upgrades[option] += improved.profit
 			if improved.cash<0 or improved.sales>improved.orders: failures += 1
 		var slow := scenario(seed_value,3,true)
-		if slow.sales>25: failures += 1
+		if slow.sales>slow.service_cap: failures += 1
 	for level in range(1,4):
 		if profits[level]<=profits[level-1] or sales[level]<=sales[level-1]: failures += 1
 	print("REGULARS CLUB · ten matched day-eight runs per tier · 600s each · profits %s · sales %s" % [profits,sales])

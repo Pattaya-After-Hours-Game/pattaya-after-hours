@@ -2369,7 +2369,7 @@ func service_team(bar: Dictionary) -> void:
 				training_button.icon = UpgradeIcons.get_icon("training")
 		if person.role in [2,3]:
 			var audience_level := int(person.get("audience_training",0))
-			body("Attraction +%.1f; replaces Welcome taps." % StreetContent.PROMOTER_BONUS[audience_level] if person.role==3 else "Dancer attraction ×%.2f; no drink service." % StreetContent.DANCER_TRAINING[audience_level],MUTED,12)
+			body("Attraction +%.1f; replaces Welcome taps." % StreetContent.PROMOTER_BONUS[audience_level] if person.role==3 else "Dancer attraction ×%.2f; no drink service." % (StreetContent.DANCER_TRAINING[audience_level]*float(eco.talent(person).get("appeal",1.0))),MUTED,12)
 			if audience_level<2:
 				var training_button := row_button("Train %s · %s · needs stage %d" % [name_text,cash(StreetContent.AUDIENCE_TRAINING_COST*(audience_level+1)),audience_level+2],street_action.bind("train_audience",i))
 				training_button.icon = UpgradeIcons.get_icon("audience")

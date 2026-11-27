@@ -1,5 +1,7 @@
 # Discoverable staff
 
+![Onyx in the live team roster](../staff-talents.png)
+
 Ordinary paid hiring can reveal eight fictional adult specialists. Bartender
 hires use the bartender pool; Hostess bar host and gogo dancer hires share the
 entertainer pool. Contracts still cost ฿1,200 / ฿4,500 and last ten game days.
@@ -33,6 +35,13 @@ New staff start ready for a real order. Training changes future recovery only;
 the saved current deadline remains unchanged. Host/dancer multipliers improve
 the person's existing trained attraction, competing for finite shared demand.
 They do not create customers or increase street traffic.
+
+The ordinary stage-two investment cadence target remains 140–300 seconds.
+A legendary discovery may beat that lower bound: the profit-cycle regression
+also runs the same campaign with ordinary hires and requires that control to
+meet the original cadence range. The lucky run must still satisfy stage-two,
+second-property, stage-three and maximum saving-gap targets. This keeps the
+legendary advantage visible without speeding up every campaign.
 
 Tips accumulate separately in `bar.talent_tips` and count with the real venue jar
 at closing or nightly settlement. They are excluded from manager bonuses,

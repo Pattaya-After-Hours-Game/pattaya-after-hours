@@ -1510,7 +1510,36 @@ use common workers where their assertions require ordinary timing or cast.
 `preview_staff_talents.gd` uses isolated saves and actual paid hiring actions to
 show current odds, all roles, personal stats, sales, rota, expired contracts,
 closure and reload. The source atlas board remains in `preview_staff_pack.gd`.
-Final combined suite, preview and build results are recorded below after checks.
+Reviewed thirteen live states at 960 × 540 and 1280 × 720, plus the final
+scrollable odds/help and personal-stat layout. All sixteen installed PNGs match
+the source manifest hashes. Ryan's Python customer-art rebuild regression passes.
+The local Linux/Windows/macOS exports and AppImage packaging passed, including
+isolated Linux binary and AppImage startup checks. The final dancer stat label
+also passed a fresh isolated gameplay/UI suite. The Regulars Club slow-service
+comparison now uses the actual recruit's recovery bound; matched scenarios and
+all fresh-campaign progression policies retain random hiring. A lucky Platinum
+run can beat the ordinary cadence floor: a matched ordinary-crew control must
+still pass 140–300 seconds, while the lucky run retains all expansion and maximum
+saving-gap bounds. The test reports both results explicitly.
+The save review also caught an existing Gabby bug: repeat-service bonuses could
+exceed the old per-visit validation ceiling. Validation now allows her recorded
+actual-sale bonuses alongside matched-drink tips. Fresh regression checks cover
+both the larger unpaid jar and its paid receipt, without creating or repaying tips.
+The complete pinned-Godot `tools/test.sh` passed with isolated saves and zero
+failures: gameplay/UI, nine baseline campaigns and six no-chat comparisons,
+twelve promoter campaigns, twenty-one automation campaigns, sixty celebration
+pairs, eighty club scenarios, 120 profit-cycle scenarios plus nine random-hire
+campaigns and one ordinary control, and nine lease routes. The legendary run's
+median was 120 seconds versus 153 seconds for its ordinary control. All original
+expansion and saving-gap bounds passed. `git diff --check` and changed local
+Markdown links passed too.
+
+Source includes Ryan's main through `484e7f6`, the title intro, current customer
+animation continuity and these staff additions. The final local desktop packages
+and Linux/AppImage smoke checks passed with verified SHA-256 checksums. Publishing
+signed Android and desktop downloads is performed by the existing main-push
+release workflow. Physical device play and Windows/macOS execution remain
+unverified.
 
 ## Toybox combat impact — 27 November 2026
 

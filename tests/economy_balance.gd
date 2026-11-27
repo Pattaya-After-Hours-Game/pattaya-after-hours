@@ -5,7 +5,13 @@ const C = preload("res://scripts/street_content.gd")
 func _initialize() -> void:
 	call_deferred("run")
 
-func simulate(seed_value: int, style: String, minutes: int = 600, opening: String = "manual", use_chat: bool = true, feature: String = "", expansion: int = 1) -> Dictionary:
+func hire_for_scenario(st: RefCounted, common_crew_control: bool) -> void:
+	# Explicit ordinary control only for comparing a lucky legendary run.
+	# Every normal pacing policy continues to use the real random hiring action.
+	if common_crew_control: st.economy.hire_staff(st.selected(),0)
+	else: st.action("hire",0)
+
+func simulate(seed_value: int, style: String, minutes: int = 600, opening: String = "manual", use_chat: bool = true, feature: String = "", expansion: int = 1, common_crew_control: bool = false) -> Dictionary:
 	var model = Campaign.new(seed_value)
 	var st = model.street
 	var eco = st.economy
@@ -52,14 +58,14 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 		var next_item := -1
 		var owner_first := opening=="manual" and style!="mostly-idle"
 		if feature=="early-bartender" and bar.team.is_empty():
-			st.action("hire",0)
+			hire_for_scenario(st,common_crew_control)
 		elif owner_first and bar.action_levels.pouring==0:
 			st.action("action_upgrade",0)
 			if bar.action_levels.pouring>0 and times.first<0: times.first = second
 		elif bar.equipment.sign==0: next_item = 0
 		elif owner_first and bar.equipment.seating==0: next_item = 4
 		elif owner_first and bar.equipment.pool==0: next_item = 3
-		elif not owner_first and bar.team.is_empty() and model.s.cash>=C.BARTENDER_CONTRACT_COST+1000: st.action("hire",0)
+		elif not owner_first and bar.team.is_empty() and model.s.cash>=C.BARTENDER_CONTRACT_COST+1000: hire_for_scenario(st,common_crew_control)
 		elif not bar.restock and model.s.cash>=1100 and (not owner_first or bar.stage>=2): st.action("restock")
 		elif bar.equipment.seating==0: next_item = 4
 		elif bar.equipment.pool==0: next_item = 3
@@ -102,7 +108,7 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 			st.action("action_upgrade",0)
 		# A contract is a late investment: do not block smaller purchases while saving.
 		if bar.stage>=2 and model.s.cash>=C.BARTENDER_CONTRACT_COST+1000:
-			if eco.floor_staff(bar)==0: st.action("hire",0)
+			if eco.floor_staff(bar)==0: hire_for_scenario(st,common_crew_control)
 			else:
 				for member in bar.team.size():
 					if bar.team[member].role==0 and not eco.contracted(bar.team[member]): st.action("rehire",member)
@@ -121,7 +127,7 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 			model.s.street.selected = 1
 			var other: Dictionary = st.selected()
 			if model.s.cash>=C.BARTENDER_CONTRACT_COST+eco.operating_rate(other)*2+48:
-				if other.team.is_empty(): st.action("hire",0)
+				if other.team.is_empty(): hire_for_scenario(st,common_crew_control)
 				elif not eco.contracted(other.team[0]): st.action("rehire",0)
 			if not other.team.is_empty() and int(other.team[0].get("training",0))<2 and model.s.cash>2500: st.action("train_staff",0)
 			if not other.restock and model.s.cash>1100: st.action("restock")
@@ -153,6 +159,11 @@ func simulate(seed_value: int, style: String, minutes: int = 600, opening: Strin
 			st.action("prepare")
 
 		st.tick(1)
+	times.talents = []
+	for venue in model.s.street.bars:
+		for person in venue.team:
+			var identity: String = person.get("identity","")
+			if C.STAFF_TALENTS.has(identity): times.talents.append(identity)
 	times.club = st.selected().club_level
 	times.staff_training = st.selected().team[0].get("training",0) if not st.selected().team.is_empty() else 0
 	times.music = st.selected().equipment.music

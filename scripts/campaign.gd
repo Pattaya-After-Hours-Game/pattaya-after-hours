@@ -740,8 +740,17 @@ func save_game(replace_campaign: bool = false) -> int:
 		if error != OK: return error
 	return DirAccess.rename_absolute(temporary,SAVE)
 
-func _valid_tip_bonus(value: Variant, visits: Variant) -> bool:
-	return _finite_number(value,0,float(visits)*Street.C.DRINK_TIP_BONUS) and fmod(float(value),Street.C.DRINK_TIP_BONUS)==0
+func _valid_tip_bonus(value: Variant, visits: Variant, bar: Dictionary) -> bool:
+	# Matched-drink bonuses are per visit; Gabby's existing bonus is per sale,
+	# including repeat/hosted rounds. Her saved actual-sale counter bounds both
+	# pending jars and older paid receipts without rejecting legitimately earned tips.
+	var maximum := float(visits)*Street.C.DRINK_TIP_BONUS
+	for person in bar.team:
+		if person.get("identity","")!="gabby": continue
+		var served: Variant = person.get("drinks_served",0)
+		if not _finite_number(served,0,1e15) or float(served)!=floorf(float(served)): return false
+		maximum += float(served)*Street.C.GABBY_TIP_PER_DRINK
+	return _finite_number(value,0,minf(1e15,maximum)) and fmod(float(value),Street.C.DRINK_TIP_BONUS)==0
 
 func _finite_number(value: Variant, minimum: float, maximum: float) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value)>=minimum and float(value)<=maximum
@@ -1034,13 +1043,13 @@ func _read(path: String) -> Variant:
 			for bar in parsed.street.bars:
 				for key in ["tip_visits","tips_total"]:
 					if not _finite_number(bar.get(key),0,1e15) or float(bar[key])!=floorf(float(bar[key])): return null
-				if not _valid_tip_bonus(bar.get("bonus_tips",0),bar.tip_visits): return null
+				if not _valid_tip_bonus(bar.get("bonus_tips",0),bar.tip_visits,bar): return null
 				if not _finite_number(bar.get("talent_tips",0),0,1e15) or fmod(float(bar.get("talent_tips",0)),5.0)!=0: return null
 				if not bar.last_tips.is_empty():
 					for key in ["day","visits","amount"]:
 						if not _finite_number(bar.last_tips.get(key),0,1e15) or float(bar.last_tips[key])!=floorf(float(bar.last_tips[key])): return null
 					var bonus: Variant = bar.last_tips.get("bonus",0)
-					if not _valid_tip_bonus(bonus,bar.last_tips.visits): return null
+					if not _valid_tip_bonus(bonus,bar.last_tips.visits,bar): return null
 					var talent_tips: Variant = bar.last_tips.get("talent",0)
 					if not _finite_number(talent_tips,0,1e15) or fmod(float(talent_tips),5.0)!=0: return null
 					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT+bonus+talent_tips: return null

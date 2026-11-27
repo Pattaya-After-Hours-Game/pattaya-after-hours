@@ -9,9 +9,13 @@ visits are preserved. See [staff talents](design/STAFF_TALENTS.md).
 
 Merged Ryan's current main, retaining his customer continuity and individual
 beer-carrying poses, Shotgun, tour manager, reopening and paused-offline contracts.
+The latest Toybox impact/launcher update (`484e7f6`) is merged too.
 The local title intro remains. The redundant older walking-distance workaround
 was removed so it cannot double-advance Ryan's animation state. Integration
-verification and release status are recorded in [testing](TESTING.md).
+verification passed: the complete isolated suite, two-resolution visuals,
+desktop exports and Linux/AppImage startup. See [testing](TESTING.md) for coverage
+and the legendary cadence control. The main-push workflow owns signed release
+publication; physical device play remains unverified.
 
 ## Contracts pause while away — 27 November 2026
 
