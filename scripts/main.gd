@@ -187,7 +187,7 @@ func _ready() -> void:
 	order_sound.stream = preload("res://assets/order_waiting.wav")
 	order_sound.volume_db = -9
 	add_child(order_sound)
-	for kind in ["click","impact","block","gong"]:
+	for kind in ["click","impact","block","gong","shotgun"]:
 		sfx_streams[kind] = load("res://assets/%s.wav" % kind)
 	if not muted and DisplayServer.get_name() != "headless": music.play()
 	render()
@@ -356,6 +356,7 @@ func set_sound() -> void:
 	if muted:
 		music.stop()
 		order_sound.stop()
+		sfx.stop()
 	elif DisplayServer.get_name() != "headless": music.play()
 	var config := ConfigFile.new()
 	config.set_value("audio","muted",muted)
@@ -402,31 +403,48 @@ func render(keep_scroll: bool = false) -> void:
 	refresh_street = false
 	var previous := scroll.scroll_vertical if keep_scroll and is_instance_valid(scroll) else 0
 	var previous_ui := root_ui
-	var previous_city := city
 	root_ui = Control.new()
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
+	# A HUD rebuild must not rebuild the live room: its routes and animation
+	# clocks belong to the visible scene, not to buttons or management panels.
+	if is_instance_valid(city): city.reparent(root_ui)
 	if is_instance_valid(previous_ui):
 		# Keep the popup moving when a street refresh rebuilds the HUD.
 		if is_instance_valid(reputation_float): reputation_float.reparent(root_ui)
 		remove_child(previous_ui)
 		previous_ui.queue_free()
 	if boot_menu:
+		if is_instance_valid(city):
+			city.hide()
+			city.set_process(false)
 		duo_reaction.clear()
 		render_boot_menu()
 		return
 	var practicing := campaign_before_tutorial != null
 	var rats_active: bool = not practicing and not model.street.rat_targets().is_empty()
 	pane(root_ui,Rect2(0,0,960,540),Color("#170f18"))
-	city = City.new()
+	if not is_instance_valid(city):
+		city = City.new()
+		city.clock = scene_clock
+		root_ui.add_child(city)
+	else:
+		root_ui.move_child(city,root_ui.get_child_count()-1)
+	city.show()
+	city.set_process(not is_instance_valid(fight) and not is_instance_valid(district))
 	city.position = Vector2(0,48)
 	city.size = Vector2(960,540)
 	city.clip_contents = true
-	city.clock = scene_clock
+	if not is_same(city.street_state,model.s.street) or city.selected_bar!=int(model.s.street.selected):
+		city.fridge_install_flash = 0.0
+	if not city.shotgun_clicked.is_connected(click_shotgun): city.shotgun_clicked.connect(click_shotgun)
+	if not city.shotgun_shout.is_connected(tone): city.shotgun_shout.connect(tone)
 	city.duo_reaction = duo_reaction
 	city.service_flash = service_animation
 	city.night = model.s.phase in ["incident","fight","report","godzilla"]
-	city.godzilla = model.s.night.get("godzilla","")
+	var monster_state: String = model.s.night.get("godzilla","")
+	if city.godzilla.is_empty() and not monster_state.is_empty(): city.arrival_time = 0.0
+	city.godzilla = monster_state
 	city.guests = model.s.night.get("guests",0)
 	city.weather = int(model.s.weather)
 	city.level = int(model.s.level)
@@ -437,12 +455,11 @@ func render(keep_scroll: bool = false) -> void:
 	city.fridge_capacity = model.street.economy.stock_capacity(model.street.selected())
 	city.street_event = model.s.street.event
 	city.celebrating = model.street.economy.celebrating(model.street.selected())
-	city.restore_animation(previous_city)
-	root_ui.add_child(city)
+	city.update_customer_motion(0)
 	if rats_active:
 		city.focus_mode = Control.FOCUS_ALL
 		city.accessibility_name = "Catch rats"
-		city.rat_caught.connect(catch_rat)
+		if not city.rat_caught.is_connected(catch_rat): city.rat_caught.connect(catch_rat)
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
 	var venue_name := abs_text(root_ui,Rect2(14,4,154 if windows_updates != null else 216,24),model.street.selected().name,19,GOLD)
@@ -664,7 +681,7 @@ func render(keep_scroll: bool = false) -> void:
 	if not live_service and not practicing:
 		at_button(root_ui,Rect2(594,490,352,40),action_label,action,true)
 	if live_service:
-		skip_to_open = at_button(root_ui,Rect2(504,490,352,40),"Skip to open",street_action.bind("skip"),true)
+		skip_to_open = at_button(root_ui,Rect2(504,490,352,40),"Skip to open",func() -> void: street_action("skip" if model.street.can_skip() else "open"),true)
 		skip_to_open.tooltip_text = "Jump to the noon opening."
 	if live_service or practicing:
 		cooldown_button(Rect2(414,490,170,40),"Serve a drink","serve")
@@ -1372,7 +1389,22 @@ func tours_panel() -> void:
 	var crew: Array = model.s.staff
 	if guide<0:
 		title("Tour guides")
-		body("Choose a guide to assign a tour. Guides recommend your street until the trading shift ends.")
+		var manager_level := int(model.s.street.tour_manager)
+		live_body(func() -> String:
+			return "Tour manager · level %d · %d%% fee saving" % [int(model.s.street.tour_manager),[0,0,10,25][int(model.s.street.tour_manager)]],GOLD,14)
+		if manager_level<3:
+			var buy := row_button(("Unlock tour manager" if manager_level==0 else "Tour manager level %d" % (manager_level+1))+" · "+cash(Campaign.TOUR_MANAGER_COSTS[manager_level]),func():
+				message = model.upgrade_tours()
+				commit(true))
+			buy.name = "TourManagerUpgrade"
+			watch_purchase(buy,buy.text,model.tour_upgrade_offer)
+		if manager_level>0:
+			var toggle := row_button("Tour manager ON" if model.s.street.tour_manager_on else "Tour manager OFF",func():
+				message = model.toggle_tour_manager()
+				commit(true))
+			toggle.name = "TourManagerToggle"
+		body("Auto-book last routes (Market loop initially) with >฿1,000, free seats at an open venue and >2 game hours to close. Levels 2/3 save 10%/25% on fees.",MUTED,12)
+		body("Choose a guide for routes and training. Agreements last until the trading shift ends.")
 		for i in crew.size():
 			if int(crew[i].guide)<=0: continue
 			var staff_id := int(crew[i].id)
@@ -1392,6 +1424,14 @@ func tours_panel() -> void:
 	var staff_id := int(crew[guide].id)
 	character_card(Art.STAFF[staff_id],Content.STAFF[staff_id][0],Content.STAFF[staff_id][1])
 	live_body(tour_agreement_text.bind(guide),GOLD,14)
+	var training := int(crew[guide].get("tour_training",0))
+	body("Tour guide level %d · +%d%% guide appeal" % [training+1,[0,10,25][training]],GOLD,14)
+	if training<2:
+		var train := row_button("Tour guide training · level %d (+%d%% appeal) · %s" % [training+2,[10,25][training],cash(Campaign.TOUR_TRAINING_COSTS[training])],func():
+			message = model.upgrade_tours(guide)
+			commit(true))
+		train.name = "TourGuideTraining"
+		watch_purchase(train,train.text,model.tour_upgrade_offer.bind(guide))
 	row_button(
 		["Base split","Standard split","Premium split"][int(model.s.pay)],cycle.bind("pay",[0,1,2]))
 	for i in Content.ROUTES.size():
@@ -1477,6 +1517,13 @@ func select_bar(index: int) -> void:
 	tab = 0
 	commit()
 
+func click_shotgun(customer_id: int) -> void:
+	if boot_menu or campaign_before_tutorial!=null or is_instance_valid(fight) or is_instance_valid(district): return
+	if not model.street.economy.shotgun_status(model.street.selected(),customer_id).enabled: return
+	message = model.street.action("shotgun",customer_id)
+	city.play_shotgun(customer_id)
+	save_state()
+
 func street_action(id: String,index: int = 0, funded: bool = false, expected_price: int = -1) -> void:
 	if campaign_before_tutorial != null:
 		if tutorial_step>=TUTORIAL_ACTIONS.size() or id!=TUTORIAL_ACTIONS[tutorial_step]: return
@@ -1531,11 +1578,17 @@ func update_action_controls() -> void:
 	var eco = model.street.economy
 	var trading: bool = eco.is_trading(bar)
 	var skipping: bool = is_instance_valid(skip_to_open) and model.street.can_skip()
-	if is_instance_valid(skip_to_open): skip_to_open.visible = skipping
+	var reopening: bool = is_instance_valid(skip_to_open) and not bar.open and not bar.raided and bar.closed==0 and eco.scheduled(bar,int(model.s.street.minute))
+	if is_instance_valid(skip_to_open):
+		skip_to_open.visible = skipping or reopening
+		var shortfall := maxi(0,ceili(eco.operating_rate(bar)/60.0)-int(model.s.cash))
+		skip_to_open.text = "Skip to open" if skipping or not reopening else "Reopen bar" if shortfall==0 else "Reopen · need ฿%d more" % shortfall
+		skip_to_open.disabled = not skipping and shortfall>0
+		skip_to_open.tooltip_text = "Jump to the noon opening." if skipping else "Resume trading with your existing stock and team." if shortfall==0 else "Need ฿%d for the next operating charge. Service → Hours offers an owner-run recovery shift." % shortfall
 	for entry in action_controls:
 		if not is_instance_valid(entry[0]): continue
-		entry[0].visible = not skipping
-		if skipping: continue
+		entry[0].visible = not (skipping or reopening)
+		if skipping or reopening: continue
 		var state: Dictionary = eco.action_status(bar,entry[4])
 		var practice_action: bool = campaign_before_tutorial == null or (tutorial_step<TUTORIAL_ACTIONS.size() and entry[4]==TUTORIAL_ACTIONS[tutorial_step])
 		var stock_shortcut: bool = state.needs_stock and campaign_before_tutorial==null

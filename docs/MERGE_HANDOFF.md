@@ -1,5 +1,104 @@
 # Current implementation and release handoff
 
+## Contracts pause while away — 27 November 2026
+
+User correction supersedes the old offline-ageing rule: all staff, including
+Nida, retain saved contract time throughout absence. Offline estimates use saved
+eligibility without expiry notices or renewals. Live closed hours and skipped
+nights still count; training/deadlines and already expired contracts are retained.
+No refunds or restored terms are granted.
+
+The full isolated Godot 4.7.2 `tools/test.sh` suite passes, including all pacing
+and lease routes. Shared-checkout verification retains only the previously
+recorded 128-second recovery-work cadence failure; that unfinished work is
+excluded. See [verification](TESTING.md#contracts-pause-while-away--27-november-2026).
+Device play and release publication remain unverified.
+
+## Hidden Shotgun Easter egg — 27 November 2026
+
+User correction: keep the interaction hidden. Removed the cooldown/countdown
+and patience-bonus feedback, restoring only the original ribs/shout bubble.
+The saved 30-second shared cooldown and +5-second patience effect remain.
+Player documentation no longer gives away the interaction or mechanics.
+See [verification](TESTING.md#hidden-shotgun-easter-egg--27-november-2026).
+Concurrent tour and closure changes are preserved outside this commit.
+Device play and release publication remain unverified.
+
+
+## Tour manager and individual guide training — 27 November 2026
+
+Adds independent tour manager purchases (฿2,000/4,000/8,000) and personal guide
+training (฿800/1,600). Automation renews eligible guides on their last route only
+on normal live plan ticks, with cash strictly above ฿1,000 and an open venue
+with space and more than two game hours before its scheduled close. Manager
+levels 2/3 save 10%/25% on future fees; guide levels 2/3 add 10%/25% appeal to
+the same bounded arrival draw. Saved agreements are never charged again.
+Optional schema-17 fields preserve the toggle, levels and last routes; missing
+fields grant nothing. Navigation, startup menus and offline claims never book.
+
+The full isolated `tools/test.sh` passed on tour commit `50d7a55`, including
+all pacing and balance suites; focused checks and two-resolution previews also
+passed. Verification and remaining platform limits are recorded in
+[testing](TESTING.md#tour-manager-and-guide-training--27-november-2026).
+Concurrent Shotgun and incident-recovery work in the shared checkout is preserved.
+The main release workflow determines when source changes reach downloads.
+
+## Shotgun patience boost — 27 November 2026
+
+Click/tap Shotgun to give all current customers across the street +5 seconds
+of patience, with one saved 30-second live cooldown shared across venues.
+The eating bubble reports the bonus, then the remaining cooldown appears above
+Shotgun. Optional schema-17 fields retain exact deadlines and granted visit
+bonuses without changing old visits or replaying rewards on load. All money,
+orders, stock, modern drinking deadlines, visit plans and RNG stay unchanged.
+This supersedes the original cosmetic-only click behavior below.
+
+Verification includes model/UI/save regressions, two-resolution preview review,
+all pacing suites and isolated Shotgun-only focused tests; see
+[the test record](TESTING.md#shotgun-patience-boost--27-november-2026).
+Concurrent tour-manager edits are preserved outside this commit. Device play
+and release publication remain unverified.
+
+
+## Shotgun — 27 November 2026
+
+Added the supplied-reference adult Shotgun as a normal customer, with an
+independent named-pose sheet. Click or tap for ribs-eating animation, exact
+“Shotgun BBQ!” bubble and a mute-aware synthetic shout. Identity survives saves;
+existing guests, business rules and gameplay RNG stay intact. No new food
+purchase or economic reward is introduced. Source/recipe/audio provenance is
+committed alongside the runtime assets.
+
+The full isolated suite, final regression rerun, authoring test and two-resolution
+visual previews passed; see [verification](TESTING.md#shotgun-customer-and-ribs-reaction--27-november-2026).
+Target-device play and release publication remain unverified.
+
+
+## Continuous motion, beer and customer templates — 27 November 2026
+
+Fixes the real Serve/HUD redraw path that recreated City and discarded walking
+state. The live room, route records and gait phase now survive redraws; existing
+records never reseed to destination feet. Frame budgets prevent catch-up jumps,
+small aisle adjustments retain facing and sitting starts after arrival. Physical
+silhouettes reserve chair clearance, and standing/conversation targets avoid
+seated bodies. Game capacity, visits, service and accounting remain unchanged.
+
+Fifteen new beer sheets add carrying walks, lowered/seated sipping and standing
+front/rear glass poses. Each customer now has one independent complete runtime
+atlas with a named-pose definition under `art/characters/`. Selected-character
+builds leave all other PNGs untouched; a shared pose can be appended and locally
+repacked across the cast without regenerating approved art. The runtime catalog
+is explicitly included in each export preset. Existing saved appearance mapping,
+companion poses and original source/packed assets stay intact.
+
+The complete combined isolated suite, real-Serve continuity regressions, Python
+authoring contracts and exported-resource checks pass. Visual review includes
+both resolutions and a 30fps real-button return clip; see
+[verification](TESTING.md#continuous-customer-motion-and-individual-templates--27-november-2026).
+The concurrent AFK implementation is preserved. Device play and publication
+remain unverified.
+
+
 ## AFK mode — 27 November 2026
 
 User-requested scope: unattended street-incident purchases and existing staff

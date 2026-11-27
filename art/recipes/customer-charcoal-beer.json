@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent16-frame sprite sheet EXACT4columns4rows. Preserve exactadultman face/body/clothes and illustratedpixelpaintedstyle from bothapprovedrefs. Broadstockybuild roundface blackslickflattophair shavedsides charcoalhighcollar buttonjacket fourpockets matchingtrousers plainblackshoes. Crispplumoutlines warmamberhighlights. SAMEsingle clear glassamberbeer smallwhitefoam in HIS RIGHTHAND everyframe. NEWACTIONS: ROW1 SIDEwalkingRIGHT4phases leftstride/passing/rightstride/oppositepassing, carryuprightglass waist/chest elbowbent freearmcounterswing. ROW2 FRONTtowardviewer4alternatinggaitphases carryingglasssteadily. ROW3 REARaway4alternatinggaitphases onlybacks nofaces, glassstillheld partlyvisible atoneside. ROW4 index12 SEATEDright relaxed beerLOWERED nearwaist/knee; index13 SEATEDright sipping beeratmouth; index14 STANDINGSTILL front/threequarterRIGHT holdingbeerLOW atwaist, freearmnatural low; index15 STANDINGSTILL fullREAR beerbyrightside bothfeetflatparallel noface nogait. Seated hips/knees90degree thighsnearhorizontal lowerlegsdown shoesnearfloor invisiblebarstoolposture, naturallyshorter thanstanding, samebody/headscale, nochairdrawn. Fourcompletefullbody figuresperrow allheads/shoes/glassinsideowncells generousalphagutters outerpadding, nocropping/overlap. Exactly16sprites. Genuine transparentalpha nofloor/shadow/backdrop/checkerboard/furniture/grid/labels/text. Preserve approvedidentity outfitall16, glassalwayshandattached onlyoneglass noextralimbs.",
+  "references": [
+    "art/sources/customer-charcoal-sheet.png",
+    "art/sources/customer-charcoal-seated.png"
+  ],
+  "source": "art/sources/customer-charcoal-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-1eec3cd3-4a41-428b-be23-a6ebfaa1af90.png",
+  "columns": [
+    0,
+    312,
+    624,
+    936,
+    1247
+  ],
+  "rows": [
+    0,
+    328,
+    635,
+    940,
+    1261
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watch_beer": 15
+  },
+  "seed": null,
+  "model_version": null
+}

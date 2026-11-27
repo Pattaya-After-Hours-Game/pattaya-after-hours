@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent16-frame sprite sheet EXACT4columns4rows. Preserve exactadult woman's face/body/clothes and illustratedpixelpaintedstyle from bothapprovedrefs. Brownwavyshoulderhair, goldmustard collaredshortsleeve shirt, olivecargoshorts, brownsatchel crossbody, tanskin brownstrappedsandals goldhoops watch sunglassesatneckline. Crispplumoutlines warmamberhighlights. SAMEsingle clear glassamberbeer smallwhitefoam in HER RIGHTHAND everyframe. NEWACTIONS: ROW1 SIDEwalkingRIGHT4phases leftstride/passing/rightstride/oppositepassing, carryuprightglass waist/chest elbowbent freearmcounterswing. ROW2 FRONTtowardviewer4alternatinggaitphases carryingglasssteadily. ROW3 REARaway4alternatinggaitphases onlybacks nofaces, glassstillheld partlyvisible atoneside. ROW4 index12 SEATEDright relaxed beerLOWERED nearwaist/knee; index13 SEATEDright sipping beeratmouth; index14 STANDINGSTILL front/threequarterRIGHT holdingbeerLOW atwaist, freearmnatural low; index15 STANDINGSTILL fullREAR beerbyrightside bothfeetflatparallel noface nogait. Seated hips/knees90degree thighsnearhorizontal lowerlegsdown shoesnearfloor invisiblebarstoolposture, naturallyshorter thanstanding, samebody/headscale, nochairdrawn. Fourcompletefullbody figuresperrow allheads/shoes/glassinsideowncells generousalphagutters outerpadding, nocropping/overlap. Exactly16 sprites. Genuine transparentalpha nofloor/shadow/backdrop/checkerboard/furniture/grid/labels/text. Preserve approvedidentity outfitall16, glassalwayshandattached onlyoneglass noextralimbs.",
+  "references": [
+    "art/sources/customer-gold-blouse-motion.png",
+    "art/sources/customer-gold-blouse-seated.png"
+  ],
+  "source": "art/sources/customer-gold-blouse-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-1467f18c-ebe5-4111-8662-9576d49347d2.png",
+  "columns": [
+    0,
+    304,
+    608,
+    912,
+    1216
+  ],
+  "rows": [
+    0,
+    318,
+    639,
+    952,
+    1293
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watch_beer": 15
+  },
+  "seed": null,
+  "model_version": null
+}

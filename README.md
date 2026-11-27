@@ -26,6 +26,9 @@ Purchases require only the listed price; there are no transfers or cash reserves
 If you cannot afford stock, **Close & count tips** pauses that venue's running
 costs and counts its earned jar immediately. Buy a full pack while closed, then
 enable opening. Repeated closing and reload never pay the same tips twice.
+A venue closed by its owner or a cash shortage shows **Reopen bar** on the main
+screen during trading hours. Restored money enables it; reopening spends nothing.
+
 Bo's consignment recovery remains available if the jar is too small.
 
 Renovations use cash; happy visits, regulars and healthy shifts earn loyalty
@@ -77,9 +80,11 @@ Every customer identity has side/front/rear walking, seated and bar poses,
 including both companion groups. Guests approach the counter for real orders,
 return to a reserved seat after service, mingle with available visitors and watch
 a purchased sports screen. Real pool players walk to their assigned table.
+HUD redraws preserve their positions and routes; served guests walk back with
+their beer before sitting. Seating leaves clear space for bodies and companions.
 Their orders remain available during walking. The same cast also appears in
-ambient street traffic. Walking steps follow distance travelled, and management
-buttons preserve ongoing walks and seated routines. [See the bar routine](docs/customer-routines.gif) or
+ambient street traffic. [See the continuous return walk](docs/customer-return.webm) or
+[the bar routine](docs/customer-routines.gif) or
 [the walking cast](docs/customer-walks.gif).
 The capybara blinks and settles onto its haunches before standing again.
 Double-click the rainbow duo or tap them on a touchscreen to see them kiss.
@@ -116,7 +121,8 @@ one drink every **25 seconds**; individual training improves this to 20 and then
 15 seconds, with training priced at ฿400 then ฿800. Stage two adds 12-second
 and 10-second training for ฿1,200 and ฿1,600 per bartender. Help serve during a rush. Contracts expire, but each person's training
 stays with them when rehired. Service shows the remaining term and rehire controls.
-Closed hours, skipped nights and offline time count toward contracts.
+Closed hours and skipped nights during play count toward contracts. Time away
+from the game pauses contracts for all staff, including Nida.
 
 In **Service → Frontage promoter**, hire **Nida for ฿1,200 per ten game days, with no commission**. She replaces Welcome taps, uses a separate roster slot
 and never serves drinks. Her preview shows estimated demand and net
@@ -225,6 +231,12 @@ net street trading: receipts minus stock purchases, operating costs, commission
 and fines. It excludes equipment/contract purchases, nightly tip counts and offline lump sums.
 Nida now faces toward the street; a purchased music system has a playing/off
 indicator. Sound/Muted remains independent of the business upgrade.
+
+In **Tours**, a separate **Tour manager** costs ฿2,000/4,000/8,000. It automates
+eligible guide agreements when shared money is above ฿1,000, an open venue has
+space and more than two game hours remain before closing. Levels 2/3 save
+10%/25% on tour fees. Individual **Tour guide training** costs ฿800/1,600 for
++10%/+25% guide appeal; training and manager ownership are independent.
 
 ## Leave the street running with AFK
 
@@ -414,7 +426,7 @@ This update adds ten-day staff contracts, individual training that survives
 rehiring, measured 25/20/15-second service, and a waiting-order bell. Hiring and
 rehiring now cost ฿1,200 for bartenders (hosts/dancers remain ฿4,500); leases follow the Beer/Hostess/Gogo ladder documented above. All purchases
 require only their advertised price. Existing hires and training migrate,
-and offline projections stop crediting staff service at contract expiry. See the
+and offline projections use the saved roster without ageing or renewing contracts. See the
 [player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).
 
 ## More room and a face out front

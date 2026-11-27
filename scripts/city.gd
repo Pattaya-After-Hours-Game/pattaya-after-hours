@@ -11,6 +11,7 @@ const PINK = Color("#f37ab0")
 const GOLD = Color("#e8ba7b")
 const ORDER_URGENT = Color("#ff514d")
 const KISS_SECONDS = 1.2
+const BBQ_SECONDS = 3.2
 const FRIDGE_BOTTLE_BAYS = [
 	[Vector2i(63,5)],
 	[Vector2i(71,7)],
@@ -25,6 +26,7 @@ var clock := 0.0
 var street_state: Dictionary = {}
 var arrival_time := 0.0
 var duo_reaction := {}
+var shotgun_reaction := {}
 # Disposable presentation cache. Saves, admission and pool settlement stay in
 # the model; walking never delays service, spends money or consumes RNG.
 var customer_motion := {}
@@ -48,6 +50,8 @@ var fridge_install_flash := 0.0
 var fridge_capacity := 1
 var legacy_staff: Array = []
 var font = ThemeDB.fallback_font
+signal shotgun_clicked(customer_id: int)
+signal shotgun_shout(kind: String)
 signal site(tab: int)
 signal select_bar(index: int)
 signal rat_caught(index: int)
@@ -56,26 +60,14 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
-func restore_animation(previous: Control) -> void:
-	# HUD buttons rebuild controls, not the visitors' routes, seats or gestures.
-	# A different campaign must never inherit transient state for reused IDs.
-	if not is_instance_valid(previous) or not is_same(previous.street_state,street_state): return
-	clock = previous.clock
-	customer_motion = previous.customer_motion
-	motion_street = previous.motion_street
-	motion_selected = previous.motion_selected
-	if selected_bar==previous.selected_bar:
-		fridge_install_flash = previous.fridge_install_flash
-		if godzilla==previous.godzilla:
-			arrival_time = previous.arrival_time
-			shot_flash = previous.shot_flash
-
 func _process(delta: float) -> void:
-	clock += delta
-	arrival_time += delta
+	# A slow render frame must not fast-forward visible walkers across the room.
+	var visual_delta := minf(maxf(delta,0),.05)
+	clock += visual_delta
+	arrival_time += visual_delta
 	service_flash = maxf(0,service_flash-delta)
 	fridge_install_flash = maxf(0,fridge_install_flash-delta)
-	update_customer_motion(delta)
+	update_customer_motion(visual_delta)
 	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
@@ -83,7 +75,7 @@ func _gui_input(event: InputEvent) -> void:
 	if not targets.is_empty() and rat_pointer_input(event,targets): return
 	if bars.is_empty(): return
 	if event is InputEventMouseButton:
-		if event.device==InputEvent.DEVICE_ID_EMULATION or event.button_index!=MOUSE_BUTTON_LEFT or not event.pressed or not event.double_click: return
+		if event.device==InputEvent.DEVICE_ID_EMULATION or event.button_index!=MOUSE_BUTTON_LEFT or not event.pressed: return
 	elif event is InputEventScreenTouch:
 		if event.device==InputEvent.DEVICE_ID_EMULATION or not event.pressed: return
 	else:
@@ -93,10 +85,21 @@ func _gui_input(event: InputEvent) -> void:
 	people.reverse()
 	for person in people:
 		if person.behind_bar or not _person_contains(person,point): continue
-		if person.who=="patrons-rainbow-duo":
+		if person.who=="shotgun":
+			shotgun_clicked.emit(person.customer_id)
+			accept_event()
+		elif person.who=="patrons-rainbow-duo" and (event is InputEventScreenTouch or event.double_click):
 			duo_reaction.assign({"id":person.customer_id,"until":clock+KISS_SECONDS})
 			accept_event()
 		return
+
+func play_shotgun(customer_id: int) -> void:
+	shotgun_reaction.assign({"id":customer_id,"until":clock+BBQ_SECONDS})
+	shotgun_shout.emit("shotgun")
+	queue_redraw()
+
+func shotgun_active(customer_id: int) -> bool:
+	return shotgun_reaction.get("id",-1)==customer_id and clock<float(shotgun_reaction.get("until",0.0))
 
 func rat_pointer_input(event: InputEvent, targets: Array) -> bool:
 	if event is InputEventKey and event.is_action_pressed("ui_accept") and not event.is_echo():
@@ -178,6 +181,10 @@ func _draw() -> void:
 	# Markers are drawn after the people so a nearer guest cannot hide an order.
 	for person in people:
 		if person.who=="patrons-rainbow-duo" and person.pose==1 and not person.get("motion_state","").begins_with("walk"): _draw_kiss_heart(person)
+		if person.get("bbq",false):
+			var bubble := Vector2(clampf(order_position(person).x-79,8,794),maxf(34,order_position(person).y-43))
+			draw_style_box(_sign_box(),Rect2(bubble,Vector2(158,27)))
+			draw_string(font,bubble+Vector2(9,19),"Shotgun BBQ!",HORIZONTAL_ALIGNMENT_LEFT,140,18,GOLD)
 		if person.get("chat_until",0.0)>float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0)):
 			var feedback := order_position(person)+Vector2(-31,-14)
 			draw_style_box(_sign_box(),Rect2(feedback-Vector2(4,15),Vector2(78,21)))
@@ -233,7 +240,7 @@ func _draw() -> void:
 			draw_line(fan+ray*.22,fan+ray,Color("#8e5e5670"),5)
 	if closed:
 		draw_rect(Rect2(0,0,960,540),Color(0.08,0.03,0.09,.55))
-		var reason := "RAID / UNTIL 12PM" if bar.get("raided",false) else "CLOSED / PREP TIME" if not Economy.scheduled(bar,int(street_state.get("minute",720))) else "TEMPORARILY CLOSED"
+		var reason := closure_title(bar,int(street_state.get("minute",720)))
 		draw_string(font,Vector2(160,250),reason,HORIZONTAL_ALIGNMENT_CENTER,390,23,GOLD)
 		if bar.get("clean_remaining",0)>0:
 			draw_string(font,Vector2(160,280),"CLEANING / %ds" % bar.clean_remaining,HORIZONTAL_ALIGNMENT_CENTER,390,18,TEAL)
@@ -355,6 +362,7 @@ static func customer_pool_foot(bar: Dictionary, guest: Dictionary, home: Vector2
 func update_customer_motion(delta: float) -> void:
 	if not is_same(motion_street,street_state):
 		customer_motion.clear()
+		shotgun_reaction.clear()
 		motion_street = street_state
 		motion_selected = -1
 	if bars.is_empty() or selected_bar>=bars.size(): return
@@ -369,7 +377,12 @@ func update_customer_motion(delta: float) -> void:
 	if first_view: customer_motion[key] = {}
 	var records: Dictionary = customer_motion[key]
 	var now := float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0))
+	# Hold only the reacting actor at his current feet; model time and service
+	# continue normally, and the walk resumes without a position jump.
+	var reacting_id := int(shotgun_reaction.get("id",-1))
+	var held: Dictionary = records[reacting_id].duplicate(true) if shotgun_active(reacting_id) and records.has(reacting_id) else {}
 	CustomerRoutine.update(bar,records,delta,first_view or changed_view,now)
+	if not held.is_empty() and records.has(reacting_id): records[reacting_id] = held
 
 func scene_people(bar: Dictionary) -> Array:
 	var people: Array = []
@@ -450,14 +463,9 @@ func scene_people(bar: Dictionary) -> Array:
 			person.activity = record.activity
 			person.partner = record.partner
 			if not record.moving:
-				var seated_id := Art.customer_seated_id(appearance)
 				if record.activity=="seat" or (record.activity=="chat" and record.get("seat",Vector2.ZERO)!=Vector2.ZERO and record.foot.distance_to(record.seat)<.5):
-					person.draw_who = seated_id
-					person.draw_pose = 2 if state=="chat" else 1 if state=="drinking" and fposmod(clock+customer_id*.37,6)<1.6 else 0
 					person.body_height = 140
 				elif record.activity=="watch":
-					person.draw_who = seated_id
-					person.draw_pose = 3
 					person.flip = false
 				elif record.activity=="mingle" and int(record.partner)>=0:
 					state = "chat" if fposmod(clock+customer_id*.7,4)<2 else "idle"
@@ -469,17 +477,47 @@ func scene_people(bar: Dictionary) -> Array:
 		# Keep companion idle reactions and sunglasses exactly as authored.
 		# A kiss is allowed only while stationary; it never interrupts a walk.
 		var kissing: bool = appearance[0]=="patrons-rainbow-duo" and pose==1
-		var keep_idle: bool = state=="idle" and (appearance[0] in ["patrons-capybara","patrons-rainbow-duo"] or (appearance[0]=="patrons-men" and int(appearance[1])==Art.COBALT_IDLE))
-		if not person.has("draw_who") and not keep_idle and not (kissing and not state.begins_with("walk")):
-			var motion_id := Art.customer_motion_id(appearance)
-			if not motion_id.is_empty():
-				person.draw_who = motion_id
-				person.draw_pose = Art.walk_frame(motion_id,state,float(records[customer_id].get("walk_distance",0.0))) if state.begins_with("walk") else Art.animation_frame(motion_id,state,clock+customer_id*.19)
-				if not state.begins_with("walk") and person.get("activity","")!="mingle": person.flip = customer_id%2==0
-		if kissing and not state.begins_with("walk"):
-			person.draw_who = "patrons-rainbow-duo"
-			person.draw_pose = 1
+		if kissing and not state.begins_with("walk"): person.body_height = 180
+		# Named poses live in this customer's own definition/atlas. A paid drink
+		# stays visible on the return walk and between sips; an order is never a beer.
+		var phase := str(guest.get("visit_phase","legacy"))
+		var carrying: bool = not guest.get("order",false) and (phase=="drinking" or (phase=="legacy" and int(guest.get("drinks",0))>0 and float(guest.get("next",0))>0))
+		var visual_pose := state
+		var visual_time := clock+customer_id*.19
+		var visual_phase := -1
+		if state.begins_with("walk"):
+			visual_pose = ("beer_" if carrying else "")+state
+			visual_time = float(records[customer_id].get("walk_distance",0))/64.0
+		elif kissing:
+			visual_pose = "kiss"
+		elif person.get("body_height",180)==140:
+			if carrying: visual_pose = "beer_seated_drinking" if state=="drinking" and fposmod(clock+customer_id*.37,6)<1.6 else "beer_seated_idle"
+			else: visual_pose = "seated_chat" if state=="chat" else "seated_idle"
+		elif person.get("activity","")=="watch":
+			visual_pose = "beer_watch" if carrying else "watch"
+		elif state=="pool":
+			visual_pose = "pool"
+		elif carrying:
+			visual_pose = "beer_stand"
+		elif state=="idle" and appearance[0]=="patrons-capybara":
+			visual_pose = "companion_idle"
+			visual_phase = Art.capybara_frame(clock+float(customer_id/24)*1.31)
+		elif state=="idle" and appearance[0]=="patrons-rainbow-duo":
+			visual_pose = "companion_idle"
+		elif state=="idle" and appearance[0]=="patrons-men" and int(appearance[1])==Art.COBALT_IDLE:
+			visual_pose = "sunglasses"
+			visual_phase = [6,9,10,11].find(Art.cobalt_frame(clock+float(customer_id/Art.CUSTOMER_VARIANTS.size())*1.31))
+		person.bbq = appearance[0]=="shotgun" and shotgun_active(customer_id)
+		if person.bbq:
+			visual_pose = "bbq"
+			visual_time = clock-(float(shotgun_reaction.until)-BBQ_SECONDS)
 			person.body_height = 180
+			person.flip = false
+		var visual := Art.customer_visual(appearance,visual_pose,visual_time,4 if person.bbq else 8,visual_phase)
+		person.draw_who = visual[0]
+		person.draw_pose = visual[1]
+		person.visual_pose = visual_pose
+		person.carrying_drink = carrying
 		person.motion_state = state
 		people.back().visit_phase = bar.customers[i].get("visit_phase","legacy") if bar.has("customers") else "legacy"
 		people.back().costume = bar.has("customers") and bar.customers[i].get("costume",false)
@@ -575,3 +613,9 @@ func _draw_event(closed: bool) -> void:
 			draw_colored_polygon(PackedVector2Array([p,p+Vector2(123,19),p+Vector2(158,-85),p+Vector2(182,-96),p+Vector2(196,-86),p+Vector2(178,-75),p+Vector2(148,64),p+Vector2(55,62)]),Color("#3c354c"))
 			draw_rect(Rect2(p+Vector2(25,64),Vector2(150,12)),Color("#7f524e"))
 			draw_circle(p+Vector2(180,-86),3,GOLD)
+
+static func closure_title(bar: Dictionary, minute: int) -> String:
+	if bar.get("raided",false): return "RAID / UNTIL 12PM"
+	if not Economy.scheduled(bar,minute): return "CLOSED / PREP TIME"
+	if not bar.get("open",true): return "CLOSED / REOPEN WHEN READY"
+	return "TEMPORARILY CLOSED"

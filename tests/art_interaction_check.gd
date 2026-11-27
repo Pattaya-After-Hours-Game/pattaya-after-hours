@@ -126,7 +126,16 @@ func run(test: SceneTree) -> void:
 	app.model = Campaign.new(555)
 	app.render()
 	test.check(not is_instance_valid(app.reputation_float),"Switching campaigns does not animate their reputation difference")
-	var duo_point := Vector2(592,300)
+	var duo_person: Dictionary = app.city.scene_people(app.model.street.selected()).filter(func(p: Dictionary) -> bool: return p.get("customer_id",-1)==3)[0]
+	var duo_point := Vector2.ZERO
+	for height in range(80,150,10):
+		for offset in [-35,0,35]:
+			var local: Vector2 = duo_person.foot+Vector2(offset,-height)
+			if app.city._person_contains(duo_person,local):
+				duo_point = app.city.global_position+local
+				break
+		if duo_point!=Vector2.ZERO: break
+	test.check(duo_point!=Vector2.ZERO,"Companion input targets an opaque pixel of the displayed sprite")
 	var before_reaction := JSON.stringify(app.model.s)
 	var mouse := InputEventMouseButton.new()
 	mouse.position = duo_point

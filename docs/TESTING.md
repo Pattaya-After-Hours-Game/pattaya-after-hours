@@ -1,5 +1,165 @@
 # Testing and release checks
 
+## Contracts pause while away — 27 November 2026
+
+All staff contracts now retain their remaining term during offline absence,
+including Nida, off-duty staff and time beyond the eight-hour earnings cap.
+Offline forecasts use saved eligibility throughout; already expired workers
+stay expired. No migration restores time or grants free renewals. Live closed
+hours and skipped nights still age contracts.
+
+`staff_check.gd` covers unchanged terms, rotas, training and fractional service
+deadlines across absence, repeated claims and save/reload, plus exact expiry
+when live time resumes. `afk_check.gd` verifies absence cannot renew or age staff.
+
+The complete pinned Godot 4.7.2 `tools/test.sh` suite passes in an isolated
+checkout containing only this fix, including all pacing and lease routes.
+The shared checkout passes gameplay/save/UI, baseline, promoter, automation,
+celebration and club checks, but retains the previously documented recovery-work
+cadence failure (balanced seed 291: 128s versus the 140s floor). Its lease routes
+pass separately. Unfinished recovery changes are excluded from this fix.
+Local Markdown links and `git diff --check` pass. Device play and release
+publication remain unverified.
+
+## Hidden Shotgun Easter egg — 27 November 2026
+
+Removed the cooldown label and the “Everyone +5s patience” message. Only the
+original ribs animation and “Shotgun BBQ!” shout/bubble remain visible.
+The model's +5-second street bonus and saved 30-second cooldown are unchanged;
+the ordinary action result also reveals only the shout. Removed discovery
+instructions and mechanical spoilers from README, the player guide and cast prose.
+
+The shared `tools/test.sh` run passed gameplay/save/UI/art, baseline pacing,
+promoter, automation, celebration and club checks. Concurrent balance edits
+failed the profit-cycle cadence bound (balanced seed 291: 128s median); the
+wrapper was interrupted before lease checks. A snapshot containing only the
+Shotgun changes passed the focused Shotgun tests, all 120 profit-cycle paired
+scenarios/nine fresh campaigns, and all nine lease routes. The concurrent
+changes remain untouched and need their own combined verification.
+
+Ran `tests/preview_shotgun.gd` through the existing art preview runner. Inspected
+active eating and early/last-second cooldown states in all three venue types
+at 960×540 and 1280×720: no countdown or bonus label appears. Existing model
+and pointer tests retain coverage of the hidden bonus, reload and cooldown.
+Changed-document links and `git diff --check` pass. Device play and release
+publication remain unverified. This supersedes the visible-feedback description
+in the earlier patience-boost record.
+
+
+
+## Shotgun patience boost — 27 November 2026
+
+A successful click/tap now adds five seconds of patience to every current
+street visitor and starts one shared 30-second foreground cooldown. The model
+owns eligibility, the additive visit allowance and fractional saved deadline.
+Legacy visits also extend their lifetime cap; modern drinking deadlines and
+round plans remain intact. City presents the granted bonus and live countdown.
+This supersedes the presentation-only behavior in the original Shotgun entry.
+
+Verification on Godot 4.7.2:
+
+- All gameplay/save/UI/art regression checks and pacing, promoter, automation,
+  celebration, club and profit-cycle suites passed through `tools/test.sh`.
+  The wrapper was interrupted during its final lease suite; that suite was
+  rerun separately in the isolated Shotgun-only source snapshot.
+- `shotgun_patience_check.gd` covers all current customers across two venues,
+  multiple Shotguns sharing a cooldown, exact fractional boundaries, cumulative
+  per-visit bonuses, no retroactive bonus for new arrivals, save/reload,
+  legacy lifetime caps, real order expiry and malformed optional save fields.
+  Exact model snapshots verify no extra stock, money, orders or RNG changes.
+- Updated pointer tests cover mouse/touch, cooldown lockout after the eating
+  animation ends, repeat clicks, mute, HUD retention and campaign reset.
+  The focused tests passed both in the shared checkout and a snapshot containing
+  only this change, preserving concurrent tour work.
+- The existing art preview runner produced 21 states each at 960×540 and
+  1280×720. Inspected the bonus bubble, early/last-second cooldown and ready
+  state in all three venue types. Existing character art stays unchanged.
+- Changed-document local links and `git diff --check` passed.
+
+[Preview](shotgun.png). Device touch/play and release publication remain
+unverified.
+
+
+## Shotgun customer and ribs reaction — 27 November 2026
+
+Shotgun joins through normal admissions as a saved optional cosmetic identity,
+using the supplied photograph and the existing customer art style. A single
+mouse click or real touch plays his 3.2-second ribs-eating animation, displays
+“Shotgun BBQ!” and triggers an original synthetic shout through Sound / Muted.
+Repeated input during the reaction does not restart it or overlap the voice.
+Only his visual route pauses; normal orders, stock, money and visit/service
+clocks keep their model behavior. Old visitors keep their original appearances.
+
+Verified on Godot 4.7.2:
+
+- `tools/test.sh` passed the full isolated gameplay/save/UI/art and pacing suites.
+  The complete `tests/check.gd` regression runner passed again after adding the
+  Shotgun checks and final animation timing.
+- `tests/shotgun_check.gd` covers real admission, complete saved-visit round-trip,
+  old appearance stability, single-click/touch input, emulated duplicate rejection,
+  both rib poses, fixed feet, reaction expiry, HUD retention, campaign reset,
+  muted playback and unchanged model/RNG. Shared catalog checks include Shotgun.
+- `python3 tests/test_customer_art_build.py` passed. Only Shotgun's runtime PNG
+  was built; existing character PNGs remain unchanged.
+- `PATTAYA_PREVIEW_SCRIPT=tests/preview_shotgun.gd tools/preview-art.sh` produced
+  15 captures each at 960×540 and 1280×720. Inspected idle, showing ribs, biting
+  and post-reaction states across all three venue types, including bubble fit.
+- `git diff --check` and changed-document local links passed.
+
+[In-game preview](shotgun.png). The [art receipt](../art/recipes/customer-shotgun.json)
+contains the exact built-in ImageGen prompt and synthetic-speech commands.
+Android touch/device play, listening quality and Windows/macOS execution remain
+unverified. Source verification does not confirm release publication.
+
+
+## Continuous customer motion and individual templates — 27 November 2026
+
+The real Serve path rebuilt City with the HUD, losing route/pose state and
+placing actors directly at new destinations. The live room now survives HUD
+redraws. `customer_continuity_check.gd` drives the actual enabled Serve button,
+refreshes the UI repeatedly during 480 motion frames, and checks exact position
+continuity, distance budgets, retained clocks, posture only after arrival,
+management navigation, repeat orders, pool rerouting, known-venue re-entry and
+bounded movement after a stalled frame. Full seated silhouettes, companions and
+beer poses have twelve-pixel clearance in all nine room layouts.
+
+Fifteen new generated sheets add 240 beer-carrying/rest/sip poses. A glass requires
+a real paid drinking phase; empty orders keep empty hands. Catalog tests cover
+named semantic lookup, all individual sheets, optional-pose fallback, walking
+with a paid beer, lowering/sipping while seated and no extra sales or timer
+changes. Existing capybara, sunglasses and kiss interactions remain covered.
+
+Every customer owns an independent complete runtime atlas and definition.
+`tests/test_customer_art_build.py` creates another person and adds a pose in a
+temporary tree, proving unrelated PNG bytes and modification times remain
+unchanged. A selected production rebuild also left the other fourteen PNGs
+untouched with identical hashes. The full packer uses the same definitions.
+A Linux resource-pack export was checked from outside the source checkout:
+the exported runtime catalog and all fifteen atlases load successfully.
+
+The isolated `tools/test.sh` suite passes gameplay/save/UI/art regressions and
+all pacing suites. The final source also preserves the concurrent AFK update;
+its combined checks pass. Target-device play remains unverified.
+
+Visual review covers eighteen counter/seated states in all nine rooms at both
+960×540 and 1280×720, all beer-pose identities on light/dark backgrounds, and a
+360-frame 30fps clip using the real Serve callback with a HUD rebuild every
+fifteen frames. Later floor-space refinements were recaptured at both sizes.
+The video preserves 30fps; the GIF is sampled for a smaller review artifact.
+
+```sh
+python3 tests/test_customer_art_build.py
+PATTAYA_PREVIEW_SCRIPT=tests/preview_customer_continuity.gd tools/preview-art.sh /tmp/pattaya-continuity
+python3 tools/review_customer_continuity.py /tmp/pattaya-review --captures /tmp/pattaya-continuity
+```
+
+[Return walk video](customer-return.webm) · [GIF](customer-return.gif) ·
+[Beer pose lineup](customer-beer-cast.png).
+Sources, exact prompts and the [individual template guide](../art/characters/README.md)
+are committed with the runtime assets. Source checks do not confirm release
+publication.
+
+
 ## AFK mode — 27 November 2026
 
 `tests/afk_check.gd` verifies exact incident prices, no duplicate payments after
@@ -1297,3 +1457,42 @@ active promotions show a bar in Events. Active Rat Plague stays untimed.
 No economy rules, assets or save fields changed. Android touch/device play and
 Windows/macOS execution remain unverified. Source verification does not confirm
 that release downloads have been published.
+
+
+## Tour manager and guide training — 27 November 2026
+
+`tests/tour_manager_check.gd` covers exact-price upgrades, strict >฿1,000 checks
+before each guide, full/closed venues, two-hour boundaries including late
+permission, guide/weather refusals, remembered routes, expiry, repeat-safe
+payment, separate trained appeal, manual discounted fees, save round-trips,
+malformed optional fields, old saves, tuning copies, live ticking, menu/offline
+isolation and real UI purchase/toggle controls. The focused isolated runner
+passed with zero failures. Full `tools/test.sh` also passed with zero failures
+in a clean snapshot of tour commit `50d7a55`, including all gameplay, pacing and
+balance suites. Snapshot gameplay/test sources were checked against that commit.
+The shared checkout's separate incident-recovery work produced a 128-second
+cadence against the 140-second floor; it is excluded from this tour commit.
+
+`PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='tour-manager-*' tools/preview-art.sh`
+produces unlock, level-two management, guide detail and fully trained states.
+Reviewed these at 960 × 540 and a 1560 × 720 window (1280 × 720 game canvas).
+The final compact explanation and prices also passed a fresh preview review.
+Existing production art is retained. Device play, Windows/macOS execution and
+release publication remain unverified for this change.
+
+## Reopening after restored cash — 27 November 2026
+
+Cash/owner shutdowns now show a main-screen Reopen bar button during legal
+opening hours, with the exact next-charge shortfall if unaffordable. The room
+label distinguishes an intentional/financial shutdown from a timed incident;
+restored cash changes the status to the reopening instruction. Reopening still
+requires an explicit tap and grants/spends nothing. `reopen_check.gd` covers the
+reported 3pm/฿500 case, live cash refresh, read-only presentation and reopening
+without cash or stock changes. The earlier sixty-second recovery work remains a
+separate pending change.
+
+The standalone reopening fix passes the complete pinned Godot `tools/test.sh`
+suite, including all pacing and lease routes. Affordable and unaffordable
+reopening screens were inspected at 960 × 540 and 1560 × 720. Device play remains
+unverified. The working-tree sixty-second recovery change is excluded from this
+verified commit and retains its separate pending cadence decision.

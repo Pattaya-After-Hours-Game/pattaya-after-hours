@@ -1,0 +1,72 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Transparent16frame sprite sheet for Pattaya After Hours. Two approved reference sheets show exact adult Indian visitor: mediumbrown skin, thick curlyblack hair, shortstubble friendlyface, maroon tee, olivecargo shorts, darkbrown crossbodybag/strap, beadbracelet, brownbuckle sandals. Preserve identity/build/clothes/style all16. EXACT4columns4rows equallyspaced cells, fullheads/shoes fullyinside with generous alpha gutters. ONE clear modest amberbeer glass smallwhitefoam gripped in SAME RIGHT HAND everypose, carry steadily elbowbent at waist/chest; freeleftarm swings, nofloating/doubledglass. Row1 SIDE walkingRIGHT fourdifferent gaitphases leftstride/passing/rightstride/oppositepassing. Row2 FRONT towardviewer fouralternating gaitphases. Row3 BACK away fouralternating gaitphases, onlybacks nofaces, glasspartlyvisible atrightside attachedtohand. Row4 cell12 SEATED upright facingRIGHT hips/knees bent90degrees thighs horizontal lowerlegsdown, beerLOWERED nearknee/waist notmouth; cell13 SAMEseated sipping glassatmouth; cell14 STANDING FRONT threequarter facingRIGHT holdingbeerlow, freehandrelaxed BOTHfeetflat; cell15 STANDING STILL FULLREAR holdingbeerbyrightside BOTHfeetflat sidebyside, noface/nogait. Samehead/bodyscale throughout, seatedshorter thanstanding notinflated. NOchair/furniture/table/screen/scenery/floor/shadow/glow/labels/text/grid, genuinealpha. Crisppixelpainted illustration plumoutlines warmclusteredshading, adultproportions notchibi/photo, noclipping/overlaps.",
+  "references": [
+    "art/sources/customer-maroon-casual-motion.png",
+    "art/sources/customer-maroon-casual-seated.png"
+  ],
+  "source": "art/sources/customer-maroon-casual-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-58e5fa28-2cb9-4646-b6d8-1b3a10834b07.png",
+  "source_dimensions": [
+    1024,
+    1536
+  ],
+  "columns": [
+    0,
+    256,
+    512,
+    768,
+    1024
+  ],
+  "rows": [
+    0,
+    380,
+    770,
+    1150,
+    1536
+  ],
+  "frame_heights": [
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    140,
+    140,
+    180,
+    180
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watching_beer": 15
+  },
+  "model_version": null,
+  "seed": null
+}

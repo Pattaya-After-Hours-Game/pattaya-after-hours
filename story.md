@@ -124,8 +124,11 @@ Pim can sell the sound; Nida can sell the welcome; neither can conjure a tab.
 > **Anong:** “One balance. If money goes out, tell me what we bought.”
 
 Tour guides are paid upfront from the shared account. One tap pays and starts
-the agreement. If the fridge is empty and money is short, close, count the earned
-tips and buy stock when the jar covers a pack. The same coins cannot be counted twice.
+the agreement. An optional Tour Manager renews eligible guides while there is
+cash above ฿1,000, room for customers and more than two hours before closing.
+Better management saves guide fees; each guide's separate training improves
+referral appeal without inventing visitors. If the fridge is empty and money is
+short, close, count the earned tips and buy stock when the jar covers a pack. The same coins cannot be counted twice.
 
 Street marketing progresses from small campaigns toward a district audience.
 Every new open property adds a little street draw, but all venues share those
@@ -327,7 +330,8 @@ an empty fridge stays empty. Bo's delivery still costs money.
 
 > **Anong:** “You can skip to opening. The floor can't.”
 
-Staff agree to ten-day contracts. Paying for training develops a person, so those
+Staff agree to ten-day contracts that pause while the player is away. Closed
+hours and skipped nights during play still count. Paying for training develops a person, so those
 skills stay with them if they leave and later return. New bartenders need the
 owner's help with a rush; learning the job gradually buys breathing room.
 
@@ -361,6 +365,7 @@ has a new sign.
 | **Dao** | Shift lead and the face of trusted management | Wants predictable hours and a venue she can run properly. Her progression is from dependable colleague to someone the player trusts with the keys. |
 | **Mali** | Bartender and Toybox regular | Likes a contest with clear rules. Wants fight nights that pay their way, not endless promises of exposure. |
 | **Gabby** | Adult bartender in a very short red dress, with pale skin and tied-back brown hair | Quick wit and a good memory for orders; her regulars leave an extra ฿5 for each drink she serves, counted in the nightly jar. |
+| **Shotgun** | Adult customer with a grey mohawk, salt-and-pepper beard and blue shirt | Loves a juicy rack of ribs and a loud “Shotgun BBQ!”. |
 | **Daisy** | Fictional adult hostess-bar entertainer, with pale skin, tied-back brown hair and a red bikini | Quick with a joke and strict about finishing on time. Attracts guests under the normal host contract; a separate character from bartender Gabby. |
 | **Pim** | Bartender with a music programme in mind | Saves for a sound studio. Distinguishes a booked performer from Bo arriving with a karaoke machine. |
 | **Fern** | Guide who knows the market | Connects the business to life outside its frontage. Her knowledge and time have value. |

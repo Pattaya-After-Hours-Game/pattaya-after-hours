@@ -73,8 +73,10 @@ claiming behaviour exists; update the relevant documentation when it changes.
   for +5% and +10% total appeal. These never block renovation;
   final renovations cost ฿40,000/65,000/120,000 by venue type.
 - Bartenders serve; hosts and dancers attract; managers enable offline operation.
-  Bartender contracts cost ฿1,200; host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped/offline
-  time. Switching a bartender to a specialist role charges the positive contract
+  Bartender contracts cost ฿1,200; host/dancer contracts cost ฿4,500 for ten game days, including closed/skipped
+  time during live play. All staff contracts pause offline, including Nida’s;
+  forecasts use saved eligibility without expiry or renewal. Switching a bartender
+  to a specialist role charges the positive contract
   price difference prorated to the remaining term, with no reserve requirement; no refund
   for switching back. Training belongs to the person and survives expiry/rehire. Base bartender
   service starts ready: sell one real order, then recover for 25 seconds, improving

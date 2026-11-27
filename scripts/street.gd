@@ -9,6 +9,7 @@ const TOUR_UPDATE_SECONDS = 8
 var s: Dictionary
 var economy: RefCounted
 var finance: RefCounted
+signal tour_manager_requested
 signal checkpoint_requested
 var raid_checkpoint := false
 var night_prep_visible := true
@@ -48,6 +49,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	if not s.street.has("expired_tours"): s.street.expired_tours = {}
 	if not s.street.has("afk"): s.street.afk = false
+	s.street.merge({"tour_manager":0,"tour_manager_on":false})
 	var event: Dictionary = s.street.event
 	if event.get("id",-1)==C.RAT_PLAGUE and event.phase=="active":
 		event.erase("remaining")
@@ -288,6 +290,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
+		"shotgun": return economy.shotgun(bar,index)
 		"afk":
 			if s.phase!="plan" or s.get("practice",false): return "Return to the live street to change AFK mode."
 			s.street.afk = not afk_enabled()
@@ -811,6 +814,7 @@ func tick(seconds: int) -> void:
 	for _second in clampi(seconds,0,60):
 		if not s.phase in ["plan","guided"]: break
 		afk_tick()
+		tour_manager_requested.emit()
 		celebration_tick()
 		reconcile_closures()
 		var trading_now := any_trading()

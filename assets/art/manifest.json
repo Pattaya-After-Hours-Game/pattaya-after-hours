@@ -1318,5 +1318,133 @@
       192
     ],
     "sha256": "5e87fc1ec87aa65ce24454fe8f299cfc7ba75693cb69ca57879760030afa4659"
+  },
+  "customer-silver-polo": {
+    "file": "res://assets/art/customer-silver-polo.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "0833c27efdde71067dfa8caabeb69ce8fc4a4a6a16f17e88bd26e3a8a0502cbb"
+  },
+  "customer-maroon-casual": {
+    "file": "res://assets/art/customer-maroon-casual.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "09dada03eba3c36bedfb10c0b068643251427769d2ce71c65d4fa76d016c3b36"
+  },
+  "customer-gold-blouse": {
+    "file": "res://assets/art/customer-gold-blouse.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "8a7b3adab3a265584886cb30af38f7706bfbb07c30c033b310d86b10223c856d"
+  },
+  "customer-amber-local": {
+    "file": "res://assets/art/customer-amber-local.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "1ef0ea7624373e344f50b5f6effeb2ba1ce7fb56097fb8bf3a4afa674b45e7ce"
+  },
+  "customer-beard-glasses": {
+    "file": "res://assets/art/customer-beard-glasses.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "af006aebe07fd776c38eb1e0c16b5cc9cdfd93406014ce4c68615bd1db4416d2"
+  },
+  "customer-capybara": {
+    "file": "res://assets/art/customer-capybara.png",
+    "size": [
+      1024,
+      2112
+    ],
+    "sha256": "b7863c8363721e3bd0e3d1c00afe92686d0a10acd1ae69e8b7f93b92088c094c"
+  },
+  "customer-charcoal": {
+    "file": "res://assets/art/customer-charcoal.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "23d9f60f55ab4138dff1b3d324a73fc324799cc24a58acfc2f1c3e58e07d475c"
+  },
+  "customer-cobalt-evening": {
+    "file": "res://assets/art/customer-cobalt-evening.png",
+    "size": [
+      640,
+      1920
+    ],
+    "sha256": "e2b6ef9e3b5948a358cfd790210519667d57e382ead8edaa8a48e004c51e7ec1"
+  },
+  "customer-ivory-club": {
+    "file": "res://assets/art/customer-ivory-club.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "0fcdf1ff89b6b894e939b0dd725ec0df02cae3fcc282132be44bb74479573631"
+  },
+  "customer-navy-tourist": {
+    "file": "res://assets/art/customer-navy-tourist.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "cabe3367e92f1729d02b4dd3ca4627b0d9b669da439673c0d929a17f432dea45"
+  },
+  "customer-plum-club": {
+    "file": "res://assets/art/customer-plum-club.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "c8fe15c2e69584197724b872ecc65ed5896dbdb7efafc25e6a2bf3912ac6fbfd"
+  },
+  "customer-rainbow-duo": {
+    "file": "res://assets/art/customer-rainbow-duo.png",
+    "size": [
+      1152,
+      1920
+    ],
+    "sha256": "a21dfbc5ac3910567546f8bf90c50fcc13cbaeb7c470d074128def4cf7d45146"
+  },
+  "customer-sage-holiday": {
+    "file": "res://assets/art/customer-sage-holiday.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "9a301a2d34cc1ceeed36bcfb36eadc01f824cd89a2b1cbc952340fcd6c15d528"
+  },
+  "customer-sunfaded-regular": {
+    "file": "res://assets/art/customer-sunfaded-regular.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "a8b15c1b43ceb37553a4e112745011a6a11b57bf324435743b05353086f4bc3e"
+  },
+  "customer-teal-dress": {
+    "file": "res://assets/art/customer-teal-dress.png",
+    "size": [
+      640,
+      1728
+    ],
+    "sha256": "759aea11c49c5704999d65f59400d287e0d2b780b9225a8e25ddd67f3f6603b2"
+  },
+  "customer-shotgun": {
+    "file": "res://assets/art/customer-shotgun.png",
+    "size": [
+      640,
+      1344
+    ],
+    "sha256": "5d77793e05e97d8867c0bc6770f475bd2f5473fd9af6befd7f4624060b3ec08b"
   }
 }

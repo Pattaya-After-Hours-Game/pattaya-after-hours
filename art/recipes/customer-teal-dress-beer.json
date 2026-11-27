@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent16-frame sprite sheet EXACT4columns4rows. Preserve exactadultwoman face/body/clothes and illustratedpixelpaintedstyle from bothapprovedrefs: darkbob Thaiwoman, tealwrapdress creamtropical flowerhem, tansandals, roundwoventanbag, jewelry/watch. Crispplumoutlines warmamberhighlights. SAMEsingle clear glassamberbeer smallwhitefoam in HER RIGHTHAND everyframe. NEWACTIONS: ROW1 SIDEwalkingRIGHT4phases leftstride/passing/rightstride/oppositepassing, carryuprightglass waist/chest elbowbent freearmcounterswing. ROW2 FRONTtowardviewer4alternatinggaitphases carryingglasssteadily. ROW3 REARaway4alternatinggaitphases onlybacks nofaces, glassstillheld partlyvisible atoneside. ROW4 index12 SEATEDright relaxed beerLOWERED nearwaist/knee; index13 SEATEDright sipping beeratmouth; index14 STANDINGSTILL front/threequarterRIGHT holdingbeerLOW atwaist, freearmnatural low; index15 STANDINGSTILL fullREAR beerbyrightside bothfeetflatparallel noface nogait. CRITICAL ROW4 FIRSTTWOSEATED, LASTTWOSTANDING, do not make third seated. Seated hips/knees90degree thighsnearhorizontal lowerlegsdown shoesnearfloor invisiblebarstoolposture, modestdrapeddress naturallyshorter thanstanding, samebody/headscale, nochairdrawn. Fourcompletefullbody figuresperrow allheads/shoes/glassinsideowncells generousalphagutters outerpadding, nocropping/overlap. Exactly16sprites. Genuine transparentalpha nofloor/shadow/backdrop/checkerboard/furniture/grid/labels/text. Preserve approvedidentity outfitall16, glassalwayshandattached onlyoneglass noextralimbs.",
+  "references": [
+    "art/sources/customer-teal-dress-motion.png",
+    "art/sources/customer-teal-dress-seated.png"
+  ],
+  "source": "art/sources/customer-teal-dress-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-ce3b74c5-448d-49dd-8d50-6fd8b0d636b5.png",
+  "columns": [
+    0,
+    300,
+    600,
+    900,
+    1199
+  ],
+  "rows": [
+    0,
+    327,
+    645,
+    957,
+    1312
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watch_beer": 15
+  },
+  "notes": "Second generation aligns uniform contract: index14 standing front with low beer. Prior approved first iteration with seated conversation preserved in authoring sibling customer-teal-dress-beer-v1-seated-chat.png and receipt.",
+  "seed": null,
+  "model_version": null
+}

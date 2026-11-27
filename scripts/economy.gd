@@ -2,6 +2,8 @@ extends RefCounted
 
 const Finance = preload("res://scripts/finance.gd")
 const C = preload("res://scripts/street_content.gd")
+const SHOTGUN_PATIENCE = 5
+const SHOTGUN_COOLDOWN = 30.0
 signal tour_arrived(guide_index: int, venue_name: String, guests: int)
 
 var s: Dictionary
@@ -95,7 +97,10 @@ func is_trading(bar: Dictionary, offline: bool = false) -> bool:
 
 func status(bar: Dictionary) -> String:
 	if bar.raided: return "Raided: closed until 12pm."
-	if not bar.open: return str(bar.close_reason)
+	if not bar.open:
+		if bar.closed==0 and scheduled(bar,int(s.street.minute)) and s.cash>=ceili(operating_rate(bar)/60.0):
+			return "Closed. Tap Reopen bar to resume trading."
+		return str(bar.close_reason)
 	if bar.closed>0: return "Event closure: %ds remaining." % bar.closed
 	if not scheduled(bar,int(s.street.minute)): return "Closed for prep. Opens at 12pm."
 	return "Trading until %s." % ("3am tonight" if bar.late_open else "1am")
@@ -712,11 +717,15 @@ func traffic_rate(offline: bool = false, replacement: Dictionary = {}, marketing
 	if s.weather >= 5: rate *= .8
 	return rate*walk_in_scale
 
+func guide_appeal(index: int) -> float:
+	return .5 * [1.0,1.1,1.25][int(s.staff[index].get("tour_training",0))]
+
 func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minute: int = -1, offset: int = 0, include_guides: bool = true) -> float:
 	if not is_trading(bar,offline): return 0.0
 	var value := 4.0 + (int(bar.stage)-1)*1.0 + int(bar.equipment.sign)*2 + int(bar.equipment.pool)*1.5
 	value += minf(3.0,int(bar.regulars)/15.0) + minf(1.5,int(s.rep)/80.0)
-	if not offline and include_guides: value += s.bookings.size()*.5
+	if not offline and include_guides:
+		for key in s.bookings: value += guide_appeal(int(key))
 	for i in bar.team.size():
 		var host: Dictionary = bar.team[i]
 		if host.role==1 and host.on and contracted(host,offset) and not i in bar.away: value += host_appeal(host)
@@ -971,6 +980,7 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 	# Cosmetic identity on new admissions only. Saved guests keep their old look;
 	# this consumes no RNG and cannot change traffic, orders or visit plans.
 	if int(customer.id)%48==24: customer.appearance = "charcoal"
+	elif int(customer.id)%48==12: customer.appearance = "shotgun"
 	customer.party_patience = C.CELEBRATION_PATIENCE if celebrating(bar) else 0
 	customer.commission_visit = C.COMMISSION_PERCENT>0 and promoter_bonus(bar)>0
 	s.street.next_customer += 1
@@ -1124,11 +1134,33 @@ func start_cooldown(bar: Dictionary, id: String, duration: float) -> void:
 	bar[id+"_ready"] = action_time()+duration
 
 static func patience(bar: Dictionary, customer: Dictionary) -> int:
-	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)+int(customer.get("party_patience",0))
+	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)+int(customer.get("party_patience",0))+int(customer.get("shotgun_patience",0))
 
 static func order_seconds_left(bar: Dictionary, customer: Dictionary) -> int:
 	var remaining := patience(bar,customer)-int(customer.wait)
 	return mini(remaining,int(customer.life)) if customer.get("visit_phase","legacy")=="legacy" else remaining
+
+# One shared saved deadline prevents multiple Shotguns or venue navigation
+# from bypassing the cooldown. Reads never grant patience or advance time.
+func shotgun_status(bar: Dictionary, customer_id: int) -> Dictionary:
+	var remaining := maxf(0.0,float(s.street.get("shotgun_ready",0.0))-action_time())
+	var present := false
+	for customer in bar.customers:
+		if int(customer.id)==customer_id and customer.get("appearance","")=="shotgun": present = true
+	var enabled: bool = s.phase in ["plan","guided"] and is_trading(bar) and present and remaining<=0.000001
+	return {"enabled":enabled,"remaining":remaining}
+
+func shotgun(bar: Dictionary, customer_id: int) -> String:
+	var offer := shotgun_status(bar,customer_id)
+	if not offer.enabled: return "Shotgun BBQ is cooling down." if offer.remaining>0 else "Shotgun must be visiting an open venue."
+	for venue in s.street.bars:
+		for customer in venue.customers:
+			customer.shotgun_patience = int(customer.get("shotgun_patience",0))+SHOTGUN_PATIENCE
+			# Legacy visits also have a lifetime cap on waiting. Extend that cap
+			# without changing modern round plans or drinking deadlines.
+			if customer.get("visit_phase","legacy")=="legacy": customer.life += SHOTGUN_PATIENCE
+	s.street.shotgun_ready = action_time()+SHOTGUN_COOLDOWN
+	return "Shotgun BBQ!"
 
 func chat_target(bar: Dictionary) -> Dictionary:
 	var target := {}
@@ -1739,8 +1771,14 @@ func tick() -> void:
 					if choice>=without_guides:
 						var guides: Array = s.bookings.keys()
 						guides.sort()
-						var guide_slot := (choice-without_guides)*guides.size()/(weight-without_guides)
-						tour_arrived.emit(int(guides[guide_slot]),str(bar.name),admitted)
+						var total_appeal := 0.0
+						for key in guides: total_appeal += guide_appeal(int(key))
+						var referral := float(choice-without_guides)*total_appeal/(weight-without_guides)
+						for key in guides:
+							referral -= guide_appeal(int(key))
+							if referral<0:
+								tour_arrived.emit(int(key),str(bar.name),admitted)
+								break
 				break
 			choice -= weight
 	for bar in s.street.bars:
@@ -1826,7 +1864,7 @@ func offline(now: int, cap_seconds: int) -> int:
 	var gap := maxi(0,now-int(s.street.last_seen))
 	var elapsed := mini(gap,cap_seconds)
 	var legal_seconds := legal_open_minutes(int(s.street.offline_cursor),elapsed)
-	var windows := contract_windows(int(s.street.offline_cursor),elapsed)
+	var windows := offline_windows(int(s.street.offline_cursor),elapsed)
 	# Even capped-away time advances the projection cursor, never the live clock.
 	s.street.offline_cursor = (int(s.street.offline_cursor)+gap)%C.DAY_MINUTES
 	s.street.last_seen = maxi(now,int(s.street.last_seen))
@@ -1850,7 +1888,7 @@ func offline(now: int, cap_seconds: int) -> int:
 		var projection: Dictionary = bar.duplicate(true)
 		ensure_stock_lots(projection)
 		for window in windows:
-			var view := forecast(bar,true,-1,int(window.minute),int(window.offset))
+			var view := forecast(bar,true,-1,int(window.minute))
 			if view.net<=0 or view.sales<=0:
 				limit = "unviable trading windows"
 				continue
@@ -1878,7 +1916,7 @@ func offline(now: int, cap_seconds: int) -> int:
 				var consignment_cost := C.CONSIGNMENT_COST if drink==0 and projection.consignment>0 else 0
 				var pool := floori(projection.offline_pool_pending)
 				var old_carry := int(projection.commission_carry)
-				var commission := commission_charge(projection,price_value) if promoter_bonus(bar,int(window.offset))>0 else 0
+				var commission := commission_charge(projection,price_value) if promoter_bonus(bar)>0 else 0
 				if bank+price_value+pool<operating+commission+consignment_cost:
 					projection.commission_carry = old_carry
 					# Discard this unviable candidate, not a real cash debt.
@@ -1914,11 +1952,8 @@ func offline(now: int, cap_seconds: int) -> int:
 
 	# A conservative net projection; it never debits opening cash or progresses
 	# queues, promotions, events, local milestones or calendar time.
-	for bar in s.street.bars:
-		for person in bar.team:
-			if contracted(person) and int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES))<=gap:
-				notes.append(str(bar.name)+": a staff contract expired; rehire in Service. Training retained.")
-	advance_contracts(gap)
+	# Contracts pause during absence, just like the live calendar. Forecasts use
+	# the saved roster throughout; offline claims never expire or renew staff.
 	s.weekly.revenue += gross
 	s.weekly.costs += expenses
 	s.street.earned += net
@@ -1973,23 +2008,6 @@ static func offline_windows(start: int, duration: int) -> Array:
 			windows.append({"minute":minute,"seconds":span,"offset":duration-remaining})
 		remaining -= span
 		minute = (minute+span)%C.DAY_MINUTES
-	return windows
-
-# Split every legal offline window at all staff expiries, including competitors.
-func contract_windows(start: int, duration: int) -> Array:
-	var expiries: Array[int] = []
-	for bar in s.street.bars:
-		for person in bar.team:
-			expiries.append(int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES)))
-	expiries.sort()
-	var windows := []
-	for window in offline_windows(start,duration):
-		var cursor := int(window.offset)
-		var finish := cursor+int(window.seconds)
-		for expiry in expiries+[finish]:
-			if expiry<=cursor or expiry>finish: continue
-			windows.append({"minute":(start+cursor)%C.DAY_MINUTES,"seconds":expiry-cursor,"offset":cursor})
-			cursor = expiry
 	return windows
 
 # Sponsored rounds are real orders, paid from the guest's entertainment budget.

@@ -134,7 +134,7 @@ func run(test: SceneTree) -> void:
 	st.advance(5)
 	test.check(JSON.stringify(m.s)==before,"AFK does not bypass an explicitly entered guided decision")
 	m.s.phase = "plan"
-	# Offline time may expire a contract, but must not pay AFK fees or resolve
+	# Offline time pauses contracts and must not pay AFK fees or resolve
 	# unseen events; only the next explicit live tick can do that work.
 	bar.team[0].contract_left = 10
 	m.s.cash = 5000
@@ -143,7 +143,7 @@ func run(test: SceneTree) -> void:
 	var now := int(Time.get_unix_time_from_system())
 	m.s.street.last_seen = now-100
 	st.claim_offline(now)
-	test.check(m.s.cash==5000 and bar.team[0].contract_left==0 and m.s.street.event==event_before,"AFK never renews contracts or handles unseen incidents offline")
+	test.check(m.s.cash==5000 and bar.team[0].contract_left==10 and m.s.street.event==event_before,"AFK preserves contracts and never handles unseen incidents offline")
 	m.save_game()
 	loaded = Campaign.new(1)
 	test.check(loaded.load_game() and not loaded.s.street.bars[0].team[1].on,"Renewal rota survives saving and loading")

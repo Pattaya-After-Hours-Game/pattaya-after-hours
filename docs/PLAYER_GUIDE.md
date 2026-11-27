@@ -13,6 +13,9 @@ Keyboard focus starts on the main action and on Cancel in the reset confirmation
 Sound/Muted works from the title screen. The campaign stays paused until New Game
 or Resume; watching the animation never spends money or advances contracts.
 
+A venue closed by its owner or a cash shortage shows **Reopen bar** on the main
+screen during trading hours. Restored money enables it; reopening spends nothing.
+
 The selected bar’s name appears at the top left. Open **Tutorial** for a short practice shift.
 Buy a pack, serve an order, help an impatient guest, hire a bartender and close
 for the night. Practice uses its own till and does not change your save.
@@ -21,6 +24,7 @@ Tab badges use green numbers for ready upgrades or active tours, a yellow **!**
 for available events, and a red **!** for no active tour agreements when seats are free.
 Double-click the rainbow duo in the bar, or tap them on a touchscreen, to see
 them kiss with a floating heart.
+
 
 ## Leaving the game running
 
@@ -92,6 +96,8 @@ looks can appear in the street. Inside, guests approach the counter for real
 orders and return to reserved seats after service. Between rounds they can stand
 up to mingle with another available guest or watch your purchased sports screen.
 Pool players walk to their real table and keep their place during the game.
+A served guest carries the beer back and sits only after reaching the chair.
+Seated guests lower the glass between sips; neighbours keep clear body space.
 You can still serve a waiting order while its customer is walking. Their normal
 budgets, patience and drinking times keep running.
 
@@ -185,6 +191,19 @@ When a referral gets a seat, the top-left update names the guide and venue.
 The badge above **Tours** counts active agreements. A red **!** appears when
 there are no active tours and the selected venue has a free seat. The guide list
 shows each agreement's remaining trading time or its **Expired** status.
+
+In the guide list, unlock **Tour manager** for **฿2,000**, then switch automation
+on or off. It books eligible guides on their last route (Market loop initially)
+when shared money is **above ฿1,000** and an open venue has a free seat with
+**more than two game hours before closing**. It renews agreements after expiry.
+Turn it off before cancelling a tour if you do not want it booked again.
+Manager levels 2/3 cost **฿4,000/8,000** and save **10%/25%** on future tour fees,
+including manual assignments. Fees round up to whole baht.
+
+Each guide's detail screen has separate **Tour guide training**: **฿800** for
+level 2 (+10% guide appeal), then **฿1,600** for level 3 (+25% total). Training
+works without a manager. Tours still compete for the same street visitors.
+These upgrades do not run tours offline or during guided shifts.
 
 ## When the rats come out
 
@@ -506,8 +525,8 @@ manual unless you enable AFK mode, which pays affordable renewals during live pl
 previous venue-wide training to those people; new hires start untrained.
 
 One game day is 24 real minutes before skips. Closed hours, off-duty time and
-skipped nights still use the contract. Offline absence also counts at one game
-minute per real second, even though the displayed live calendar pauses. At
+skipped nights during play still use the contract. Time away pauses every staff
+contract, including Nida’s, along with the live calendar. At
 normal hours with overnight skips, ten trading days are about 130 real minutes.
 The manager appointment and supplier agreement remain permanent purchases.
 

@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "id": "shotgun",
+  "atlas": "customer-shotgun",
+  "cell": [
+    160,
+    192
+  ],
+  "sources": [
+    {
+      "kind": "generated",
+      "recipe": "art/recipes/customer-shotgun.json",
+      "heights": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        140,
+        140,
+        140,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        140,
+        140,
+        180,
+        180
+      ],
+      "scale_groups": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          19,
+          20
+        ],
+        [
+          23,
+          24
+        ],
+        [
+          4
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ],
+        [
+          13
+        ],
+        [
+          14
+        ],
+        [
+          21
+        ],
+        [
+          22
+        ]
+      ],
+      "animations": {
+        "walk": [
+          0,
+          1,
+          0,
+          1
+        ],
+        "walk_front": [
+          2,
+          3,
+          2,
+          3
+        ],
+        "walk_back": [
+          5,
+          6,
+          5,
+          6
+        ],
+        "idle": [
+          4
+        ],
+        "drinking": [
+          7
+        ],
+        "chat": [
+          8
+        ],
+        "pool": [
+          9
+        ],
+        "seated_idle": [
+          10
+        ],
+        "seated_drinking": [
+          11
+        ],
+        "seated_chat": [
+          12
+        ],
+        "watch": [
+          13
+        ],
+        "beer_watch": [
+          14
+        ],
+        "beer_walk": [
+          15,
+          16,
+          15,
+          16
+        ],
+        "beer_walk_front": [
+          17,
+          18,
+          17,
+          18
+        ],
+        "beer_walk_back": [
+          19,
+          20,
+          19,
+          20
+        ],
+        "beer_seated_idle": [
+          21
+        ],
+        "beer_seated_drinking": [
+          22
+        ],
+        "beer_stand": [
+          7
+        ],
+        "bbq": [
+          23,
+          24,
+          24,
+          23
+        ]
+      }
+    }
+  ],
+  "fallbacks": {
+    "beer_seated_chat": "beer_seated_idle",
+    "beer_chat": "beer_stand",
+    "rest": "idle"
+  },
+  "seat_span": 1
+}

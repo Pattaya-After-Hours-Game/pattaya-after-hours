@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Draw a production transparent sprite sheet with EXACTLY 4 columns and 4 rows, 16 complete GROUP sprites. Each group is the same existing adult man with his tawny capybara companion from the two references. Preserve olive broad face, swept salt-and-pepper hair, full white beard, black T-shirt with tiny chest mark, navy shorts, black trainers/watch, teal capybara harness and burgundy leash, illustrated pixel-painted shading, plum outlines. IMPORTANT ANATOMY: man has exactly TWO ARMS and TWO HANDS in every sprite. His RIGHT HAND holds ONE clear glass of amber beer with small white foam, at waist/chest height. His LEFT HAND holds the leash. NEVER ADD AN EXTRA ARM OR HAND TO HOLD THE LEASH. In REAR views show left arm/hand at LEFT side of body holding leash, right bent arm/hand at RIGHT side holding glass. Leash may cross behind body to capybara at right. In FRONT views man's right beer-hand is at IMAGE LEFT, his left leash-hand at IMAGE RIGHT. Keep these two occupied hands steady while walking; no other hand swings.\nROW 1 four side-profile RIGHT walking phases: left stride, passing feet under hips, right stride, opposite passing. Man carries beer upright; capybara walks quadruped beside him.\nROW 2 four FRONT walks toward viewer, alternating gait phases.\nROW 3 four REAR walks away, alternating gait phases, no faces; exactly TWO arms, right arm with beer, left arm with leash.\nROW 4: cell1 man SEATED RIGHT, beer lowered near knee, capybara on ground beside him; cell2 man SEATED RIGHT sipping glass at mouth, animal beside; cell3 man STANDING STILL three-quarter FRONT RIGHT with beer low and animal beside; cell4 man STANDING STILL REAR with both feet flat and animal on ground beside, right hand beer left hand leash, no gait.\nSeated man has truly bent hips/knees, horizontal thighs and lower legs down, invisible stool posture; seated naturally shorter at same body scale, no chair drawn. Animal never holds props. EXACT 16 groups, complete heads/shoes/paws/glasses/leashes inside cells with generous transparent outer margins and gutters, no cropped limbs, no overlaps. Genuine alpha transparency, no background, floor, shadow, furniture, checkerboard, labels or text. Same identity/clothing/body proportions in every frame.",
+  "references": [
+    "art/sources/customer-capybara-motion.png",
+    "art/sources/customer-capybara-seated.png"
+  ],
+  "source": "art/sources/customer-capybara-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-2c5d6092-fad2-4743-9010-81ffef7e5a6d.png",
+  "columns": [
+    0,
+    328,
+    656,
+    984,
+    1312
+  ],
+  "rows": [
+    0,
+    301,
+    601,
+    890,
+    1199
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watch_beer": 15
+  },
+  "notes": "Second generation corrected extra leash arm in rear walks. Selected source has exactly two man arms; capybara turns sideways in standing rear-watch group while man faces rear.",
+  "rejected_generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-c0167610-7b2d-47cb-bca5-0b7a3c878f29.png",
+  "seed": null,
+  "model_version": null
+}

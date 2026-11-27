@@ -1,12 +1,20 @@
 # Developer setup and handover
 
-The optional customer `appearance: "charcoal"` field is cosmetic and remains
-compatible with schema 17. Only `economy.admit` assigns it to new ID-24-mod-48
-visits, without RNG; absent fields keep legacy looks. Campaign validation
-accepts only that identity. `city.scene_people` reads actual visit phase, saved
+The optional customer `appearance` field accepts `charcoal` and `shotgun` in
+schema 17. Only `economy.admit` assigns these to new ID-24/12-mod-48 visits,
+without RNG; absent fields keep legacy looks. Campaign validation accepts
+these two identities. `city.scene_people` reads actual visit phase, saved
 Chat deadline and active pool state for poses. Packing and provenance are in
 [the art guide](art/README.md); `charcoal_guest_check.gd` covers save preservation
 and read-only presentation. Outdoor walkers remain ambient traffic, not admissions.
+
+Shotgun's click bonus is model-owned in `economy.shotgun`, routed through
+`street.action("shotgun", customer_id)`. City emits the click; main plays the
+reaction and saves only after an eligible action. Optional schema-17
+`street.shotgun_ready` and `customer.shotgun_patience` keep the shared fractional
+30-second cooldown and current-visit bonus across reloads. Validation rejects
+malformed fields; absent fields retain old visits without gifts. Status/UI reads
+never activate the bonus. See `tests/shotgun_patience_check.gd`.
 
 All existing customer identities now map to expanded sixteen-frame sheets via
 `Art.customer_motion_id`. `city.update_customer_motion` owns only transient
@@ -31,6 +39,22 @@ priority. Leisure phases advance only through the visible scene's delta. Model
 admission, patience, drinking, pool fees, service clocks, budgets and RNG are
 unchanged. `customer_routine_check.gd` checks those boundaries and state purity.
 `tools/prepare_customer_seated.py` packs the new authored seated/watch poses.
+
+`main.render` reparents the existing City into the rebuilt HUD. Serve, purchases
+and navigation must preserve that node, its route cache and animation phase.
+Only a campaign change resets the cache; seeding an existing venue never moves
+its existing actors. Frame budgets cap visual catch-up after a stall, and gait
+phase uses travelled distance. `customer_continuity_check.gd` exercises the real
+Serve button and repeated redraws throughout a return journey.
+
+Every customer now renders from an individual `customer-<id>.png` with named
+poses in `assets/art/customer-characters.json`. Definitions and the new-person
+example live in [art/characters](art/characters/README.md).
+`tools/prepare_customers.py --character <id>` rebuilds just that person;
+`--all` repacks a common pose extension. Approved source art remains independent.
+Runtime JSON is included explicitly in all export presets. Catalog normalization
+keeps frame indices integral after JSON parsing. `customer_catalog_check.gd` and
+the isolated Python authoring test cover the contract.
 
 For the premise and cast, see [story.md](story.md). For gameplay help, see the
 [player guide](docs/PLAYER_GUIDE.md). [Testing and release checks](docs/TESTING.md)
@@ -191,6 +215,18 @@ festival outcomes, all preparation gates, existing staff renewal, save validatio
 menu pauses, read-only UI and popup suppression. Run it through `tools/test.sh`
 so save fixtures remain isolated. AFK visual states are in the `afk-*` filter of
 `tests/preview_economy.gd`.
+
+## Tour manager and guide training
+
+`campaign.gd` owns tour upgrade quotes, purchases, guide fees and automation;
+`street.gd` emits `tour_manager_requested` only during live fixed ticks. Fresh,
+loaded and tuning-copy campaigns connect the same handler. `economy.gd` applies
+per-guide trained appeal and weighted referral attribution within bounded demand.
+Optional schema-17 `street.tour_manager` (0–3), `tour_manager_on` (boolean),
+`staff[].tour_training` (0–2) and `tour_route` (route index) validate on load.
+Absence means no purchase, baseline guide skill and Market loop. The guide list
+and detail controls use pure offers; no UI read books or spends. Regression
+coverage is in `tests/tour_manager_check.gd`; previews use `tour-manager-*`.
 
 ## Saves and settings
 

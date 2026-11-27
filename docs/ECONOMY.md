@@ -9,7 +9,10 @@ are disposable visual routines. Pending orders send visitors toward the counter;
 real service sends them back to a seat. Active pool players retain their actual
 table. Orders remain serviceable while walking. Animation never changes admission,
 patience, drinking intervals, budgets, stock, finances, saves or gameplay RNG.
-It grants no extra visit time, sales, tips, loyalty or pool income.
+It grants no extra visit time, sales, tips, loyalty or pool income. Beer-carrying
+poses require an actual paid drinking phase; a pending order keeps empty hands.
+Physical room spacing affects presentation rather than the model seating cap.
+HUD rebuilds retain routes and never move actors to their destinations.
 
 The current account and growth rules are defined in
 [Finance and growth](design/FINANCE_AND_GROWTH.md). Schema 17 restores one shared
@@ -53,8 +56,8 @@ supplier purchases. Navigation/status reads never spend or roll RNG.
 Renewal retains identity, training and service deadlines. Expiry saves the prior
 duty setting in optional `person.renew_on`; AFK restores that setting after the
 ordinary rehire action. Pre-field expired workers default to returning on duty.
-Unaffordable contracts retry on later live ticks. Closed, skipped and offline
-time still ages contracts; offline claims never renew them.
+Unaffordable contracts retry on later live ticks. Closed and skipped time during
+play still ages contracts; offline absence neither ages nor renews them.
 
 Paid Rat Plague retains its normal swarm and sweep, then AFK catches one of the
 last six rats per live second. Without patrol money, AFK invokes the existing
@@ -372,11 +375,29 @@ Local, tourist and nightlife groups choose among the venues and outside options.
 Each booked tour guide adds 0.5 to live venue appeal before modifiers. When the
 guide's share of the same arrival draw brings customers who get seats, the
 street update names the guide and venue.
-Live tour agreements pay the guide upfront from the selected venue’s till in
-the same action that starts the tour. The company bank and other tills are not
-used. Guide pay remains excluded from the five-second trading sample; weekly
-costs record it once. Existing agreements are not charged again or refunded.
+Live tour agreements pay the guide upfront from shared money in the same
+action that starts the tour. Guide pay remains excluded from the five-second
+trading sample; weekly costs record it once. Existing agreements are not charged again or refunded.
 Guide eligibility and pay rules still apply; navigation changes no model state.
+Tour Manager costs ฿2,000/4,000/8,000 for levels 1/2/3. Level 1 enables a
+saved on/off switch and automatic bookings on normal plan ticks only: shared
+cash must be strictly above ฿1,000 before each booking, and at least one trading
+venue must have a free seat and more than 120 game minutes before its own
+scheduled close (including late permission). These are start conditions, not
+protected reserves. Active agreements are never repaid. After expiry the manager
+uses each guide's last paid route, defaulting to Market loop; all normal guide,
+weather and pay-split refusals apply. Cancellation keeps the remembered route;
+switch automation off to prevent rebooking. Levels 2/3 reduce future manual and
+automatic guide fees by 10%/25% total, rounded up to whole baht. No retroactive
+refunds. Automation never runs offline, in practice or during guided decisions.
+
+Each guide separately buys level 2/3 training for ฿800/1,600, raising their base
+0.5 appeal to 0.55/0.625 (+10%/+25% total). No manager purchase is required.
+Training does not create guests, change visit budgets or expand shared traffic.
+Referral attribution uses each guide's actual contribution. Optional schema-17
+manager level/toggle and per-guide training/last-route fields preserve progress;
+absent fields grant no purchases and loading does not book tours.
+
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.
@@ -805,10 +826,11 @@ gap (even beyond the earning cap), but leave the live clock unchanged. Foregroun
 clock movement reanchors it; consecutive offline claims cannot reuse a legal
 window. Split the projection at opening, closing and all venue peak boundaries;
 calculate competition and service/stock limits separately for each segment.
-Also split at every staff contract expiry across all venues, so expired staff
-stop contributing service, attraction and payroll at the correct projected minute.
-Consume contract time across the full absence, even beyond the eight-hour earning
-cap, and include expiry notices in the offline report. Never auto-renew contracts inside an offline claim; AFK renewals resume only on live street ticks.
+Staff contracts pause throughout absence, including time beyond the eight-hour
+earning cap. Use saved contract eligibility, duty and training for service,
+attraction and payroll throughout the projection. Already expired staff stay
+expired; do not reset terms, restore lost time or emit new expiry notices.
+Offline claims never renew contracts; AFK renewals resume only on live street ticks.
 Expected sales are bounded by shared demand, space, service and stock. Estimated
 sales consume owned stock; supplier purchases add complete six- or twelve-drink deliveries at the
 venue’s current supplier price.
@@ -969,3 +991,26 @@ She never serves orders or earns Gabby's bartender bonus. Only one roster place
 across the street belongs to Daisy, including expired contracts. Renewal retains
 her training and any booking deadline. Her appended host ID preserves the six
 existing host identities; no saved employee is replaced or granted for free.
+
+## Shotgun customer — 27 November 2026
+
+New admissions whose IDs are 12 modulo 48 carry the optional saved cosmetic
+identity `shotgun`. Existing customers keep their appearances, paid quotes,
+budgets and visit plans. Shotgun uses the same bounded arrivals and business
+rules as every guest. Clicking/tapping him during live trading gives every
+current customer in every venue +5 seconds of patience and starts one shared 30-second foreground cooldown.
+The bonus stacks per current visit on later successful activations; new arrivals
+receive no retroactive bonus. Legacy visits also receive +5 seconds on their
+lifetime cap so the full waiting extension applies. Modern round plans, paid
+drinking deadlines, orders, stock, prices, money and RNG remain unchanged.
+No food stock, purchase, income or service is created. Paused menus/decisions,
+closed venues, absent Shotgun and repeated clicks cannot activate it.
+
+Optional schema-17 `street.shotgun_ready` preserves the fractional live deadline;
+`customer.shotgun_patience` preserves the granted integer visit allowance.
+Missing fields default to zero, without rewriting old visits or replaying a bonus.
+The cooldown advances with the live action clock, never menu time or offline
+estimates. The scene requests the model action; status reads stay pure.
+This is a hidden Easter egg: only the original ribs animation and “Shotgun BBQ!”
+shout appear. No bonus message, countdown or player-guide instructions reveal
+the mechanic. Existing owner and staff service clocks stay independent.

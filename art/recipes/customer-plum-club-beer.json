@@ -1,0 +1,72 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Transparent16frame production sprite sheet Pattaya After Hours. Two approved refs show exact adult Indian clubgoer: warmbrownskin, sweptdarkwavyhair, neatshortfullbeard, plumopenneck collaredshirt rolledsleeves, charcoaltrousers, darkbelt goldbuckle, goldwristwatch, oxbloodloafers. Preserve exactidentity/build/outfit/style all16. EXACT4columns4rows, samebody/headscale, fullheads/shoes withgenerousalphagutter everycell nooverlap. ONE modest clearamberbeer glass littlewhitefoam grippedin SAME RIGHTHAND everyframe steady bentelbowwaist/chestcarry, freeleftarm counterswings, nofloating/doubleglass. Row1 SIDEwalkingRIGHT fourdistinctgaits leftstride/passing/rightstride/oppositepassing. Row2 FRONT towardviewer fouralternatinggaits. Row3 BACKaway fouralternatinggaits, backshead/clothes onlynofaces, glasspartlyvisibleatrightside heldbyhand. Row4cell12 SEATED uprightfacingRIGHT hip/knees90degrees thighs horizontal lowerlegsdown beerLOWERED nearknee/waist notmouth; cell13 SAMEseated sippingglassatmouth; cell14 STANDINGFRONT threequarterright holdingbeerLOW freehandrelaxed BOTHfeetflat; cell15 STANDINGSTILL fullREAR holdingbeeratrighside BOTHfeetflat nexttoeachother noface/nogait. Seatedshorterthanstanding samebodyscale notinflated. NOchair/furniture/table/screen/background/floor/shadow/glow/text/labels/grid. Genuinealpha crispplumoutlines warmclusteredpixelpaintedshading adultproportions notchibi/photo. Nocroppedheads/shoes.",
+  "references": [
+    "art/sources/customer-plum-club-motion.png",
+    "art/sources/customer-plum-club-seated.png"
+  ],
+  "source": "art/sources/customer-plum-club-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-ad407fd8-4ce5-413b-b1fd-1eddca1601d9.png",
+  "source_dimensions": [
+    1024,
+    1536
+  ],
+  "columns": [
+    0,
+    256,
+    512,
+    768,
+    1024
+  ],
+  "rows": [
+    0,
+    380,
+    760,
+    1140,
+    1536
+  ],
+  "frame_heights": [
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    140,
+    140,
+    180,
+    180
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watching_beer": 15
+  },
+  "model_version": null,
+  "seed": null
+}

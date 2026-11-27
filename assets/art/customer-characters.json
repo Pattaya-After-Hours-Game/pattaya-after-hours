@@ -1,0 +1,1499 @@
+{
+  "amber-local": {
+    "atlas": "customer-amber-local",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "beard-glasses": {
+    "atlas": "customer-beard-glasses",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "capybara": {
+    "atlas": "customer-capybara",
+    "cell": [
+      256,
+      192
+    ],
+    "frames": 44,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "companion_idle": [
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "charcoal": {
+    "atlas": "customer-charcoal",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "cobalt-evening": {
+    "atlas": "customer-cobalt-evening",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 40,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "sunglasses": [
+        36,
+        37,
+        38,
+        39
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "gold-blouse": {
+    "atlas": "customer-gold-blouse",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "ivory-club": {
+    "atlas": "customer-ivory-club",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "maroon-casual": {
+    "atlas": "customer-maroon-casual",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "navy-tourist": {
+    "atlas": "customer-navy-tourist",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "plum-club": {
+    "atlas": "customer-plum-club",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "rainbow-duo": {
+    "atlas": "customer-rainbow-duo",
+    "cell": [
+      288,
+      192
+    ],
+    "frames": 40,
+    "seat_span": 2,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "companion_idle": [
+        36
+      ],
+      "kiss": [
+        37
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "sage-holiday": {
+    "atlas": "customer-sage-holiday",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "shotgun": {
+    "atlas": "customer-shotgun",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 28,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "walk_front": [
+        2,
+        3,
+        2,
+        3
+      ],
+      "walk_back": [
+        5,
+        6,
+        5,
+        6
+      ],
+      "idle": [
+        4
+      ],
+      "drinking": [
+        7
+      ],
+      "chat": [
+        8
+      ],
+      "pool": [
+        9
+      ],
+      "seated_idle": [
+        10
+      ],
+      "seated_drinking": [
+        11
+      ],
+      "seated_chat": [
+        12
+      ],
+      "watch": [
+        13
+      ],
+      "beer_watch": [
+        14
+      ],
+      "beer_walk": [
+        15,
+        16,
+        15,
+        16
+      ],
+      "beer_walk_front": [
+        17,
+        18,
+        17,
+        18
+      ],
+      "beer_walk_back": [
+        19,
+        20,
+        19,
+        20
+      ],
+      "beer_seated_idle": [
+        21
+      ],
+      "beer_seated_drinking": [
+        22
+      ],
+      "beer_stand": [
+        7
+      ],
+      "bbq": [
+        23,
+        24,
+        24,
+        23
+      ],
+      "beer_seated_chat": [
+        21
+      ],
+      "beer_chat": [
+        7
+      ],
+      "rest": [
+        4
+      ]
+    }
+  },
+  "silver-polo": {
+    "atlas": "customer-silver-polo",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "sunfaded-regular": {
+    "atlas": "customer-sunfaded-regular",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  },
+  "teal-dress": {
+    "atlas": "customer-teal-dress",
+    "cell": [
+      160,
+      192
+    ],
+    "frames": 36,
+    "seat_span": 1,
+    "animations": {
+      "walk": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "walk_front": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walk_back": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "idle": [
+        12
+      ],
+      "drinking": [
+        13
+      ],
+      "chat": [
+        14
+      ],
+      "pool": [
+        15
+      ],
+      "seated_idle": [
+        16
+      ],
+      "seated_drinking": [
+        17
+      ],
+      "seated_chat": [
+        18
+      ],
+      "watch": [
+        19
+      ],
+      "beer_walk": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "beer_walk_front": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "beer_walk_back": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "beer_seated_idle": [
+        32
+      ],
+      "beer_seated_drinking": [
+        33
+      ],
+      "beer_stand": [
+        34
+      ],
+      "beer_watch": [
+        35
+      ],
+      "beer_seated_chat": [
+        32
+      ],
+      "beer_chat": [
+        34
+      ],
+      "rest": [
+        12
+      ]
+    }
+  }
+}
