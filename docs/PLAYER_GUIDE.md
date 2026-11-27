@@ -518,8 +518,8 @@ manual unless you enable AFK mode, which pays affordable renewals during live pl
 previous venue-wide training to those people; new hires start untrained.
 
 One game day is 24 real minutes before skips. Closed hours, off-duty time and
-skipped nights still use the contract. Offline absence also counts at one game
-minute per real second, even though the displayed live calendar pauses. At
+skipped nights during play still use the contract. Time away pauses every staff
+contract, including Nida’s, along with the live calendar. At
 normal hours with overnight skips, ten trading days are about 130 real minutes.
 The manager appointment and supplier agreement remain permanent purchases.
 

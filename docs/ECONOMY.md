@@ -56,8 +56,8 @@ supplier purchases. Navigation/status reads never spend or roll RNG.
 Renewal retains identity, training and service deadlines. Expiry saves the prior
 duty setting in optional `person.renew_on`; AFK restores that setting after the
 ordinary rehire action. Pre-field expired workers default to returning on duty.
-Unaffordable contracts retry on later live ticks. Closed, skipped and offline
-time still ages contracts; offline claims never renew them.
+Unaffordable contracts retry on later live ticks. Closed and skipped time during
+play still ages contracts; offline absence neither ages nor renews them.
 
 Paid Rat Plague retains its normal swarm and sweep, then AFK catches one of the
 last six rats per live second. Without patrol money, AFK invokes the existing
@@ -826,10 +826,11 @@ gap (even beyond the earning cap), but leave the live clock unchanged. Foregroun
 clock movement reanchors it; consecutive offline claims cannot reuse a legal
 window. Split the projection at opening, closing and all venue peak boundaries;
 calculate competition and service/stock limits separately for each segment.
-Also split at every staff contract expiry across all venues, so expired staff
-stop contributing service, attraction and payroll at the correct projected minute.
-Consume contract time across the full absence, even beyond the eight-hour earning
-cap, and include expiry notices in the offline report. Never auto-renew contracts inside an offline claim; AFK renewals resume only on live street ticks.
+Staff contracts pause throughout absence, including time beyond the eight-hour
+earning cap. Use saved contract eligibility, duty and training for service,
+attraction and payroll throughout the projection. Already expired staff stay
+expired; do not reset terms, restore lost time or emit new expiry notices.
+Offline claims never renew contracts; AFK renewals resume only on live street ticks.
 Expected sales are bounded by shared demand, space, service and stock. Estimated
 sales consume owned stock; supplier purchases add complete six- or twelve-drink deliveries at the
 venue’s current supplier price.

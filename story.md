@@ -330,7 +330,8 @@ an empty fridge stays empty. Bo's delivery still costs money.
 
 > **Anong:** “You can skip to opening. The floor can't.”
 
-Staff agree to ten-day contracts. Paying for training develops a person, so those
+Staff agree to ten-day contracts that pause while the player is away. Closed
+hours and skipped nights during play still count. Paying for training develops a person, so those
 skills stay with them if they leave and later return. New bartenders need the
 owner's help with a rush; learning the job gradually buys breathing room.
 

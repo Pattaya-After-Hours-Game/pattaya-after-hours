@@ -97,7 +97,7 @@ func run(test: SceneTree) -> void:
 	test.check(restored.load_game(),"Reload individual staff contracts")
 	var loaded: Dictionary = restored.street.selected()
 	test.check(loaded.team[0].contract_left==0 and loaded.team[0].training==2 and loaded.team[1].service_clock==9,"Reload preserves expiry, training and partial service")
-	# One minute of a remaining contract cannot power an eight-hour projection.
+	# Offline absence pauses all contract roles, even beyond the earning cap.
 	m = Campaign.new(72)
 	m.s.cash = 100000
 	bar = m.street.selected()
@@ -105,16 +105,34 @@ func run(test: SceneTree) -> void:
 	bar.manager = true
 	bar.restock = true
 	bar.team[0].contract_left = 60
+	bar.team[0].training = 2
+	bar.team[0].service_ready = 17.5
+	for role in [1,2,3]:
+		bar.team.append({"role":role,"on":false,"host":0 if role==1 else -1,"contract_left":30,"training":1})
+	bar.team.append({"role":0,"on":false,"host":-1,"contract_left":0,"training":2})
+	m.street = Campaign.Street.new(m.s)
+	var team_before: Array = bar.team.duplicate(true)
 	m.s.street.last_seen = 1000
-	var short = Campaign.new(72)
-	short.s = m.s.duplicate(true)
-	short.street = Campaign.Street.new(short.s)
-	var expected: int = short.street.claim_offline(1060)
-	test.check(expected>0 and m.street.claim_offline(1000+28800)==expected,"Offline income stops serving at the exact staff expiry")
-	test.check(bar.team[0].contract_left==0 and not bar.team[0].on,"Offline absence expires contracts")
+	var full = Campaign.new(72)
+	full.s = m.s.duplicate(true)
+	full.street = Campaign.Street.new(full.s)
+	full.street.selected().team[0].contract_left = C.STAFF_CONTRACT_MINUTES
+	var expected: int = full.street.claim_offline(1000+28800)
+	test.check(expected>0 and m.street.claim_offline(1000+28800)==expected,"Offline forecasts use saved active contracts for the whole capped absence")
+	test.check(bar.team==team_before,"Offline preserves every role's term, rota, training and fractional service deadline, including expired staff")
+	test.check(not str(m.s.street.offline_report.notes).contains("contract expired"),"Offline report never announces contract expiry")
 	cash_before = m.s.cash
 	m.street.claim_offline(1000+28800)
-	test.check(m.s.cash==cash_before,"Repeated offline claims cannot renew or duplicate contracts")
+	test.check(m.s.cash==cash_before and bar.team==team_before,"Repeated offline claims cannot renew, age or duplicate contracts")
+	m.street.claim_offline(1000+28800*3)
+	test.check(bar.team==team_before,"Absence beyond the eight-hour earning cap still preserves contracts")
+	m.save_game()
+	restored = Campaign.new(1)
+	test.check(restored.load_game() and restored.street.selected().team==team_before,"Offline-paused contracts survive save and reload without restoration gifts")
+	m.street.economy.advance_contracts(59)
+	test.check(bar.team[0].contract_left==1 and bar.team[0].on,"Resumed live time consumes only the saved remaining term")
+	m.street.economy.advance_contracts(1)
+	test.check(bar.team[0].contract_left==0 and not bar.team[0].on,"Resumed contracts still expire at their exact live deadline")
 	# Intermittent empty queues and UI redraws cannot spam the alert.
 	var alert = Alert.new()
 	test.check(not alert.tick(false,1) and alert.tick(true,0),"First waiting order requests a chime")

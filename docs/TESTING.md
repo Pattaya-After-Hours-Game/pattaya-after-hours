@@ -1,5 +1,26 @@
 # Testing and release checks
 
+## Contracts pause while away — 27 November 2026
+
+All staff contracts now retain their remaining term during offline absence,
+including Nida, off-duty staff and time beyond the eight-hour earnings cap.
+Offline forecasts use saved eligibility throughout; already expired workers
+stay expired. No migration restores time or grants free renewals. Live closed
+hours and skipped nights still age contracts.
+
+`staff_check.gd` covers unchanged terms, rotas, training and fractional service
+deadlines across absence, repeated claims and save/reload, plus exact expiry
+when live time resumes. `afk_check.gd` verifies absence cannot renew or age staff.
+
+The complete pinned Godot 4.7.2 `tools/test.sh` suite passes in an isolated
+checkout containing only this fix, including all pacing and lease routes.
+The shared checkout passes gameplay/save/UI, baseline, promoter, automation,
+celebration and club checks, but retains the previously documented recovery-work
+cadence failure (balanced seed 291: 128s versus the 140s floor). Its lease routes
+pass separately. Unfinished recovery changes are excluded from this fix.
+Local Markdown links and `git diff --check` pass. Device play and release
+publication remain unverified.
+
 ## Hidden Shotgun Easter egg — 27 November 2026
 
 Removed the cooldown label and the “Everyone +5s patience” message. Only the

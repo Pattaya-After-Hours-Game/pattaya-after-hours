@@ -115,7 +115,8 @@ one drink every **25 seconds**; individual training improves this to 20 and then
 15 seconds, with training priced at ฿400 then ฿800. Stage two adds 12-second
 and 10-second training for ฿1,200 and ฿1,600 per bartender. Help serve during a rush. Contracts expire, but each person's training
 stays with them when rehired. Service shows the remaining term and rehire controls.
-Closed hours, skipped nights and offline time count toward contracts.
+Closed hours and skipped nights during play count toward contracts. Time away
+from the game pauses contracts for all staff, including Nida.
 
 In **Service → Frontage promoter**, hire **Nida for ฿1,200 per ten game days, with no commission**. She replaces Welcome taps, uses a separate roster slot
 and never serves drinks. Her preview shows estimated demand and net
@@ -419,7 +420,7 @@ This update adds ten-day staff contracts, individual training that survives
 rehiring, measured 25/20/15-second service, and a waiting-order bell. Hiring and
 rehiring now cost ฿1,200 for bartenders (hosts/dancers remain ฿4,500); leases follow the Beer/Hostess/Gogo ladder documented above. All purchases
 require only their advertised price. Existing hires and training migrate,
-and offline projections stop crediting staff service at contract expiry. See the
+and offline projections use the saved roster without ageing or renewing contracts. See the
 [player guide](docs/PLAYER_GUIDE.md) and [economy rules](docs/ECONOMY.md).
 
 ## More room and a face out front

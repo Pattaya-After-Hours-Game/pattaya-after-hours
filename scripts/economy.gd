@@ -1864,7 +1864,7 @@ func offline(now: int, cap_seconds: int) -> int:
 	var gap := maxi(0,now-int(s.street.last_seen))
 	var elapsed := mini(gap,cap_seconds)
 	var legal_seconds := legal_open_minutes(int(s.street.offline_cursor),elapsed)
-	var windows := contract_windows(int(s.street.offline_cursor),elapsed)
+	var windows := offline_windows(int(s.street.offline_cursor),elapsed)
 	# Even capped-away time advances the projection cursor, never the live clock.
 	s.street.offline_cursor = (int(s.street.offline_cursor)+gap)%C.DAY_MINUTES
 	s.street.last_seen = maxi(now,int(s.street.last_seen))
@@ -1888,7 +1888,7 @@ func offline(now: int, cap_seconds: int) -> int:
 		var projection: Dictionary = bar.duplicate(true)
 		ensure_stock_lots(projection)
 		for window in windows:
-			var view := forecast(bar,true,-1,int(window.minute),int(window.offset))
+			var view := forecast(bar,true,-1,int(window.minute))
 			if view.net<=0 or view.sales<=0:
 				limit = "unviable trading windows"
 				continue
@@ -1916,7 +1916,7 @@ func offline(now: int, cap_seconds: int) -> int:
 				var consignment_cost := C.CONSIGNMENT_COST if drink==0 and projection.consignment>0 else 0
 				var pool := floori(projection.offline_pool_pending)
 				var old_carry := int(projection.commission_carry)
-				var commission := commission_charge(projection,price_value) if promoter_bonus(bar,int(window.offset))>0 else 0
+				var commission := commission_charge(projection,price_value) if promoter_bonus(bar)>0 else 0
 				if bank+price_value+pool<operating+commission+consignment_cost:
 					projection.commission_carry = old_carry
 					# Discard this unviable candidate, not a real cash debt.
@@ -1952,11 +1952,8 @@ func offline(now: int, cap_seconds: int) -> int:
 
 	# A conservative net projection; it never debits opening cash or progresses
 	# queues, promotions, events, local milestones or calendar time.
-	for bar in s.street.bars:
-		for person in bar.team:
-			if contracted(person) and int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES))<=gap:
-				notes.append(str(bar.name)+": a staff contract expired; rehire in Service. Training retained.")
-	advance_contracts(gap)
+	# Contracts pause during absence, just like the live calendar. Forecasts use
+	# the saved roster throughout; offline claims never expire or renew staff.
 	s.weekly.revenue += gross
 	s.weekly.costs += expenses
 	s.street.earned += net
@@ -2011,23 +2008,6 @@ static func offline_windows(start: int, duration: int) -> Array:
 			windows.append({"minute":minute,"seconds":span,"offset":duration-remaining})
 		remaining -= span
 		minute = (minute+span)%C.DAY_MINUTES
-	return windows
-
-# Split every legal offline window at all staff expiries, including competitors.
-func contract_windows(start: int, duration: int) -> Array:
-	var expiries: Array[int] = []
-	for bar in s.street.bars:
-		for person in bar.team:
-			expiries.append(int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES)))
-	expiries.sort()
-	var windows := []
-	for window in offline_windows(start,duration):
-		var cursor := int(window.offset)
-		var finish := cursor+int(window.seconds)
-		for expiry in expiries+[finish]:
-			if expiry<=cursor or expiry>finish: continue
-			windows.append({"minute":(start+cursor)%C.DAY_MINUTES,"seconds":expiry-cursor,"offset":cursor})
-			cursor = expiry
 	return windows
 
 # Sponsored rounds are real orders, paid from the guest's entertainment budget.

@@ -1,5 +1,19 @@
 # Current implementation and release handoff
 
+## Contracts pause while away — 27 November 2026
+
+User correction supersedes the old offline-ageing rule: all staff, including
+Nida, retain saved contract time throughout absence. Offline estimates use saved
+eligibility without expiry notices or renewals. Live closed hours and skipped
+nights still count; training/deadlines and already expired contracts are retained.
+No refunds or restored terms are granted.
+
+The full isolated Godot 4.7.2 `tools/test.sh` suite passes, including all pacing
+and lease routes. Shared-checkout verification retains only the previously
+recorded 128-second recovery-work cadence failure; that unfinished work is
+excluded. See [verification](TESTING.md#contracts-pause-while-away--27-november-2026).
+Device play and release publication remain unverified.
+
 ## Hidden Shotgun Easter egg — 27 November 2026
 
 User correction: keep the interaction hidden. Removed the cooldown/countdown
