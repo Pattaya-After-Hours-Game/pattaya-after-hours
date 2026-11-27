@@ -1,5 +1,17 @@
 # Current implementation and release handoff
 
+## Hidden Shotgun Easter egg — 27 November 2026
+
+User correction: keep the interaction hidden. Removed the cooldown/countdown
+and patience-bonus feedback, restoring only the original ribs/shout bubble.
+The saved 30-second shared cooldown and +5-second patience effect remain.
+Player documentation no longer gives away the interaction or mechanics.
+See [verification](TESTING.md#hidden-shotgun-easter-egg--27-november-2026).
+Concurrent tour and closure changes are preserved outside this commit.
+Device play and release publication remain unverified.
+
+
+
 ## Shotgun patience boost — 27 November 2026
 
 Click/tap Shotgun to give all current customers across the street +5 seconds

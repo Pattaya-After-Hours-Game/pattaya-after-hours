@@ -991,6 +991,7 @@ Optional schema-17 `street.shotgun_ready` preserves the fractional live deadline
 `customer.shotgun_patience` preserves the granted integer visit allowance.
 Missing fields default to zero, without rewriting old visits or replaying a bonus.
 The cooldown advances with the live action clock, never menu time or offline
-estimates. The scene requests the model action; status/countdown reads stay pure.
-After success the bubble shows “Everyone +5s patience”, followed by the live
-cooldown above Shotgun. Existing owner and staff service clocks stay independent.
+estimates. The scene requests the model action; status reads stay pure.
+This is a hidden Easter egg: only the original ribs animation and “Shotgun BBQ!”
+shout appear. No bonus message, countdown or player-guide instructions reveal
+the mechanic. Existing owner and staff service clocks stay independent.

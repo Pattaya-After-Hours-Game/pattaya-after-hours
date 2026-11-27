@@ -182,16 +182,9 @@ func _draw() -> void:
 	for person in people:
 		if person.who=="patrons-rainbow-duo" and person.pose==1 and not person.get("motion_state","").begins_with("walk"): _draw_kiss_heart(person)
 		if person.get("bbq",false):
-			var bubble := Vector2(clampf(order_position(person).x-93,8,766),maxf(34,order_position(person).y-61))
-			draw_style_box(_sign_box(),Rect2(bubble,Vector2(186,45)))
-			draw_string(font,bubble+Vector2(9,19),"Shotgun BBQ!",HORIZONTAL_ALIGNMENT_LEFT,168,18,GOLD)
-			draw_string(font,bubble+Vector2(9,36),"Everyone +5s patience",HORIZONTAL_ALIGNMENT_LEFT,168,13,TEAL)
-		elif person.who=="shotgun":
-			var remaining := maxf(0.0,float(street_state.get("shotgun_ready",0.0))-float(street_state.get("elapsed",0))-float(street_state.get("tick_fraction",0.0)))
-			if remaining>0:
-				var feedback := Vector2(clampf(order_position(person).x-54,8,844),maxf(34,order_position(person).y-34))
-				draw_style_box(_sign_box(),Rect2(feedback,Vector2(108,23)))
-				draw_string(font,feedback+Vector2(7,16),"BBQ · %ds" % ceili(remaining),HORIZONTAL_ALIGNMENT_LEFT,94,13,GOLD)
+			var bubble := Vector2(clampf(order_position(person).x-79,8,794),maxf(34,order_position(person).y-43))
+			draw_style_box(_sign_box(),Rect2(bubble,Vector2(158,27)))
+			draw_string(font,bubble+Vector2(9,19),"Shotgun BBQ!",HORIZONTAL_ALIGNMENT_LEFT,140,18,GOLD)
 		if person.get("chat_until",0.0)>float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0)):
 			var feedback := order_position(person)+Vector2(-31,-14)
 			draw_style_box(_sign_box(),Rect2(feedback-Vector2(4,15),Vector2(78,21)))

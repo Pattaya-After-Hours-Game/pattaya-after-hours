@@ -78,11 +78,6 @@ ambient street traffic. [See the continuous return walk](docs/customer-return.we
 [the bar routine](docs/customer-routines.gif) or
 [the walking cast](docs/customer-walks.gif).
 The capybara blinks and settles onto its haunches before standing again.
-Shotgun joins the customer rotation with his grey mohawk, beard and blue shirt.
-Click or tap him to see him eat a rack of ribs and yell **“Shotgun BBQ!”**;
-Sound / Muted also controls his synthetic shout. Each successful click gives
-all current customers across the street **+5 seconds of patience**, with one
-shared **30-second live cooldown** saved across reloads.
 Double-click the rainbow duo or tap them on a touchscreen to see them kiss.
 Wall fans appear only after buying **Fans & comfortable seats**, including in
 the property thumbnail; renovation alone does not install them.

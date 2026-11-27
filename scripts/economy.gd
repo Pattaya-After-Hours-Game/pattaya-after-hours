@@ -1153,7 +1153,7 @@ func shotgun(bar: Dictionary, customer_id: int) -> String:
 			# without changing modern round plans or drinking deadlines.
 			if customer.get("visit_phase","legacy")=="legacy": customer.life += SHOTGUN_PATIENCE
 	s.street.shotgun_ready = action_time()+SHOTGUN_COOLDOWN
-	return "Shotgun BBQ! Everyone gets +5s patience."
+	return "Shotgun BBQ!"
 
 func chat_target(bar: Dictionary) -> Dictionary:
 	var target := {}

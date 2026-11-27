@@ -1,5 +1,31 @@
 # Testing and release checks
 
+## Hidden Shotgun Easter egg — 27 November 2026
+
+Removed the cooldown label and the “Everyone +5s patience” message. Only the
+original ribs animation and “Shotgun BBQ!” shout/bubble remain visible.
+The model's +5-second street bonus and saved 30-second cooldown are unchanged;
+the ordinary action result also reveals only the shout. Removed discovery
+instructions and mechanical spoilers from README, the player guide and cast prose.
+
+The shared `tools/test.sh` run passed gameplay/save/UI/art, baseline pacing,
+promoter, automation, celebration and club checks. Concurrent balance edits
+failed the profit-cycle cadence bound (balanced seed 291: 128s median); the
+wrapper was interrupted before lease checks. A snapshot containing only the
+Shotgun changes passed the focused Shotgun tests, all 120 profit-cycle paired
+scenarios/nine fresh campaigns, and all nine lease routes. The concurrent
+changes remain untouched and need their own combined verification.
+
+Ran `tests/preview_shotgun.gd` through the existing art preview runner. Inspected
+active eating and early/last-second cooldown states in all three venue types
+at 960×540 and 1280×720: no countdown or bonus label appears. Existing model
+and pointer tests retain coverage of the hidden bonus, reload and cooldown.
+Changed-document links and `git diff --check` pass. Device play and release
+publication remain unverified. This supersedes the visible-feedback description
+in the earlier patience-boost record.
+
+
+
 ## Shotgun patience boost — 27 November 2026
 
 A successful click/tap now adds five seconds of patience to every current
