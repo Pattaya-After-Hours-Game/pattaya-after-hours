@@ -17,6 +17,16 @@ waiting-order dots turn red as patience runs out. Source and release downloads
 are tracked separately; the download links above select the latest published build.
 See [the current handover](docs/MERGE_HANDOFF.md) for chat and branch status.
 
+## Discover your next star
+
+Hiring can reveal eight new staff members with their own sprites and talents.
+Rose pours more slowly but earns bigger tips; Platinum pours in 13 seconds and
+adds ฿15 per drink. Entertainers range from Violet's crowd appeal to legendary
+Onyx's 3× appeal and ฿30 bonus. New pools start at 70% common, 24% uncommon,
+5% rare and 1% legendary. Team's **?** shows current odds and each recruit's
+card explains their stats. Renewals keep the person you discovered.
+See [staff talents](docs/design/STAFF_TALENTS.md) for all eight and tip rules.
+
 ## One balance for the whole street
 
 All money goes into and out of one shared account. Tap **MONEY** for

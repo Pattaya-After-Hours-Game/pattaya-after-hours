@@ -1496,3 +1496,18 @@ suite, including all pacing and lease routes. Affordable and unaffordable
 reopening screens were inspected at 960 × 540 and 1560 × 720. Device play remains
 unverified. The working-tree sixty-second recovery change is excluded from this
 verified commit and retains its separate pending cadence decision.
+
+## Discoverable staff integration — 27 November 2026
+
+`staff_talents_check.gd` exercises all eight real paid hiring outcomes, rarity
+distribution across 1,000 contracts, independent saved recruitment RNG, failed
+actions/read purity, unique identity validation, save/reload, renewal, training
+and current-deadline retention. It checks real bartender and hosted sales,
+first-drink dancer tips, eligibility, no offline tips, once-only jar settlement
+and visible hire/rota/renewal controls. Existing base-service tests explicitly
+use common workers where their assertions require ordinary timing or cast.
+
+`preview_staff_talents.gd` uses isolated saves and actual paid hiring actions to
+show current odds, all roles, personal stats, sales, rota, expired contracts,
+closure and reload. The source atlas board remains in `preview_staff_pack.gd`.
+Final combined suite, preview and build results are recorded below after checks.

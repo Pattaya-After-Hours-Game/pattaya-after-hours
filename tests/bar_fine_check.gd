@@ -10,9 +10,9 @@ func fixture(stage: int = 2) -> RefCounted:
 	load("res://tests/finance_fixture.gd").buy(m.street,1)
 	var b: Dictionary = m.street.selected()
 	b.stage = stage
-	m.street.action("hire",1) # Bee accepts.
-	m.street.action("hire",1) # May declines.
-	if stage>1: m.street.action("hire",1) # June accepts.
+	m.street.economy.hire_staff(b,1) # Bee accepts.
+	m.street.economy.hire_staff(b,1) # May declines.
+	if stage>1: m.street.economy.hire_staff(b,1) # June accepts.
 	m.s.street.pass_credit = -1000000
 	return m
 

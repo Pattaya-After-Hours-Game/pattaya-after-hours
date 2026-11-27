@@ -1446,5 +1446,133 @@
       1344
     ],
     "sha256": "5d77793e05e97d8867c0bc6770f475bd2f5473fd9af6befd7f4624060b3ec08b"
+  },
+  "host-goldie": {
+    "file": "res://assets/art/host-goldie.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "f70edc4e917c35cb272ba8c741d6bb53fc412707d83b996975c967069f2d18a1"
+  },
+  "host-onyx": {
+    "file": "res://assets/art/host-onyx.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "d4af942188d330239c32c97b83621bcae05a9ff15f12a766b94a90dd9f10b64e"
+  },
+  "host-scarlet": {
+    "file": "res://assets/art/host-scarlet.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "613fea48c3254ebbe2fe53153d22b9126657abb7091ca7e3e4653926fb52be18"
+  },
+  "host-violet": {
+    "file": "res://assets/art/host-violet.png",
+    "size": [
+      960,
+      256
+    ],
+    "sha256": "5b21d14f7cef551264fd025e8a526abfafa686ba474fdb9b309b2e55db48eef2"
+  },
+  "portrait-host-goldie": {
+    "file": "res://assets/art/portrait-host-goldie.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "0fd4cca91fb62eca9a1d7512fe798a8106a31fdd1209524c1131bcf54510544e"
+  },
+  "portrait-host-onyx": {
+    "file": "res://assets/art/portrait-host-onyx.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "7c04381f3f5f9e8cc097a898782b4655a10d32208a7313c9e25bff46f901b138"
+  },
+  "portrait-host-scarlet": {
+    "file": "res://assets/art/portrait-host-scarlet.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "49ed594a8ada5cd30d02ef91e16fd9823d61edc373f7c087d209f26fa052f33a"
+  },
+  "portrait-host-violet": {
+    "file": "res://assets/art/portrait-host-violet.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "9c00b38bae4ab5662252a2e280b2b5307117d28c59ff7f6b596089dde97ae9dc"
+  },
+  "portrait-staff-copper": {
+    "file": "res://assets/art/portrait-staff-copper.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "f2328432db593973c62bd207fa7454bbb697a5e56453e3d4bc92f94729de4602"
+  },
+  "portrait-staff-platinum": {
+    "file": "res://assets/art/portrait-staff-platinum.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "4222ee085ed3beba5ee75be264cceb06c534c48718f901eb2f10ae90462188f9"
+  },
+  "portrait-staff-rose": {
+    "file": "res://assets/art/portrait-staff-rose.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "3125f73caafe92d7857e0df1e0e759556f54cde9c2ae0521539c824d7b67498a"
+  },
+  "portrait-staff-ruby": {
+    "file": "res://assets/art/portrait-staff-ruby.png",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "2e34beda72edd15972b21f3f54ad3fe25d123817e1cac5d17df1a2d9e8114af2"
+  },
+  "staff-copper": {
+    "file": "res://assets/art/staff-copper.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "bc752e12fd39b09cc9435c9749a0f022e6a0fe906c7b775d166f696c04f881a4"
+  },
+  "staff-platinum": {
+    "file": "res://assets/art/staff-platinum.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "92b2cfd27760193745b734471c7aa5f0f5dcc3f8edea36b297827d2feabcc447"
+  },
+  "staff-rose": {
+    "file": "res://assets/art/staff-rose.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "1c77ef858f94a0dd5f8e3bd18ba360b07dbf87328ca8e7d38d542151b765079c"
+  },
+  "staff-ruby": {
+    "file": "res://assets/art/staff-ruby.png",
+    "size": [
+      640,
+      192
+    ],
+    "sha256": "a6150b49174c56c0f268299497d2ce3bacfec5a8dc7ec622b5133d31d0d71961"
   }
 }

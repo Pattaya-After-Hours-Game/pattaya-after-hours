@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Pack the optional staff art collection without changing the live catalog.
+"""Pack and install the eight discoverable staff identities.
 
 Uses the existing art pipeline's alpha cutoff, nearest-neighbour resampling,
 foot pivot and four-pixel baseline. No generative image editing.
 """
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -98,10 +99,25 @@ def main():
             'animations': {'idle': [0], 'walk': [1, 2], 'carry': [3], 'serve': [3, 0]} if bartender else {
                 'idle': [0], 'carry': [1], 'serve': [1, 0], 'dance': [2, 3], 'walk': [4, 5]},
         })
-    (PACK / 'manifest.json').write_text(json.dumps({'status': 'authoring-only', 'characters': entries}, indent=2) + '\n')
+    (PACK / 'manifest.json').write_text(json.dumps({'status': 'integrated', 'characters': entries}, indent=2) + '\n')
     lineup.convert('RGB').save(PACK / 'lineup.png')
     review.convert('RGB').save(PACK / 'pose-review.png')
     print(f'Packed {len(entries)} characters, {sum(len(e["frames"]) for e in entries)} frames and eight portraits.')
+    install()
+
+
+def install():
+    """Install only this collection, preserving every other runtime asset."""
+    output = ROOT / 'assets/art'
+    manifest_path = output / 'manifest.json'
+    manifest = json.loads(manifest_path.read_text())
+    for entry in json.loads((PACK / 'manifest.json').read_text())['characters']:
+        for source, name in [(entry['atlas'], entry['id']), (entry['portrait'], 'portrait-' + entry['id'])]:
+            target = output / (name + '.png')
+            shutil.copy2(PACK / source, target)
+            manifest[name] = {'file': 'res://assets/art/' + target.name,
+                              'size': list(Image.open(target).size), 'sha256': digest(target)}
+    manifest_path.write_text(json.dumps(manifest, indent=2) + '\n')
 
 
 if __name__ == '__main__':

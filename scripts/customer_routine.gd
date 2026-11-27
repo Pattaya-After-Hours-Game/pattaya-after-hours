@@ -113,9 +113,7 @@ static func step(record: Dictionary, delta: float) -> void:
 		if offset.length()>8 or Vector2(record.direction)==Vector2.ZERO: record.direction = offset.normalized()
 		record.moving = true
 		var used := minf(distance,offset.length())
-		var next_foot: Vector2 = record.foot.move_toward(point,used)
-		record.walk_distance = float(record.get("walk_distance",0.0))+used/Art.person_scale((record.foot.y+next_foot.y)*.5)
-		record.foot = next_foot
+		record.foot = record.foot.move_toward(point,used)
 		distance -= used
 		record.walk_distance = float(record.get("walk_distance",0))+used
 		if record.foot.distance_to(point)<=.00001:

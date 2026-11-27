@@ -4,7 +4,7 @@ Eight original fictional adults inspired by the user's supplied nightlife
 reference boards, generated with built-in ImageGen on 27 November 2026.
 Dao's existing sprite supplied the rendering style. Reference photos, names,
 logos and advertising copy are not included in the pack. The nicknames below
-are working art identifiers, not additions to the story or hiring roster.
+are the names of the eight discoverable recruits in the live hiring roster.
 
 ![Cast lineup](lineup.png)
 
@@ -41,13 +41,12 @@ The existing alpha cutoff of 160 and nearest-neighbour resizing are used.
 There are two authored walk/dance key poses, rather than a full directional
 locomotion cycle. No pole interactions or rear/front walking sheets are included.
 
-This directory is **authoring-only**, excluded from game imports/exports by
-`art/.gdignore`. The pack does not change production characters, the runtime
-manifest, staff IDs, hiring, contracts, saves, budgets or service logic.
-To integrate a selected character, copy its atlas/portrait into `assets/art/`,
-register the catalog entries and stable identity, and retain model-owned role,
-availability and real-sale animation triggers. The entertainer greeting/carry
-index is presentation art, not an ability to serve ordinary orders.
+Source material stays excluded from game imports/exports by `art/.gdignore`.
+The packer installs atlases and portraits into `assets/art/` and updates their
+runtime manifest entries. Saved identities select these assets without replacing
+existing cast members. [Staff talents](../../docs/design/STAFF_TALENTS.md) defines
+random hiring, service, attraction and real-sale tip bonuses. Entertainer poses
+are presentation art; they do not grant ordinary drink service.
 
 ## Rebuild and review
 
@@ -56,11 +55,13 @@ python3 tools/prepare_staff_pack.py
 PATTAYA_PREVIEW_SCRIPT=tests/preview_staff_pack.gd tools/preview-art.sh /tmp/pattaya-staff-pack-preview
 ```
 
-The packer only writes this pack. It fails on empty/clipped cells and retains
+The packer writes this pack and its sixteen runtime PNGs. It fails on empty/clipped cells and retains
 the source alpha. The isolated Godot preview loads these files directly for
 review without starting a campaign or adding decorative staff to a live venue.
 The PNGs have real alpha; some source viewers can display RGB colour stored
 under transparent pixels. The packed edge sheet shows their actual composition.
 
 Verification results are recorded in [verification.json](verification.json).
-Live hiring/venue integration and device play are not part of this art pack.
+Use `PATTAYA_PREVIEW_SCRIPT=tests/preview_staff_talents.gd tools/preview-art.sh`
+for live hiring cards, odds, service, roles, renewal, closure and reload views.
+Device play remains a separate check.

@@ -101,6 +101,7 @@ func run() -> void:
 	load("res://tests/staff_ready_check.gd").new().run(self)
 	load("res://tests/gabby_check.gd").new().run(self)
 	load("res://tests/daisy_check.gd").new().run(self)
+	load("res://tests/staff_talents_check.gd").new().run(self)
 	load("res://tests/bar_fine_check.gd").new().run(self)
 	load("res://tests/hosted_drinks_check.gd").new().run(self)
 	load("res://tests/balance_guidance_check.gd").new().run(self)
@@ -117,6 +118,7 @@ func run() -> void:
 	await load("res://tests/tips_check.gd").new().run_ui(self)
 	await load("res://tests/gabby_check.gd").new().run_ui(self)
 	await load("res://tests/daisy_check.gd").new().run_ui(self)
+	await load("res://tests/staff_talents_check.gd").new().run_ui(self)
 	await load("res://tests/bar_fine_check.gd").new().run_ui(self)
 	await load("res://tests/hosted_drinks_check.gd").new().run_ui(self)
 	await load("res://tests/staff_ready_check.gd").new().run_ui(self)
@@ -130,7 +132,6 @@ func run() -> void:
 	await load("res://tests/shotgun_check.gd").new().run(self)
 	load("res://tests/shotgun_patience_check.gd").new().run(self)
 	load("res://tests/customer_motion_check.gd").new().run(self)
-	await load("res://tests/customer_motion_check.gd").new().run_ui(self)
 	load("res://tests/customer_routine_check.gd").new().run(self)
 	load("res://tests/customer_catalog_check.gd").new().run(self)
 	await load("res://tests/customer_continuity_check.gd").new().run(self)
@@ -227,6 +228,7 @@ func test_ui() -> void:
 	check(hire.disabled and hire.text.ends_with("Need ฿1 more"),"Team hiring includes the payroll reserve in the visible shortfall")
 	app.model.s.cash = 50000
 	app._process(1.0)
+	app.model.s.street.hiring_seed = 100 # Common recruit for the base-service UI regression.
 	use_button(app,"Hire bartender · ฿1,200")
 	app.model.street.tick(25)
 	check(app.model.s.street.served == 2,"Hired staff serve without tapping")

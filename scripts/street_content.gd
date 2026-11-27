@@ -59,9 +59,27 @@ const HOSTS = [
 	["Lek", "Experienced host; accepts bar-fine requests", true],
 	["Fah", "Runs the music; prefers hosted drinks", false],
 	["Nan", "Wants predictable hours; accepts bar-fine requests", true],
-	["Daisy", "Adult entertainer; quick wit, red bikini and a strict finish time. Accepts bar-fine requests", true]
+	["Daisy", "Adult entertainer; quick wit, red bikini and a strict finish time. Accepts bar-fine requests", true],
+	["Violet", "Loves a lively dance floor; prefers hosted drinks", false],
+	["Goldie", "Remembers everyone's favourite song; accepts bookings", true],
+	["Scarlet", "A seasoned headliner; accepts bookings", true],
+	["Onyx", "A star performer who prefers hosted drinks", false]
 ]
 const DAISY_HOST = 6
+
+# Weighted new-hire discoveries. The remaining 70% keeps the ordinary cast.
+# An already-owned identity's chance returns to ordinary staff, even if expired.
+# Ratios modify future recoveries/appeal; no RNG or rewards belong in readouts.
+const STAFF_TALENTS = {
+	"staff-copper":{"name":"Copper","rarity":"Uncommon","weight":12,"roles":[0],"service":0.9,"tip":0,"appeal":1.0,"host":-1,"trait":"Quick hands"},
+	"staff-rose":{"name":"Rose","rarity":"Uncommon","weight":12,"roles":[0],"service":1.2,"tip":10,"appeal":1.0,"host":-1,"trait":"Takes her time, earns her tips"},
+	"staff-ruby":{"name":"Ruby","rarity":"Rare","weight":5,"roles":[0],"service":0.72,"tip":5,"appeal":1.0,"host":-1,"trait":"Rush-hour ace"},
+	"staff-platinum":{"name":"Platinum","rarity":"Legendary","weight":1,"roles":[0],"service":0.5,"tip":15,"appeal":1.0,"host":-1,"trait":"The golden pour"},
+	"host-violet":{"name":"Violet","rarity":"Uncommon","weight":12,"roles":[1,2],"service":1.0,"tip":5,"appeal":1.5,"host":7,"trait":"Crowd favourite"},
+	"host-goldie":{"name":"Goldie","rarity":"Uncommon","weight":12,"roles":[1,2],"service":1.0,"tip":20,"appeal":1.2,"host":8,"trait":"Generous regulars"},
+	"host-scarlet":{"name":"Scarlet","rarity":"Rare","weight":5,"roles":[1,2],"service":1.0,"tip":10,"appeal":2.0,"host":9,"trait":"Headline act"},
+	"host-onyx":{"name":"Onyx","rarity":"Legendary","weight":1,"roles":[1,2],"service":1.0,"tip":30,"appeal":3.0,"host":10,"trait":"Soi superstar"}
+}
 
 # Host development changes future booking quotes, never an already-paid booking.
 const BAR_FINE_SECONDS = 30
@@ -74,7 +92,7 @@ const HOST_DRINK_MATCH_BONUS = 40
 const HOST_DRINK_SECONDS = 20
 const HOST_DRINK_WAIT = 30
 const AUTO_HOST_DRINK_COST = 1500
-const HOST_TOPICS = [0,0,2,2,1,1,0] # Bee/May/Daisy: chat; June/Lek: pool; Fah/Nan: music.
+const HOST_TOPICS = [0,0,2,2,1,1,0,1,0,2,1]
 const HOST_TOPIC_NAMES = ["Chat", "Music", "Pool"]
 const HOST_DRINK_CHANCE = [40,60,80]
 const HOST_BUZZ_SECONDS = 30

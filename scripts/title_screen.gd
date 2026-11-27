@@ -180,7 +180,7 @@ func update_time(value: float) -> void:
 	menu.modulate.a = smoothstep(TITLE_SETTLED,INTRO_SECONDS,clock) if not confirming else 1.0
 	menu.visible = menu.modulate.a>0
 	splash.visible = is_intro()
-	if was_intro and not is_intro(): primary.grab_focus()
+	if was_intro and not is_intro() and primary.is_inside_tree(): primary.grab_focus()
 	queue_redraw()
 
 func _draw() -> void:

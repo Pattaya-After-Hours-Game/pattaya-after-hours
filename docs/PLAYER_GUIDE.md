@@ -840,3 +840,13 @@ Street-event banners and their Events details have a draining bar for time until
 an announced event starts or an active event ends. Active venue promotions show
 the same indicator in Events. The seconds readout remains visible. Rat Plague
 has no duration bar once active: catch the remaining rats or leave it to Bo.
+
+## Finding talented staff
+
+**Team → Hire** can discover Copper, Rose, Ruby or Platinum as a bartender,
+or Violet, Goldie, Scarlet or Onyx as a host/dancer. The card shows rarity and
+talents. Platinum is exceptionally fast; Rose trades speed for larger tips.
+Entertainers improve appeal and tips from actual drinks, without serving orders.
+Tap the hiring **?** for current odds. Contracts and wages cost the normal amount;
+renewal retains your discovery. Tips pay when you close and count the jar.
+See [all eight profiles](design/STAFF_TALENTS.md).

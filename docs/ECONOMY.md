@@ -1014,3 +1014,13 @@ estimates. The scene requests the model action; status reads stay pure.
 This is a hidden Easter egg: only the original ribs animation and “Shotgun BBQ!”
 shout appear. No bonus message, countdown or player-guide instructions reveal
 the mechanic. Existing owner and staff service clocks stay independent.
+
+## Discoverable staff — 27 November 2026
+
+Ordinary hiring now draws a common worker or one of eight named specialists at
+the existing contract price. Profiles change future bartender recovery, real
+sale tips or individual entertainer appeal. The opening pool is 70/24/5/1%
+common/uncommon/rare/legendary. Owned identities stay unique and retain training
+on renewal. [Staff talents](design/STAFF_TALENTS.md) records exact profiles, odds,
+rounding, eligibility and settlement. Tips do not enter trading samples or
+manager margins; attraction still competes for bounded street traffic.

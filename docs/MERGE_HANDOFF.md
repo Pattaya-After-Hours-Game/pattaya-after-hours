@@ -1,5 +1,18 @@
 # Current implementation and release handoff
 
+## Discoverable staff integration — 27 November 2026
+
+Eight new animated recruits now enter normal paid hiring, with 70/24/5/1%
+common/uncommon/rare/legendary opening odds, personal service/appeal/tip traits
+and persistent identities. Existing staff, contracts, paid stock and customer
+visits are preserved. See [staff talents](design/STAFF_TALENTS.md).
+
+Merged Ryan's current main, retaining his customer continuity and individual
+beer-carrying poses, Shotgun, tour manager, reopening and paused-offline contracts.
+The local title intro remains. The redundant older walking-distance workaround
+was removed so it cannot double-advance Ryan's animation state. Integration
+verification and release status are recorded in [testing](TESTING.md).
+
 ## Contracts pause while away — 27 November 2026
 
 User correction supersedes the old offline-ageing rule: all staff, including

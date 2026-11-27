@@ -3,6 +3,7 @@ extends RefCounted
 const ROOT = "res://assets/art/"
 const TYPES = ["beer", "soi", "gogo"]
 const STAFF = ["dao", "mali", "fern", "nok", "jin", "pim"]
+const TalentContent = preload("res://scripts/street_content.gd")
 const HOSTS = ["bee", "may", "june", "lek", "fah", "nan"]
 const FRIDGE_ORIGIN = Vector2i(800,160)
 const FRIDGE_CELL = Vector2i(160,256)
@@ -159,6 +160,8 @@ static func atlas_specs() -> Dictionary:
 	var specs := {"anong-walk":[Vector2(128,192),16],"anong-service":[Vector2(160,192),4],"patrons":[Vector2(160,192),4],"patrons-men":[Vector2(160,192),12],"nida":[Vector2(160,192),4],"monster":[Vector2(320,320),4]}
 	specs["patrons-capybara"] = [Vector2(224,192),5]
 	specs["gabby"] = [Vector2(160,192),4]
+	for id in TalentContent.STAFF_TALENTS:
+		specs[id] = [Vector2(160,192),4] if id.begins_with("staff-") else [Vector2(160,256),6]
 	specs["daisy"] = [Vector2(160,256),6]
 	specs["street-walkers"] = [Vector2(96,128),16]
 	specs["patrons-charcoal"] = [Vector2(160,192),16]
@@ -237,7 +240,7 @@ static func animation_frames(id: String, state: String) -> Array:
 		return {"idle":[0],"walk":[1,2],"jump":[3],"guard":[4],"anticipation":[5],"jab":[6],"kick":[7],"burst":[8],"hit":[9],"ko":[10],"victory":[11]}.get(state,[0])
 	if id == "monster": return {"arrival":[0,1],"idle":[1],"drinking":[2,1],"sleep":[3]}.get(state,[1])
 	if id=="nida": return {"idle":[0],"welcome":[0,1,1,0,2,0,3,0]}.get(state,[0])
-	if id in HOSTS or id=="daisy": return {"idle":[0],"carry":[1],"serve":[1,0],"dance":[2,3],"walk":[4,5]}.get(state,[0])
+	if id in HOSTS or id=="daisy" or id.begins_with("host-"): return {"idle":[0],"carry":[1],"serve":[1,0],"dance":[2,3],"walk":[4,5]}.get(state,[0])
 	return {"idle":[0],"walk":[1,2],"carry":[3],"serve":[3,0]}.get(state,[0])
 
 static func animation_frame(id: String, state: String, time: float, fps: float = 5.0) -> int:
@@ -260,6 +263,7 @@ static func event_treatment(id: int) -> String:
 static func worker_id(bar: Dictionary, index: int) -> String:
 	if bar.has("team") and index<bar.team.size():
 		var person: Dictionary = bar.team[index]
+		if TalentContent.STAFF_TALENTS.has(person.get("identity","")): return person.identity
 		if person.get("identity","")=="gabby": return "gabby"
 		if person.role==3: return "nida"
 		if person.role==1 and int(person.host)==6: return "daisy"

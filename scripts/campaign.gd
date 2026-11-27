@@ -751,12 +751,14 @@ func _read(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK: return null
 	var parsed: Variant = json.data
+	var seen_talents := {}
 	if parsed is Dictionary and int(parsed.get("version",0)) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17] and parsed.has("staff") and parsed.has("phase"):
 		for key in ["cash","level","venue","day","weekly","night","log","rng"]:
 			if not parsed.has(key): return null
 		if parsed.version >= 2:
 			if not parsed.get("street") is Dictionary: return null
 			var data: Dictionary = parsed.street
+			if data.has("hiring_seed") and (not _finite_number(data.hiring_seed,1,2147483646) or float(data.hiring_seed)!=floorf(float(data.hiring_seed))): return null
 			if data.has("afk") and not data.afk is bool: return null
 			if data.has("shotgun_ready") and not _finite_number(data.shotgun_ready,0,1.0e15): return null
 			if data.has("tour_manager_on") and not data.tour_manager_on is bool: return null
@@ -840,7 +842,7 @@ func _read(path: String) -> Variant:
 				if int(parsed.version)==3:
 					for key in Street.Economy.clock_fields(): defaults.erase(key)
 				for key in defaults:
-					if key in ["drink_stock","bonus_tips"] and not bar.has(key): continue
+					if key in ["drink_stock","bonus_tips","talent_tips"] and not bar.has(key): continue
 					if not bar.has(key): return null
 					if defaults[key] is Array and not bar[key] is Array: return null
 					if defaults[key] is Dictionary and not bar[key] is Dictionary: return null
@@ -851,7 +853,17 @@ func _read(path: String) -> Variant:
 					if bar.shift.has(key) and not bar.shift[key] is Dictionary: return null
 				for person in bar.team:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
-					if person.has("identity") and (person.identity!="gabby" or int(person.role)!=0): return null
+					if person.has("identity"):
+						if not person.identity is String: return null
+						if person.identity=="gabby":
+							if int(person.role)!=0: return null
+						elif Street.C.STAFF_TALENTS.has(person.identity):
+							var profile: Dictionary = Street.C.STAFF_TALENTS[person.identity]
+							if not _finite_number(person.role,0,2) or float(person.role)!=floorf(float(person.role)) or not int(person.role) in profile.roles or seen_talents.has(person.identity): return null
+							if int(person.role)==1 and int(person.host)!=int(profile.host): return null
+							seen_talents[person.identity] = true
+						else: return null
+					if int(person.role)==1 and int(person.host)>Street.C.DAISY_HOST and not person.has("identity"): return null
 					if not int(person.role) in ([0,1,2,3] if int(parsed.version)>=6 else [0,1,2]) or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
 					if person.has("renew_on") and not person.renew_on is bool: return null
 					for key in ["training","service_clock","contract_left"]:
@@ -1023,12 +1035,15 @@ func _read(path: String) -> Variant:
 				for key in ["tip_visits","tips_total"]:
 					if not _finite_number(bar.get(key),0,1e15) or float(bar[key])!=floorf(float(bar[key])): return null
 				if not _valid_tip_bonus(bar.get("bonus_tips",0),bar.tip_visits): return null
+				if not _finite_number(bar.get("talent_tips",0),0,1e15) or fmod(float(bar.get("talent_tips",0)),5.0)!=0: return null
 				if not bar.last_tips.is_empty():
 					for key in ["day","visits","amount"]:
 						if not _finite_number(bar.last_tips.get(key),0,1e15) or float(bar.last_tips[key])!=floorf(float(bar.last_tips[key])): return null
 					var bonus: Variant = bar.last_tips.get("bonus",0)
 					if not _valid_tip_bonus(bonus,bar.last_tips.visits): return null
-					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT+bonus: return null
+					var talent_tips: Variant = bar.last_tips.get("talent",0)
+					if not _finite_number(talent_tips,0,1e15) or fmod(float(talent_tips),5.0)!=0: return null
+					if bar.last_tips.amount!=bar.last_tips.visits*Street.C.TIP_PER_VISIT+bonus+talent_tips: return null
 		if int(parsed.version)>=10:
 			var prep: Variant = parsed.street.get("night_prep")
 			if not prep is Dictionary: return null

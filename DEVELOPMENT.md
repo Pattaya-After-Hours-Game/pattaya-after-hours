@@ -653,3 +653,13 @@ Use `tests/finance_check.gd` through the isolated wrapper for conservation,
 exact-price boundaries, tip recovery, named transactions and UI. The finance
 preview group covers shared money, renovations, leases and an empty-fridge
 recovery. See [finance rules](docs/design/FINANCE_AND_GROWTH.md).
+
+## Staff discovery assets and saves
+
+`tools/prepare_staff_pack.py` deterministically packs and installs the eight
+new staff atlases/portraits; the general art builder calls it too. The profile
+table is `StreetContent.STAFF_TALENTS`. Keep identities stable: schema 17 accepts
+optional `street.hiring_seed`, named `person.identity`, `bar.talent_tips` and
+`last_tips.talent`. Migration grants no discoveries or tips. Recruitment uses a
+separate saved stream only after a paid valid hire. See
+[staff talents](docs/design/STAFF_TALENTS.md) for economy and role rules.

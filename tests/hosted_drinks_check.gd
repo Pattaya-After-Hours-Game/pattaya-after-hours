@@ -80,7 +80,7 @@ func run(test: SceneTree) -> void:
 	e = m.street.economy
 	guest(m)
 	m.street.action("host_drink",1)
-	m.street.action("hire",0)
+	e.hire_staff(b,0)
 	e.staff_service(b)
 	test.check(b.shift.hosted_drinks==1 and b.team[3].drinks_served==1 and b.team[3].service_ready==25,"Bartender's actual hosted sale starts the normal independent service cooldown")
 

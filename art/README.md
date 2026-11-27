@@ -1,15 +1,16 @@
 # Blue Hour production art
 
-## Optional bar staff collection — 27 November 2026
+## Discoverable bar staff collection — 27 November 2026
 
 [Staff pack v1](staff-pack-v1/README.md) contains eight new original adult
 character designs inspired by supplied nightlife references: four bartenders
 and four entertainers, with 40 poses and eight portraits. It follows the
 existing Gabby/Daisy frame indices, cell sizes, alpha cutoff and foot pivots.
 Sources, exact built-in ImageGen prompts, manifest, deterministic scoped packer
-and light/dark Godot previews are included. This is an authoring collection;
-the characters are not registered in the live roster or runtime catalog.
-Existing production art and gameplay are unchanged.
+and light/dark Godot previews are included. All eight atlases and portraits are
+installed in `assets/art/` and selected by saved staff identity. They use normal
+model-owned service, walking and performance states. Existing production art
+is retained. See [staff talents](../docs/design/STAFF_TALENTS.md) for hiring and stats.
 
 This directory contains authoring material only. `.gdignore` and the export
 presets keep it out of the game. Runtime PNGs are in `assets/art/`; there are no

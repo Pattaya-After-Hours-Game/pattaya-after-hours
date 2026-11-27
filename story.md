@@ -589,3 +589,13 @@ Nida's ten-day fee remains ฿1,200, but drink commission is gone, including unp
 commitments on old visits. Past payments are history, not a new refund. New pool
 games run thirty seconds for the same ฿50 per table; Free Pool Night remains free.
 Shorter games free the table sooner, but still need two real customers.
+
+## Discoverable nightlife crew
+
+Eight fictional adult recruits join the hiring pool: bartenders Copper, Rose,
+Ruby and Platinum, and entertainers Violet, Goldie, Scarlet and Onyx. Their
+workplace talents range from unhurried service with generous tips to a legendary
+headline act. They keep their names and training on renewal. These are roster
+characters with live business effects, not new mandatory chapters or personal
+quests. Violet and Onyx decline private bookings. Existing consent rules and
+off-screen treatment remain.
