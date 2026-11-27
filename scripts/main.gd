@@ -339,6 +339,16 @@ func at_button(parent: Control,rect: Rect2,value: String,call: Callable,primary:
 	parent.add_child(b)
 	return b
 
+func tab_badge(index: int, caption: String, action: Callable, fill: Color, primary: bool) -> Button:
+	var badge := at_button(root_ui,Rect2(56+index*62,478,21,21),caption,action,primary)
+	badge.custom_minimum_size = Vector2.ZERO
+	badge.size = Vector2(21,21)
+	badge.add_theme_font_size_override("font_size",11)
+	var style := box(fill,DARK,2)
+	style.set_corner_radius_all(10)
+	for state in ["normal","hover","pressed"]: badge.add_theme_stylebox_override(state,style)
+	return badge
+
 func tone(kind: String) -> void:
 	if muted or DisplayServer.get_name() == "headless": return
 	sfx.stream = sfx_streams[kind]
@@ -515,31 +525,15 @@ func render(keep_scroll: bool = false) -> void:
 		b.add_theme_font_size_override("font_size",12)
 		b.disabled = model.s.phase != "plan" or practicing
 	if not practicing and model.s.phase=="plan":
-		event_badge = at_button(root_ui,Rect2(112,478,21,21),"!",change_tab.bind(1))
+		event_badge = tab_badge(1,"!",change_tab.bind(1),Color("#ffe45c"),true)
 		event_badge.name = "EventBadge"
-		event_badge.custom_minimum_size = Vector2.ZERO
-		event_badge.size = Vector2(21,21)
 		event_badge.tooltip_text = "Open Events · An event is ready"
-		event_badge.add_theme_font_size_override("font_size",14)
-		var event_yellow := Color("#ffe45c")
-		var event_style := box(DARK,event_yellow)
-		event_style.set_corner_radius_all(10)
-		for state in ["normal","hover","pressed"]:
-			event_badge.add_theme_stylebox_override(state,event_style)
-		for color in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:
-			event_badge.add_theme_color_override(color,event_yellow)
 		sync_event_badge()
 		var tours: int = model.s.bookings.size()
-		var tour_badge := at_button(root_ui,Rect2(180,478,21,21),str(tours) if tours>0 else "!",toggle_drawer.bind(2),tours>0)
+		var tour_badge := tab_badge(2,str(tours) if tours>0 else "!",toggle_drawer.bind(2),TEAL if tours>0 else Color("#b8293d"),tours>0)
 		tour_badge.name = "TourBadge"
-		tour_badge.custom_minimum_size = Vector2.ZERO
-		tour_badge.size = Vector2(21,21)
 		tour_badge.z_index = 2
 		tour_badge.tooltip_text = "%d active tour agreements" % tours if tours>0 else "No active tour agreements"
-		tour_badge.add_theme_font_size_override("font_size",11)
-		var tour_style := box(TEAL if tours>0 else Color("#b8293d"),DARK,2)
-		tour_style.set_corner_radius_all(10)
-		for state in ["normal","hover","pressed"]: tour_badge.add_theme_stylebox_override(state,tour_style)
 		if tours==0:
 			var refresh_tour_warning := func() -> String:
 				var bar: Dictionary = model.street.selected()
@@ -547,15 +541,9 @@ func render(keep_scroll: bool = false) -> void:
 				return "!"
 			tour_badge.text = refresh_tour_warning.call()
 			live_labels.append([tour_badge,refresh_tour_warning])
-		upgrade_badge = at_button(root_ui,Rect2(56,478,21,21),"",open_upgrades,true)
+		upgrade_badge = tab_badge(0,"",open_upgrades,GOLD,true)
 		upgrade_badge.name = "UpgradeBadge"
-		upgrade_badge.custom_minimum_size = Vector2.ZERO
-		upgrade_badge.size = Vector2(21,21)
 		upgrade_badge.z_index = 2
-		upgrade_badge.add_theme_font_size_override("font_size",11)
-		var badge_style := box(GOLD,DARK,2)
-		badge_style.set_corner_radius_all(10)
-		for state in ["normal","hover","pressed"]: upgrade_badge.add_theme_stylebox_override(state,badge_style)
 		sync_upgrade_badge()
 	var walk := at_button(root_ui,Rect2(328,490,76,40),"Walk\ndistrict",walk_district)
 	walk.add_theme_font_size_override("font_size",12)
