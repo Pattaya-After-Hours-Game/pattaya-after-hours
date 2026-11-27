@@ -1024,3 +1024,7 @@ common/uncommon/rare/legendary. Owned identities stay unique and retain training
 on renewal. [Staff talents](design/STAFF_TALENTS.md) records exact profiles, odds,
 rounding, eligibility and settlement. Tips do not enter trading samples or
 manager margins; attraction still competes for bounded street traffic.
+
+Toybox combat hit pauses, knockback, uppercut launches, low sweeps and flying
+kicks run only in the optional fight simulation. They do not change customer
+service, street progression or the existing arcade reward rules.

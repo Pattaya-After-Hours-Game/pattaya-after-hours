@@ -593,3 +593,9 @@ controls the voice.
 
 [In-game reaction](../docs/shotgun.png). Preview with
 `PATTAYA_PREVIEW_SCRIPT=tests/preview_shotgun.gd tools/preview-art.sh`.
+
+Toybox impact reactions reuse the production fighter atlases. Low kicks lower
+and angle the kick pose; flying kicks carry it through actual airborne motion.
+Uppercuts tilt the punch upward, and launched hurt poses rotate until landing.
+Contact sparks use the strike position, with a lower point for sweeps. Inspect
+`tests/preview_fight_impact.gd` through `tools/preview-art.sh` at both sizes.

@@ -599,3 +599,7 @@ headline act. They keep their names and training on renewal. These are roster
 characters with live business effects, not new mandatory chapters or personal
 quests. Violet and Onyx decline private bookings. Existing consent rules and
 off-screen treatment remain.
+
+Toybox fights now give Mali a launching uppercut, low sweep and travelling flying
+kick alongside punches, roundhouses and Burst. These remain optional arcade
+contests with the existing cast and circuit rewards.

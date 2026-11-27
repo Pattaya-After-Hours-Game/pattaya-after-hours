@@ -6,14 +6,16 @@ signal finished(won: bool)
 signal sound(kind: String)
 const FLOOR = 126.0
 const ATTACKS = {
-	"jab": [0.105,0.065,0.18,26,8,6.0],
-	"kick":[0.20,0.09,0.29,39,15,13.0],
-	"uppercut":[0.16,0.10,0.32,27,18,10.0],
+	"jab": [0.085,0.10,0.17,36,8,6.0],
+	"kick":[0.16,0.12,0.26,46,15,13.0],
+	"uppercut":[0.16,0.10,0.32,34,18,10.0],
+	"lowkick":[0.12,0.12,0.25,40,12,9.0],
+	"flykick":[0.09,0.24,0.20,46,19,16.0],
 	"roundhouse":[0.28,0.11,0.39,45,22,17.0],
 	"super":[0.24,0.14,0.36,52,29,22.0],
 	"ultimate":[0.52,0.14,0.36,0,100,28.0],
 }
-const CONTACT_POSES = {"jab":6,"kick":7,"uppercut":6,"roundhouse":7,"super":8,"ultimate":8}
+const CONTACT_POSES = {"jab":6,"kick":7,"uppercut":6,"roundhouse":7,"lowkick":7,"flykick":7,"super":8,"ultimate":8}
 const RIVALS = [["JUNO",Color("#ab8bfa"),Color("#ef947b"),0.39],["VEGA",Color("#ff6a93"),Color("#c88570"),0.30],["ORCHID",Color("#ffc474"),Color("#cda086"),0.25]]
 const BUTTONS = [["left","LEFT",22,"A / ←"],["right","RIGHT",98,"D / →"],
 	["jump","JUMP",174,"W / ↑"],["guard","CROUCH",250,"S / ↓"],
@@ -50,6 +52,10 @@ var pad_pointer := NO_PAD_POINTER
 var pad_direction := Vector2i.ZERO
 var sparks: Array[Dictionary] = []
 var flash := 0.0
+var hitstop := 0.0
+var shake := 0.0
+var impact_text := ""
+var impact_time := 0.0
 var buffered := {}
 var code_step := 0
 var code_deadline := 0.0
@@ -66,7 +72,7 @@ func _ready() -> void:
 func reset_round() -> void:
 	fighters = []
 	for x in [88.0,232.0]:
-		fighters.append({"x":x,"y":FLOOR,"vy":0.0,"hp":100,"meter":0,"facing":1 if x < 100 else -1,
+		fighters.append({"x":x,"y":FLOOR,"vy":0.0,"vx":0.0,"down":0.0,"launched":false,"hp":100,"meter":0,"facing":1 if x < 100 else -1,
 			"move":"","timer":0.0,"hit":false,"stun":0.0,"guard":false,"crouch":false,"motion":0})
 	time_left = 45.0
 	countdown = 1.4
@@ -76,6 +82,10 @@ func reset_round() -> void:
 	announced = ""
 	code_step = 0
 	buffered.clear()
+	hitstop = 0.0
+	shake = 0.0
+	impact_time = 0.0
+	sparks.clear()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
@@ -224,9 +234,15 @@ func _physics_process(delta: float) -> void:
 		sparks[i].life -= delta
 		sparks[i].p += sparks[i].v * delta
 		if sparks[i].life <= 0: sparks.remove_at(i)
+	shake = maxf(0,shake-delta*28)
+	impact_time = maxf(0,impact_time-delta)
 	queue_redraw()
+	if hitstop > 0:
+		hitstop = maxf(0,hitstop-delta)
+		return
 	if over: return
 	if next_round > 0:
+		for f in fighters: _motion(f,delta)
 		var winner := fighters[0]
 		if winner.move == "ultimate":
 			winner.timer += delta
@@ -254,7 +270,7 @@ func _physics_process(delta: float) -> void:
 	var distance := absf(me.x - cpu.x)
 	me.facing = 1 if me.x < cpu.x else -1
 	cpu.facing = -me.facing
-	me.crouch = pressed("guard") and me.y == FLOOR and me.vy == 0 and me.move.is_empty()
+	me.crouch = pressed("guard") and me.y == FLOOR and me.vy == 0 and me.move.is_empty() and me.stun <= 0 and me.down <= 0
 	me.guard = me.crouch
 	var move := int(pressed("right")) - int(pressed("left"))
 	_walk(me,move,delta)
@@ -264,14 +280,17 @@ func _physics_process(delta: float) -> void:
 	for button in ["super","kick","jab"]:
 		var action: String = button
 		if me.crouch:
-			if button == "kick": action = "roundhouse"
+			if button == "kick": action = "lowkick"
 			if button == "jab": action = "uppercut"
+		elif button == "kick":
+			if me.y < FLOOR or me.vy < 0: action = "flykick"
+			elif move == me.facing: action = "roundhouse"
 		if pressed(button) and _attack(me,action):
 			buffered.erase(button)
 			break
 	ai_timer -= delta
 	ai_guard -= delta
-	cpu.crouch = ai_guard > 0 and cpu.y == FLOOR and cpu.move.is_empty()
+	cpu.crouch = ai_guard > 0 and cpu.y == FLOOR and cpu.move.is_empty() and cpu.stun <= 0 and cpu.down <= 0
 	cpu.guard = cpu.crouch
 	var ai_move := int(cpu.facing) if distance > 31 else -int(cpu.facing) if distance < 16 else 0
 	_walk(cpu,ai_move,delta * (0.75 + rival_index * 0.11))
@@ -287,6 +306,10 @@ func _physics_process(delta: float) -> void:
 			var attack := "kick" if distance > 24 or likes_kicks else "jab"
 			if cpu.meter >= 100:
 				attack = "super"
+			elif cpu.y < FLOOR:
+				attack = "flykick"
+			elif me.crouch and chance > 0.5:
+				attack = "lowkick"
 			elif me.y < FLOOR and distance < 27:
 				attack = "uppercut"
 			elif distance >= 30 and chance > 0.86:
@@ -314,17 +337,20 @@ func _physics_process(delta: float) -> void:
 
 func _walk(f: Dictionary,dir: int,delta: float) -> void:
 	f.motion = 0
-	if f.stun > 0 or not f.move.is_empty() or f.guard: return
+	if f.stun > 0 or f.down > 0 or f.launched or not f.move.is_empty() or f.guard: return
 	f.motion = dir
+	if f.y < FLOOR: return
 	f.x = clampf(f.x + dir*91*delta,12,308)
 
 func _jump(f: Dictionary) -> void:
-	if f.y == FLOOR and f.stun <= 0 and f.move.is_empty() and not f.guard:
+	if f.y == FLOOR and f.stun <= 0 and f.down <= 0 and f.move.is_empty() and not f.guard:
 		f.vy = -165
+		f.vx = f.motion * 95.0
 
 func _attack(f: Dictionary,action: String) -> bool:
-	if f.stun > 0 or not f.move.is_empty(): return false
-	if f.guard and action not in ["uppercut","roundhouse"]: return false
+	if not ATTACKS.has(action) or f.stun > 0 or f.down > 0 or f.launched or not f.move.is_empty(): return false
+	if f.guard and action not in ["uppercut","lowkick"]: return false
+	if action == "flykick" and f.y == FLOOR and f.vy >= 0: return false
 	if action == "super":
 		if f.meter < 100: return false
 		f.meter = 0
@@ -333,43 +359,82 @@ func _attack(f: Dictionary,action: String) -> bool:
 	f.move = action
 	f.timer = 0.0
 	f.hit = false
+	if action == "flykick": f.vx = f.facing * 125.0
 	return true
 
-func _resolve(f: Dictionary,other: Dictionary,delta: float) -> void:
+# Airborne motion continues through hit stun and the round's K.O. pause.
+func _motion(f: Dictionary,delta: float) -> void:
+	f.x = clampf(f.x + f.vx*delta,12,308)
 	if f.vy != 0 or f.y < FLOOR:
 		f.y = minf(FLOOR,f.y + f.vy*delta)
 		f.vy += 445*delta
-		if f.y == FLOOR: f.vy = 0
+		if f.y == FLOOR and f.vy > 0:
+			f.vy = 0.0
+			if f.launched:
+				f.launched = false
+				f.down = 0.38
+				shake = maxf(shake,3.0)
+				if f.hp > 0: sound.emit("impact")
+	else:
+		f.vx = move_toward(f.vx,0,420*delta)
+		f.down = maxf(0,f.down-delta)
+
+func _resolve(f: Dictionary,other: Dictionary,delta: float) -> void:
+	_motion(f,delta)
 	f.stun = maxf(0,f.stun-delta)
 	if f.move.is_empty(): return
 	var timing: Array = ATTACKS[f.move]
+	var previous: float = f.timer
 	f.timer += delta
-	if f.timer >= timing[0] and f.timer < timing[0]+timing[1] and not f.hit:
+	# Sweep the active window, so a slow frame cannot skip a punch.
+	if f.timer >= timing[0] and previous < timing[0]+timing[1] and not f.hit:
 		var ultimate: bool = f.move == "ultimate"
 		var gap: float = (other.x-f.x)*f.facing
 		var vertical: float = f.y-other.y
 		var reaches: bool = gap >= -6 and gap < timing[3] and absf(vertical) < 25
 		if f.move == "uppercut": reaches = gap >= -6 and gap < timing[3] and vertical > -13 and vertical < 43
+		if f.move == "lowkick": reaches = gap >= -6 and gap < timing[3] and absf(vertical) < 12
+		if f.move == "flykick": reaches = gap >= -6 and gap < timing[3] and vertical > -44 and vertical < 22
+		if other.down > 0 or other.hp <= 0: reaches = false
 		if f.move == "roundhouse" and other.crouch: reaches = false
 		if ultimate or (reaches and other.move != "ultimate"):
 			f.hit = true
+			var contact := Vector2(other.x,other.y-(9 if f.move == "lowkick" else 34))
 			var blocked: bool = not ultimate and other.guard and other.facing == -f.facing
 			var damage: int = maxi(1,int(timing[4] / 5.0)) if blocked else timing[4]
 			other.hp = maxi(0, other.hp-damage)
 			other.x = clampf(other.x + f.facing * timing[5] * (0.4 if blocked else 1.0),12,308)
-			other.stun = 0.09 if blocked else 0.20
-			if not blocked: other.move = ""
+			other.stun = 0.15 if blocked else (0.30 if f.move == "jab" else 0.40)
+			other.vx = f.facing * (22.0 if blocked else 62.0)
+			if not blocked:
+				other.move = ""
+				other.guard = false
+				other.crouch = false
+				if f.move in ["uppercut","super","flykick"]:
+					other.vy = -205.0 if f.move == "uppercut" else -130.0
+					other.vx = f.facing * (112.0 if f.move == "uppercut" else 125.0)
+					other.y = minf(other.y,FLOOR-1)
+					other.launched = true
+					other.stun = 0.9
+				elif f.move == "lowkick":
+					other.down = 0.32
+					other.stun = 0.42
+			hitstop = 0.045 if blocked else (0.065 if f.move == "jab" else 0.095)
+			shake = 2.0 if blocked else (4.0 if f.move == "jab" else 7.0)
+			impact_text = "BLOCK" if blocked else {"jab":"HIT!","kick":"THWACK!","uppercut":"LAUNCH!","lowkick":"SWEEP!","flykick":"FLYING KICK!","roundhouse":"CRACK!","super":"BURST!","ultimate":"TAKEDOWN!"}[f.move]
+			impact_time = 0.55
 			f.meter = mini(100,f.meter + (11 if blocked else 19))
 			other.meter = mini(100,other.meter + (12 if blocked else 8))
 			flash = 0.24 if ultimate else 0.11
 			sound.emit("block" if blocked else "impact")
 			for i in (28 if ultimate else 10):
-				sparks.append({"p":Vector2(other.x,other.y-24),"v":Vector2(rng.randf_range(-77,77),rng.randf_range(-72,39)),"attack":f.move,
+				sparks.append({"p":contact,"v":Vector2(rng.randf_range(-77,77),rng.randf_range(-72,39)),"attack":f.move,
 					"life":rng.randf_range(0.13,0.39),"color":Color("#75ffed") if blocked else Color("#ffcb79")})
 	if f.timer >= timing[0]+timing[1]+timing[2]: f.move = ""
 
 func frame_index(f: Dictionary) -> int:
-	if f.hp <= 0: return 10
+	if f.launched: return 9
+	if f.hp <= 0 or f.down > 0: return 10
 	if (over or next_round > 0) and f.move != "ultimate":
 		if f.hp > fighters[1 if f == fighters[0] else 0].hp: return 11
 	if f.stun > 0: return 4 if f.guard else 9
@@ -432,7 +497,8 @@ func _draw() -> void:
 	for i in fighters.size():
 		var f: Dictionary = fighters[i]
 		var pose := frame_index(f)
-		var foot := Vector2(f.x*3,414 if pose in [10,11] else 414+(f.y-FLOOR)*3)
+		var foot := Vector2(f.x*3,414+(f.y-FLOOR)*3)
+		foot += Vector2(sin(elapsed*120)*shake,cos(elapsed*95)*shake*.4)
 		# A fallen body stays visible inside the arena without moving simulation positions.
 		if pose==10: foot.x = clampf(foot.x,160,800)
 		draw_set_transform(Vector2(f.x*3,416)*canvas_scale,0,Vector2(1,.16)*canvas_scale)
@@ -441,8 +507,13 @@ func _draw() -> void:
 		var breath := 1.0+.006*sin(elapsed*3+i) if pose in [0,4,11] else 1.0
 		if f.crouch and pose == 4: breath *= .74
 		var lean := 0.0
-		if f.move == "uppercut" and pose == 6: lean = -.29*f.facing
+		if f.move == "uppercut" and pose == 6: lean = -.55*f.facing
 		if f.move == "roundhouse" and pose == 7: lean = .18*f.facing
+		if f.move == "flykick" and pose == 7: lean = .18*f.facing
+		if f.move == "lowkick":
+			breath *= .60
+			lean = .30*f.facing
+		if f.launched: lean = -f.facing * clampf(absf(f.vx)/130.0,.4,.95)
 		draw_set_transform(foot*canvas_scale,lean,canvas_scale)
 		Art.frame(self,id,pose,Vector2.ZERO,1.0,int(f.facing)<0,Vector2(320,256),Color.WHITE,Vector2(1,breath))
 		draw_set_transform(Vector2.ZERO,0,canvas_scale)
@@ -466,9 +537,10 @@ func _draw() -> void:
 				draw_line(origin,target,Color(neon,.42*fade),18*fade,true)
 				draw_line(origin,target,Color("#fff7ca",fade),5*fade,true)
 	for spark in sparks:
-		var pos: Vector2 = Vector2(spark.p.x*3,369+(spark.p.y-FLOOR)*3)
-		if spark.attack not in ["kick","roundhouse"]: pos.y -= 40
+		var pos: Vector2 = Vector2(spark.p.x*3,414+(spark.p.y-FLOOR)*3)
 		draw_line(pos,pos+spark.v.normalized()*9,spark.color,2)
+	if impact_time > 0:
+		centered(480,194,impact_text,26,gold)
 	if flash>0: draw_rect(Rect2(0,68,960,388),Color(1,.6,.7,flash*.3))
 	panel(Rect2(0,0,960,72),Color("#21161ff8"))
 	Art.image(self,"portrait-mali",Rect2(10,8,54,54))
@@ -487,8 +559,8 @@ func _draw() -> void:
 		if not over:
 			draw_mobile_controls(neon,gold)
 			panel(Rect2(282,469,396,51),Color("#21161fe8"))
-			centered(480,490,"Hold ↓ + Punch for Uppercut",15,neon)
-			centered(480,510,"Hold ↓ + Kick for Roundhouse",15,neon)
+			centered(480,490,"↓ + Punch: Uppercut · ↓ + Kick: Low kick",13,neon)
+			centered(480,510,"Jump + Kick: Fly kick · Forward + Kick: Roundhouse",12,neon)
 	else:
 		panel(Rect2(0,456,960,84),Color("#21161ff8"))
 		for item in BUTTONS:
@@ -496,8 +568,8 @@ func _draw() -> void:
 			panel(rect,Color("#4d3941") if pressed(item[0]) else Color("#30212c"),neon if pressed(item[0]) else gold.darkened(.45))
 			centered(rect.get_center().x,487,item[1],13,gold if item[0]=="super" else neon)
 			centered(rect.get_center().x,511,item[3],16,gold)
-		centered(478,488,"Hold S / ↓ + J  ·  Uppercut",15,neon)
-		centered(478,512,"Hold S / ↓ + K  ·  Roundhouse",15,neon)
+		centered(478,488,"↓ J: Uppercut · ↓ K: Low kick",15,neon)
+		centered(478,512,"Jump K: Fly kick · Forward K: Roundhouse",15,neon)
 	var exit := exit_rect()
 	panel(exit,Color("#392630"))
 	if mobile_controls:

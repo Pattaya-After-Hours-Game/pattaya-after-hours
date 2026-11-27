@@ -663,3 +663,12 @@ optional `street.hiring_seed`, named `person.identity`, `bar.talent_tips` and
 `last_tips.talent`. Migration grants no discoveries or tips. Recruitment uses a
 separate saved stream only after a paid valid hire. See
 [staff talents](docs/design/STAFF_TALENTS.md) for economy and role rules.
+
+## Toybox combat impact
+
+`fight.gd` owns transient hit pauses, impulses, launch/landing recovery and move
+selection. Down + Kick sweeps; airborne Kick flies forward; Forward + Kick keeps
+the roundhouse. Active-window overlap prevents a slow frame skipping contact.
+All damage still needs range/contact, with one hit per move and guarded chip.
+`fight_impact_check.gd` checks real-tick spacing, frame skips, launch recovery,
+guard, flying-kick input and K.O. scoring. No campaign/save fields are added.
