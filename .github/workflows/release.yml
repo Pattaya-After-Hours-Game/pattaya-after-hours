@@ -70,6 +70,7 @@ jobs:
               --title "Pattaya After Hours $RELEASE_TAG" --generate-notes
           fi
           gh release upload "$RELEASE_TAG" --clobber \
+            dist/PattayaAfterHours-linux-x86_64.AppImage \
             dist/PattayaAfterHours-linux-x86_64.zip dist/PattayaAfterHours-windows-x86_64.zip \
             dist/PattayaAfterHours-macOS.zip dist/PattayaAfterHours.apk dist/SHA256SUMS.txt
           latest_tag=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)

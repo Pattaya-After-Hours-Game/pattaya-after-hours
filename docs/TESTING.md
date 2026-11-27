@@ -1,5 +1,21 @@
 # Testing and release checks
 
+## Linux AppImage packaging — 27 November 2026
+
+The release script now produces `PattayaAfterHours-linux-x86_64.AppImage`
+alongside the existing ZIP, adds it to `SHA256SUMS.txt`, and the main release
+workflow uploads it. Pinned appimagetool/runtime downloads passed SHA-256
+verification. The local Linux export packaged successfully (about 42 MB).
+Isolated startup passed through FUSE, extraction mode, and a relocated AppRun
+in a path containing spaces, without creating a campaign save. Desktop-entry
+validation, included license comparison, shell syntax, documentation links and
+`git diff --check` passed. No gameplay or save code changes are part of this work.
+
+The full local desktop export stopped at missing Windows templates, after
+successfully exporting Linux. CI installs the complete templates and verifies
+all release checksums before publishing. These packaging checks do not establish
+compatibility across Linux distributions or replace a graphical playtest.
+
 ## Separate finance and growth — 27 November 2026
 
 The release gate remains the isolated `tools/test.sh` on pinned Godot 4.7.2,

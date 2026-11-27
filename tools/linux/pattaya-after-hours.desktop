@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Pattaya After Hours
+Comment=Build the Blue Hour into a thriving nightlife street
+Exec=PattayaAfterHours.x86_64
+Icon=pattaya-after-hours
+Terminal=false
+Categories=Game;Simulation;

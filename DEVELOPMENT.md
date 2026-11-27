@@ -15,6 +15,7 @@ database, npm install, Python virtual environment, or .NET dependency.
 | Edit, play, and test | **Godot 4.7.2 standard build**, Git; Bash for repository scripts |
 | Linux installer | Linux x86-64, `curl`, `unzip`, `sha256sum`, `awk`; internet for downloads |
 | Desktop exports | Matching **4.7.2.stable export templates**, `zip`, `unzip` |
+| Linux AppImage packaging | Linux x86-64, `curl`, `sha256sum`; internet on first build for pinned AppImage tooling |
 | Android debug export | Templates, JDK 17, Android SDK with platform-tools and compatible build-tools |
 | Android release export | Android tooling plus the existing release signing key and credentials |
 | Regenerate audio | Python 3 and FFmpeg; neither is needed to play or run tests |
@@ -187,9 +188,19 @@ foreground saves move the timestamp watermark forward. Tutorials remain isolated
 env -u ANDROID_HOME -u JAVA_HOME tools/release.sh
 ```
 
-This exports Linux x86-64, Windows x86-64, and universal macOS archives into
-ignored `dist/`, adds license notices, produces `SHA256SUMS.txt`, and runs a
-headless smoke test of the Linux executable. It does not publish releases.
+This exports Linux x86-64, Windows x86-64, and universal macOS archives plus
+`PattayaAfterHours-linux-x86_64.AppImage` into ignored `dist/`, adds license
+notices, produces `SHA256SUMS.txt`, and runs isolated headless startup checks
+of both Linux formats. The main-branch release workflow publishes all packages;
+the local script does not publish releases.
+
+`tools/appimage.sh` packages an existing `dist/linux/PattayaAfterHours.x86_64`.
+It verifies pinned appimagetool 1.9.1 and type-2 runtime 20251108 downloads before
+use, caching them under `${XDG_CACHE_HOME:-$HOME/.cache}/pattaya-after-hours/appimage/`.
+Both packaging and startup checks use extraction mode, so CI needs no FUSE.
+The AppImage includes the production icon and license notices, forwards launch
+arguments, and keeps Godot's normal save path. It requires the same host graphics
+support as the Linux ZIP; Linux distribution compatibility still needs testing.
 Windows is unsigned; macOS uses ad-hoc signing and is not notarized. Building
 those archives on Linux does not replace testing them on their target OS.
 
