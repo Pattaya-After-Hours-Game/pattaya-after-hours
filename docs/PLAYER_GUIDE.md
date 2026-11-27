@@ -130,6 +130,13 @@ Bed Race take over the game screen until you finish or leave.
 
 Open **Tours**, choose a guide, then assign a route. The guide recommends your
 street for the current trading shift. Use **Back** to return to the guide list.
+Guide pay is upfront from the **company bank**, separate from the HUD's venue
+till. Tours shows both balances and names the account in any shortfall. Tap
+**Cash & Bank · deposit tour funds**, enter the missing amount, choose
+**Deposit amount**, then return to **Tours** and assign the route. For example,
+a ฿670 till and ฿0 bank cannot pay a ฿145 guide until you deposit ฿145.
+Keep enough in the till for stock and running costs. Opening either screen
+never transfers money or books a tour.
 When a referral gets a seat, the top-left update names the guide and venue.
 The badge above **Tours** counts active agreements. A red **!** appears when
 there are no active tours and the selected venue has a free seat. The guide list

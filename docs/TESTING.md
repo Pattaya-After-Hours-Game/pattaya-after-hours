@@ -1,5 +1,19 @@
 # Testing and release checks
 
+## Tour funding clarity — 27 November 2026
+
+`tests/check.gd` reproduces a ฿670 venue till with an empty company bank.
+It checks the bank-specific guide-pay shortfall, deposit instructions, pure
+Tours/Cash & Bank navigation, an explicit ฿145 deposit and one bank-funded
+booking that leaves the remaining ฿525 till untouched.
+
+The `tour-funding-*` group in `tests/preview_economy.gd`, run through
+`tools/preview-art.sh`, covers the guide list, blocked route, account controls
+and funded route. All four states were inspected at 960×540 and 1280×720.
+The complete isolated `tools/test.sh` suite passed on Godot 4.7.2, including all
+pacing suites. Documentation links and `git diff --check` pass. Target-device
+play remains unverified.
+
 ## Outdoor layers and animated traffic — 27 November 2026
 
 The bar's front/rear follow-up adds 56 authored frames across four walkers,

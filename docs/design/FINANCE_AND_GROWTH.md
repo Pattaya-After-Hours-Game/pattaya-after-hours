@@ -13,7 +13,7 @@ service clocks, finite visits and stock rules remain in force.
 | Staff contracts, equipment, training, renovation | Venue till | No |
 | Nightly tips | Venue till | No |
 | Offline estimate | Venue till | No live sample |
-| Leases, street marketing, district preparation/rewards, unattributed legacy actions | Company bank | No local sample |
+| Leases, street marketing, upfront tour guide pay, district preparation/rewards, unattributed legacy actions | Company bank | No local sample |
 | Explicit deposits and withdrawals | Transfer between bank and one till | No |
 
 `bar.cash` is local money; `s.cash` is company money. A closed or insolvent venue

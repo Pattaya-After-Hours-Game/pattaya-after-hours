@@ -23,6 +23,9 @@ Every bar has its own till and five-second **฿/s** figure. Tap **Till** for
 **Cash & Bank**: transfer money explicitly or deposit surplus while retaining
 working cash. A rich company can **Fund & buy** a local upgrade directly from
 Upgrades. Leases and **Empire → Street marketing** use company-bank money.
+Tours also pay guides from the company bank. Their screen shows both balances
+and a **Cash & Bank** shortcut; deposit the displayed shortfall from a till
+before returning to assign the route.
 
 Renovations now require cash and operating reserve. Happy visits, regulars and
 healthy shifts earn **loyalty appeal**, rather than stopping a wealthy owner

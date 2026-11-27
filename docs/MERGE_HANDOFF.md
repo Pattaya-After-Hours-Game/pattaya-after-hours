@@ -1,5 +1,19 @@
 # Current implementation and release handoff
 
+## Tour funding clarity — 27 November 2026
+
+Built on synced main `e27fa7c`. Tours already charges guide pay to the company
+bank; the former generic shortfall made a funded venue till look unusable.
+Tours now shows both accounts, names the bank in missing-funds captions and
+links to Cash & Bank. The route reason gives the exact missing deposit amount
+and steps to return and book. Opening the shortcut moves no money.
+
+Account routing, tour prices, guide eligibility, stock and saves are unchanged.
+Regression coverage and two-resolution visual review are recorded in
+[testing](TESTING.md#tour-funding-clarity--27-november-2026). The full isolated
+suite passed on Godot 4.7.2. Target-device play remains unverified; a source push
+is not proof of published release downloads.
+
 ## Front/rear traffic in the bar opening — 27 November 2026
 
 The bar now uses separate native front/rear walking and driving atlases for

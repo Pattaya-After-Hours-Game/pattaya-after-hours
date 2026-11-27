@@ -120,8 +120,8 @@ func booking_offer(index: int, route_id: int) -> Dictionary:
 	elif reason.is_empty() and s.pay==0 and C.ROUTES[route_id][2]==2:
 		reason = "The guide asks for standard split or better on long routes."
 	elif reason.is_empty() and s.cash<required:
-		reason = "The guide needs their agreed pay upfront."
-	return {"required":required,"reason":reason,"enabled":reason.is_empty()}
+		reason = "Guide pay comes from the company bank. Open Cash & Bank, enter ฿%d and choose Deposit amount, then return to Tours." % (required-int(s.cash))
+	return {"required":required,"available":int(s.cash),"account":"company bank","reason":reason,"enabled":reason.is_empty()}
 
 func booking(index: int, route_id: int) -> String:
 	if s.phase != "plan":

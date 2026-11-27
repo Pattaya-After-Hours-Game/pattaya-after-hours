@@ -334,6 +334,10 @@ Local, tourist and nightlife groups choose among the venues and outside options.
 Each booked tour guide adds 0.5 to live venue appeal before modifiers. When the
 guide's share of the same arrival draw brings customers who get seats, the
 street update names the guide and venue.
+Live tour agreements pay the guide upfront from the company bank. Tours shows
+bank and selected-till balances, a bank-specific shortfall and a Cash & Bank
+shortcut with explicit deposit instructions. A funded till alone cannot book a
+route; navigation transfers no money. Guide eligibility and pay rules still apply.
 An empty bar needs appeal; a queue needs service; a full bar needs more space.
 
 Useful early investments include signage, seating, deliveries, pool and a fridge.

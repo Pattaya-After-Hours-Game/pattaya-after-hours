@@ -85,6 +85,24 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.model = Campaign.new(72)
+	if filter.begins_with("tour-funding-"):
+		app.show_tutorial_hint = false
+		app.model.s.cash = 0
+		app.model.street.selected().cash = 670
+		app.change_tab(2)
+		await capture(app,"tour-funding-guides","",false)
+		app.guide = 2
+		await capture(app,"tour-funding-blocked")
+		app.open_service_section("finance")
+		await capture(app,"tour-funding-accounts","",false)
+		app.model.street.finance.transfer(app.model.street.selected(),145,true)
+		app.change_tab(2)
+		app.guide = 2
+		await capture(app,"tour-funding-ready")
+		app.queue_free()
+		await process_frame
+		quit()
+		return
 	if filter.begins_with("finance-"):
 		app.show_tutorial_hint = false
 		app.model.s.cash = 700000

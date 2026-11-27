@@ -1125,6 +1125,7 @@ func purchase_text(control: Button, caption: String, quote: Dictionary, compact:
 	if int(quote.get("transfer",0))>0 and quote.enabled: return caption+"\nFund & buy · bank → till "+cash(quote.transfer)
 	if missing<=0: return caption
 	var shortfall := "Need %s more" % cash(missing)
+	if not str(quote.get("account","")).is_empty(): shortfall += " in "+str(quote.account)
 	var funding := "%s. %s cash required." % [shortfall,cash(quote.required)]
 	control.tooltip_text = funding if control.tooltip_text.is_empty() else funding+" "+control.tooltip_text
 	return caption+"\n"+("%s short" % cash(missing) if compact else shortfall)
@@ -1319,6 +1320,10 @@ func promotion_report(bar: Dictionary) -> void:
 
 func tours_panel() -> void:
 	var crew: Array = model.s.staff
+	if not model.legacy_mode():
+		live_body(func() -> String: return "Company bank: %s · %s till: %s\nTours use the company bank. Deposit till money before assigning a route." % [cash(model.s.cash),model.street.selected().name,cash(model.street.selected().cash)],WHITE,13)
+		var accounts := row_button("Cash & Bank · deposit tour funds",open_service_section.bind("finance"))
+		accounts.name = "TourCashBank"
 	if guide<0:
 		title("Tour guides")
 		body("Choose a guide to assign a tour. Guides recommend your street until the trading shift ends.")
