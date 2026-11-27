@@ -41,6 +41,35 @@ The [seating/six-pack/promoter design](design/PROMOTER_CAPACITY_PLAN.md) is
 implemented. Its initial forecast examples are analytical estimates; measured
 campaign outcomes appear below.
 
+## AFK incident handling — 27 November 2026
+
+The optional saved `street.afk` flag defaults false, including old schema-17
+saves. Only normal live `plan` ticks execute AFK purchases. Each tick tries
+existing event preparation first, then expired existing staff in venue/roster
+order, using the normal offer, listed price and shared-money action. There are
+no reserves, automatic new hires, upgrades, leases, promotions or speculative
+supplier purchases. Navigation/status reads never spend or roll RNG.
+
+Renewal retains identity, training and service deadlines. Expiry saves the prior
+duty setting in optional `person.renew_on`; AFK restores that setting after the
+ordinary rehire action. Pre-field expired workers default to returning on duty.
+Unaffordable contracts retry on later live ticks. Closed, skipped and offline
+time still ages contracts; offline claims never renew them.
+
+Paid Rat Plague retains its normal swarm and sweep, then AFK catches one of the
+last six rats per live second. Without patrol money, AFK invokes the existing
+close-for-day cleanup, with its real tip settlement and skipped contract time.
+Paid Godzilla preparation costs ฿450 (festival ฿1,200), including when AFK is
+enabled after the active monster arrives. At the normal event expiry it avoids
+repair closure without awarding tapping-game cash or victory reputation.
+Festival completion still counts once. Unpaid monsters keep ordinary setbacks;
+other events retain their existing gates, durations and consequences.
+
+UI suppresses blocking news and supplier-special offers while AFK is enabled.
+The supplier offer is marked seen, never bought. AFK gives no extra owner service,
+attraction, stock, income or offline earnings. Menus, practice and explicit
+interactive decisions remain paused. The normal nightly cleanup/countdown remains.
+
 ## Current finance and pacing — 27 November 2026
 
 One shared balance pays every venue and street action. There are no purchase
@@ -779,7 +808,7 @@ calculate competition and service/stock limits separately for each segment.
 Also split at every staff contract expiry across all venues, so expired staff
 stop contributing service, attraction and payroll at the correct projected minute.
 Consume contract time across the full absence, even beyond the eight-hour earning
-cap, and include expiry notices in the offline report. Never auto-renew contracts.
+cap, and include expiry notices in the offline report. Never auto-renew contracts inside an offline claim; AFK renewals resume only on live street ticks.
 Expected sales are bounded by shared demand, space, service and stock. Estimated
 sales consume owned stock; supplier purchases add complete six- or twelve-drink deliveries at the
 venue’s current supplier price.

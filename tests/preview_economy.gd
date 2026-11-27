@@ -85,6 +85,30 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.model = Campaign.new(72)
+	if filter.begins_with("afk-"):
+		app.show_tutorial_hint = false
+		app.drawer_open = false
+		await capture(app,"afk-off")
+		app.model.s.cash = 10000
+		app.model.street.action("afk")
+		app.model.street.announce(8)
+		app.model.street.afk_tick()
+		app.tab = 1
+		app.drawer_open = true
+		await capture(app,"afk-godzilla")
+		app.model.street.announce(app.StreetContent.RAT_PLAGUE)
+		app.model.street.afk_tick()
+		app.model.street.start_event()
+		app.model.street.tick(6)
+		app.drawer_open = false
+		await capture(app,"afk-rats")
+		app.start_tutorial()
+		app.tutorial_step = 6
+		await capture(app,"afk-tutorial")
+		app.queue_free()
+		await process_frame
+		quit()
+		return
 	if filter.begins_with("badges-"):
 		app.show_tutorial_hint = false
 		app.drawer_open = false

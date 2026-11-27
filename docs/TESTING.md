@@ -1,5 +1,28 @@
 # Testing and release checks
 
+## AFK mode — 27 November 2026
+
+`tests/afk_check.gd` verifies exact incident prices, no duplicate payments after
+reload, paid/unpaid Godzilla and festival outcomes, normal rat sweep plus final
+stragglers, unaffordable rat closure, every preparation gate, all-venue staff
+renewal, retained duty/training/deadlines, affordable retries and no new assets.
+A 14,400-second live run crosses multiple nights and contract renewals without
+input. Offline claims never pay incident or renewal fees. Optional schema-17
+fields default off and reject malformed values.
+
+UI checks cover saved-AFK startup pause, read-only Events navigation, visible
+stop control, news/supplier/welcome-back suppression, ordinary popups after
+switching off, and the tutorial explanation. The full isolated `tools/test.sh` suite passes with zero failures, including all
+pacing/balance routes. The expanded regression run also passes. AFK off/on, prepared Godzilla, rat
+stragglers and tutorial closeout have been inspected at 960×540 and 1280×720 via:
+
+```sh
+PATTAYA_PREVIEW_FILTER='afk-*' PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd tools/preview-art.sh /tmp/pattaya-afk-preview
+```
+
+Device play remains unverified. Release publication is tracked by the workflow,
+not inferred from the local source or previews.
+
 ## Customer social routines — 27 November 2026
 
 The full isolated `tools/test.sh` passed on Godot 4.7.2 with zero failures across

@@ -1,5 +1,23 @@
 # Current implementation and release handoff
 
+## AFK mode — 27 November 2026
+
+User-requested scope: unattended street-incident purchases and existing staff
+renewals only. AFK uses normal shared-cash offers, completes paid rat cleanup and
+prepared Godzilla visits, and suppresses interrupting notices. No automatic
+upgrades, leases, new hires, venue promotions or supplier specials. Prepared
+monster visits finish without manual minigame prizes. Unaffordable rats use the
+existing close-for-day recovery; other setbacks remain recoverable.
+
+Additive schema-17 flags retain opt-in preference and expired staff rota; menus
+and offline estimates never execute AFK purchases. Tutorial, Events help,
+README, story, economy, player and agent rules describe the resulting behavior.
+The full isolated suite, expanded regressions and two-resolution AFK visual
+checks pass. This change is prepared for the main release workflow; verify its
+publication before treating it as a downloadable build. Concurrent title-screen
+and customer-graphics work in the shared checkout is preserved. See
+[the test record](TESTING.md#afk-mode--27-november-2026).
+
 ## Customer social routines — 27 November 2026
 
 The customer animation follow-up adds real seated art for every identity and a

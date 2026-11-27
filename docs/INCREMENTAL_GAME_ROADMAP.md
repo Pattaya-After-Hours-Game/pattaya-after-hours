@@ -22,15 +22,15 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | One shared account, no cash reserves, named costs and closing-tip recovery |
-| Status | DONE in shared checkout — combined automated and visual checks passed; unpublished |
+| Active feature | Opt-in AFK incident handling and existing staff renewals |
+| Status | DONE — implementation, regressions, pacing and visual checks passed |
 | Implementer | Codex in shared main |
-| Reviewer / playtester | Automated regression, balance and visual checks; device play pending |
+| Reviewer / playtester | Automated regression, pacing and visual checks; device play pending |
 | Shared claim location | This table |
-| Working branch / chat / PR | main, synced through eb96a48 |
-| Scope and owned files | Finance/economy/street/save/UI, tests, previews and documentation |
-| Acceptance | Shared money in/out; conserve all saved cash; no reserve gates; close and count real tips once; explain every expense |
-| Next handoff / blocker | See current handover; device play and release publication remain unverified |
+| Working branch / chat / PR | main, synced through 7745ea7 |
+| Scope and owned files | Street/economy/save, scoped main UI and tutorial edits, AFK tests/previews and documentation; preserve concurrent graphics/title work |
+| Acceptance | Pay affordable incident responses, finish rats and prepared Godzilla without input, renew existing staff, suppress popups; no upgrades or leases; menu/offline remain inert |
+| Next handoff / blocker | Publish through main release workflow; device play remains unverified |
 | Recommended next, when free | Await user direction |
 | Last updated | 2026-11-27 |
 

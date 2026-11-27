@@ -161,6 +161,23 @@ activity, daylight, all nine venue openings and animated traffic.
 Keep mouse, keyboard, touch, scrolling, and Android back behavior in mind
 when changing interface code.
 
+## AFK live-play mode
+
+`scripts/street.gd` owns optional schema-17 `street.afk`, pure `afk_status`,
+normal-action purchases in `afk_tick`, rat recovery and the assisted monster
+outcome. `economy.advance_contracts` retains an optional boolean `renew_on` at
+expiry so AFK rehire restores the rota. `campaign._read` validates both optional
+fields; loading grants nothing. No save-version bump is needed for these
+additive fields. `main.gd` presents the toggle, explanation and tutorial copy,
+and suppresses notices without creating transactions. Startup/update workers
+still return before all live work; offline estimates do not call AFK.
+
+`tests/afk_check.gd` covers incident fees, recovery, rat progress, Godzilla and
+festival outcomes, all preparation gates, existing staff renewal, save validation,
+menu pauses, read-only UI and popup suppression. Run it through `tools/test.sh`
+so save fixtures remain isolated. AFK visual states are in the `afk-*` filter of
+`tests/preview_economy.gd`.
+
 ## Saves and settings
 
 On default Linux installations, campaign files live at:

@@ -47,6 +47,7 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 	if not s.street.has("supplier_deal"): s.street.supplier_deal = {}
 	if not s.street.has("night_prep"): s.street.night_prep = {"night":-1,"remaining":0,"cancelled":false}
 	if not s.street.has("expired_tours"): s.street.expired_tours = {}
+	if not s.street.has("afk"): s.street.afk = false
 	var event: Dictionary = s.street.event
 	if event.get("id",-1)==C.RAT_PLAGUE and event.phase=="active":
 		event.erase("remaining")
@@ -239,18 +240,58 @@ func preparation_offer() -> Dictionary:
 	if event.is_empty(): return {"required":0,"enabled":false,"reason":"Preparation closes when the event starts."}
 	var required := int(C.EVENTS[int(event.id)][3])
 	var reason := ""
-	if event.phase!="warning" and event.id!=C.RAT_PLAGUE: reason = "Preparation closes when the event starts."
+	if event.phase!="warning" and event.id!=C.RAT_PLAGUE and not (afk_enabled() and int(event.id) in [8,9]): reason = "Preparation closes when the event starts."
 	elif event.prepared: reason = "Already prepared."
 	elif event.id==C.RAT_PLAGUE and event.phase=="active" and rat_targets().size()<=C.RAT_STRAGGLERS: reason = "Only stragglers left. Click or tap them to clear the infestation."
 	elif event.id==C.Local.BED and race_staff(s.street.bars[int(event.venue)])<0: reason = "Enter with an available bartender."
 	elif s.cash<required: reason = "The preparation needs more cash."
 	return {"required":required,"reason":reason,"enabled":reason.is_empty()}
 
+func afk_enabled() -> bool:
+	return s.street.get("afk",false) and not s.get("practice",false)
+
+func afk_status() -> String:
+	if not afk_enabled(): return "AFK off · incident responses and renewals are manual."
+	var event: Dictionary = s.street.event
+	if not event.is_empty() and not event.prepared:
+		var offer := preparation_offer()
+		if s.cash<int(offer.required):
+			return "AFK on · %s needs ฿%d more. Unpaid incidents keep their setbacks." % [C.EVENTS[int(event.id)][0],int(offer.required)-int(s.cash)]
+	for bar in s.street.bars:
+		for i in bar.team.size():
+			if not economy.contracted(bar.team[i]):
+				var offer: Dictionary = economy.rehire_offer(bar,i)
+				if not offer.enabled: return "AFK on · %s renewal: %s" % [bar.name,offer.reason]
+	return "AFK on · paying affordable incident responses and renewing existing staff."
+
+func afk_tick() -> void:
+	if not afk_enabled() or s.phase!="plan": return
+	# Use the ordinary offers and actions. No purchases happen in UI reads,
+	# offline claims, or while the startup menu has the live clock paused.
+	if preparation_offer().enabled: action("prepare")
+	for bar in s.street.bars:
+		for i in bar.team.size():
+			var person: Dictionary = bar.team[i]
+			if not economy.rehire_offer(bar,i).enabled: continue
+			var on_duty: bool = person.get("renew_on",true)
+			var result: String = economy.action(bar,"rehire",i)
+			person.on = on_duty
+			record("AFK · %s · %s" % [bar.name,result])
+	# The existing free recovery closes the street for the day; an unpaid
+	# patrol must not magically remove the swarm while the venues trade.
+	var event: Dictionary = s.street.event
+	if event.get("id",-1)==C.RAT_PLAGUE and event.phase=="active" and not event.prepared and rat_targets().size()>C.RAT_STRAGGLERS:
+		action("close_for_rats")
+
 func action(id: String, index: int = 0) -> String:
 	if not s.phase in ["plan","guided"]: return "Finish the current decision first."
 	var bar := selected()
 	var result := ""
 	match id:
+		"afk":
+			if s.phase!="plan" or s.get("practice",false): return "Return to the live street to change AFK mode."
+			s.street.afk = not afk_enabled()
+			result = "AFK on: affordable incidents and existing contracts are automatic. Purchased service and deliveries still do the trading." if afk_enabled() else "AFK off: incident responses and renewals are manual again."
 		"serve","regulars_club","stock","buy_drink","return_drink","hire","hire_gabby","hire_daisy","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","close_and_count","recovery","host_drink","auto_host_drinks","bar_fine","train_host","auto_bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
 			result = economy.action(bar,id,index)
 		"late":
@@ -322,7 +363,7 @@ func action(id: String, index: int = 0) -> String:
 			var event: Dictionary = s.street.event
 			var offer := preparation_offer()
 			if not offer.enabled: return offer.reason
-			if not pay(offer.required): return "The preparation needs more cash."
+			if not pay(offer.required,"Event preparation: "+str(C.EVENTS[int(event.id)][0])): return "The preparation needs more cash."
 			event.prepared = true
 			result = "Bo's rat patrol is on the job." if event.id==C.RAT_PLAGUE else C.EVENTS[int(event.id)][2] + " arranged."
 		"festival":
@@ -586,12 +627,14 @@ func settle_event_game(id: int, won: bool) -> String:
 		return "You won the bed race! The trophy is on the wall."
 	return "Bo’s bed finished. Eventually."
 
-func finish_event(won: bool = true, outcome: String = "") -> void:
+func finish_event(won: bool = true, outcome: String = "", assisted: bool = false) -> void:
 	if s.street.event.is_empty(): return
 	var event: Dictionary = s.street.event
 	var id := int(event.id)
 	if id in [8,9]:
-		if won:
+		if assisted:
+			record("AFK · The paid crew settles Godzilla's visit. No tapping prize; no repair closure.")
+		elif won:
 			credit(1500 if id == 8 else 8000)
 			s.rep = mini(100,int(s.rep)+5)
 			record("Godzilla sleeps outside. The photo queue buys another round.")
@@ -767,6 +810,7 @@ func tick(seconds: int) -> void:
 	if not s.phase in ["plan","guided"]: return
 	for _second in clampi(seconds,0,60):
 		if not s.phase in ["plan","guided"]: break
+		afk_tick()
 		celebration_tick()
 		reconcile_closures()
 		var trading_now := any_trading()
@@ -782,12 +826,14 @@ func tick(seconds: int) -> void:
 			if event.prepared and event.rats.size()>C.RAT_STRAGGLERS:
 				var catches := mini(C.RAT_PATROL_CATCHES,event.rats.size()-C.RAT_STRAGGLERS)
 				event.rats = event.rats.slice(catches)
+			elif afk_enabled() and s.phase=="plan" and not event.rats.is_empty():
+				catch_rat(int(event.rats[0]))
 		elif trading_now:
 			if not event.is_empty():
 				event.remaining -= 1
 				if event.remaining<=0:
 					if event.phase=="warning": start_event()
-					else: finish_event(not int(event.id) in [8,9])
+					else: finish_event(not int(event.id) in [8,9],"",afk_enabled() and s.phase=="plan" and event.prepared and int(event.id) in [8,9])
 			elif s.street.chapter==0 and s.day==1 and int(s.street.elapsed)>=180 and not s.street.get("early_encore",false):
 				s.street.early_encore = true
 				announce(C.Local.ENCORE)

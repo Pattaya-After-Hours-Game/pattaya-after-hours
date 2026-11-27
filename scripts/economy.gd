@@ -452,6 +452,7 @@ func advance_contracts(minutes: int) -> void:
 			if not contracted(person): continue
 			person.contract_left = maxi(0,int(person.get("contract_left",C.STAFF_CONTRACT_MINUTES))-minutes)
 			if person.contract_left==0:
+				person.renew_on = person.on
 				person.on = false
 				person.service_clock = 0
 				if float(person.get("host_return",0))<=action_time(): bar.away.erase(i)

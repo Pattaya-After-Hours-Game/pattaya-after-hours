@@ -558,6 +558,10 @@ func render(keep_scroll: bool = false) -> void:
 	if not practicing:
 		bartender_hud()
 		bar_fine_hud()
+		var afk := at_button(root_ui,Rect2(448,374,106,38),"AFK ON" if model.street.afk_enabled() else "AFK OFF",street_action.bind("afk"),model.street.afk_enabled())
+		afk.name = "AfkToggle"
+		afk.disabled = model.s.phase!="plan"
+		afk.tooltip_text = "Automatically pay for street incidents and renew existing staff when affordable. Details in Events."
 	if not practicing and int(model.s.street.night_prep.remaining)>0:
 		var stay := at_button(root_ui,Rect2(14,330,430,68),"",street_action.bind("stay"),true)
 		stay.name = "NightPrepCancel"
@@ -1232,6 +1236,7 @@ func tutorial_panel() -> void:
 			body("A red dot means an order is about to be lost. Chat gives that guest 10 more seconds and shares Welcome’s timer.")
 		4:
 			body("Bartenders serve on their own when ready. Contracts last 10 game days, and training stays with the worker.")
+			body("In the live game, AFK can renew existing contracts when affordable. It keeps each worker's duty setting.",MUTED,13)
 			var hire := row_button("Hire bartender · "+cash(StreetContent.BARTENDER_CONTRACT_COST),street_action.bind("hire"),true)
 			watch_purchase(hire,hire.text,model.street.economy.hire_offer.bind(model.street.selected(),0))
 		5:
@@ -1241,6 +1246,7 @@ func tutorial_panel() -> void:
 			body("%d drinks sold · %s in tips" % [bar.last_shift.get("sales",0),cash(bar.last_tips.get("amount",0))],TEAL,16)
 			body("Serve the specialty drink a guest asks for on their first round for a chance at a ฿5 tip. Tips pay out at closing.")
 			body("At closing, wait for noon or tap Stay here. Follow Anong’s next step in Service to grow the bar.",MUTED,13)
+			body("Leaving the game running? AFK pays for incidents such as rats and Godzilla and skips popups. Buy service and delivery automation first. AFK buys no upgrades or venues; Events explains the costs.",MUTED,13)
 			row_button("Finish tutorial",finish_tutorial,true)
 
 func tutorial_close() -> void:
@@ -1319,6 +1325,10 @@ func update_time_meters() -> void:
 		if is_instance_valid(entry[0]): entry[0].value = entry[1].call()
 
 func events_panel() -> void:
+	row_button("Turn AFK off" if model.street.afk_enabled() else "Turn AFK on",street_action.bind("afk"),model.street.afk_enabled())
+	live_body(model.street.afk_status,TEAL,13)
+	event_detail(body("About AFK mode",GOLD,13),"AFK mode",func() -> String:
+		return "While the live street runs, AFK pays the listed incident response and renews existing staff when affordable, retaining their rota and training. News and supplier specials do not interrupt.\n\nBo's ฿120 patrol also catches the last rats. If the patrol is unaffordable, AFK closes for the day and leaves the cleanup to Bo. Godzilla costs ฿450 (festival ฿1,200); paid preparation settles at the event's normal end without tapping prizes or repair closure. Unpaid Godzilla keeps its setback.\n\nYour purchased staff, service and deliveries still run the bar. AFK buys no upgrades, venues, promotions or supplier specials and does not play optional minigames. It does nothing on the startup menu or offline. Turn it off any time on the live street.")
 	street_event_panel()
 	celebration_panel(true)
 	var bar: Dictionary = model.street.selected()
@@ -2349,12 +2359,14 @@ func celebration_panel(compact: bool = false) -> void:
 			body(scope,MUTED,12)
 
 func rat_instruction_text() -> String:
+	if model.street.afk_enabled(): return "AFK · Bo handles the cleanup  ·  %d left" % model.street.rat_targets().size()
 	return "%s  ·  %d left" % [StreetContent.RAT_INSTRUCTION,model.street.rat_targets().size()]
 
 func rat_patrol_caption() -> String:
 	return "Call Bo's rat patrol · "+cash(StreetContent.EVENTS[StreetContent.RAT_PLAGUE][3])
 
 func rat_patrol_status() -> String:
+	if model.street.afk_enabled(): return "Bo is catching every rat…"
 	return "Bo is sweeping the swarm…" if model.street.rat_targets().size()>StreetContent.RAT_STRAGGLERS else "Check shelves and furniture."
 
 func catch_rat(index: int) -> void:
@@ -2443,6 +2455,7 @@ func poll_news() -> void:
 		return
 
 func show_news(issue: Dictionary) -> void:
+	if model.street.afk_enabled(): return
 	news_issue = issue
 	draw_event_overlay()
 
@@ -2938,6 +2951,13 @@ func _process(delta: float) -> void:
 	if updater_worker or boot_menu: return
 	scene_clock += delta
 	service_animation = maxf(0,service_animation-delta)
+	if model.street.afk_enabled() and campaign_before_tutorial==null:
+		if not news_issue.is_empty() or supplier_special_open or offline_notice>0:
+			news_issue = {}
+			supplier_special_open = false
+			offline_notice = 0
+			render(true)
+		if not model.s.street.supplier_deal.is_empty(): model.s.street.supplier_deal.seen = true
 	if event_game>=0:
 		if event_game==Local.BED:
 			if race_finish_left>=0:
@@ -2954,7 +2974,7 @@ func _process(delta: float) -> void:
 		if not news_issue.is_empty(): return
 		if model.s.phase=="plan" and offline_notice==0 and not is_instance_valid(fight) and not is_instance_valid(district) and not is_instance_valid(service_help_panel):
 			var deal: Dictionary = model.s.street.supplier_deal
-			if not deal.get("seen",true) and not model.street.supplier_deal_offer().is_empty():
+			if not model.street.afk_enabled() and not deal.get("seen",true) and not model.street.supplier_deal_offer().is_empty():
 				open_supplier_special()
 				return
 		var before := street_ui_state()

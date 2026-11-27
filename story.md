@@ -519,6 +519,21 @@ what actually happened: empty seats filled, a queue that got away from you, or
 regulars returning afterward. Reports should not invent income to make a story
 sound more successful.
 
+## Anong can mind the interruptions
+
+> **Anong:** “Leave the keys. Leave money for Bo. The lizard still gets a bill.”
+
+AFK mode lets the owner leave a viable street running. Anong pays affordable
+incident preparations and renews the existing team's contracts, keeping their
+training and rota. Bo's paid patrol now finds the last rats; without patrol
+money the street closes for his normal next-day cleanup. Paid giant ice buckets
+let Godzilla's visit finish peacefully, without the owner's tapping-game prize.
+
+This is an optional live-play convenience, not a new source of free trade or a
+personal quest. The established staff and delivery purchases still do the work.
+Anong does not buy the next venue, start promotions or choose upgrades for the
+owner. The startup menu and time away remain separate from the running street.
+
 ## Writing the next update
 
 Keep Anong a co-owner with opinions. Give colleagues a reason to want

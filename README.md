@@ -219,6 +219,21 @@ and fines. It excludes equipment/contract purchases, nightly tip counts and offl
 Nida now faces toward the street; a purchased music system has a playing/off
 indicator. Sound/Muted remains independent of the business upgrade.
 
+## Leave the street running with AFK
+
+Tap **AFK OFF** above the property cards to enable it; **AFK ON** switches it
+back off. AFK pays affordable street-incident responses (including rats and
+Godzilla), renews existing staff at their normal contract prices, and keeps news
+and supplier-offer popups from pausing play. Training and duty settings stay.
+
+Bo's ฿120 patrol finishes every rat. If unaffordable, AFK uses the existing
+close-for-day cleanup. Prepared Godzilla visits settle without tapping at the
+normal event end: ฿450, or ฿1,200 for the festival, with no minigame prize.
+Unpaid Godzilla keeps its normal repair closure. AFK does not buy upgrades,
+leases, promotions or supplier specials. Your purchased service and delivery
+automation must still run a viable bar. **Events → About AFK mode** explains it.
+The setting is saved, defaults off, and does nothing on the startup menu or offline.
+
 ## Opening time, prep and late nights
 
 The clock runs at **one game minute per real second**. Venues open at **12pm**

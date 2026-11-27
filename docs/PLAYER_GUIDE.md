@@ -15,6 +15,39 @@ for available events, and a red **!** for no active tour agreements when seats a
 Double-click the rainbow duo in the bar, or tap them on a touchscreen, to see
 them kiss with a floating heart.
 
+## Leaving the game running
+
+Use **AFK OFF / AFK ON** above the property cards, or the AFK control at the top
+of **Events**. When on, affordable incident responses and expired existing
+staff contracts are purchased from shared money. Renewals retain training,
+service deadlines and the last duty setting, including an off-duty Nida.
+An unaffordable renewal waits and retries when its full price is available.
+The Events readout shows the shortfall.
+
+AFK handles street incidents, not optional venue promotions:
+
+- **Rat Plague:** pays Bo ฿120 and lets him catch the last six rats after the
+  normal sweep. If the patrol cannot be afforded, AFK closes for the day using
+  the existing cleanup and next-noon reopening, including normal tip settlement
+  and contract ageing.
+- **Godzilla / festival:** pays ฿450 / ฿1,200 for preparation and lets the event
+  finish normally without the tapping game, prize cash or victory reputation.
+  Paid visits avoid the repair closure. An unpaid visit keeps the normal setback.
+- Other incidents use their existing preparation prices, eligibility and timers.
+  Optional arcade, traffic and race games are not played or awarded wins.
+
+News, celebration, raid, welcome-back and supplier-offer popups will not block
+the live street. Supplier specials are skipped, not purchased. Ordinary purchased
+supplier deliveries still work. AFK adds no free serving, welcoming, stock or
+money; it buys no upgrades, venues or promotions and does not reopen a venue
+that you closed or that ran out of cash. Set up sustainable staff and delivery
+automation before leaving it running.
+
+Turn AFK off any time during normal street play. The setting is saved, defaults
+off for existing and new campaigns, and never runs on the startup menu, during
+the isolated tutorial, or in offline estimates. Deliberately entering a guided
+shift or a minigame still requires your input.
+
 ## Money & costs
 
 **MONEY** is the shared balance for your whole street. Every sale, bill and
@@ -462,7 +495,7 @@ does not create customers and is retained across contracts and role changes.
 **Service → Team** shows the remaining contract time. When it expires,
 the person stops working and stops drawing wages. Their card stays available;
 **Rehire** costs ฿1,200 for bartenders (฿4,500 for hosts/dancers) for another ten days and keeps their training. Rehiring is
-manual, never an automatic charge. Existing saves retain their hires and apply
+manual unless you enable AFK mode, which pays affordable renewals during live play. Existing saves retain their hires and apply
 previous venue-wide training to those people; new hires start untrained.
 
 One game day is 24 real minutes before skips. Closed hours, off-duty time and

@@ -181,6 +181,20 @@ supersedes the earlier separate-finance approval.
   loyalty appeal and earned manager bonuses. Navigation is read-only.
 - See [finance and growth](docs/design/FINANCE_AND_GROWTH.md) for current rules.
 
+## AFK mode — 27 November 2026
+
+AFK is an opt-in saved live-street setting, default off. During normal plan ticks,
+pay affordable existing incident responses then renew expired existing staff at
+listed prices; preserve duty settings, training and service deadlines. Never buy
+upgrades, venues, new staff, promotions or supplier specials. Suppress blocking
+news/specials without purchases. Paid rat patrol catches its final six at one per
+second; unaffordable patrol uses existing close-for-day recovery. Paid Godzilla
+(฿450, festival ฿1,200) resolves at normal event expiry without repair closure or
+manual minigame prizes/reputation. Unpaid monsters retain setbacks. Keep festival
+completion repeat-safe. Optional schema-17 `street.afk` and `person.renew_on` must
+validate as booleans. No AFK activity on menu, offline, practice, or explicit
+interactive decisions; UI/status reads never purchase or advance time.
+
 ## Implementation boundaries
 
 This is a Godot/GDScript project, not a web app. Use the engine version pinned in

@@ -704,6 +704,7 @@ func _read(path: String) -> Variant:
 		if parsed.version >= 2:
 			if not parsed.get("street") is Dictionary: return null
 			var data: Dictionary = parsed.street
+			if data.has("afk") and not data.afk is bool: return null
 			for key in ["bars","selected","chapter","served","earned","seconds","cycle","event","event_wait","event_index","events_survived","reopening","festival","festivals","last_seen","offline","history"]:
 				if not data.has(key): return null
 			if not data.bars is Array or data.bars.is_empty() or data.bars.size() > Street.C.NAMES.size(): return null
@@ -789,6 +790,7 @@ func _read(path: String) -> Variant:
 					if not person is Dictionary or not person.has("role") or not person.has("on") or not person.has("host"): return null
 					if person.has("identity") and (person.identity!="gabby" or int(person.role)!=0): return null
 					if not int(person.role) in ([0,1,2,3] if int(parsed.version)>=6 else [0,1,2]) or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
+					if person.has("renew_on") and not person.renew_on is bool: return null
 					for key in ["training","service_clock","contract_left"]:
 						if person.has(key) and (not (person[key] is int or person[key] is float) or person[key]<0): return null
 					if int(person.get("training",0))>=Street.C.STAFF_SERVICE_SECONDS.size() or int(person.get("contract_left",0))>Street.C.STAFF_CONTRACT_MINUTES: return null
