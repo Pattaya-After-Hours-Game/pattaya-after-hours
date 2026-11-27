@@ -441,6 +441,7 @@ func render(keep_scroll: bool = false) -> void:
 	city.clip_contents = true
 	if not is_same(city.street_state,model.s.street) or city.selected_bar!=int(model.s.street.selected):
 		city.fridge_install_flash = 0.0
+	if not city.shotgun_clicked.is_connected(click_shotgun): city.shotgun_clicked.connect(click_shotgun)
 	if not city.shotgun_shout.is_connected(tone): city.shotgun_shout.connect(tone)
 	city.duo_reaction = duo_reaction
 	city.service_flash = service_animation
@@ -1490,6 +1491,13 @@ func select_bar(index: int) -> void:
 	model.s.street.selected = index
 	tab = 0
 	commit()
+
+func click_shotgun(customer_id: int) -> void:
+	if boot_menu or campaign_before_tutorial!=null or is_instance_valid(fight) or is_instance_valid(district): return
+	if not model.street.economy.shotgun_status(model.street.selected(),customer_id).enabled: return
+	message = model.street.action("shotgun",customer_id)
+	city.play_shotgun(customer_id)
+	save_state()
 
 func street_action(id: String,index: int = 0, funded: bool = false, expected_price: int = -1) -> void:
 	if campaign_before_tutorial != null:

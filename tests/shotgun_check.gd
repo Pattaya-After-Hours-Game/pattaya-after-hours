@@ -52,6 +52,8 @@ func run(test: SceneTree) -> void:
 	var rng_before: int = model.rng.state
 	var foot: Vector2 = actor(app).foot
 	pointer(app)
+	test.check(guest.get("shotgun_patience",0)==5 and model.s.street.shotgun_ready==30.0,"Successful click grants five seconds and starts the saved thirty-second deadline")
+	before = JSON.stringify(model.s)
 	test.check(actor(app).visual_pose=="bbq" and shouts==["shotgun"],"A single mouse click starts ribs and one shout")
 	var poses := {}
 	for time in [.0,.15,.3,.45]:
@@ -70,8 +72,11 @@ func run(test: SceneTree) -> void:
 	pointer(app,true,true)
 	test.check(shouts.size()==1,"Emulated touch duplicates cannot replay the shout")
 	pointer(app,true)
-	test.check(shouts.size()==2 and actor(app).bbq,"A real touchscreen tap starts the same reaction")
-	test.check(JSON.stringify(model.s)==before and model.rng.state==rng_before,"Eating, audio and redraws never change money, orders, stock, visits, deadlines or RNG")
+	test.check(shouts.size()==1 and not actor(app).bbq,"A real touchscreen tap cannot bypass the model cooldown after the animation ends")
+	test.check(JSON.stringify(model.s)==before and model.rng.state==rng_before,"Repeated inputs, animation and redraws cannot grant another bonus or change other model state")
+	model.s.street.elapsed = 30
+	pointer(app,true)
+	test.check(shouts.size()==2 and actor(app).bbq and guest.shotgun_patience==10,"A real touchscreen tap at thirty seconds starts another reaction and grants five more seconds")
 	test.check(not app.sfx.playing,"Muted Shotgun interaction stays silent")
 	var old_city: Control = app.city
 	app.model = Campaign.new(9)

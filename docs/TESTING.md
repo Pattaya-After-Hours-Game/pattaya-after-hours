@@ -1,5 +1,38 @@
 # Testing and release checks
 
+## Shotgun patience boost — 27 November 2026
+
+A successful click/tap now adds five seconds of patience to every current
+street visitor and starts one shared 30-second foreground cooldown. The model
+owns eligibility, the additive visit allowance and fractional saved deadline.
+Legacy visits also extend their lifetime cap; modern drinking deadlines and
+round plans remain intact. City presents the granted bonus and live countdown.
+This supersedes the presentation-only behavior in the original Shotgun entry.
+
+Verification on Godot 4.7.2:
+
+- All gameplay/save/UI/art regression checks and pacing, promoter, automation,
+  celebration, club and profit-cycle suites passed through `tools/test.sh`.
+  The wrapper was interrupted during its final lease suite; that suite was
+  rerun separately in the isolated Shotgun-only source snapshot.
+- `shotgun_patience_check.gd` covers all current customers across two venues,
+  multiple Shotguns sharing a cooldown, exact fractional boundaries, cumulative
+  per-visit bonuses, no retroactive bonus for new arrivals, save/reload,
+  legacy lifetime caps, real order expiry and malformed optional save fields.
+  Exact model snapshots verify no extra stock, money, orders or RNG changes.
+- Updated pointer tests cover mouse/touch, cooldown lockout after the eating
+  animation ends, repeat clicks, mute, HUD retention and campaign reset.
+  The focused tests passed both in the shared checkout and a snapshot containing
+  only this change, preserving concurrent tour work.
+- The existing art preview runner produced 21 states each at 960×540 and
+  1280×720. Inspected the bonus bubble, early/last-second cooldown and ready
+  state in all three venue types. Existing character art stays unchanged.
+- Changed-document local links and `git diff --check` passed.
+
+[Preview](shotgun.png). Device touch/play and release publication remain
+unverified.
+
+
 ## Shotgun customer and ribs reaction — 27 November 2026
 
 Shotgun joins through normal admissions as a saved optional cosmetic identity,

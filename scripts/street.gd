@@ -288,6 +288,7 @@ func action(id: String, index: int = 0) -> String:
 	var bar := selected()
 	var result := ""
 	match id:
+		"shotgun": return economy.shotgun(bar,index)
 		"afk":
 			if s.phase!="plan" or s.get("practice",false): return "Return to the live street to change AFK mode."
 			s.street.afk = not afk_enabled()

@@ -978,5 +978,19 @@ existing host identities; no saved employee is replaced or granted for free.
 New admissions whose IDs are 12 modulo 48 carry the optional saved cosmetic
 identity `shotgun`. Existing customers keep their appearances, paid quotes,
 budgets and visit plans. Shotgun uses the same bounded arrivals and business
-rules as every guest. Clicking/tapping his ribs reaction affects presentation
-only: no food stock, purchase, income, service, visit extension or gameplay RNG.
+rules as every guest. Clicking/tapping him during live trading gives every
+current customer in every venue +5 seconds of patience and starts one shared 30-second foreground cooldown.
+The bonus stacks per current visit on later successful activations; new arrivals
+receive no retroactive bonus. Legacy visits also receive +5 seconds on their
+lifetime cap so the full waiting extension applies. Modern round plans, paid
+drinking deadlines, orders, stock, prices, money and RNG remain unchanged.
+No food stock, purchase, income or service is created. Paused menus/decisions,
+closed venues, absent Shotgun and repeated clicks cannot activate it.
+
+Optional schema-17 `street.shotgun_ready` preserves the fractional live deadline;
+`customer.shotgun_patience` preserves the granted integer visit allowance.
+Missing fields default to zero, without rewriting old visits or replaying a bonus.
+The cooldown advances with the live action clock, never menu time or offline
+estimates. The scene requests the model action; status/countdown reads stay pure.
+After success the bubble shows “Everyone +5s patience”, followed by the live
+cooldown above Shotgun. Existing owner and staff service clocks stay independent.

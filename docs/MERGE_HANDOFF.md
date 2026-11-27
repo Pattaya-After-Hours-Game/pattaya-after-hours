@@ -1,5 +1,22 @@
 # Current implementation and release handoff
 
+## Shotgun patience boost — 27 November 2026
+
+Click/tap Shotgun to give all current customers across the street +5 seconds
+of patience, with one saved 30-second live cooldown shared across venues.
+The eating bubble reports the bonus, then the remaining cooldown appears above
+Shotgun. Optional schema-17 fields retain exact deadlines and granted visit
+bonuses without changing old visits or replaying rewards on load. All money,
+orders, stock, modern drinking deadlines, visit plans and RNG stay unchanged.
+This supersedes the original cosmetic-only click behavior below.
+
+Verification includes model/UI/save regressions, two-resolution preview review,
+all pacing suites and isolated Shotgun-only focused tests; see
+[the test record](TESTING.md#shotgun-patience-boost--27-november-2026).
+Concurrent tour-manager edits are preserved outside this commit. Device play
+and release publication remain unverified.
+
+
 ## Shotgun — 27 November 2026
 
 Added the supplied-reference adult Shotgun as a normal customer, with an

@@ -552,7 +552,10 @@ python3 tools/prepare_customers.py --character shotgun
 or imitation of the reference person. Its reproducible command is recorded in
 the art receipt. Godot renders the exact “Shotgun BBQ!” text; the click/tap
 reaction holds only his visual walking position for 3.2 seconds. Real model
-service, budgets, timers and stock continue. Sound / Muted controls the voice.
+service, budgets, drinking timers and stock continue. Clicking now requests the
+model-owned +5-second street patience bonus with its saved 30-second cooldown;
+the bubble reports the bonus and then displays remaining cooldown. Sound / Muted
+controls the voice.
 
 [In-game reaction](../docs/shotgun.png). Preview with
 `PATTAYA_PREVIEW_SCRIPT=tests/preview_shotgun.gd tools/preview-art.sh`.

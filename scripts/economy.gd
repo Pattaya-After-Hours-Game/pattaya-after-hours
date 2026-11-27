@@ -2,6 +2,8 @@ extends RefCounted
 
 const Finance = preload("res://scripts/finance.gd")
 const C = preload("res://scripts/street_content.gd")
+const SHOTGUN_PATIENCE = 5
+const SHOTGUN_COOLDOWN = 30.0
 signal tour_arrived(guide_index: int, venue_name: String, guests: int)
 
 var s: Dictionary
@@ -1125,11 +1127,33 @@ func start_cooldown(bar: Dictionary, id: String, duration: float) -> void:
 	bar[id+"_ready"] = action_time()+duration
 
 static func patience(bar: Dictionary, customer: Dictionary) -> int:
-	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)+int(customer.get("party_patience",0))
+	return (45 if customer.opening else C.PATIENCE_SECONDS)+(10 if bar.equipment.comfort else 0)+(C.CHAT_PATIENCE if customer.get("chatted",false) else 0)+int(customer.get("party_patience",0))+int(customer.get("shotgun_patience",0))
 
 static func order_seconds_left(bar: Dictionary, customer: Dictionary) -> int:
 	var remaining := patience(bar,customer)-int(customer.wait)
 	return mini(remaining,int(customer.life)) if customer.get("visit_phase","legacy")=="legacy" else remaining
+
+# One shared saved deadline prevents multiple Shotguns or venue navigation
+# from bypassing the cooldown. Reads never grant patience or advance time.
+func shotgun_status(bar: Dictionary, customer_id: int) -> Dictionary:
+	var remaining := maxf(0.0,float(s.street.get("shotgun_ready",0.0))-action_time())
+	var present := false
+	for customer in bar.customers:
+		if int(customer.id)==customer_id and customer.get("appearance","")=="shotgun": present = true
+	var enabled: bool = s.phase in ["plan","guided"] and is_trading(bar) and present and remaining<=0.000001
+	return {"enabled":enabled,"remaining":remaining}
+
+func shotgun(bar: Dictionary, customer_id: int) -> String:
+	var offer := shotgun_status(bar,customer_id)
+	if not offer.enabled: return "Shotgun BBQ is cooling down." if offer.remaining>0 else "Shotgun must be visiting an open venue."
+	for venue in s.street.bars:
+		for customer in venue.customers:
+			customer.shotgun_patience = int(customer.get("shotgun_patience",0))+SHOTGUN_PATIENCE
+			# Legacy visits also have a lifetime cap on waiting. Extend that cap
+			# without changing modern round plans or drinking deadlines.
+			if customer.get("visit_phase","legacy")=="legacy": customer.life += SHOTGUN_PATIENCE
+	s.street.shotgun_ready = action_time()+SHOTGUN_COOLDOWN
+	return "Shotgun BBQ! Everyone gets +5s patience."
 
 func chat_target(bar: Dictionary) -> Dictionary:
 	var target := {}

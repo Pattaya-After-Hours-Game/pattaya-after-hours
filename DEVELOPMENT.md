@@ -1,12 +1,20 @@
 # Developer setup and handover
 
-The optional customer `appearance: "charcoal"` field is cosmetic and remains
-compatible with schema 17. Only `economy.admit` assigns it to new ID-24-mod-48
-visits, without RNG; absent fields keep legacy looks. Campaign validation
-accepts only that identity. `city.scene_people` reads actual visit phase, saved
+The optional customer `appearance` field accepts `charcoal` and `shotgun` in
+schema 17. Only `economy.admit` assigns these to new ID-24/12-mod-48 visits,
+without RNG; absent fields keep legacy looks. Campaign validation accepts
+these two identities. `city.scene_people` reads actual visit phase, saved
 Chat deadline and active pool state for poses. Packing and provenance are in
 [the art guide](art/README.md); `charcoal_guest_check.gd` covers save preservation
 and read-only presentation. Outdoor walkers remain ambient traffic, not admissions.
+
+Shotgun's click bonus is model-owned in `economy.shotgun`, routed through
+`street.action("shotgun", customer_id)`. City emits the click; main plays the
+reaction and saves only after an eligible action. Optional schema-17
+`street.shotgun_ready` and `customer.shotgun_patience` keep the shared fractional
+30-second cooldown and current-visit bonus across reloads. Validation rejects
+malformed fields; absent fields retain old visits without gifts. Status/UI reads
+never activate the bonus. See `tests/shotgun_patience_check.gd`.
 
 All existing customer identities now map to expanded sixteen-frame sheets via
 `Art.customer_motion_id`. `city.update_customer_motion` owns only transient

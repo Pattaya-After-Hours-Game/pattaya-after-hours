@@ -27,6 +27,9 @@ func run() -> void:
 	app.model.street.economy.admit(bar)
 	for kind in 3:
 		bar.type = kind
+		app.model.s.street.erase("shotgun_ready")
+		app.model.s.street.elapsed = 0
+		app.model.s.street.tick_fraction = 0.0
 		app.render()
 		app.city.set_process(false)
 		app.city.clock = 0
@@ -34,7 +37,9 @@ func run() -> void:
 		app.city.queue_redraw()
 		await capture("shotgun-%d-idle" % kind)
 		load("res://tests/shotgun_check.gd").new().pointer(app)
-		for time in [0.0,.3,.6,3.3]:
+		for time in [0.0,.3,.6,3.3,29.1,30.0]:
+			app.model.s.street.elapsed = floori(time)
+			app.model.s.street.tick_fraction = fposmod(time,1.0)
 			app.city.clock = time
 			app.city.queue_redraw()
 			await capture("shotgun-%d-%03d" % [kind,int(time*100)])

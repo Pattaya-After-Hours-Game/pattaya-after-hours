@@ -705,6 +705,7 @@ func _read(path: String) -> Variant:
 			if not parsed.get("street") is Dictionary: return null
 			var data: Dictionary = parsed.street
 			if data.has("afk") and not data.afk is bool: return null
+			if data.has("shotgun_ready") and not _finite_number(data.shotgun_ready,0,1.0e15): return null
 			for key in ["bars","selected","chapter","served","earned","seconds","cycle","event","event_wait","event_index","events_survived","reopening","festival","festivals","last_seen","offline","history"]:
 				if not data.has(key): return null
 			if not data.bars is Array or data.bars.is_empty() or data.bars.size() > Street.C.NAMES.size(): return null
@@ -797,6 +798,7 @@ func _read(path: String) -> Variant:
 				for customer in bar.customers:
 					if not customer is Dictionary: return null
 					if customer.has("appearance") and not customer.appearance in ["charcoal","shotgun"]: return null
+					if customer.has("shotgun_patience") and (not _finite_number(customer.shotgun_patience,0,1.0e15) or float(customer.shotgun_patience)!=floorf(float(customer.shotgun_patience))): return null
 					for key in ["id","life","order","wait","quoted","drinks","next","budget","pool","pool_wait","played","playing","missed","opening","promo","fine_budget"]:
 						if not customer.has(key): return null
 					if customer.has("drink") and not int(customer.drink) in range(Street.C.DRINKS.size()): return null
@@ -999,7 +1001,7 @@ func _restore_numbers(value: Variant, field: String = "") -> Variant:
 	# Preserve explicit fractional action clocks; legacy numeric fields stay integers.
 	match typeof(value):
 		TYPE_FLOAT:
-			if field in ["host_deadline","host_buzz_until","host_return","tick_fraction","service_ready","last_served","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
+			if field in ["recovery_left","shotgun_ready","host_deadline","host_buzz_until","host_return","tick_fraction","service_ready","last_served","serve_ready","welcome_ready","welcome_until","serve_duration","welcome_duration","chat_until","offline_sales_credit","offline_cost_pending","offline_pool_pending","net_per_second"]: return value
 			return int(value)
 		TYPE_ARRAY:
 			for i in value.size(): value[i] = _restore_numbers(value[i])
