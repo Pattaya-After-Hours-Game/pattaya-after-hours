@@ -1,5 +1,17 @@
 # Current implementation and release handoff
 
+## Shared notification badges — 27 November 2026
+
+All tab notifications now use `scripts/status_badge.gd`: green numeric counts,
+yellow warnings and red exclamation alerts. The component owns compact sizing,
+font, border, hover/pressed colours and keyboard focus. Tab layout, click sound,
+tooltips and model-driven visibility remain in `main.gd`. Upgrade counts now
+match active-tour counts. No economy or save change.
+
+Badge regressions and two-resolution in-engine previews are documented in
+[TESTING](TESTING.md#shared-notification-badges--27-november-2026).
+Source changes do not confirm release publication; device play is unverified.
+
 ## Action readiness and event timers — 27 November 2026
 
 Serve, Welcome and Chat now share the bright mint ready-button style and dark

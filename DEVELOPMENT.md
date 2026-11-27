@@ -102,6 +102,7 @@ the affected screens when changing visuals, controls, audio, or mobile layout.
 | File | Responsibility |
 | --- | --- |
 | `scripts/main.gd` | Programmatically built management UI, tabs, tutorial, audio, minigame transitions, Godzilla timer |
+| `scripts/status_badge.gd` | Reusable tab notification button: green counts, yellow warnings and red alerts, with shared sizing and interaction styles |
 | `scripts/campaign.gd` | Campaign dictionary, actions, service simulation, accounting, endings, RNG, saves |
 | `scripts/street.gd` | Shared clock/calendar, nightly hours, raids, properties, chapters and events |
 | `scripts/economy.gd` | Trading availability, cleaning, customers, pool, promotions, ledgers and offline projections |

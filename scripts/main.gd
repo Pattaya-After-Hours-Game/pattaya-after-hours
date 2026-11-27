@@ -10,6 +10,7 @@ const District = preload("res://scripts/district.gd")
 const Art = preload("res://scripts/art.gd")
 const Fight = preload("res://scripts/fight.gd")
 const UpgradeIcons = preload("res://scripts/upgrade_icons.gd")
+const StatusBadge = preload("res://scripts/status_badge.gd")
 const WindowsUpdates = preload("res://scripts/windows_updates.gd")
 const TEAL = Color("#71f9d2")
 const PINK = Color("#ff80b2")
@@ -340,14 +341,13 @@ func at_button(parent: Control,rect: Rect2,value: String,call: Callable,primary:
 	parent.add_child(b)
 	return b
 
-func tab_badge(index: int, caption: String, action: Callable, fill: Color, primary: bool) -> Button:
-	var badge := at_button(root_ui,Rect2(56+index*62,478,21,21),caption,action,primary)
-	badge.custom_minimum_size = Vector2.ZERO
-	badge.size = Vector2(21,21)
-	badge.add_theme_font_size_override("font_size",11)
-	var style := box(fill,DARK,2)
-	style.set_corner_radius_all(10)
-	for state in ["normal","hover","pressed"]: badge.add_theme_stylebox_override(state,style)
+func tab_badge(index: int, kind: StatusBadge.Kind, action: Callable, count: int = 0) -> Button:
+	var badge := StatusBadge.new(kind,count)
+	badge.position = Vector2(56+index*62,478)
+	badge.pressed.connect(func():
+		tone("click")
+		action.call())
+	root_ui.add_child(badge)
 	return badge
 
 func tone(kind: String) -> void:
@@ -534,14 +534,13 @@ func render(keep_scroll: bool = false) -> void:
 		b.add_theme_font_size_override("font_size",12)
 		b.disabled = model.s.phase != "plan" or practicing
 	if not practicing and model.s.phase=="plan":
-		event_badge = tab_badge(1,"!",change_tab.bind(1),Color("#ffe45c"),true)
+		event_badge = tab_badge(1,StatusBadge.Kind.WARNING,change_tab.bind(1))
 		event_badge.name = "EventBadge"
 		event_badge.tooltip_text = "Open Events · An event is ready"
 		sync_event_badge()
 		var tours: int = model.s.bookings.size()
-		var tour_badge := tab_badge(2,str(tours) if tours>0 else "!",toggle_drawer.bind(2),TEAL if tours>0 else Color("#b8293d"),tours>0)
+		var tour_badge := tab_badge(2,StatusBadge.Kind.COUNT if tours>0 else StatusBadge.Kind.ALERT,toggle_drawer.bind(2),tours)
 		tour_badge.name = "TourBadge"
-		tour_badge.z_index = 2
 		tour_badge.tooltip_text = "%d active tour agreements" % tours if tours>0 else "No active tour agreements"
 		if tours==0:
 			var refresh_tour_warning := func() -> String:
@@ -550,9 +549,8 @@ func render(keep_scroll: bool = false) -> void:
 				return "!"
 			tour_badge.text = refresh_tour_warning.call()
 			live_labels.append([tour_badge,refresh_tour_warning])
-		upgrade_badge = tab_badge(0,"",open_upgrades,GOLD,true)
+		upgrade_badge = tab_badge(0,StatusBadge.Kind.COUNT,open_upgrades)
 		upgrade_badge.name = "UpgradeBadge"
-		upgrade_badge.z_index = 2
 		sync_upgrade_badge()
 	var walk := at_button(root_ui,Rect2(328,490,76,40),"Walk\ndistrict",walk_district)
 	walk.add_theme_font_size_override("font_size",12)

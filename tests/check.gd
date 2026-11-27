@@ -145,6 +145,11 @@ func test_ui() -> void:
 	await process_frame
 	use_button(app,"New Game")
 	check(app.show_tutorial_hint,"New players see the tutorial hint")
+	await process_frame
+	var badges := [app.upgrade_badge,app.event_badge,app.root_ui.get_node("TourBadge")]
+	for badge in badges:
+		check(badge.get_script()==preload("res://scripts/status_badge.gd") and badge.size==Vector2(21,21),"Tab notifications share one compact component and size")
+	check(app.event_badge.get_theme_stylebox("normal").bg_color!=badges[2].get_theme_stylebox("normal").bg_color,"Warnings and missing-agreement alerts remain visually distinct")
 	test_tuning(app)
 	use_button(app,"TILL")
 	check(app.service_section=="finance","Tapping Till opens Cash & Bank")
@@ -331,6 +336,7 @@ func test_tour_update(app: Control) -> void:
 	check(app.model.s.bookings.is_empty() and app.drawer_close_button.text=="Back","Selecting a guide opens their routes without booking")
 	app.column.get_node("TourRoute_0").pressed.emit()
 	check(app.root_ui.get_node("TourBadge").text=="1" and app.tour_agreement_text(2)=="Active · Market loop · 120s left","The Tours badge and drawer identify the active deal")
+	check(app.root_ui.get_node("TourBadge").get_theme_stylebox("normal").bg_color==app.upgrade_badge.get_theme_stylebox("normal").bg_color,"Active tour and ready-upgrade counts use the same green")
 	app.model.s.street.pass_credit = 60000
 	app.model.s.street.next_group = 1
 	app.live_seconds = 1.0

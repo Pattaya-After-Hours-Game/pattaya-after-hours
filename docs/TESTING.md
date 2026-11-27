@@ -1,5 +1,23 @@
 # Testing and release checks
 
+## Shared notification badges — 27 November 2026
+
+Service upgrade counts, Events warnings and Tours counts/alerts use the same
+`scripts/status_badge.gd` component. UI regressions check the common 21×21
+logical size, shared component, distinct warning/alert fills and matching green
+counts after a real tour booking. Existing badge navigation, visibility and
+agreement-expiry checks still apply.
+
+Focused in-engine previews cover green single/two-digit counts, yellow warnings
+and red exclamation alerts at 960×540 and 1280×720:
+
+```sh
+PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='badges-*' tools/preview-art.sh /tmp/pattaya-badges
+```
+
+The full isolated `tools/test.sh` suite passed with zero failures. Both preview
+sizes were visually reviewed. Target-device touch play remains unverified.
+
 ## Charcoal reference guest — 27 November 2026
 
 The full isolated `tools/test.sh` suite passed on Godot 4.7.2, including pacing.

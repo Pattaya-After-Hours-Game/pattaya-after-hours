@@ -85,6 +85,17 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.model = Campaign.new(72)
+	if filter.begins_with("badges-"):
+		app.show_tutorial_hint = false
+		app.drawer_open = false
+		app.model.street.selected().cash = 6000
+		await capture(app,"badges-warning-alert")
+		app.model.booking(2,0)
+		await capture(app,"badges-green-counts")
+		app.queue_free()
+		await process_frame
+		quit()
+		return
 	if filter.begins_with("timers-"):
 		app.show_tutorial_hint = false
 		app.drawer_open = false
