@@ -1,0 +1,47 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent 16-frame animation sprite sheet for Pattaya After Hours. Preserve EXACT reference adult Korean visitor: light warm skin, tousled black hair, thin round dark glasses, clean-shaven friendly face, loose sage green tee, charcoal knee-length shorts, navy blue zipped waist pouch, white crew socks, worn white/grey trainers. Same hair, face, build, clothes and accessories every sprite. Crisp illustrated painted pixel-art matching reference, dark plum outlines, clustered shadows, warm highlights, six-head adult proportions. EXACT 4 columns × 4 rows, equal sized cells, 16 isolated full bodies same scale, common foot baselines. Leave generous TRANSPARENT padding on all four sides of each cell, fully contain hair/shoes/cue, no touching edges or other cells. Row1: SIDE walking RIGHT left stride, passing, right stride, opposite passing with alternating arm swings. Row2: FRONT walking toward viewer four clear alternating gait phases. Row3: BACK walking away four alternating gait phases, back of hair/shirt no face. Row4 three-quarter right: idle empty hands; beer glass touching mouth drinking; friendly open hand Chat gesture; holding diagonal upward pool cue fully contained, no table. True transparent alpha, no backdrop/glow/floor/shadows/gridlines/labels/text/new characters. Do not change outfit. Not chibi, not photograph.",
+  "reference": "art/sources/customer-sage-holiday.png",
+  "source": "art/sources/customer-sage-holiday-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-04d4fd99-f27b-4390-a5cf-9765d6e5d628.png",
+  "columns": [
+    0,
+    272,
+    543,
+    815,
+    1086
+  ],
+  "rows": [
+    0,
+    350,
+    710,
+    1065,
+    1448
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": 12,
+    "drinking": 13,
+    "chat": 14,
+    "pool": 15
+  },
+  "model_version": null,
+  "seed": null
+}

@@ -15,6 +15,8 @@ const CUSTOMER_VARIANTS = [
 	["patrons",0], ["patrons-men",4], ["patrons-men",6],
 	["patrons",3], ["patrons-men",7], ["patrons-men",8]
 ]
+# Names follow the original atlas identities; no save identity is reassigned.
+const CUSTOMER_MOTION_NAMES = ["sunfaded-regular","silver-polo","maroon-casual","plum-club","sage-holiday","ivory-club","cobalt-evening","amber-local","beard-glasses","navy-tourist","teal-dress","gold-blouse","capybara","rainbow-duo"]
 const COBALT_IDLE = 6
 static var textures: Dictionary = {}
 
@@ -141,6 +143,11 @@ static func atlas_specs() -> Dictionary:
 	for id in STAFF: specs[id] = [Vector2(160,192),4]
 	for id in HOSTS: specs[id] = [Vector2(160,256),6]
 	for id in ["mali","juno","vega","orchid"]: specs["fight-"+id] = [Vector2(320,256),12]
+	for name in CUSTOMER_MOTION_NAMES:
+		var width := 288 if name=="rainbow-duo" else 256 if name=="capybara" else 160
+		specs["customer-motion-"+name] = [Vector2(width,192),16]
+		specs["street-customer-"+name] = [Vector2(192 if width>160 else 96,128),4]
+		specs["street-customer-"+name+"-depth"] = [Vector2(192 if width>160 else 96,128),8]
 	return specs
 
 static func customer_sprite(customer_id: int, appearance: String = "") -> Array:
@@ -150,6 +157,16 @@ static func customer_sprite(customer_id: int, appearance: String = "") -> Array:
 	if customer_id%32==3: return ["patrons-rainbow-duo",0]
 	# Existing saved IDs keep a guest's look stable as other guests leave.
 	return CUSTOMER_VARIANTS[(maxi(1,customer_id)-1)%CUSTOMER_VARIANTS.size()]
+
+static func customer_motion_id(appearance: Array) -> String:
+	if appearance[0]=="patrons-charcoal": return "patrons-charcoal"
+	var name := ""
+	match appearance[0]:
+		"patrons-men": name = CUSTOMER_MOTION_NAMES[int(appearance[1])]
+		"patrons": name = {0:"navy-tourist",1:"teal-dress",3:"gold-blouse"}.get(int(appearance[1]),"")
+		"patrons-capybara": name = "capybara"
+		"patrons-rainbow-duo": name = "rainbow-duo"
+	return "customer-motion-"+name if not name.is_empty() else ""
 
 static func capybara_frame(time: float) -> int:
 	var phase := fposmod(time,8.0)
@@ -168,7 +185,7 @@ static func cobalt_frame(time: float) -> int:
 
 # Semantic animation catalog. Contact frames are selected by the combat simulator.
 static func animation_frames(id: String, state: String) -> Array:
-	if id=="patrons-charcoal":
+	if id=="patrons-charcoal" or id.begins_with("customer-motion-"):
 		return {"idle":[12],"walk":[0,1,2,3],"walk_front":[4,5,6,7],"walk_back":[8,9,10,11],"drinking":[13],"chat":[14],"pool":[15]}.get(state,[12])
 	# Customer-specific poses are selected by the street scene.
 	if id.begins_with("patrons"): return [0]

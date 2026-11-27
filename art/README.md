@@ -12,6 +12,53 @@ Existing room plates and cast artwork remain unchanged. Nida appears at the
 entrance only while contracted, scheduled on and trading; benches appear only
 for purchased level-three beer-bar seating.
 
+## Full customer animation cast — 27 November 2026
+
+Fourteen new reference-preserving sheets extend the existing charcoal sheet to
+all fifteen live customer identities. Each has sixteen frames: four side walks,
+four front walks, four rear walks, idle, drinking, Chat and pool. Leftward walking
+mirrors the side cycle; front/rear views are authored. The capybara and rainbow
+duo remain composed groups with their existing companions. The duo's dog stays
+carried, matching its original sprite. Original production PNGs are unchanged.
+
+Sources are `sources/customer-<name>-motion.png`; matching
+`recipes/customer-<name>-motion.json` files contain the exact built-in ImageGen
+prompts, original identity reference, generation receipt and authored crop cuts.
+No model version or seed was exposed. These sheets were generated with the
+built-in image tool; deterministic packing creates the runtime variants.
+
+`tools/prepare_customer_motion.py` packs forty-two new atlases: fourteen bar
+sheets (`customer-motion-*`) plus side and front/rear street variants
+(`street-customer-*`). Standard bar cells are 160×192; capybara/duo cells are
+256×192 and 288×192. Street cells are 96×128, or 192×128 for companion groups.
+A shared scale within each four-frame cycle, consistent adult row height and
+fixed supporting-foot baselines prevent gait pulsing and changes of size on
+turns. Alpha below 160 is removed, source cuts fail closed on clipped silhouettes,
+and nearest-neighbour packing preserves crisp small sprites. The full packer
+calls this scoped packer. Repacking never rewrites older customer atlases.
+
+`Art.customer_motion_id` maps the existing saved identities to the new sheets;
+no admissions or save appearance fields change. City keeps a disposable visual
+cache for stable floor slots, entrance arrivals and actual pool transitions.
+The cache advances only with the visible scene and resets between campaigns.
+Opening a room places existing guests directly at their places. Walking never
+delays service or changes budgets, visit timers, stock, payments or gameplay RNG.
+Drinking, Chat and pool poses read model state. Capybara idle, cobalt sunglasses
+and the duo's existing stationary kiss reaction keep their original art.
+
+Street traffic now rotates through nineteen walking identities: four existing
+ambient walkers and all fifteen customers. Density, vehicle limits and shared
+demand stay unchanged. These are ambient walkers, not extra admitted guests.
+Both street directions and bar depth views remain native four-frame cycles.
+
+[Walking cast preview](../docs/customer-walks.gif) · [In-bar arrival](../docs/customer-arrival.gif).
+
+```sh
+python3 tools/prepare_customer_motion.py
+python3 tools/review_customer_motion.py /tmp/pattaya-customer-review
+PATTAYA_PREVIEW_SCRIPT=tests/preview_customer_motion.gd tools/preview-art.sh /tmp/pattaya-customer-motion
+```
+
 ## Provenance
 
 The charcoal-suited supplied-reference guest has a 16-frame sheet: four side

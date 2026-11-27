@@ -1,0 +1,47 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent 16-frame sprite sheet for Pattaya After Hours. Exact adult customer from reference: elderly slender white man, swept neat silver hair, white moustache, black rectangular glasses, salmon pink polo with fine cream collar trim tucked into belted beige knee shorts, cream socks, dark brown sandals, wristwatch. Preserve recognizable face, age, build and all clothing/accessories consistently. Match reference illustrated painted pixel-art with plum outlines, clustered shading, warm highlights. EXACT 4 columns by 4 rows, equally sized cells, 16 full-body sprites entirely contained with generous transparent gutters and common foot baselines. Row 1: SIDE view walking RIGHT, left stride, passing, right stride, opposite passing, clear alternating arms/feet. Row 2: FRONT toward viewer, four distinct alternating gait phases. Row 3: BACK walking away, four distinct alternating gait phases, no face visible. Row 4: front three-quarter right idle empty hands; beer glass touching mouth drinking; friendly open-hand Chat; holding pool cue diagonally up entirely within cell with no table. Same height and same adult man in every cell, no head/shoe/cue clipping or cell overlap. Actual transparent alpha, NO background, floor, shadows, glow, labels, text, grid, other characters, extra props. Not chibi or photo.",
+  "reference": "art/sources/customer-silver-polo.png",
+  "source": "art/sources/customer-silver-polo-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-0b814b91-fe20-42d8-98d2-f2eff6ad127b.png",
+  "columns": [
+    0,
+    272,
+    543,
+    815,
+    1086
+  ],
+  "rows": [
+    0,
+    348,
+    710,
+    1060,
+    1448
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": 12,
+    "drinking": 13,
+    "chat": 14,
+    "pool": 15
+  },
+  "model_version": null,
+  "seed": null
+}

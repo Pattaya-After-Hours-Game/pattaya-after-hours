@@ -244,6 +244,8 @@ from prepare_street_art import prepare as prepare_street
 prepare_street()
 from prepare_charcoal_guest import prepare as prepare_charcoal
 prepare_charcoal()
+from prepare_customer_motion import prepare as prepare_customer_motion
+prepare_customer_motion()
 manifest={}
 for p in sorted(OUT.glob('*.png')):
     im=Image.open(p)

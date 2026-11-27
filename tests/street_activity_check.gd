@@ -104,10 +104,10 @@ func check_traffic(test: SceneTree) -> void:
 			test.check(matches.size()==1 and matches[0]==item,"Busier bands add actors without teleporting existing traffic")
 		test.check(first.any(func(item: Dictionary) -> bool: return item.id.begins_with("street-cars")) and first.any(func(item: Dictionary) -> bool: return item.id.begins_with("street-scooters")),"Busy streets include cars and scooters")
 	var views := {}
-	for second in range(0,180,3):
+	for second in range(0,600,3):
 		for item in StreetView.traffic(7,second,true):
 			views["%s/%d" % [item.id,item.frame/4]] = true
-	test.check(views.size()==16,"All five walkers, two scooters and the car can appear in front and rear views")
+	test.check(views.size()==44,"All nineteen walkers, two scooters and the car can appear in front and rear views")
 	var quiet_directions := {}
 	for second in range(0,60,3):
 		for item in StreetView.traffic(4,second,true):

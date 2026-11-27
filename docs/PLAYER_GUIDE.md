@@ -47,7 +47,10 @@ time of day, while animated walkers, scooters and cars reflect current activity.
 They stay outside, behind the existing doorway and furnishings. They are ambient
 traffic, separate from the actual guests and orders inside your venue.
 Walkers and vehicles face toward you when approaching and show their backs when
-heading away. The district keeps its side-facing traffic.
+heading away. The district keeps its side-facing traffic. All fifteen customer
+looks can appear in the street. Inside, new guests walk to a stable place and
+pool players walk to their real table. You can still serve a waiting order while
+its customer is walking. Drinking, Chat and cue poses follow the actual visit.
 
 ## Drink prices and restocking money
 

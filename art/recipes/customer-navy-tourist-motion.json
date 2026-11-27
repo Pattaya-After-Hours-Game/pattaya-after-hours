@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Asset: production transparent 16-frame animation sprite sheet for Pattaya After Hours Godot game. Reference is exact adult male tourist's identity, swept short greying dark hair, neat goatee, navy polo with white piping and tiny white sailboat emblem, tan cargo shorts, brown sandals, sunglasses hanging from collar, strapped compact camera at hip, wristwatch, body proportions and illustrated rendering style. Preserve them in all cells. Crisp plum outlines, clustered painted-pixel shading, warm amber light, slightly cartoon six-head adult proportions matching reference, readable at 180px tall. EXACT 4 columns by 4 rows evenly spaced equal cells on true transparent alpha canvas. No background, glow, floor, ground, shadows, checkerboard, labels, lines or text. Each cell one entire full-body man at identical scale, generous transparent gutters, no head, shoe or cue cropping. Row 1: SIDE profile walking RIGHT four distinct phases: left foot extended, passing beneath hips, right foot extended, opposite passing, empty hands and opposite arm swings, camera stays strapped at hip. Row 2: FRONT walking toward viewer four alternating gait phases. Row 3: BACK walking away four alternating gait phases, show back of greying hair and navy polo, no face. Row 4: front three-quarter toward right four bar poses: idle empty hands; beer glass at mouth drinking; open-hand friendly conversation gesture; holding pool cue diagonally upward, cue fits within cell. Feet same baseline per row, no props crossing cells, same man in all 16 poses.",
+  "references": [
+    "art/sources/patrons-0.png"
+  ],
+  "source": "art/sources/customer-navy-tourist-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-5c3f-7802-a622-0e5e47fa4804/exec-e248f2c5-3c70-4ac9-8baf-cc57a7785c7a.png",
+  "rows": [
+    0,
+    355,
+    718,
+    1084,
+    1448
+  ],
+  "columns": [
+    0,
+    272,
+    543,
+    815,
+    1086
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": [
+      12
+    ],
+    "drinking": [
+      13
+    ],
+    "chat": [
+      14
+    ],
+    "pool": [
+      15
+    ]
+  },
+  "seed": null,
+  "model_version": null
+}

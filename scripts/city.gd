@@ -24,6 +24,11 @@ var clock := 0.0
 var street_state: Dictionary = {}
 var arrival_time := 0.0
 var duo_reaction := {}
+# Disposable presentation cache. Saves, admission and pool settlement stay in
+# the model; walking never delays service, spends money or consumes RNG.
+var customer_motion := {}
+var motion_street: Dictionary = {}
+var motion_selected := -1
 var night := false
 var celebrating := false
 var godzilla := ""
@@ -55,6 +60,7 @@ func _process(delta: float) -> void:
 	arrival_time += delta
 	service_flash = maxf(0,service_flash-delta)
 	fridge_install_flash = maxf(0,fridge_install_flash-delta)
+	update_customer_motion(delta)
 	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
@@ -103,15 +109,17 @@ func rat_pointer_input(event: InputEvent, targets: Array) -> bool:
 	return true
 
 func _person_contains(person: Dictionary, point: Vector2) -> bool:
-	var cell: Vector2 = Art.atlas_specs()[person.who][0]
+	var draw_id: String = person.get("draw_who",person.who)
+	var draw_pose: int = person.get("draw_pose",person.pose)
+	var cell: Vector2 = Art.atlas_specs()[draw_id][0]
 	var scale_value := person_scale(person.foot.y)
 	var pixel := (point-Vector2(person.foot))/scale_value + Vector2(cell.x*.5,cell.y-4)
 	if not Rect2(Vector2.ZERO,cell).has_point(pixel): return false
 	var x := int(cell.x)-1-int(pixel.x) if person.flip else int(pixel.x)
-	var texture := Art.texture(person.who)
+	var texture := Art.texture(draw_id)
 	var columns := int(texture.get_width()/cell.x)
-	return texture.get_image().get_pixel(x+person.pose%columns*int(cell.x),
-		int(pixel.y)+person.pose/columns*int(cell.y)).a>.5
+	return texture.get_image().get_pixel(x+draw_pose%columns*int(cell.x),
+		int(pixel.y)+draw_pose/columns*int(cell.y)).a>.5
 
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
@@ -154,7 +162,7 @@ func _draw() -> void:
 			_draw_person(item)
 	# Markers are drawn after the people so a nearer guest cannot hide an order.
 	for person in people:
-		if person.who=="patrons-rainbow-duo" and person.pose==1: _draw_kiss_heart(person)
+		if person.who=="patrons-rainbow-duo" and person.pose==1 and not person.get("motion_state","").begins_with("walk"): _draw_kiss_heart(person)
 		if person.get("chat_until",0.0)>float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0)):
 			var feedback := order_position(person)+Vector2(-31,-14)
 			draw_style_box(_sign_box(),Rect2(feedback-Vector2(4,15),Vector2(78,21)))
@@ -297,7 +305,7 @@ func _draw_person(person: Dictionary) -> void:
 		for offset in offsets:
 			draw_circle(Vector2(offset*scale_value,0),18*scale_value,Color(0,0,0,.24))
 	draw_set_transform(Vector2.ZERO,0,size/Vector2(960,540))
-	Art.frame(self,person.who,person.pose,foot,scale_value,person.flip)
+	Art.frame(self,person.get("draw_who",person.who),person.get("draw_pose",person.pose),foot,scale_value,person.flip)
 
 func _draw_kiss_heart(person: Dictionary) -> void:
 	var progress := 1.0-(float(duo_reaction.until)-clock)/KISS_SECONDS
@@ -322,6 +330,59 @@ func _draw_street(kind: int, stage: int) -> void:
 		Art.image(self,"street-day-%d" % posmod(period-1,8),Rect2(Art.STREET_RECT))
 	Art.image(self,"street-day-%d" % period,Rect2(Art.STREET_RECT),Color(1,1,1,blend))
 	StreetView.draw_traffic(self,StreetView.activity(street_state),clock,true,kind==0 and stage==3)
+
+static func customer_home(kind: int, slot: int) -> Vector2:
+	var columns := [300,440,580,370,510,650,720,790]
+	var row := slot/8
+	return Vector2(columns[slot%8]+(15 if row%2 else 0),366-row*9 if kind==2 else 362-row*19)
+
+static func customer_pool_foot(bar: Dictionary, guest: Dictionary, home: Vector2) -> Vector2:
+	if guest.playing:
+		for game in bar.games:
+			var player: int = game.players.find(guest.id)
+			if player>=0: return Vector2(250+int(game.get("table",0))*200+player*205,355+int(game.get("table",0))*12)
+	return home
+
+func update_customer_motion(delta: float) -> void:
+	if not is_same(motion_street,street_state):
+		customer_motion.clear()
+		motion_street = street_state
+		motion_selected = -1
+	if bars.is_empty() or selected_bar>=bars.size(): return
+	var changed_view := motion_selected!=selected_bar
+	motion_selected = selected_bar
+	var bar: Dictionary = bars[selected_bar]
+	var key := str(bar.get("name",selected_bar))
+	if not Economy.trading(bar,int(street_state.get("minute",720))):
+		customer_motion.erase(key)
+		return
+	var first_view := not customer_motion.has(key)
+	if first_view: customer_motion[key] = {}
+	var records: Dictionary = customer_motion[key]
+	var ids: Array = bar.customers.map(func(g: Dictionary) -> int: return int(g.id))
+	for id in records.keys():
+		if not ids.has(id): records.erase(id)
+	var occupied := {}
+	for record in records.values(): occupied[int(record.slot)] = true
+	for i in bar.customers.size():
+		var guest: Dictionary = bar.customers[i]
+		var id := int(guest.id)
+		if not records.has(id):
+			var slot := 0
+			while occupied.has(slot): slot += 1
+			occupied[slot] = true
+			var home := customer_home(int(bar.type),slot)
+			var foot := customer_pool_foot(bar,guest,home) if first_view or changed_view else Vector2(242,362)
+			records[id] = {"slot":slot,"foot":foot,"direction":Vector2.ZERO,"moving":false}
+		var record: Dictionary = records[id]
+		var target := customer_pool_foot(bar,guest,customer_home(int(bar.type),int(record.slot)))
+		var offset: Vector2 = target-record.foot
+		record.moving = offset.length()>.5
+		if record.moving:
+			record.direction = offset.normalized()
+			record.foot = record.foot.move_toward(target,maxf(0.0,delta)*52.0)
+		else:
+			record.foot = target
 
 func scene_people(bar: Dictionary) -> Array:
 	var people: Array = []
@@ -375,18 +436,8 @@ func scene_people(bar: Dictionary) -> Array:
 
 	var crowd: int = bar.customers.size() if bar.has("customers") else mini(8,guests)
 	for i in crowd:
-		# Fill spaced positions first; busy venues add staggered rows. All slots
-		# stay inside the doorway and above the property dock (scene y=373).
-		var columns := [300,440,580,370,510,650,720,790]
-		var row := i/8
-		var foot := Vector2(columns[i%8]+(15 if row%2 else 0),362-row*19)
-		if kind==2:
-			# Keep guests off the raised performance stage.
-			foot.y = 366-row*9
-		if bar.has("customers") and bar.customers[i].playing:
-			for game in bar.games:
-				var player: int = game.players.find(bar.customers[i].id)
-				if player>=0: foot = Vector2(250+int(game.get("table",0))*200+player*205,355+int(game.get("table",0))*12)
+		var foot := customer_home(kind,i)
+		if bar.has("customers"): foot = customer_pool_foot(bar,bar.customers[i],foot)
 		var customer_id: int = int(bar.customers[i].id) if bar.has("customers") else i+1
 		var appearance := Art.customer_sprite(customer_id,str(bar.customers[i].get("appearance","")) if bar.has("customers") else "")
 		var pose: int = appearance[1]
@@ -402,6 +453,28 @@ func scene_people(bar: Dictionary) -> Array:
 		elif appearance[0]=="patrons-rainbow-duo" and duo_reaction.get("id",-1)==customer_id and clock<float(duo_reaction.get("until",0.0)):
 			pose = 1
 		people.append({"who":appearance[0],"pose":pose,"foot":foot,"flip":customer_id%2==0,"order":bar.has("customers") and bar.customers[i].order,"customer":true,"customer_id":customer_id,"chat_until":bar.customers[i].get("chat_until",0.0) if bar.has("customers") else 0.0,"behind_bar":false})
+		var person: Dictionary = people.back()
+		var guest: Dictionary = bar.customers[i] if bar.has("customers") else {}
+		var state := "pool" if guest.get("playing",false) else "chat" if float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0))<float(guest.get("chat_until",0)) else "drinking" if guest.get("visit_phase","")=="drinking" else "idle"
+		var records: Dictionary = customer_motion.get(str(bar.get("name",selected_bar)),{})
+		if records.has(customer_id):
+			var record: Dictionary = records[customer_id]
+			person.foot = record.foot
+			if record.moving:
+				var direction: Vector2 = record.direction
+				state = ("walk_front" if direction.y>0 else "walk_back") if absf(direction.y)>absf(direction.x) else "walk"
+				person.flip = state=="walk" and direction.x<0
+		# Keep companion idle reactions and sunglasses exactly as authored.
+		# A kiss is allowed only while stationary; it never interrupts a walk.
+		var kissing: bool = appearance[0]=="patrons-rainbow-duo" and pose==1
+		var keep_idle: bool = state=="idle" and (appearance[0] in ["patrons-capybara","patrons-rainbow-duo"] or (appearance[0]=="patrons-men" and int(appearance[1])==Art.COBALT_IDLE))
+		if not keep_idle and not (kissing and not state.begins_with("walk")):
+			var motion_id := Art.customer_motion_id(appearance)
+			if not motion_id.is_empty():
+				person.draw_who = motion_id
+				person.draw_pose = Art.animation_frame(motion_id,state,clock+customer_id*.19,8)
+				if not state.begins_with("walk"): person.flip = customer_id%2==0
+		person.motion_state = state
 		people.back().visit_phase = bar.customers[i].get("visit_phase","legacy") if bar.has("customers") else "legacy"
 		people.back().costume = bar.has("customers") and bar.customers[i].get("costume",false)
 		people.back().order_seconds_left = Economy.order_seconds_left(bar,bar.customers[i]) if bar.has("customers") else Content.PATIENCE_SECONDS

@@ -1,0 +1,47 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production sprite sheet for Pattaya After Hours, preserve exact adult Indian clubgoer in reference: warm brown skin, swept dark wavy hair, neatly trimmed full short beard, plum purple open-neck collared shirt sleeves rolled to elbows, tailored charcoal trousers, black belt gold buckle, gold wristwatch, oxblood polished loafers. Same recognizable face/build/outfit all 16 frames. Crisp detailed illustrated pixel art, plum outlines, clustered shading, warm amber highlights; six-head adult proportions. EXACT four columns and four rows, equal cells, 16 isolated FULL BODY figures same scale, generous TRANSPARENT PADDING on every edge, no cropping heads/shoes/cue and no cell overlap. Row 1 SIDE walking RIGHT four clear alternating gait phases left stride, passing, right stride, opposite passing with opposite arm swings. Row 2 FRONT walking toward camera, four different alternating foot/arm phases. Row 3 BACK walking away, four different gait phases, back of head and shirt no faces. Row 4 three-quarter facing RIGHT: idle empty hands; beer glass at mouth drinking; open-hand conversational gesture; holding diagonal upward pool cue fully within cell with no table. Actual transparent alpha canvas, no backdrop, floor, shadow, glow, labels, text, gridlines, extra people or changed clothing. Feet grounded on same baseline per row; not chibi or photography.",
+  "reference": "art/sources/customer-plum-club.png",
+  "source": "art/sources/customer-plum-club-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-9e82552b-6d0e-454c-8d34-747ddff8dcfc.png",
+  "columns": [
+    0,
+    256,
+    512,
+    768,
+    1024
+  ],
+  "rows": [
+    0,
+    380,
+    760,
+    1140,
+    1536
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": 12,
+    "drinking": 13,
+    "chat": 14,
+    "pool": 15
+  },
+  "model_version": null,
+  "seed": null
+}

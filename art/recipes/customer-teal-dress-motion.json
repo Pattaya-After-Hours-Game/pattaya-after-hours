@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Asset: production transparent 16-frame animation sprite sheet for Pattaya After Hours Godot game. Reference image is exact existing adult Thai woman's identity, proportions, outfit, colors, face, hair, accessories AND illustrated pixel-art rendering style. Preserve shoulder-length dark bob, teal wrap summer dress with cream flower/palm patterns at hem, tan sandals, round woven tan shoulder bag, necklace, watch and earrings consistently. Crisp plum outlines, clustered painted-pixel shading, warm amber light, six-head adult proportions, not chibi, not photorealistic. EXACT 4 columns by 4 rows evenly spaced equal cells on transparent canvas, no labels/lines/text. Each cell ONE full body woman, identical size, generous transparent gutters. No cropping head/shoes/cue, no overlap across cells. Feet common baseline each row. True alpha, no scenery/floor/shadows/backdrop/checkerboard. Row 1 SIDE profile walking RIGHT four distinct phases: left foot extended, passing under hips, right foot extended, opposite passing; opposite arm swings, no carried glass. Row 2 FRONT walking toward viewer four alternating gait phases. Row 3 BACK walking away four alternating gait phases, back of hair and dress, no face. Row 4 front three-quarter RIGHT: idle; beer glass touching mouth drinking; open hand conversation; holding pool cue diagonally up entirely in cell, no table. Same adult woman every cell; preserve face, clothes, bag, dress pattern. Exactly sixteen complete isolated sprites, four in each of four rows.\nCRITICAL LAYOUT: Render on a large canvas with outer transparent margins at least 50 pixels on EVERY edge and at least 40 pixels between rows. Draw each figure SMALLER so all hair and sandal soles have clear empty alpha around them. No sprite can touch top or bottom image border. The reference image is ONLY identity and style; return the specified 4 by 4 sprite sheet, full body.",
+  "reference": "art/sources/patrons-1.png",
+  "source": "art/sources/customer-teal-dress-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-b390be30-d025-448e-93de-9048d0edf8c6.png",
+  "columns": [
+    0,
+    300,
+    600,
+    900,
+    1199
+  ],
+  "rows": [
+    0,
+    329,
+    645,
+    958,
+    1312
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": [
+      12
+    ],
+    "drinking": [
+      13
+    ],
+    "chat": [
+      14
+    ],
+    "pool": [
+      15
+    ]
+  },
+  "notes": "First generation clipped top/bottom; selected second generation adds margins. Alpha cutoff 160 cleans semitransparent fringe in normal project packing.",
+  "seed": null,
+  "model_version": null
+}

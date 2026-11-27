@@ -1,5 +1,27 @@
 # Current implementation and release handoff
 
+## Full customer animation cast — 27 November 2026
+
+Fourteen new reference-preserving sixteen-frame sheets complete all fifteen
+existing customer identities alongside the charcoal guest. Side/front/rear
+walks and idle/drinking/Chat/pool poses are packed into forty-two new runtime
+atlases. Original images, companion idle/kiss/sunglasses reactions and saved
+identities remain intact. Exact built-in ImageGen prompts and source cuts are
+committed with a deterministic scoped packer and review tool.
+
+The visible room now interpolates real arrivals and pool transitions, keeps
+surviving guests in stable floor slots and hit-tests their displayed frames.
+Orders stay immediately serviceable while walking. Street traffic rotates
+through the full cast within its existing density caps. All position caches are
+presentation-only; no economy, save, RNG or progression rules change.
+
+The full isolated `tools/test.sh` passed with zero failures, including pacing.
+All new sheets/alpha edges and 83 in-engine views at each of two resolutions
+were reviewed; deterministic repacking preserves every original production PNG.
+See [verification](TESTING.md#full-customer-animation-cast--27-november-2026).
+Device play and release publication remain unverified.
+
+
 ## Shared notification badges — 27 November 2026
 
 All tab notifications now use `scripts/status_badge.gd`: green numeric counts,

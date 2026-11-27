@@ -862,5 +862,341 @@
       256
     ],
     "sha256": "5912393a9425a2eaf7b6df2769270614e077bdf9ba77b1a1bf609e50fc2d13f6"
+  },
+  "customer-motion-sunfaded-regular": {
+    "file": "res://assets/art/customer-motion-sunfaded-regular.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "948053cf8f898e48262e7a877c823917e71ca8de4f205ad78f95c752874a8e94"
+  },
+  "street-customer-sunfaded-regular": {
+    "file": "res://assets/art/street-customer-sunfaded-regular.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "480cbe3cc687dd0932fb0ba4d22ca8ee0298af276bfd5032c32d6a688adac5b9"
+  },
+  "street-customer-sunfaded-regular-depth": {
+    "file": "res://assets/art/street-customer-sunfaded-regular-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "75d3bf897e0878f5dd74ddb2896e990c10cbcb1607da0c50fcf2310b528b58e4"
+  },
+  "customer-motion-silver-polo": {
+    "file": "res://assets/art/customer-motion-silver-polo.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "69bf1b032c6a767ce43218505809c93fceeee45e88dbeb50459b069b109644fc"
+  },
+  "street-customer-silver-polo": {
+    "file": "res://assets/art/street-customer-silver-polo.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "931f3608590a995d5194adcfb56ccccb9724d60f42e1d883d61aa0531bc36efd"
+  },
+  "street-customer-silver-polo-depth": {
+    "file": "res://assets/art/street-customer-silver-polo-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "da72ac40db8424230486a6c7e559c4ecfb8b2b8de58cd96153b63b3c630b5695"
+  },
+  "customer-motion-ivory-club": {
+    "file": "res://assets/art/customer-motion-ivory-club.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "8bd95e9cba7f59a4fb8164d8902ff06a3886efd98d96c2ce72eaf629d505bcd7"
+  },
+  "street-customer-ivory-club": {
+    "file": "res://assets/art/street-customer-ivory-club.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "0fbaf9614a1f02d6178ff3cf3d383f323a77c21e40f2fc194067b21531eb9386"
+  },
+  "street-customer-ivory-club-depth": {
+    "file": "res://assets/art/street-customer-ivory-club-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "3f97829d409ca60749c81d852d9019a013d2f07b00f2acbc4b7bdb5e3aa334bb"
+  },
+  "customer-motion-cobalt-evening": {
+    "file": "res://assets/art/customer-motion-cobalt-evening.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "534c12d7a658a416fe24ff06d0d341dda5f2557373d46f10f1c3be6bb0b7b117"
+  },
+  "street-customer-cobalt-evening": {
+    "file": "res://assets/art/street-customer-cobalt-evening.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "de88b68e76dbf94e9d544a3cf0b0d50a4c359cba3a2a059bb5a78200dfa2e208"
+  },
+  "street-customer-cobalt-evening-depth": {
+    "file": "res://assets/art/street-customer-cobalt-evening-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "9d723b2a46ce4b6b662887eb5f5c95f0db0d3eeb86770f83195eba012d2c124b"
+  },
+  "customer-motion-teal-dress": {
+    "file": "res://assets/art/customer-motion-teal-dress.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "8e32baa80e417ea0536da3320ec59dac35d275e24199492a5aca9fe6ef56d89c"
+  },
+  "street-customer-teal-dress": {
+    "file": "res://assets/art/street-customer-teal-dress.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "75a91028b6663d902b42275745eb5d60adce431385555ae38cb8c4c533b0c1b2"
+  },
+  "street-customer-teal-dress-depth": {
+    "file": "res://assets/art/street-customer-teal-dress-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "0ecf144b054d930354880c3f037bd62bf8b69699ee91dd954bc9e7ed17a39b44"
+  },
+  "customer-motion-gold-blouse": {
+    "file": "res://assets/art/customer-motion-gold-blouse.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "d0e3d829fe28d07e42acaf78e1ab0bc519850bf992303c480664a90932d2c78d"
+  },
+  "street-customer-gold-blouse": {
+    "file": "res://assets/art/street-customer-gold-blouse.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "91df6306df0ff3a5329c501dcc2a87eb94bf665663f6ff0eca7d609e3e040b12"
+  },
+  "street-customer-gold-blouse-depth": {
+    "file": "res://assets/art/street-customer-gold-blouse-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "2f132bf7c617801b42e075a511f67cc3412d2ff81f3624553bcbdd903100e055"
+  },
+  "customer-motion-maroon-casual": {
+    "file": "res://assets/art/customer-motion-maroon-casual.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "c3f85e034f69aea2984eb849466c36294e8db55d19dd320a222aa71c66187798"
+  },
+  "street-customer-maroon-casual": {
+    "file": "res://assets/art/street-customer-maroon-casual.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "ce1b955c0503fef4dd11760eaf7e921fe21b8a1a51df0cf9d5d3ad8cddd840bc"
+  },
+  "street-customer-maroon-casual-depth": {
+    "file": "res://assets/art/street-customer-maroon-casual-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "6b83a2e11331625a49822d03b9d9f2b4fe9b130dd556f064b6317a5fe9390321"
+  },
+  "customer-motion-plum-club": {
+    "file": "res://assets/art/customer-motion-plum-club.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "df62cc3c2534a57d3eea3b31a9ce20ed469e4f30dc84af602782c2c1ffd687ad"
+  },
+  "street-customer-plum-club": {
+    "file": "res://assets/art/street-customer-plum-club.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "0def5d811239ecf876b19f6e091b32088a4f75a0e96715e74631205de981a0d5"
+  },
+  "street-customer-plum-club-depth": {
+    "file": "res://assets/art/street-customer-plum-club-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "071ae49a4796b72bfb8b19bd2e52fcdb4e80924ef5d5c93f66fe2fa16acc97b3"
+  },
+  "customer-motion-amber-local": {
+    "file": "res://assets/art/customer-motion-amber-local.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "c3ee9aa410037d8770722c38f9bdc8cbd5de88b174dab2cf3b39974005256ba1"
+  },
+  "street-customer-amber-local": {
+    "file": "res://assets/art/street-customer-amber-local.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "26554e745f399be97fcf2d02604623185282fad4e675669a072cc5230b618a68"
+  },
+  "street-customer-amber-local-depth": {
+    "file": "res://assets/art/street-customer-amber-local-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "d1a59bbfe54d5277ec7804b45df43ec3ff4d81440b10f6af8bc21bbb727d6174"
+  },
+  "customer-motion-beard-glasses": {
+    "file": "res://assets/art/customer-motion-beard-glasses.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "b98da93fcbee2b120ee7143339a96542495b7d61eeaa205dd5c0bdc4d2390f77"
+  },
+  "street-customer-beard-glasses": {
+    "file": "res://assets/art/street-customer-beard-glasses.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "098d55a8090abc5eef8772860b701fec6c52d192a5ff0598fd1d5e9da716a5c5"
+  },
+  "street-customer-beard-glasses-depth": {
+    "file": "res://assets/art/street-customer-beard-glasses-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "0e4375374f145b6467a85519beca3728610a3de377323098c22711246a5c3361"
+  },
+  "customer-motion-capybara": {
+    "file": "res://assets/art/customer-motion-capybara.png",
+    "size": [
+      1024,
+      768
+    ],
+    "sha256": "bab516209138e6534e9bfd1ef86e3f41d083a565a34dd706e29727adad4fbe66"
+  },
+  "street-customer-capybara": {
+    "file": "res://assets/art/street-customer-capybara.png",
+    "size": [
+      768,
+      128
+    ],
+    "sha256": "5e76409d9f36c1735d8e6610248773aa9dea20fddcf035bc4a359885260e6ffb"
+  },
+  "street-customer-capybara-depth": {
+    "file": "res://assets/art/street-customer-capybara-depth.png",
+    "size": [
+      768,
+      256
+    ],
+    "sha256": "eb204b2404d94bb96aa5f5fab0c44eba989810ddee87f766253b7ac0cb743bcd"
+  },
+  "customer-motion-navy-tourist": {
+    "file": "res://assets/art/customer-motion-navy-tourist.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "ff03ca3e3b2a179087c1477b1a9d8cc2b8a3ba0b8628387fabd44dfcd0d926ba"
+  },
+  "street-customer-navy-tourist": {
+    "file": "res://assets/art/street-customer-navy-tourist.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "7c2071cae9c5bfea8c454476de1450f262277943538e2d3ceda4650dd1935960"
+  },
+  "street-customer-navy-tourist-depth": {
+    "file": "res://assets/art/street-customer-navy-tourist-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "18b6d5c2c1ebc77a1135bb8d28890b0b1c626ac7b0ff97f05e36e91e95f34c8f"
+  },
+  "customer-motion-sage-holiday": {
+    "file": "res://assets/art/customer-motion-sage-holiday.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "fa3b4afcf1169672b8b8f8846b868f1763a3d2a1b8aaa8528ce7003f48f887a7"
+  },
+  "street-customer-sage-holiday": {
+    "file": "res://assets/art/street-customer-sage-holiday.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "cd326e8b3405ee155e5bc3a0aada1cea90b1ab6c8e48b6da983f27eed739574c"
+  },
+  "street-customer-sage-holiday-depth": {
+    "file": "res://assets/art/street-customer-sage-holiday-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "29470d23890571a0f0790d616a52892196b3aea2d72a8a09341660151400efc5"
+  },
+  "customer-motion-rainbow-duo": {
+    "file": "res://assets/art/customer-motion-rainbow-duo.png",
+    "size": [
+      1152,
+      768
+    ],
+    "sha256": "e09aa0df3c3a9f1c4746e015a6c38929faafbb3d3c9f4dd72d45ea53a7b561e5"
+  },
+  "street-customer-rainbow-duo": {
+    "file": "res://assets/art/street-customer-rainbow-duo.png",
+    "size": [
+      768,
+      128
+    ],
+    "sha256": "f218d93fa347c40fb3c1adbd201a002c6a3927d4457666ee08f50ec4ba35d9f5"
+  },
+  "street-customer-rainbow-duo-depth": {
+    "file": "res://assets/art/street-customer-rainbow-duo-depth.png",
+    "size": [
+      768,
+      256
+    ],
+    "sha256": "adc51b65c5419b5837c17caee7d5fe9909dc9f14fec8c53a403c2fd59963eca4"
   }
 }

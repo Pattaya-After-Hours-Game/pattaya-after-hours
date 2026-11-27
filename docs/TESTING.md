@@ -1,5 +1,39 @@
 # Testing and release checks
 
+## Full customer animation cast — 27 November 2026
+
+The complete isolated `tools/test.sh` passed on pinned Godot 4.7.2 with zero
+failures, including all gameplay/save/UI/art regressions and pacing suites.
+`customer_motion_check.gd` covers all fifteen catalog identities, real
+model-driven action poses, stable floor positions after queue reordering,
+interpolated arrival and pool movement, immediate service eligibility while
+walking, closure and campaign reset, and complete campaign/RNG purity.
+Existing companion pointer/touch reactions and charcoal save checks still pass.
+
+Art integrity covers all forty-two new runtime atlases, all nonempty transparent
+cells, bounds and manifest hashes. Street checks now exercise nineteen walker
+identities plus both scooters and the car in front/rear views, with unchanged
+activity limits and deterministic paths. Two scoped packing runs produced
+identical hashes for every new atlas. Existing production PNGs remain unchanged.
+
+`preview_customer_motion.gd` produced 83 views each at 960×540 and 1280×720:
+bar actions across all three venue types, arrival and pool-walk sequences,
+closure, district walking and bar depth traffic. Runtime sheets and alpha edges
+were reviewed on light/dark backgrounds. Direction cycles share a body scale
+within each row and normalize to the same adult height between directions.
+
+```sh
+PATTAYA_PREVIEW_SCRIPT=tests/preview_customer_motion.gd tools/preview-art.sh /tmp/pattaya-customer-motion
+python3 tools/review_customer_motion.py /tmp/pattaya-customer-review
+```
+
+[Cast animation](customer-walks.gif) · [Arrival in the bar](customer-arrival.gif).
+Built-in image generation prompts and source receipts are in
+[the art guide](../art/README.md#full-customer-animation-cast--27-november-2026).
+Target-device play remains unverified; these checks do not establish release
+publication.
+
+
 ## Shared notification badges — 27 November 2026
 
 Service upgrade counts, Events warnings and Tours counts/alerts use the same

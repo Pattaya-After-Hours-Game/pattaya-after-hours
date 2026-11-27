@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent game animation sprite sheet for Pattaya After Hours. Reference is exact adult man AND his capybara companion identity, clothing and rendering style. Preserve broad face, tousled swept salt-and-pepper hair, full white/grey beard, olive skin, black T-shirt with tiny pale abstract chest mark, dark blue knee shorts and black trainers; his tawny knee-high capybara wears teal harness with thin burgundy leash connected to man's lowered hand. Same proportions, identity, costumes all cells. Illustrated pixel-painted style, crisp plum outlines clustered shading warm amber light, not photo/chibi. EXACTLY 4 columns by 4 rows evenly spaced equal WIDE cells. SIXTEEN full-body GROUPS, each group exactly ONE man AND ONE capybara, both fully visible. Generous transparent gutters, outer margins; keep every head/shoe/paw/leash/cue fully within cell. Render smaller to allow wide group in each cell. True transparent alpha, no background/floor/shadow/checkerboard/text/labels/grid. Row1 FOUR groups walking SIDE profile toward RIGHT: left stride, passing, right stride, passing; man natural opposite arm swing while holding leash, capybara natural four-legged walk alongside. Row2 FOUR groups FRONT walking toward viewer, distinct alternating gait phases; man and capybara beside each other. Row3 FOUR groups BACK walking away, distinct alternating gait phases, show rear of man and capybara, no faces. Row4 FOUR front three-quarter RIGHT stationary groups: man idle; man drinking beer glass at mouth; man open-hand conversation; man holding pool cue upward entirely inside cell, no table. Capybara remains beside man at knee height naturally standing in all bar poses. Animal never holds drink or cue, never anthropomorphic. Leash connected to teal harness and held by man in every cell. Exactly 16 complete isolated groups, four in each row, consistent adult scale and floor baseline.",
+  "reference": "art/sources/customer-capybara.png",
+  "source": "art/sources/customer-capybara-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-753b8d8b-829c-4a36-b436-dd9b7c832695.png",
+  "columns": [
+    0,
+    328,
+    656,
+    984,
+    1312
+  ],
+  "rows": [
+    0,
+    301,
+    603,
+    892,
+    1199
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": [
+      12
+    ],
+    "drinking": [
+      13
+    ],
+    "chat": [
+      14
+    ],
+    "pool": [
+      15
+    ]
+  },
+  "seed": null,
+  "model_version": null
+}

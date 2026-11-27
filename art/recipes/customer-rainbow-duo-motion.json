@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent 16-frame game sprite sheet for Pattaya After Hours. Image reference EXACT existing composed group: TWO adult men and ONE small orange fluffy dog held in arms of shorter man. Preserve both distinct people and their height difference in EVERY cell: left shorter stocky adult with brown swept hair, dark beard and rectangular black glasses, open short-sleeved rainbow shirt over charcoal tee, blue jean shorts and brown sandals, carrying orange fluffy dog; right taller broad ginger adult with tousled ginger hair/full beard, open orange/navy plaid shirt with little bear pocket over grey rainbow-stripe tee, navy cargo shorts and black sandals. Same faces, outfits, colors and identities all poses. Dog held safely in shorter man's arms in ALL walking/standing views. Tall man performs drink/chat/pool actions, shorter man continues holding dog. Crisp outlined illustrated painted pixel-art matching reference, warm amber highlights, plum shadows, not photo/chibi. EXACT 4 columns 4 rows equal WIDE cells; sixteen isolated GROUPS, each contains both full-body men AND one orange dog; no extra people. Generous transparent gutters and outer margin. Draw groups SMALLER to fit wide cells without clipping ANY hair/shoe/limb/cue. No overlaps between cells. Genuine alpha transparency with no backdrop/scenery/floor/shadow/checkerboard/grid/text. Row1 four groups SIDE profile walking RIGHT: left stride, passing under hips, right stride, opposite passing, natural leg gait. Dog remains carried. Row2 four groups FRONT walking toward viewer with distinct alternating gait phases. Row3 four groups BACK walking away with distinct alternating gait phases, back of both hair/shirts, no faces. Row4 four stationary three-quarter RIGHT groups: both idle; taller man drinking beer glass at mouth while shorter holds dog; taller open-hand conversation gesture while shorter holds dog; taller holds pool cue diagonally upward fitting cell, no table, shorter holds dog. Both adults always visible from complete head to complete sandal sole and dog in every cell. Exact same recognizable group all 16. Transparent margin between groups and edge is essential.",
+  "reference": "art/sources/customer-rainbow-duo.png",
+  "source": "art/sources/customer-rainbow-duo-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-77811525-f753-4a1c-8aa0-55663f735407.png",
+  "columns": [
+    0,
+    384,
+    768,
+    1152,
+    1536
+  ],
+  "rows": [
+    0,
+    254,
+    509,
+    764,
+    1024
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": [
+      12
+    ],
+    "drinking": [
+      13
+    ],
+    "chat": [
+      14
+    ],
+    "pool": [
+      15
+    ]
+  },
+  "notes": "Dog is carried by shorter man as in existing production source. Taller man performs bar interactions. Transparent RGB contains brown backdrop colors but alpha is zero outside silhouettes; normal alpha threshold160 produces clean isolated cutouts.",
+  "seed": null,
+  "model_version": null
+}

@@ -66,11 +66,21 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 				id += "-depth"
 				# Front/rear are authored views, never mirrored side profiles.
 				# Change identity only at the invisible end of a crossing.
-				var identities: int = [5,2,1][kind]
-				var identity := posmod(i/2+cycle,identities)
+				var identities: int = [5+Art.CUSTOMER_MOTION_NAMES.size(),2,1][kind]
+				var identity := posmod(i/2+cycle*3,identities)
 				charcoal = kind==0 and identity==4
 				row = (0 if charcoal else identity)*2+(0 if forward else 1)
-			if charcoal:
+			var customer_index := -1
+			if kind==0:
+				var identity := posmod(i/2+cycle*3,5+Art.CUSTOMER_MOTION_NAMES.size())
+				if not closeup:
+					charcoal = identity==4
+					row = identity if identity<4 else 0
+				if identity>=5: customer_index = identity-5
+			if customer_index>=0:
+				id = "street-customer-"+Art.CUSTOMER_MOTION_NAMES[customer_index]+("-depth" if closeup else "")
+				row = (0 if forward else 1) if closeup else 0
+			elif charcoal:
 				id = "street-charcoal-depth" if closeup else "street-charcoal"
 				if not closeup: row = 0
 			var frame := row*4+posmod(int(time*(7 if kind==0 else 5))+i,4)

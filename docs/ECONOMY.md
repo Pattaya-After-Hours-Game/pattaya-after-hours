@@ -3,7 +3,10 @@
 The charcoal-suited supplied-reference guest uses ordinary admission, budgets,
 orders, paid stock, service and pool rules. His optional saved appearance is
 assigned only to new visits without RNG; existing visits keep their old looks.
-Art reads drinking, Chat deadlines and active pool state without settling sales.
+All fifteen customer identities have model-driven drinking, Chat and pool poses.
+Their arrival/pool movement is a disposable visual interpolation; orders remain
+serviceable while walking. Animation never changes admission, timers, budgets,
+stock, finances, saves or gameplay RNG.
 
 The current account and growth rules are defined in
 [Finance and growth](design/FINANCE_AND_GROWTH.md). Schema 16 replaces shared

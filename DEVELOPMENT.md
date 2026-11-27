@@ -8,6 +8,14 @@ Chat deadline and active pool state for poses. Packing and provenance are in
 [the art guide](art/README.md); `charcoal_guest_check.gd` covers save preservation
 and read-only presentation. Outdoor walkers remain ambient traffic, not admissions.
 
+All existing customer identities now map to expanded sixteen-frame sheets via
+`Art.customer_motion_id`. `city.update_customer_motion` owns only transient
+visual positions/slots; `scene_people` remains a read of business state.
+Arrival/pool walks do not hold up service or retain departed customers. Scene
+hit testing uses the displayed atlas and frame. Source receipts, authored crop
+cuts and deterministic packing are documented in [the art guide](art/README.md).
+`customer_motion_check.gd` covers position continuity and presentation purity.
+
 For the premise and cast, see [story.md](story.md). For gameplay help, see the
 [player guide](docs/PLAYER_GUIDE.md). [Testing and release checks](docs/TESTING.md)
 records coverage and remaining platform verification.

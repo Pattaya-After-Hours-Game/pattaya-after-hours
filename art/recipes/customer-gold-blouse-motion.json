@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent 16-frame animation sprite sheet for Pattaya After Hours Godot game. Reference is exact existing adult woman's identity/style. Preserve wavy shoulder-length brown hair, warm tan skin, mustard-gold short sleeve collared blouse with front pockets, olive belted cargo shorts, brown leather shoulder satchel across torso, brown strapped sandals, gold hoop earrings, watch and sunglasses hanging at neckline. Hands EMPTY except row4 beer and cue; no map. Preserve face/proportions/outfit colors in every cell. Crisp plum outlines, clustered pixel-painted illustrated shading, warm amber light, six-head adult proportions, not chibi/photo. EXACT 4 columns 4 rows equal cells. Sixteen complete isolated full-body figures at same size, generous transparent gutters and at least 50px transparent outer margins all edges. No head/shoes/cue cropping; no overlaps. True alpha transparency, no background/checkerboard/scenery/floor/shadows/grid/text. Row1 four SIDE-profile walking RIGHT phases: left stride, passing under hips, right stride, opposite passing. Natural opposite arm swing. Row2 four FRONT walks toward viewer alternating gait phases. Row3 four BACK walks away alternating gait phases, back hair/clothes, no face. Row4 front three-quarter RIGHT poses: standing idle; beer glass touching mouth; friendly open-hand conversation gesture; holding pool cue diagonally up fully inside cell without table. Same adult woman all sixteen cells. Render smaller with clear empty alpha between every sprite and image edges. Feet on common baseline per row.",
+  "reference": "art/sources/patrons-3.png",
+  "source": "art/sources/customer-gold-blouse-motion.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-2dcda6ea-4a27-499d-a366-fc02f0791b45.png",
+  "columns": [
+    0,
+    304,
+    608,
+    913,
+    1217
+  ],
+  "rows": [
+    0,
+    318,
+    638,
+    957,
+    1293
+  ],
+  "frames": {
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": [
+      12
+    ],
+    "drinking": [
+      13
+    ],
+    "chat": [
+      14
+    ],
+    "pool": [
+      15
+    ]
+  },
+  "seed": null,
+  "model_version": null
+}
