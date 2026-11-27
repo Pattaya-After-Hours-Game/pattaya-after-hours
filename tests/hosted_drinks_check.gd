@@ -183,6 +183,7 @@ func run_ui(test: SceneTree) -> void:
 	test.check(b.shift.hosted_income==220,"Normal Serve button fulfills the sponsored drink order")
 	app.root_ui.find_child("ManageHosts",true,false).pressed.emit()
 	test.check(app.service_section=="team","Good Company manage arrow opens the Team controls")
+	test.use_button(app,"Host settings  ›")
 	test.use_button(app,"Auto-host rounds · ฿1,500")
 	test.check(b.auto_host_drinks,"Service exposes the paid auto-host upgrade")
 	app.queue_free()

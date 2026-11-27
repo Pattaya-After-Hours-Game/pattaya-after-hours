@@ -112,15 +112,26 @@ func run_ui(test: SceneTree) -> void:
 	app.model.s.cash = 10000
 	app.change_tab(0)
 	test.use_button(app,"Team")
+	test.use_button(app,"Hire floor staff  ›")
 	test.use_button(app,"Hire Gabby · ฿1,200")
 	var b: Dictionary = app.model.street.selected()
 	test.check(b.team.size()==1 and b.team[0].identity=="gabby" and app.model.s.cash==8800,"Gabby's visible hiring button uses the paid model action")
-	test.use_button(app,"Gabby · On duty")
+	app.model.s.street.hiring_seed = 100 # Common recruit for the roster fixture.
+	test.use_button(app,"Hire bartender · ฿1,200")
+	var roster_before := JSON.stringify(app.model.s)
+	test.use_button(app,"Back")
+	test.check(app.column.find_child("TeamMember_0",true,false)!=null and app.column.find_child("TeamMember_1",true,false)!=null,"The roster shows both workers as compact entries")
+	test.use_button(app,"Bartender 2 · On duty  ›")
+	test.check(app.team_member==1 and app.column.find_child("TeamMember_0",true,false)==null,"Only the selected worker’s controls are shown")
+	test.use_button(app,"Back")
+	test.use_button(app,"Gabby · On duty  ›")
+	test.check(app.team_member==0 and JSON.stringify(app.model.s)==roster_before,"Opening details and going back leave the campaign untouched")
+	test.use_button(app,"Go off duty")
 	test.check(not b.team[0].on,"Gabby's named rota control updates her own slot")
 	b.team[0].contract_left = 0
 	app.render()
 	test.use_button(app,"Rehire Gabby · ฿1,200")
-	test.check(b.team[0].on and b.team[0].contract_left==14400 and b.team.size()==1,"Gabby's visible renewal reuses her existing slot")
+	test.check(b.team[0].on and b.team[0].contract_left==14400 and b.team.size()==2 and b.team[1].on,"Gabby's visible renewal reuses her existing slot")
 	app.queue_free()
 	await test.process_frame
 	for path in [Campaign.SAVE,Campaign.BACKUP]:

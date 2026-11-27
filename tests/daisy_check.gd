@@ -80,10 +80,13 @@ func run_ui(test: SceneTree) -> void:
 	app.model.s.street.chapter = 2
 	load("res://tests/finance_fixture.gd").buy(app.model.street,1)
 	app.open_service_section("team")
+	test.use_button(app,"Hire floor staff  ›")
 	test.use_button(app,"Hire Daisy · ฿4,500")
 	var b: Dictionary = app.model.street.selected()
 	test.check(b.team.size()==1 and b.team[0].host==C.DAISY_HOST,"Daisy's visible hire control purchases her host contract")
-	test.use_button(app,"Daisy · On duty")
+	test.use_button(app,"Back")
+	test.use_button(app,"Daisy · On duty  ›")
+	test.use_button(app,"Go off duty")
 	test.check(not b.team[0].on,"Daisy's named rota works")
 	b.team[0].contract_left = 0
 	app.render()

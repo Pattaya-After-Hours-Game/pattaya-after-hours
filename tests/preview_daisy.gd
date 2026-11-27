@@ -18,11 +18,12 @@ func run() -> void:
 	app.model.s.rep = 100
 	app.model.s.street.chapter = 2
 	load("res://tests/finance_fixture.gd").buy(app.model.street,1)
-	app.open_service_section("team")
+	app.open_team_page("hire")
 	app.drawer_open = true
 	await capture(app,"daisy-hire","Hire Daisy")
 	app.model.street.action("hire_daisy")
-	await capture(app,"daisy-roster","Daisy · On duty")
+	app.open_team_page("member",0)
+	await capture(app,"daisy-roster")
 	app.model.street.action("hire_gabby")
 	var b: Dictionary = app.model.street.selected()
 	app.drawer_open = false
@@ -45,7 +46,7 @@ func run() -> void:
 	app.drawer_open = true
 	await capture(app,"daisy-renewal","Rehire Daisy")
 	app.model.street.action("rehire",0)
-	await capture(app,"daisy-returned","Daisy · On duty")
+	await capture(app,"daisy-returned")
 	app.queue_free()
 	await process_frame
 	quit()

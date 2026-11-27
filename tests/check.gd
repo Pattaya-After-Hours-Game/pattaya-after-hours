@@ -225,8 +225,9 @@ func test_ui() -> void:
 	var hiring: Dictionary = app.model.street.economy.hire_offer(bar,0)
 	app.model.s.cash = hiring.required-1
 	use_button(app,"Team")
+	use_button(app,"Hire floor staff  ›")
 	var hire := find_button(app,"Hire bartender · ฿1,200")
-	check(hire.disabled and hire.text.ends_with("Need ฿1 more"),"Team hiring includes the payroll reserve in the visible shortfall")
+	check(hire.disabled and hire.text.ends_with("Need ฿1 more"),"Team hiring shows the exact contract shortfall")
 	app.model.s.cash = 50000
 	app._process(1.0)
 	app.model.s.street.hiring_seed = 100 # Common recruit for the base-service UI regression.
@@ -237,7 +238,7 @@ func test_ui() -> void:
 	var staff_hud: Button = app.root_ui.find_child("Bartender0",true,false)
 	check(staff_hud.tooltip_text.contains("1 drinks served"),"Top-right HUD reports real staff sales separately from owner taps")
 	staff_hud.pressed.emit()
-	check(app.tab==0 and app.drawer_open and app.service_section=="team","Staff indicator opens Team directly")
+	check(app.tab==0 and app.drawer_open and app.service_section=="team" and app.team_member==0,"Staff indicator opens that bartender’s details directly")
 	app.model.street.announce(3)
 	app.render()
 	app.event_banner.pressed.emit()
@@ -250,12 +251,14 @@ func test_ui() -> void:
 	app.model.s.cash = 50000
 	app.change_tab(0)
 	use_button(app,"Team")
-	use_button(app,"Train Bartender 1 · ฿400 · 20s")
+	use_button(app,"Bartender 1 · On duty  ›")
+	use_button(app,"Train · ฿400 · 20s per order")
 	check(app.model.street.selected().team[0].training==1,"Individual training control works")
 	app.model.street.economy.advance_contracts(14400)
 	app.render()
 	use_button(app,"Rehire Bartender 1 · ฿1,200")
 	check(app.model.street.selected().team[0].training==1 and app.model.street.selected().team[0].on,"Rehire control retains training")
+	use_button(app,"Back")
 	use_button(app,"Hire Nida · ฿1,200")
 	var nida: Dictionary = app.model.street.selected().team.back()
 	nida.contract_left = 1

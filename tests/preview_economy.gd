@@ -22,9 +22,20 @@ func capture(app: Control, name_text: String, scroll_to: String = "", refresh: b
 	var was_open: bool = app.upgrades_open
 	var ready_only: bool = app.upgrades_ready_only
 	var section: String = app.service_section
+	var team_page: String = app.team_page
+	var team_member: int = app.team_member
 	var was_fridge: bool = app.fridge_open
 	if app.tab==0 and upgrade_target.is_empty():
-		if scroll_to in ["TEAM & PAYROLL","FRONTAGE PROMOTER","Hire Gabby","Rehire Gabby","+฿5 tip"] or scroll_to.begins_with("HOST") or name_text.begins_with("barfine-") and not scroll_to.is_empty(): app.service_section = "team"
+		if scroll_to in ["FLOOR STAFF","FRONTAGE PROMOTER","Hire Nida","Rehire Nida"]:
+			app.service_section = "team"
+			app.team_page = ""
+		if name_text in ["service-team-help","purchase-team","bulk-hiring","gabby-hire"]:
+			app.service_section = "team"
+			app.team_page = "hire"
+		if name_text in ["staff-base","staff-trained","staff-expired","staff-rehired","gabby-roster","gabby-tips","gabby-renewal","barfine-service","hosted-service","hosted-upgraded","promoter-contract","promoter-trained"]:
+			app.service_section = "team"
+			app.team_page = "member"
+			app.team_member = 1 if name_text.begins_with("hosted-") else 0
 		if scroll_to in ["PREP FOR OPENING","Heat"]: app.service_section = "hours"
 		if scroll_to in ["YOUR PROFIT CYCLE","NIGHTLY TIPS","Show visit plans","Hide visit plans"]: app.service_section = "reports"
 		if name_text.begins_with("prices-") or scroll_to.begins_with("Buy ") or name_text=="economy-drinks": app.fridge_open = true
@@ -70,6 +81,8 @@ func capture(app: Control, name_text: String, scroll_to: String = "", refresh: b
 	app.upgrades_ready_only = ready_only
 	app.close_service_help()
 	app.service_section = section
+	app.team_page = team_page
+	app.team_member = team_member
 	app.fridge_open = was_fridge
 
 func run() -> void:
@@ -360,8 +373,15 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.change_tab(0)
 	await capture(app,"service-overview")
-	await capture(app,"service-team","TEAM & PAYROLL")
-	await capture(app,"service-team-help","TEAM & PAYROLL")
+	await capture(app,"service-team","FLOOR STAFF")
+	await capture(app,"service-team-help","Hire bartender")
+	app.model.s.cash = 10000
+	app.model.s.street.hiring_seed = 100
+	app.model.street.action("hire",0)
+	app.model.street.action("hire_gabby")
+	app.model.street.action("hire",3)
+	await capture(app,"service-team-roster","FLOOR STAFF")
+	app.model = Campaign.new(72)
 	app.open_fridge()
 	await capture(app,"fridge-overview")
 	app.model.s.cash = 2000
@@ -412,10 +432,12 @@ func run() -> void:
 	app.model.street.advance(20)
 	await capture(app,"hosted-buzz")
 	app.open_service_section("team")
-	await capture(app,"hosted-service","GOOD COMPANY")
+	await capture(app,"hosted-service")
 	app.model.street.action("train_host",1)
 	app.model.street.action("auto_host_drinks")
-	await capture(app,"hosted-upgraded","GOOD COMPANY")
+	await capture(app,"hosted-upgraded")
+	app.open_team_page("hosts")
+	await capture(app,"host-settings")
 	app.drawer_open = false
 	app.model.street.selected().open = false
 	await capture(app,"hosted-closed")
@@ -433,7 +455,7 @@ func run() -> void:
 	app.model.street.advance(15)
 	await capture(app,"barfine-returned")
 	app.drawer_open = true
-	await capture(app,"barfine-service","BAR FINES")
+	await capture(app,"barfine-service")
 	await capture(app,"barfine-upgrades","Train Bee")
 	app.model.street.action("train_host",0)
 	app.model.street.action("auto_bar_fine")
@@ -509,7 +531,7 @@ func run() -> void:
 	app.model.s.cash = 10000
 	await capture(app,"gabby-hire","Hire Gabby")
 	app.model.street.action("hire_gabby")
-	await capture(app,"gabby-roster","+฿5 tip")
+	await capture(app,"gabby-roster")
 	app.drawer_open = false
 	for kind in 3:
 		app.model.street.selected().type = kind
@@ -518,7 +540,7 @@ func run() -> void:
 	app.model.street.economy.staff_service(app.model.street.selected())
 	await capture(app,"gabby-serving")
 	app.drawer_open = true
-	await capture(app,"gabby-tips","+฿5 tip")
+	await capture(app,"gabby-tips")
 	app.model.street.selected().team[0].on = false
 	app.drawer_open = false
 	await capture(app,"gabby-off-duty")
@@ -677,7 +699,7 @@ func run() -> void:
 	app.model.street.action("hire",3)
 	app.model.street.action("auto_serve")
 	app.model.street.economy.advance_contracts(14400)
-	app.model.s.cash = 1200
+	app.model.s.cash = 1199
 	await capture(app,"staff-ready-nida-shortfall","FRONTAGE PROMOTER")
 	app.model.s.cash = 2000
 	await capture(app,"staff-ready-nida-renew","FRONTAGE PROMOTER")
@@ -781,7 +803,7 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.tab = 0
 	app.model.s.cash = 10000
-	await capture(app,"bulk-hiring","TEAM & PAYROLL")
+	await capture(app,"bulk-hiring","Hire bartender")
 	app.model.street.action("hire",3)
 	await capture(app,"bulk-welcome","YOUR ACTION UPGRADES")
 	await capture(app,"bulk-fridge","Better fridge")
@@ -800,16 +822,16 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.model.s.cash = 50000
 	app.model.street.action("hire",0)
-	await capture(app,"staff-base","Train Bartender 1")
+	await capture(app,"staff-base","Train ·")
 	app.model.street.action("train_staff",0)
-	await capture(app,"staff-trained","Train Bartender 1")
+	await capture(app,"staff-trained","Train ·")
 	app.model.street.economy.advance_contracts(14400)
 	await capture(app,"staff-expired","Rehire Bartender 1")
 	app.drawer_open = false
 	await capture(app,"staff-expired-scene")
 	app.model.street.action("rehire",0)
 	app.drawer_open = true
-	await capture(app,"staff-rehired","Train Bartender 1")
+	await capture(app,"staff-rehired","Train ·")
 	app.model.s.cash = 250000
 	var first: Dictionary = app.model.street.selected()
 	app.drawer_open = false
@@ -911,7 +933,7 @@ func run() -> void:
 	app.model.street.action("hire",3)
 	await capture(app,"promoter-working")
 	app.drawer_open = true
-	await capture(app,"promoter-contract","FRONTAGE PROMOTER")
+	await capture(app,"promoter-contract")
 	app.model.street.action("rota",0)
 	app.drawer_open = false
 	await capture(app,"promoter-off-duty")
@@ -927,7 +949,7 @@ func run() -> void:
 	promo_bar.stage = 2
 	app.model.street.action("train_audience",0)
 	app.drawer_open = true
-	await capture(app,"promoter-trained","FRONTAGE PROMOTER")
+	await capture(app,"promoter-trained")
 	promo_bar.team[0].contract_left = 0
 	promo_bar.team[0].on = false
 	await capture(app,"promoter-expired","Rehire Nida")

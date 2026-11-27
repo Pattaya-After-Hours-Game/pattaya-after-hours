@@ -115,7 +115,7 @@ existing campaign does not change its cash, stock, waiting tabs or paid stock co
 
 ## Hire Gabby
 
-In **Service → Team**, choose **Hire Gabby · ฿1,200** when a floor
+In **Service → Team → Hire floor staff**, choose **Hire Gabby · ฿1,200** when a floor
 position is free. She has the standard ten-day bartender contract, wages and
 25-second service, improved through normal training. Each real drink she serves
 earns an extra ฿5 in the nightly tip jar. Owner service and offline estimates
@@ -125,7 +125,7 @@ venue. There is one Gabby across the street, and she works as a bartender.
 
 ## Hire Daisy
 
-At a **Hostess bar**, open **Service → Team → Hire Daisy · ฿4,500**.
+At a **Hostess bar**, open **Service → Team → Hire floor staff → Hire Daisy · ฿4,500**.
 Daisy is a separate adult entertainer with a ten-day host contract, normal host
 wages and one floor position. Keep the next shift's payroll after hiring.
 She attracts visitors and uses the existing host training and booking controls;
@@ -251,8 +251,8 @@ in teal and losses appear in red.
 Look at **BARTENDERS** in the top right. Each row shows a portrait, level and
 red cooldown bar that fills until ready. Level 1 means no training; each training
 purchase adds one level. The label explains no orders, no stock, off duty,
-finished contracts or venue closure. Scroll for larger teams. Tap a row or the
-arrow for Service and detailed actual-sale counts.
+finished contracts or venue closure. Scroll for larger teams. Tap a worker
+for their actual sale count and controls, or use the arrow for the Team roster.
 
 The **Tip jar** beneath the list is this venue's shared unpaid total, including
 first-visit tips, matched-drink bonuses and Gabby's bonus. It pays at closing;
@@ -518,8 +518,12 @@ keep serving alongside them during rushes. **Train** on their individual card
 costs ฿400 for level 1 (20 seconds) and ฿800 for level 2 (15 seconds). Training
 does not create customers and is retained across contracts and role changes.
 
-**Service → Team** shows the remaining contract time. When it expires,
-the person stops working and stops drawing wages. Their card stays available;
+**Service → Team** shows the roster and each person’s duty status. Select a
+worker for their contract, training and rota. Tapping a bartender’s portrait in
+the **Bartenders** indicator opens their details directly. Use **Back** to
+return to the roster and **Hire floor staff** to see available contracts.
+When a contract expires, the person stops working and stops drawing wages.
+Their roster entry stays available.
 **Rehire** costs ฿1,200 for bartenders (฿4,500 for hosts/dancers) for another ten days and keeps their training. Rehiring is
 manual unless you enable AFK mode, which pays affordable renewals during live play. Existing saves retain their hires and apply
 previous venue-wide training to those people; new hires start untrained.
@@ -567,8 +571,9 @@ is removed until she returns. The card shows the countdown. Up to one/two/three
 hosts can be away at once at venue stages one/two/three. Scroll for larger teams.
 May and Fah prefer hosted drinks and never accept bookings.
 
-**Service → Team** has the same controls, training and **Auto-accept for
-฿3,000**. Once bought, toggle it on or off. It accepts eligible requests on live
+Select a host in **Service → Team** for the same booking controls and training.
+Open **Host settings** from the roster to buy **Auto-accept** for **฿3,000**
+or toggle it after purchase. It accepts eligible requests on live
 ticks using the same consent, contract, rota, customer-budget and capacity rules.
 It earns nothing on the startup menu or in offline estimates.
 
@@ -853,7 +858,7 @@ has no duration bar once active: catch the remaining rats or leave it to Bo.
 
 ## Finding talented staff
 
-**Team → Hire** can discover Copper, Rose, Ruby or Platinum as a bartender,
+**Team → Hire floor staff** can discover Copper, Rose, Ruby or Platinum as a bartender,
 or Violet, Goldie, Scarlet or Onyx as a host/dancer. The card shows rarity and
 talents. Platinum is exceptionally fast; Rose trades speed for larger tips.
 Entertainers improve appeal and tips from actual drinks, without serving orders.

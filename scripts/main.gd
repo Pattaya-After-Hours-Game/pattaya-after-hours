@@ -104,6 +104,8 @@ var duo_reaction := {}
 var service_animation := 0.0
 var tab := 0
 var guide := -1
+var team_page := ""
+var team_member := -1
 var message := ""
 var scroll: ScrollContainer
 var column: VBoxContainer
@@ -592,6 +594,8 @@ func render(keep_scroll: bool = false) -> void:
 	var show_fridge: bool = fridge_open and not practicing and model.s.phase in ["plan","guided"]
 	var drawer_title: String = TAB_NAMES[tab].to_upper()
 	if tab==0 and not service_section.is_empty(): drawer_title = service_section.to_upper()
+	if tab==0 and service_section=="team":
+		drawer_title = {"hire":"HIRE FLOOR STAFF","hosts":"HOST SETTINGS"}.get(team_page,"TEAM")
 	if tab==0 and upgrades_open: drawer_title = "UPGRADES"
 	if practicing or model.s.phase not in ["plan","guided"]: drawer_title = "SHIFT DESK"
 	if show_fridge: drawer_title = "FRIDGE"
@@ -859,7 +863,7 @@ func bartender_hud() -> void:
 		list.add_child(rows)
 		for i in roster:
 			var person: Dictionary = bar.team[i]
-			var row := button("",open_service_section.bind("team"))
+			var row := button("",open_team_page.bind("member",i))
 			row.name = "Bartender%d" % i
 			row.custom_minimum_size = Vector2(0,60)
 			rows.add_child(row)
@@ -1009,53 +1013,37 @@ func update_bar_fine_controls() -> void:
 		entry.status.text = topic+" specialist\n"+detail
 
 
-func bar_fine_panel(bar: Dictionary) -> void:
-	if bar.type!=1: return
+func host_settings_panel(bar: Dictionary) -> void:
 	var eco = model.street.economy
-	body("GOOD COMPANY · HOSTED DRINKS",GOLD,14)
-	body("Match a chat, music or pool fan to her favourite topic for +฿40. One sponsored round per guest; pour a real house lager, then enjoy 20 seconds of company. Hosts keep their appeal. Three finished rounds earn 30 seconds of Room Buzz (+2 appeal).",MUTED,12)
-	live_body(func() -> String: return eco.hosted_buzz_text(bar)+"\n"+str(bar.get("host_last_line","")),TEAL,13)
-	if bar.get("auto_host_drinks",false):
-		row_button("Auto-host rounds · "+("On" if bar.auto_host_drinks_on else "Off"),street_action.bind("auto_host_drinks"))
-	else:
-		var auto_rounds := row_button("Auto-host rounds · ฿1,500",street_action.bind("auto_host_drinks"))
-		watch_purchase(auto_rounds,auto_rounds.text,eco.auto_hosted_offer.bind(bar))
-		live_body(func() -> String:
-			var offer: Dictionary = eco.auto_hosted_offer(bar)
+	live_body(func() -> String: return eco.hosted_buzz_text(bar),TEAL,13)
+	var hosted := "Auto-host rounds · "+(("On" if bar.auto_host_drinks_on else "Off") if bar.auto_host_drinks else cash(StreetContent.AUTO_HOST_DRINK_COST))
+	var rounds := service_option(hosted,street_action.bind("auto_host_drinks"),"auto",func() -> String:
+		return "Matches guest topics automatically. A match adds ฿40. Hosted-drinks-only colleagues get first choice in a tie. Bartenders pour the house lager. Three completed rounds earn 30 seconds of Room Buzz (+2 appeal).")
+	if not bar.auto_host_drinks: watch_purchase(rounds,hosted,eco.auto_hosted_offer.bind(bar))
+	var fines := "Auto-accept bar fines · "+(("On" if bar.auto_bar_fine_on else "Off") if bar.auto_bar_fine else cash(StreetContent.AUTO_BAR_FINE_COST))
+	var accept := service_option(fines,street_action.bind("auto_bar_fine"),"auto",func() -> String:
+		return "Accepts eligible requests from paying guests when a willing host is available. She leaves for 30 seconds and her appeal returns when she does.")
+	if not bar.auto_bar_fine: watch_purchase(accept,fines,eco.auto_bar_fine_offer.bind(bar))
+	live_body(func() -> String: return "%d requests · %d accepted · %s this shift" % [bar.host_requests.size(),bar.shift.get("bar_fines",0),cash(bar.shift.get("bar_fine_income",0))],MUTED,12)
+	live_body(func() -> String: return str(bar.get("host_last_line","")),MUTED,12)
 
-			return offer.reason if not offer.enabled else "Finds topic matches automatically. Bartenders still need to serve. Hosted-drinks-only colleagues get first choice in a tie.",MUTED,12)
-	body("BAR FINES",GOLD,14)
-	body("Accept a real customer's request: the host leaves for 30 seconds, removing her appeal until she returns. Adult hosts choose whether to accept; private activity stays off-screen.",MUTED,12)
-	if bar.get("auto_bar_fine",false):
-		row_button("Auto-accept bar fines · "+("On" if bar.auto_bar_fine_on else "Off"),street_action.bind("auto_bar_fine"))
-	else:
-		var buy := row_button("Auto-accept bar fines · ฿3,000",street_action.bind("auto_bar_fine"))
-		watch_purchase(buy,buy.text,eco.auto_bar_fine_offer.bind(bar))
-		live_body(func() -> String:
-			var offer: Dictionary = eco.auto_bar_fine_offer(bar)
-
-			return offer.reason if not offer.enabled else "Accepts eligible requests on live ticks. Same fees, consent, budgets and 30-second absence.",MUTED,12)
-	for i in bar.team.size():
-		var person: Dictionary = bar.team[i]
-		if person.role!=1: continue
-		var name_text: String = StreetContent.HOSTS[int(person.host)][0]
-		character_card(Art.worker_id(bar,i),"%s · Host level %d" % [name_text,int(person.get("host_training",0))+1],"+%.1f appeal · %s bar fine" % [eco.host_appeal(person),cash(eco.host_fee(person))] if StreetContent.HOSTS[int(person.host)][2] else "+%.1f appeal · hosted drinks only" % eco.host_appeal(person))
-		var state := body("",TEAL,13)
-		var host_drink := row_button("",street_action.bind("host_drink",i),true)
-		host_drink.name = "ServiceHostDrink%d" % i
-		var accept := row_button("",street_action.bind("bar_fine",i),true)
-		accept.name = "ServiceBarFine%d" % i
-		bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":false,"host_button":host_drink})
-		var training: Dictionary = eco.host_training_offer(bar,i)
-		if not training.maxed:
-			var level: int = training.level
-			var upgrade := row_button("Train %s · %s" % [name_text,cash(training.price)],street_action.bind("train_host",i))
-			watch_purchase(upgrade,upgrade.text,eco.host_training_offer.bind(bar,i))
-			live_body(func() -> String:
-				var offer: Dictionary = eco.host_training_offer(bar,i)
-
-				return "+%.1f → +%.1f appeal%s. %s" % [eco.host_appeal(person),StreetContent.HOST_APPEAL[level+1]*float(eco.talent(person).get("appeal",1.0))," · hosted drink %s → %s" % [cash(StreetContent.HOST_DRINK_PRICES[level]),cash(StreetContent.HOST_DRINK_PRICES[level+1])]+(" · bar fine %s → %s" % [cash(StreetContent.BAR_FINE_FEES[level]),cash(StreetContent.BAR_FINE_FEES[level+1])] if StreetContent.HOSTS[int(person.host)][2] else ""),offer.reason],MUTED,12)
-	live_body(func() -> String: return "%d requests · %d accepted this shift · %s bar-fine receipts" % [bar.host_requests.size(),bar.shift.get("bar_fines",0),cash(bar.shift.get("bar_fine_income",0))],TEAL,12)
+func host_member_controls(bar: Dictionary, i: int) -> void:
+	var eco = model.street.economy
+	var person: Dictionary = bar.team[i]
+	var state := body("",TEAL,13)
+	var actions := row_pair("",street_action.bind("host_drink",i),"",street_action.bind("bar_fine",i))
+	var host_drink := actions[0]
+	var accept := actions[1]
+	host_drink.name = "ServiceHostDrink%d" % i
+	accept.name = "ServiceBarFine%d" % i
+	bar_fine_controls.append({"button":accept,"status":state,"index":i,"compact":false,"host_button":host_drink})
+	var training: Dictionary = eco.host_training_offer(bar,i)
+	if not training.maxed:
+		var level: int = training.level
+		var caption := "Train host · %s" % cash(training.price)
+		var upgrade := service_option(caption,street_action.bind("train_host",i),"training",func() -> String:
+			return "Appeal +%.1f → +%.1f · Hosted drink %s → %s%s" % [eco.host_appeal(person),StreetContent.HOST_APPEAL[level+1]*float(eco.talent(person).get("appeal",1.0)),cash(StreetContent.HOST_DRINK_PRICES[level]),cash(StreetContent.HOST_DRINK_PRICES[level+1])," · Bar fine %s → %s" % [cash(StreetContent.BAR_FINE_FEES[level]),cash(StreetContent.BAR_FINE_FEES[level+1])] if StreetContent.HOSTS[int(person.host)][2] else ""])
+		watch_purchase(upgrade,caption,eco.host_training_offer.bind(bar,i))
 	update_bar_fine_controls()
 
 func toggle_stat_tip(key: String,x: int) -> void:
@@ -1276,7 +1264,12 @@ func tutorial_close() -> void:
 	message = "Tips counted. Cleaning has started."
 	render()
 
-func open_service_section(section: String) -> void:
+func open_team_page(page: String, member: int = -1) -> void:
+	open_service_section("team",page,member)
+
+func open_service_section(section: String, page: String = "", member: int = -1) -> void:
+	team_page = page
+	team_member = member
 	tab = 0
 	drawer_open = true
 	service_section = section
@@ -1514,6 +1507,8 @@ func repay_debt() -> void:
 func select_bar(index: int) -> void:
 	if model.s.phase != "plan" or index < 0 or index >= model.s.street.bars.size(): return
 	model.s.street.selected = index
+	team_page = ""
+	team_member = -1
 	tab = 0
 	commit()
 
@@ -2219,12 +2214,14 @@ func update_drawer_navigation() -> void:
 	var help_open := is_instance_valid(service_help_panel)
 	var subview := service_subview_open()
 	var guide_detail := tab==2 and guide>=0
+	var team_detail := tab==0 and service_section=="team" and not team_page.is_empty()
 	drawer_close_button.text = "Back" if help_open or subview or guide_detail else "×"
-	drawer_close_button.tooltip_text = "Back to the service view" if help_open else "Back to Service" if subview else "Back to tour guides" if guide_detail else "Close drawer"
+	drawer_close_button.tooltip_text = "Back to the service view" if help_open else "Back to Team" if team_detail else "Back to Service" if subview else "Back to tour guides" if guide_detail else "Close drawer"
 	drawer_close_button.visible = help_open or subview or model.s.phase=="plan"
 
 func close_drawer_layer() -> void:
 	if is_instance_valid(service_help_panel): close_service_help()
+	elif tab==0 and service_section=="team" and not team_page.is_empty(): open_service_section("team")
 	elif service_subview_open(): change_tab(0)
 	elif tab==2 and guide>=0: change_tab(2)
 	else: close_drawer()
@@ -2305,34 +2302,29 @@ func service_reports(bar: Dictionary) -> void:
 
 func service_team(bar: Dictionary) -> void:
 	var eco = model.street.economy
-	bar_fine_panel(bar)
-	if bar.auto_serve:
-		var auto_button := row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off"),street_action.bind("auto_serve"))
-		auto_button.icon = UpgradeIcons.get_icon("auto")
-		auto_button.tooltip_text = eco.auto_serve_status(bar)
-	if eco.floor_staff(bar)<model.street.staff_limit(bar):
-		for role in 3:
-			if role>0 and role!=bar.type: continue
-			var role_name: String = StreetContent.ROLE_NAMES[role].to_lower()
-			var caption := "Hire %s · %s" % [role_name,cash(eco.contract_cost(role))]
-			var hire := service_option(caption,street_action.bind("hire",role),"manager",func() -> String:
-				var impact := "Regular crew serves every 25s. Discoveries can be faster or earn more tips." if role==0 else "Attracts visitors without serving drinks."
-				return "%s\n\n10-day contract · ฿%d/min on duty. %s" % [eco.hiring_help(role),StreetContent.ROLE_WAGES[role],impact])
-			watch_purchase(hire,caption,eco.hire_offer.bind(bar,role))
-		body("Random recruits · 24% uncommon · 5% rare · 1% legendary before discoveries. Tap ? for current odds.",GOLD,12)
-		if eco.gabby_venue().is_empty():
-			var gabby := service_option("Hire Gabby · ฿1,200",street_action.bind("hire_gabby"),"pouring",func() -> String:
-				return "Gabby is a bartender. She earns an extra ฿%d in tips per drink she serves. Tips pay out at closing. The contract lasts ten game days." % StreetContent.GABBY_TIP_PER_DRINK)
-			gabby.icon = Art.texture("portrait-gabby")
-			gabby.add_theme_constant_override("icon_max_width",28)
-			watch_purchase(gabby,gabby.text,eco.hire_offer.bind(bar,0))
-		if bar.type==1 and eco.daisy_venue().is_empty():
-			var daisy := service_option("Hire Daisy · ฿4,500",street_action.bind("hire_daisy"),"audience",func() -> String:
-				return "Daisy is an adult entertainer. She attracts visitors and hosts sponsored drinks; she does not serve drinks. Normal host wages and training apply. The contract lasts ten game days and uses one team position.")
-			daisy.icon = Art.texture("portrait-daisy")
-			daisy.add_theme_constant_override("icon_max_width",28)
-			watch_purchase(daisy,daisy.text,eco.hire_offer.bind(bar,1))
-	if eco.promoter_index(bar)<0:
+	match team_page:
+		"hire":
+			team_hiring(bar)
+			return
+		"hosts":
+			if bar.type==1:
+				host_settings_panel(bar)
+				return
+		"member":
+			if team_member>=0 and team_member<bar.team.size():
+				team_member_panel(bar,team_member)
+				return
+	column.add_theme_constant_override("separation",5)
+	var floor_staff: int = eco.floor_staff(bar)
+	var limit: int = model.street.staff_limit(bar)
+	body("FLOOR STAFF · %d/%d" % [floor_staff,limit],GOLD,13)
+	for i in bar.team.size():
+		if bar.team[i].role!=3: team_roster_row(bar,i)
+	if floor_staff<limit:
+		row_button("Hire floor staff  ›",open_team_page.bind("hire"),floor_staff==0)
+	body("FRONTAGE PROMOTER",GOLD,13)
+	var nida_index: int = eco.promoter_index(bar)
+	if nida_index<0:
 		var nida := service_option("Hire Nida · ฿1,200",street_action.bind("hire",3),"audience",func() -> String:
 			var forecast: Dictionary = eco.promoter_forecast(bar)
 			var active: Dictionary = eco.promoter_forecast(bar,true)
@@ -2341,45 +2333,119 @@ func service_team(bar: Dictionary) -> void:
 		nida.add_theme_constant_override("icon_max_width",28)
 		watch_purchase(nida,nida.text,eco.hire_offer.bind(bar,3))
 	else:
-		var nida_index: int = eco.promoter_index(bar)
-		var renewal := func() -> String:
-			var offer: Dictionary = eco.rehire_offer(bar,nida_index)
-			return offer.reason
-		var renew := service_option("Rehire Nida · ฿1,200",street_action.bind("rehire",nida_index),"audience",renewal)
-		watch_purchase(renew,renew.text,eco.rehire_offer.bind(bar,nida_index))
-	for i in bar.team.size():
-		var person: Dictionary = bar.team[i]
-		var name_text: String = eco.staff_name(person,i)
-		character_card(Art.worker_id(bar,i),name_text,"Contract finished" if not eco.contracted(person) else "Serves waiting orders" if person.role==0 else "Attracts visitors")
-		if not eco.talent(person).is_empty(): live_body(func() -> String: return eco.talent_description(person),TEAL,12)
-		live_body(func() -> String:
-			var remaining := int(person.get("contract_left",StreetContent.STAFF_CONTRACT_MINUTES))
-			return ("Contract: %dd %dh %dm left" % [remaining/1440,remaining%1440/60,remaining%60] if remaining>0 else "Contract finished · rehire available")+" · Training %d/%d" % [int(person.get("audience_training",0) if person.role in [2,3] else person.get("training",0)),2 if person.role in [2,3] else eco.training_limit(bar)],GOLD,12)
-		if not eco.contracted(person):
-			if person.role!=3:
-				var caption := "Rehire %s · %s" % [name_text,cash(eco.contract_cost(int(person.role)))]
-				watch_purchase(row_button(caption,street_action.bind("rehire",i)),caption,eco.rehire_offer.bind(bar,i))
-			continue
-		if person.role==0:
-			live_body(func() -> String: return eco.staff_status(bar,person).text+" · %d staff drinks served" % int(person.get("drinks_served",0)),TEAL,12)
-			if int(person.get("training",0))<eco.training_limit(bar):
+		team_roster_row(bar,nida_index)
+		if not eco.contracted(bar.team[nida_index]): team_rehire(bar,nida_index,"Nida")
+	if bar.auto_serve:
+		var auto_button := row_button("Auto-serve · "+("On" if bar.auto_serve_on else "Off"),street_action.bind("auto_serve"))
+		auto_button.icon = UpgradeIcons.get_icon("auto")
+		auto_button.tooltip_text = eco.auto_serve_status(bar)
+	if bar.type==1:
+		row_button("Host settings  ›",open_team_page.bind("hosts"))
+
+func team_hiring(bar: Dictionary) -> void:
+	var eco = model.street.economy
+	if eco.floor_staff(bar)>=model.street.staff_limit(bar):
+		body("All floor positions filled.",GOLD,13)
+		return
+	for role in 3:
+		if role>0 and role!=bar.type: continue
+		var role_name: String = StreetContent.ROLE_NAMES[role].to_lower()
+		var caption := "Hire %s · %s" % [role_name,cash(eco.contract_cost(role))]
+		var hire := service_option(caption,street_action.bind("hire",role),"manager",func() -> String:
+			var impact := "Regular crew serves every 25s. Discoveries can be faster or earn more tips." if role==0 else "Attracts visitors without serving drinks."
+			return "%s\n\n10-day contract · ฿%d/min on duty. %s" % [eco.hiring_help(role),StreetContent.ROLE_WAGES[role],impact])
+		watch_purchase(hire,caption,eco.hire_offer.bind(bar,role))
+	if eco.gabby_venue().is_empty():
+		var gabby := service_option("Hire Gabby · ฿1,200",street_action.bind("hire_gabby"),"pouring",func() -> String:
+			return "Gabby is a bartender. She earns an extra ฿%d in tips per drink she serves. Tips pay out at closing. The contract lasts ten game days." % StreetContent.GABBY_TIP_PER_DRINK)
+		gabby.icon = Art.texture("portrait-gabby")
+		gabby.add_theme_constant_override("icon_max_width",28)
+		watch_purchase(gabby,gabby.text,eco.hire_offer.bind(bar,0))
+	if bar.type==1 and eco.daisy_venue().is_empty():
+		var daisy := service_option("Hire Daisy · ฿4,500",street_action.bind("hire_daisy"),"audience",func() -> String:
+			return "Daisy is an adult entertainer. She attracts visitors and hosts sponsored drinks; she does not serve drinks. Normal host wages and training apply. The contract lasts ten game days and uses one team position.")
+		daisy.icon = Art.texture("portrait-daisy")
+		daisy.add_theme_constant_override("icon_max_width",28)
+		watch_purchase(daisy,daisy.text,eco.hire_offer.bind(bar,1))
+
+func team_roster_row(bar: Dictionary, i: int) -> void:
+	var eco = model.street.economy
+	var person: Dictionary = bar.team[i]
+	var name_text: String = eco.staff_name(person,i)
+	var caption := func() -> String:
+		var duty := "On duty" if person.on else "Off duty"
+		if i in bar.away and person.on: duty = "Away"
+		if not eco.contracted(person): duty = "Expired"
+		return "%s · %s  ›" % [name_text,duty]
+	var card := row_button(caption.call(),open_team_page.bind("member",i))
+	card.name = "TeamMember_%d" % i
+	card.icon = Art.texture("portrait-"+Art.worker_id(bar,i))
+	card.expand_icon = true
+	card.add_theme_constant_override("icon_max_width",34)
+	card.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	live_labels.append([card,caption])
+
+func team_rehire(bar: Dictionary, i: int, name_text: String) -> void:
+	var eco = model.street.economy
+	var price: int = eco.contract_cost(int(bar.team[i].role))
+	var caption := "Rehire %s · %s" % [name_text,cash(price)]
+	var renew: Button
+	if bar.team[i].role==3:
+		renew = service_option(caption,street_action.bind("rehire",i),"audience",func() -> String:
+			var offer: Dictionary = eco.rehire_offer(bar,i)
+			return "Keep %s for payroll and one delivery. %s" % [cash(offer.reserve),offer.reason] if offer.reserve>0 else offer.reason)
+	else:
+		renew = row_button(caption,street_action.bind("rehire",i))
+	watch_purchase(renew,caption,eco.rehire_offer.bind(bar,i))
+
+func team_member_panel(bar: Dictionary, i: int) -> void:
+	var eco = model.street.economy
+	var person: Dictionary = bar.team[i]
+	var name_text: String = eco.staff_name(person,i)
+	var role: int = person.role
+	var detail: String = StreetContent.ROLE_NAMES[role]
+	if person.get("identity","")=="gabby":
+		detail += " · +฿%d tip per drink served" % StreetContent.GABBY_TIP_PER_DRINK
+	if role==1:
+		detail += " · +%.1f appeal" % eco.host_appeal(person)
+		detail += " · "+(cash(eco.host_fee(person))+" bar fine" if StreetContent.HOSTS[int(person.host)][2] else "Hosted drinks only")
+	character_card(Art.worker_id(bar,i),name_text,detail)
+	if not eco.talent(person).is_empty(): body(eco.talent_description(person),TEAL,12)
+	var audience_level := int(person.get("audience_training",0))
+	var level := int(person.get("host_training",0)) if role==1 else audience_level if role in [2,3] else int(person.get("training",0))
+	var limit: int = eco.training_limit(bar) if role==0 else 2
+	live_body(func() -> String:
+		var remaining := int(person.get("contract_left",StreetContent.STAFF_CONTRACT_MINUTES))
+		var term := "%dd %dh %dm left" % [remaining/1440,remaining%1440/60,remaining%60] if remaining>0 else "Contract expired"
+		return "%s · Training %d/%d" % [term,level,limit],GOLD,13)
+	if not eco.contracted(person):
+		team_rehire(bar,i,name_text)
+		return
+	match role:
+		0:
+			live_body(func() -> String: return "%s · %ds per order · %d served" % [eco.staff_status(bar,person).text,eco.service_seconds(person),int(person.get("drinks_served",0))],TEAL,13)
+			if level<limit:
 				var offer: Dictionary = eco.training_offer(bar,i,false)
-				var training_button := row_button("Train %s · %s · %ds" % [name_text,cash(offer.price),eco.service_seconds(person,int(offer.level)+1)],street_action.bind("train_staff",i))
-				watch_purchase(training_button,training_button.text,eco.training_offer.bind(bar,i,false))
-				training_button.icon = UpgradeIcons.get_icon("training")
-		if person.role in [2,3]:
-			var audience_level := int(person.get("audience_training",0))
-			body("Attraction +%.1f; replaces Welcome taps." % StreetContent.PROMOTER_BONUS[audience_level] if person.role==3 else "Dancer attraction ×%.2f; no drink service." % (StreetContent.DANCER_TRAINING[audience_level]*float(eco.talent(person).get("appeal",1.0))),MUTED,12)
-			if audience_level<2:
-				var training_button := row_button("Train %s · %s · needs stage %d" % [name_text,cash(StreetContent.AUDIENCE_TRAINING_COST*(audience_level+1)),audience_level+2],street_action.bind("train_audience",i))
-				training_button.icon = UpgradeIcons.get_icon("audience")
-				watch_purchase(training_button,training_button.text,eco.training_offer.bind(bar,i,true))
-		row_button("%s · %s" % [name_text,"On duty" if person.on else "Off duty"],street_action.bind("rota",i))
-		if bar.type>0 and person.role!=3 and eco.talent(person).is_empty() and person.get("identity","")!="gabby" and not (person.role==1 and int(person.host)==StreetContent.DAISY_HOST):
-			var caption := "Reassign role · %s · %s" % [name_text,cash(eco.role_change_fee(bar,i))]
-			watch_purchase(row_button(caption,street_action.bind("role",i)),caption,func() -> Dictionary:
-				var reason: String = "Wait until this team member returns or finishes hosting." if i in bar.away or not eco.hosted_round(bar,i).is_empty() else ""
-				return venue_cash_offer(bar,eco.role_change_required_cash(bar,i),reason))
+				var caption := "Train · %s · %ds per order" % [cash(offer.price),eco.service_seconds(person,int(offer.level)+1)]
+				var train := row_button(caption,street_action.bind("train_staff",i))
+				train.icon = UpgradeIcons.get_icon("training")
+				watch_purchase(train,caption,eco.training_offer.bind(bar,i,false))
+		1:
+			host_member_controls(bar,i)
+		2,3:
+			body("Attraction +%.1f · replaces Welcome" % StreetContent.PROMOTER_BONUS[audience_level] if role==3 else "Attraction ×%.2f" % (StreetContent.DANCER_TRAINING[audience_level]*float(eco.talent(person).get("appeal",1.0))),MUTED,13)
+			if audience_level<limit:
+				var caption := "Train · %s · Stage %d" % [cash(StreetContent.AUDIENCE_TRAINING_COST*(audience_level+1)),audience_level+2]
+				var train := row_button(caption,street_action.bind("train_audience",i))
+				train.icon = UpgradeIcons.get_icon("audience")
+				watch_purchase(train,caption,eco.training_offer.bind(bar,i,true))
+	row_button("Go off duty" if person.on else "Go on duty",street_action.bind("rota",i))
+	if bar.type>0 and role!=3 and eco.talent(person).is_empty() and person.get("identity","")!="gabby" and not (role==1 and int(person.host)==StreetContent.DAISY_HOST):
+		var next_role: String = StreetContent.ROLE_NAMES[int(bar.type) if role==0 else 0].to_lower()
+		var caption := "Switch to %s · %s" % [next_role,cash(eco.role_change_fee(bar,i))]
+		watch_purchase(row_button(caption,street_action.bind("role",i)),caption,func() -> Dictionary:
+			var reason: String = "Wait until this team member returns or finishes hosting." if i in bar.away or not eco.hosted_round(bar,i).is_empty() else ""
+			return cash_offer(eco.role_change_required_cash(bar,i),reason))
 
 func shift_report(bar: Dictionary) -> void:
 	if bar.last_shift.is_empty(): return

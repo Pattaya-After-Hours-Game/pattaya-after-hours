@@ -29,7 +29,7 @@ func run() -> void:
 	app.model.s.street.chapter = 1
 	app.model.street.selected().stage = 3
 	app.show_tutorial_hint = false
-	app.open_service_section("team")
+	app.open_team_page("hire")
 	await capture(app,"talents-hiring-odds")
 	for control in app.column.find_children("*","Button",true,false):
 		if control.tooltip_text=="Explain Hire bartender · ฿1,200":
@@ -39,32 +39,33 @@ func run() -> void:
 	await capture(app,"talents-odds-help","",false)
 	for id in ["staff-platinum","staff-copper","staff-rose","staff-ruby"]:
 		discover(app,0,id)
-	await capture(app,"talents-platinum-card","Platinum")
-	await capture(app,"talents-rose-card","Rose")
+	app.open_team_page("member",0)
+	await capture(app,"talents-platinum-card")
+	app.open_team_page("member",2)
+	await capture(app,"talents-rose-card")
 	app.model.street.economy.staff_service(app.model.street.selected())
 	app.drawer_open = false
 	await capture(app,"talents-bartender-sales")
-	app.drawer_open = true
-	app.service_section = "team"
+	app.open_team_page("member",0)
 	var p: Dictionary = app.model.street.selected().team[0]
 	p.on = false
-	await capture(app,"talents-off-duty","Platinum")
+	await capture(app,"talents-off-duty")
 	p.contract_left = 0
 	await capture(app,"talents-renewal","Rehire Platinum")
 	app.model.street.action("buy",1)
 	app.model.s.street.selected = app.model.s.street.bars.size()-1
 	app.model.street.selected().stage = 3
 	for id in ["host-violet","host-goldie"]: discover(app,1,id)
-	await capture(app,"talents-goldie-card","Goldie\nAttracts")
+	app.open_team_page("member",1)
+	await capture(app,"talents-goldie-card")
 	app.drawer_open = false
 	await capture(app,"talents-hostess-room")
 	app.model.street.action("buy",2)
 	app.model.s.street.selected = app.model.s.street.bars.size()-1
 	app.model.street.selected().stage = 3
 	for id in ["host-onyx","host-scarlet"]: discover(app,2,id)
-	app.drawer_open = true
-	app.service_section = "team"
-	await capture(app,"talents-onyx-card","Onyx")
+	app.open_team_page("member",0)
+	await capture(app,"talents-onyx-card")
 	app.model.s.street.seconds = 40
 	app.drawer_open = false
 	await capture(app,"talents-gogo-set")
@@ -76,9 +77,8 @@ func run() -> void:
 		push_error("Talent preview save failed to reload")
 		quit(1)
 		return
-	app.drawer_open = true
-	app.service_section = "team"
-	await capture(app,"talents-reloaded","Onyx")
+	app.open_team_page("member",0)
+	await capture(app,"talents-reloaded")
 	app.queue_free()
 	await process_frame
 	quit()

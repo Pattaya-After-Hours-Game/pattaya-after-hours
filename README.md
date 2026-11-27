@@ -23,8 +23,8 @@ Hiring can reveal eight new staff members with their own sprites and talents.
 Rose pours more slowly but earns bigger tips; Platinum pours in 13 seconds and
 adds ฿15 per drink. Entertainers range from Violet's crowd appeal to legendary
 Onyx's 3× appeal and ฿30 bonus. New pools start at 70% common, 24% uncommon,
-5% rare and 1% legendary. Team's **?** shows current odds and each recruit's
-card explains their stats. Renewals keep the person you discovered.
+5% rare and 1% legendary. Tap **?** in **Hire floor staff** for current odds.
+Select a worker in Team to see their stats. Renewals keep the person you discovered.
 See [staff talents](docs/design/STAFF_TALENTS.md) for all eight and tip rules.
 
 ## One balance for the whole street
@@ -134,7 +134,7 @@ stays with them when rehired. Service shows the remaining term and rehire contro
 Closed hours and skipped nights during play count toward contracts. Time away
 from the game pauses contracts for all staff, including Nida.
 
-In **Service → Frontage promoter**, hire **Nida for ฿1,200 per ten game days, with no commission**. She replaces Welcome taps, uses a separate roster slot
+Under **Service → Team → Frontage promoter**, hire **Nida for ฿1,200 per ten game days, with no commission**. She replaces Welcome taps, uses a separate roster slot
 and never serves drinks. Her preview shows estimated demand and net
 profit with and without owner service. Bringing more customers to an already
 slow bar can lose money. Old unpaid commission commitments are cancelled; historical payments remain recorded. Promoters and dancers unlock separate audience training at stages
@@ -421,12 +421,12 @@ For a signed Android export, set `ANDROID_HOME`, `JAVA_HOME`, `GODOT_ANDROID_KEY
 
 The streets, businesses, characters, artwork, and arcade moves are original fictional content. The game and original assets are [MIT licensed](LICENSE). Godot and the bundled [DejaVu font](assets/DejaVu-LICENSE.txt) have their own notices.
 
-Gabby is available in **Service → Team & Payroll → Hire Gabby**. Her ฿1,200
+Gabby is available in **Service → Team → Hire floor staff → Hire Gabby**. Her ฿1,200
 ten-day bartender contract uses a normal team slot. Each drink she actually
 serves adds ฿5 to the nightly tip jar, alongside existing visit and drink bonuses.
 
 Daisy is a separate fictional adult entertainer in a red bikini, available at
-Hostess bars through **Service → Team & Payroll → Hire Daisy · ฿4,500**.
+Hostess bars through **Service → Team → Hire floor staff → Hire Daisy · ฿4,500**.
 Her ten-day contract uses a normal host slot, wages, training and availability.
 She attracts visitors; bartenders serve their orders.
 
@@ -485,8 +485,9 @@ The top-right **BARTENDERS** list shows the selected venue's portraits, levels
 and red bars filling toward each person's next serve. Level 1 is untrained;
 each purchased training tier adds a level. Ready, stock, rota, contract and
 closure labels reflect the live model. Larger teams scroll within the compact list.
-Tap a row or the arrow for Service; actual staff sale counts remain in the
-row tooltip and Service roster. Serving poses still follow actual sales.
+Tap a worker to open their details or use the arrow for the Team roster.
+Actual staff sales appear in the row tooltip and worker details. Serving poses
+follow actual sales.
 The shared venue **Tip jar** shows unpaid first-visit and drink bonuses, including
 Gabby's tips, and resets when paid at closing.
 
