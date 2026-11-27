@@ -498,7 +498,7 @@ func render(keep_scroll: bool = false) -> void:
 				var b: Dictionary = model.s.street.bars[i]
 				var thumb := TextureRect.new()
 				thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-				thumb.texture = Art.venue(int(b.type),int(b.stage),City.fan_owned(b),City.screen_owned(b),City.fridge_tier(b,i))
+				thumb.texture = Art.venue(int(b.type),int(b.stage),City.fan_owned(b),City.screen_owned(b),City.fridge_tier(b))
 				thumb.position = Vector2(3,3)
 				thumb.size = Vector2(56,32)
 				thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1442,13 +1442,12 @@ func street_action(id: String,index: int = 0, funded: bool = false, expected_pri
 		return
 	var sold_before := int(model.s.street.served)
 	var selected: Dictionary = model.street.selected()
-	var slot := int(model.s.street.selected)
-	var fridge_before := City.fridge_tier(selected,slot)
+	var fridge_before := City.fridge_tier(selected)
 	message = model.street.fund_and_buy(id,index,expected_price) if funded else model.street.action(id,index)
 	if id=="serve" and model.s.street.served>sold_before: service_animation = 0.7
-	var fridge_after := City.fridge_tier(selected,slot)
+	var fridge_after := City.fridge_tier(selected)
 	if fridge_after>fridge_before:
-		message = "Blue Hour fridge · Level %d installed · +40 drink slots" % fridge_after
+		message = "%s fridge · Level %d installed · +40 drink slots" % [selected.name,fridge_after]
 		show_details = false
 		save_state()
 		close_drawer()

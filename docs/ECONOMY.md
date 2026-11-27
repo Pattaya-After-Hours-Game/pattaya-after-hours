@@ -399,6 +399,8 @@ unchanged; eleven spare spaces cannot accept a twelve-drink delivery. Each fridg
 tier also adds +1 to the base +1 reputation earned per ten satisfied departures
 at that venue, capped at 100 street reputation. Purchases grant no immediate
 reputation; already-owned fridges benefit on future milestones.
+The cabinet display uses the venue's current stock divided by its capacity,
+including at the starter tier.
 
 Nida costs ฿1,200 for ten game days, with no drink commission or hourly wage. One frontage slot is separate from seats and floor staffing. While
 contracted/on duty, her attraction weight is +4.8; the model uses the greater of

@@ -9,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC, OUT = ROOT/'art/sources', ROOT/'assets/art'
 OUT.mkdir(parents=True, exist_ok=True)
 NEAREST = Image.Resampling.NEAREST
-required=[f'{kind}-{stage}' for kind in ['beer','soi','gogo'] for stage in range(1,4)]
+room_plates=[f'{kind}-{stage}' for kind in ['beer','soi','gogo'] for stage in range(1,4)]
+required=room_plates.copy()
 required+=['district','toybox','counter','event-inspection','icon','anong-walk-reference','core-cast-reference','support-cast-reference']
 missing_plates=[name for name in required if not (SRC/(name+'.png')).exists()]
 if missing_plates and '--partial' not in sys.argv:
@@ -186,7 +187,7 @@ for item in fan_recipe['assets']:
         canvas.alpha_composite(im,((canvas.width-im.width)//2,0))
         im=canvas
     im.save(OUT/(item['id']+'.png'))
-# The Blue Hour cabinet keeps its footprint through room renovations.
+# Refit the cabinet tiers in every room, patching each old silhouette.
 fridge_recipe=json.loads((ROOT/'art/recipes/blue-hour-fridges.json').read_text())
 fridges=Image.open(SRC/'blue-hour-fridge-upgrades.png').convert('RGBA')
 fridges.putalpha(fridges.getchannel('A').point(lambda a: 0 if a<190 else 255))
@@ -196,24 +197,28 @@ cabinet_atlas=Image.new('RGBA',(cell[0]*5,cell[1]))
 starter=Image.open(OUT/'beer-1.png').convert('RGBA').crop((*origin,origin[0]+cell[0],origin[1]+cell[1]))
 mask=Image.new('L',cell)
 ImageDraw.Draw(mask).polygon([tuple(point) for point in fridge_recipe['starter_mask']],fill=255)
-starter.putalpha(mask)
-cabinet_atlas.alpha_composite(starter)
 for i, width in enumerate(fridge_recipe['upgrade_widths']):
     x, y = i%2, i//2
     sprite=fridges.crop((x*fridges.width//2,y*fridges.height//2,(x+1)*fridges.width//2,(y+1)*fridges.height//2))
     sprite=sprite.crop(sprite.getbbox()).resize((width,250),NEAREST)
     cabinet_atlas.alpha_composite(sprite,((i+2)*cell[0]-3-width,4))
+left, top, right, bottom = fridge_recipe['starter_glass']
+glass = cabinet_atlas.crop(tuple(fridge_recipe['clean_glass']))
+starter.paste(glass.resize((right-left,bottom-top),NEAREST),(left,top))
+starter.putalpha(mask)
+cabinet_atlas.alpha_composite(starter)
 cabinet_atlas.save(OUT/'blue-hour-fridges.png')
 wall=Image.open(SRC/'blue-hour-fridge-wall.png').convert('RGBA')
 wall=wall.crop(tuple(fridge_recipe['wall_crop'])).resize((119,340),NEAREST).crop((0,50,119,306))
-wall_atlas=Image.new('RGBA',(cell[0]*2,cell[1]))
-for i, outline in enumerate(fridge_recipe['wall_masks']):
+wall_atlas=Image.new('RGBA',(cell[0]*3,cell[1]*3))
+for i, plate in enumerate(room_plates):
+    outline=fridge_recipe['wall_masks'][plate]
     patch=Image.new('RGBA',cell)
-    patch.alpha_composite(wall,(41,0))
+    patch.alpha_composite(wall,(40,0))
     mask=Image.new('L',cell)
     ImageDraw.Draw(mask).polygon([tuple(point) for point in outline],fill=255)
     patch.putalpha(mask.filter(ImageFilter.GaussianBlur(.6)))
-    wall_atlas.alpha_composite(patch,(i*cell[0],0))
+    wall_atlas.alpha_composite(patch,((i%3)*cell[0],(i//3)*cell[1]))
 wall_atlas.save(OUT/'blue-hour-fridge-walls.png')
 # Mini-game sprites use cell-centred footprints and wheel baselines.
 for sheet, cols, rows, cell in [

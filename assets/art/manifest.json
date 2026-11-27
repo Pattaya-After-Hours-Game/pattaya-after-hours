@@ -82,10 +82,10 @@
   "blue-hour-fridge-walls": {
     "file": "res://assets/art/blue-hour-fridge-walls.png",
     "size": [
-      320,
-      256
+      480,
+      768
     ],
-    "sha256": "ab0fd16110a5850a79a0b833a3e16425e35ef5341c6dc3a4be752ec45ace3928"
+    "sha256": "de5f59dc815fdff3ac6f2673b6c288b2cd2f790cec20df7f9e4e6322c95f167e"
   },
   "blue-hour-fridges": {
     "file": "res://assets/art/blue-hour-fridges.png",
@@ -93,7 +93,7 @@
       800,
       256
     ],
-    "sha256": "b050bd5e24519134114226f9481f0708e6f0b9d427e2f7738b334ae49095b618"
+    "sha256": "8f629ec2466a6475d1e3ec73665e67a6deedb445e364c2465ec8b66164f6b780"
   },
   "cart-jam-overhead": {
     "file": "res://assets/art/cart-jam-overhead.png",

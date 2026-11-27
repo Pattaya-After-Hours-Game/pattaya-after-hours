@@ -59,12 +59,14 @@ func run(test: SceneTree) -> void:
 					test.check(plain.get_region(strip).get_data()==equipped.get_region(strip).get_data(),"Sports screen preserves the surrounding production artwork")
 				test.check(Art.venue(kind,stage,has_fan,false).get_image().get_data()==plain.get_data(),"Switching properties cannot leak purchased TV artwork to another room")
 	var fridge_region := Rect2i(Art.FRIDGE_ORIGIN,Art.FRIDGE_CELL)
-	for stage in range(1,4):
-		var before := Art.venue(0,stage,false,false,0).get_image().get_region(fridge_region).get_data()
-		for tier in range(1,stage+2):
-			var after := Art.venue(0,stage,false,false,tier).get_image().get_region(fridge_region).get_data()
-			test.check(after!=before,"Each Blue Hour fridge purchase changes the cabinet at the same renovation stage")
-			before = after
+	for kind in 3:
+		for stage in range(1,4):
+			var before := Art.venue(kind,stage,false,false).get_image().get_region(fridge_region).get_data()
+			var tier_count := stage+2 if kind==0 else 3
+			for tier in tier_count:
+				var after := Art.venue(kind,stage,false,false,tier).get_image().get_region(fridge_region).get_data()
+				test.check(after!=before,"Starter and upgraded fridge art differs for room %d/%d at tier %d" % [kind,stage,tier])
+				before = after
 	for id in ["district","toybox","counter","event-inspection","compact-bench"]:
 		test.check(Art.texture(id) != null,"Scene/prop artwork exists: "+id)
 	for id in ["anong"]+Art.STAFF+Art.HOSTS+["juno","vega","orchid","nida","gabby","daisy"]:

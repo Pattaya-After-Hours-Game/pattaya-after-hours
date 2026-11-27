@@ -10,6 +10,7 @@ const GOLD = Color("#e8ba7b")
 const ORDER_URGENT = Color("#ff514d")
 const KISS_SECONDS = 1.2
 const FRIDGE_BOTTLE_BAYS = [
+	[Vector2i(63,5)],
 	[Vector2i(71,7)],
 	[Vector2i(54,6),Vector2i(125,1)],
 	[Vector2i(88,5),Vector2i(23,5)],
@@ -116,10 +117,10 @@ func _draw() -> void:
 	var bar: Dictionary = bars[selected_bar] if not bars.is_empty() else {"type":0,"stage":clampi(level,1,3),"crew":legacy_staff.size(),"away":[],"closed":0,"name":"Blue Hour"}
 	var kind := int(bar.type)
 	var stage := int(bar.stage)
-	var tier := fridge_tier(bar,selected_bar) if not bars.is_empty() else -1
+	var tier := fridge_tier(bar) if not bars.is_empty() else -1
 	var backdrop := Art.venue(kind,stage,fan_owned(bar),screen_owned(bar),tier)
 	if backdrop: draw_texture_rect(backdrop,Rect2(0,0,960,540),false)
-	if tier>0: _draw_fridge_stock(tier,int(bar.stock))
+	if tier>=0: _draw_fridge_stock(tier,int(bar.stock))
 	if celebrating: _draw_celebration()
 	var closed := not Economy.trading(bar,int(street_state.get("minute",720)))
 	# Only the street opening contains ambient traffic. Interior sprites come
@@ -190,8 +191,8 @@ func _draw() -> void:
 	# Anong remains available at the service position even before the first hire.
 	var idle := 0 if service_flash <= 0 or closed else 3
 	Art.frame(self,"anong-service",idle,Vector2(817,418),person_scale(418),false,Vector2.ZERO,Color.WHITE,Vector2(1,1+.005*sin(clock*2)))
-	# Leave the upgraded cabinet and its lower drawer visible beside Anong.
-	Art.image(self,"counter",Rect2(650,344,198 if tier>0 else 310,92))
+	# Leave the cabinet and its lower drawer visible beside Anong.
+	Art.image(self,"counter",Rect2(650,344,198 if tier>=0 else 310,92))
 	if tier==4 and fridge_install_flash>0: _draw_fridge_frost()
 	if bar.get("bed_trophy",false):
 		draw_rect(Rect2(697,104,35,25),Color("#2b242d"))
@@ -239,11 +240,12 @@ func _draw_compact_layout() -> void:
 	for x in [257,465]: Art.image(self,"compact-bench",Rect2(x,294,150,80))
 
 func _draw_fridge_stock(tier: int, stock: int) -> void:
-	var bays: Array = FRIDGE_BOTTLE_BAYS[tier-1]
+	var bays: Array = FRIDGE_BOTTLE_BAYS[tier]
+	var shelves := [191,145,100] if tier==0 else [190,154,118,83]
 	var slots := 0
-	for bay in bays: slots += 4*bay.y
+	for bay in bays: slots += shelves.size()*bay.y
 	var fill := ceili(slots*clampf(float(stock)/fridge_capacity,0,1))
-	for shelf in [190,154,118,83]:
+	for shelf in shelves:
 		for bay in bays:
 			for i in bay.y:
 				if fill==0: return
@@ -259,8 +261,7 @@ func _draw_fridge_frost() -> void:
 		var p := Vector2(890+i*6,396-i%3*4)-Vector2(progress*(12+i*2),progress*16)
 		draw_rect(Rect2(p,Vector2(8+i%3*2,3)),Color(.70,.94,1.0,.8*fridge_install_flash))
 
-static func fridge_tier(bar: Dictionary, slot: int) -> int:
-	if slot!=0 or int(bar.type)!=0: return -1
+static func fridge_tier(bar: Dictionary) -> int:
 	return clampi(int(bar.get("equipment",{}).get("fridge",0)),0,4)
 
 static func fan_owned(bar: Dictionary) -> bool:

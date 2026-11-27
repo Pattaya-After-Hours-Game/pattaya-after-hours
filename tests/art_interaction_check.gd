@@ -33,33 +33,46 @@ func fight_key(test: SceneTree, key: Key, down: bool, echo: bool = false) -> voi
 	event.echo = echo
 	test.root.push_input(event,true)
 
-func check_blue_hour_fridges(test: SceneTree, app: Control) -> void:
+func check_venue_fridges(test: SceneTree, app: Control) -> void:
 	app.model = Campaign.new(555)
-	app.model.street.selected().cash = 20000
-	var bar: Dictionary = app.model.street.selected()
-	var before: Texture2D = Art.venue(0,1,false,false,0)
-	for tier in range(1,5):
-		bar.stage = [1,1,2,3][tier-1]
-		var capacity: int = app.model.street.economy.stock_capacity(bar)
-		app.open_upgrades()
-		var purchase := app.column.find_child("Upgrade_fridge",true,false) as Button
-		test.check(purchase!=null and not purchase.disabled,"Blue Hour offers fridge tier %d" % tier)
-		if purchase==null or purchase.disabled: return
-		purchase.pressed.emit()
-		var thumbnail := app.find_child("Property0",true,false).get_child(0) as TextureRect
-		test.check(bar.equipment.fridge==tier and thumbnail.texture!=before and not app.drawer_open,
-			"Buying Blue Hour fridge tier %d updates its artwork and reveals the room" % tier)
-		test.check(app.city.fridge_capacity==capacity+40 and (app.city.fridge_install_flash>0)==(tier==4),
-			"Fridge art uses the purchased capacity and only the final tier emits frost")
-		before = thumbnail.texture
+	app.model.s.cash = 150000
+	app.model.s.rep = 100
+	app.model.s.street.chapter = 4
+	for kind in 3: app.model.street.action("buy",kind)
+	test.check(app.model.s.street.bars.size()==4,"Fridge checks include a second beer bar, hostess bar and gogo")
+	var cabinets: Array[Texture2D] = []
+	for slot in app.model.s.street.bars.size():
+		app.model.s.street.selected = slot
+		var bar: Dictionary = app.model.street.selected()
+		bar.cash = 20000
+		app.render()
+		var property_name := "Property%d" % slot
+		var thumbnail := app.find_child(property_name,true,false).get_child(0) as TextureRect
+		var before: Texture2D = thumbnail.texture
+		test.check(before==Art.venue(bar.type,1,false,false,0),"Every venue starts with the adaptive cabinet")
+		for tier in range(1,5 if bar.type==0 else 3):
+			bar.stage = [1,1,2,3][tier-1]
+			var capacity: int = app.model.street.economy.stock_capacity(bar)
+			app.open_upgrades()
+			var purchase := app.column.find_child("Upgrade_fridge",true,false) as Button
+			test.check(purchase!=null and not purchase.disabled,"%s offers fridge tier %d" % [bar.name,tier])
+			if purchase==null or purchase.disabled: return
+			purchase.pressed.emit()
+			thumbnail = app.find_child(property_name,true,false).get_child(0) as TextureRect
+			test.check(bar.equipment.fridge==tier and thumbnail.texture!=before and not app.drawer_open,
+				"Buying a fridge updates the selected venue's artwork and reveals the room")
+			test.check(app.city.fridge_capacity==capacity+40 and (app.city.fridge_install_flash>0)==(tier==4),
+				"Fridge art uses the purchased capacity and only tier four emits frost")
+			before = thumbnail.texture
+		cabinets.append(before)
 	var loaded := Campaign.new(555)
 	test.check(loaded.load_game(),"Fridge purchase is saved")
 	app.model = loaded
 	app.render()
-	var restored := app.find_child("Property0",true,false).get_child(0) as TextureRect
-	test.check(restored.texture==before and app.city.fridge_install_flash==0,
-		"Reload restores Blue Hour fridge art without replaying the installation")
-	test.check(app.city.fridge_tier(bar,1)==-1,"Other beer bars keep their regular art")
+	for slot in cabinets.size():
+		var restored := app.find_child("Property%d" % slot,true,false).get_child(0) as TextureRect
+		test.check(restored.texture==cabinets[slot] and app.city.fridge_install_flash==0,
+			"Reload restores each venue's fridge art without replaying the installation")
 
 func run(test: SceneTree) -> void:
 	var app = load("res://main.tscn").instantiate()
@@ -73,7 +86,7 @@ func run(test: SceneTree) -> void:
 	test.check(app.boot_menu and not app.new_game_confirmation,"Pointer cancels without leaving the menu")
 	await click(test,test.find_button(app,"Resume"))
 	test.check(not app.boot_menu,"Pointer resumes the saved campaign")
-	check_blue_hour_fridges(test,app)
+	check_venue_fridges(test,app)
 	app.model = Campaign.new(555)
 	app.offline_notice = 0
 	app.show_tutorial_hint = false

@@ -81,8 +81,9 @@ Stock starts in **six-drink packs for ฿228**. Supplier level 2 switches both m
 and automatic deliveries to **twelve drinks for ฿432** (฿36 each). Levels 3–5
 keep twelve-drink deliveries and lower the bill to ฿408/384/360. Every purchase
 needs room and cash for the whole delivery; the button explains any shortfall.
-At the Blue Hour, each fridge upgrade visibly adds storage and frost. Each fridge
-tier adds +1 reputation per ten satisfied visits, on top of the base +1.
+Every venue starts with a cabinet that shows how full its fridge is. Fridge
+upgrades change the cabinet in the room and add +1 reputation per ten satisfied
+visits per tier, on top of the base +1.
 Stage-1 beer bars can buy a third seating level, **Compact layout
 for ฿1,200**, reaching twelve customers even with pool and fans installed.
 

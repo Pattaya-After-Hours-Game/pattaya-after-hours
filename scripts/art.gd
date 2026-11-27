@@ -41,8 +41,7 @@ static func venue(kind: int, stage: int, has_fan: bool = true, has_screen: bool 
 	var id := "%s-%d" % [TYPES[kind],stage]
 	var original := texture(id)
 	if original==null: return null
-	var fitted_fridge := kind==0 and fridge_tier>=0 and (stage>1 or fridge_tier>0)
-	var key := "%s#fan-%s#screen-%s#fridge-%d" % [id,has_fan,has_screen,fridge_tier if fitted_fridge else -1]
+	var key := "%s#fan-%s#screen-%s#fridge-%d" % [id,has_fan,has_screen,fridge_tier]
 	if not textures.has(key):
 		var plate: Image = original.get_image().duplicate()
 		plate.convert(Image.FORMAT_RGBA8)
@@ -65,11 +64,11 @@ static func venue(kind: int, stage: int, has_fan: bool = true, has_screen: bool 
 		elif kind==0 and stage>1:
 			# The fitted bezel remains, but its display is off until purchased.
 			plate.fill_rect(screen.grow(-4),Color("#171824"))
-		if fitted_fridge:
+		if fridge_tier>=0:
 			var wall := texture("blue-hour-fridge-walls").get_image()
 			var cabinet := texture("blue-hour-fridges").get_image()
-			var wall_x := FRIDGE_CELL.x if stage>1 else 0
-			plate.blend_rect(wall,Rect2i(Vector2i(wall_x,0),FRIDGE_CELL),FRIDGE_ORIGIN)
+			var wall_origin := Vector2i(stage-1,kind)*FRIDGE_CELL
+			plate.blend_rect(wall,Rect2i(wall_origin,FRIDGE_CELL),FRIDGE_ORIGIN)
 			plate.blend_rect(cabinet,Rect2i(Vector2i(fridge_tier*FRIDGE_CELL.x,0),FRIDGE_CELL),FRIDGE_ORIGIN)
 		textures[key] = ImageTexture.create_from_image(plate)
 	return textures[key]

@@ -208,13 +208,14 @@ economy views, plus wider-window pool/layout checks. Linux export and its isolat
 headless smoke test pass; the integrated Android debug APK exports and verifies.
 Android device, Windows and macOS execution were not tested in this integration.
 
-## Equipment ownership: Blue Hour fridge
+## Equipment ownership: adaptive fridges
 
-The Blue Hour room and property thumbnail use the saved fridge tier. The
-four fitted cabinets add a shelf, a side bay, twin doors and a cold drawer.
-The live room fills the upgraded shelves from actual inventory and gives the
-final purchase a brief burst of frost. The generated cabinets and wall patch
-are packed by `tools/prepare_art.py` using the [fridge recipe](recipes/blue-hour-fridges.json).
+Every room and property thumbnail uses the saved fridge tier. The live room
+draws bottles from the venue's actual stock, including the starter cabinet.
+The fitted upgrades add a shelf, a side bay, twin doors and a cold drawer,
+with a brief burst of frost on the final purchase. The cabinet atlas and
+wall patches for the nine room plates are packed by `tools/prepare_art.py`
+using the [fridge recipe](recipes/blue-hour-fridges.json).
 
 ## Equipment ownership: wall fans
 

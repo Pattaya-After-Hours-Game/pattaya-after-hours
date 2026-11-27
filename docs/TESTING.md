@@ -68,14 +68,15 @@ them and repeating the loop. The `sunglasses-*` previews show each pose in the
 Blue Hour at 960 × 540 and 1280 × 720. The nine original atlas cells and the
 animated guest's lower body were checked for pixel-for-pixel alignment.
 
-## Blue Hour fridge art
+## Adaptive fridge art
 
-The art checks compare consecutive fridge variants at each renovation stage.
-The UI check uses the four paid upgrade buttons, verifies the room reveal and
-thumbnail, then reloads the saved cabinet without replaying the cold puff.
-The `blue-hour-fridge-*` economy previews cover all tiers, a renovated room
-with the starter cabinet, and stocked and empty versions of the final tier.
-The previews were inspected at 960×540 and 1280×720.
+The art checks compare the starter and consecutive fridge upgrades at all
+three renovation stages for each venue type. The UI check buys each allowed
+tier in Blue Hour, a second beer bar, a hostess bar and a gogo. It checks the
+room reveal, the thumbnail, the extra stock room and the saved cabinet on
+reload. The `venue-fridge-*` economy previews show empty and full starter
+and tier-two cabinets in all nine rooms. The `blue-hour-fridge-*` previews
+also cover intermediate beer-bar tiers and the cold drawer.
 
 ## Demand-aware action refills — 27 November 2026
 

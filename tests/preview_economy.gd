@@ -143,6 +143,26 @@ func run() -> void:
 		await capture(app,"blue-hour-fridge-4-empty")
 		quit()
 		return
+	if filter.begins_with("venue-fridge-"):
+		app.show_tutorial_hint = false
+		app.model.s.cash = 150000
+		app.model.s.rep = 100
+		app.model.s.street.chapter = 4
+		for kind in 3:
+			app.model.street.action("buy",kind)
+			var bar: Dictionary = app.model.street.selected()
+			bar.cash = 20000
+			for stage in range(1,4):
+				bar.stage = stage
+				for tier in [0,2]:
+					bar.equipment.fridge = tier
+					var state := "venue-fridge-%d-%d-%d" % [kind,stage,tier]
+					bar.stock = 0
+					await capture(app,state+"-empty")
+					bar.stock = app.model.street.economy.stock_capacity(bar)
+					await capture(app,state+"-full")
+		quit()
+		return
 	await capture(app,"opening")
 	app.model.street.selected().cash = 50
 	app.open_fridge()

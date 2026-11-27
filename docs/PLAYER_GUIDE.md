@@ -720,9 +720,10 @@ per ten satisfied visits at that bar. With no upgrade that milestone earns +1;
 with fridge levels one/two it earns +2/+3, up to 100 reputation. Buying the fridge
 alone grants no reputation. Existing fridges benefit from future happy visits.
 
-Buying a fridge upgrade at the Blue Hour reveals it in the room. The four tiers
-add a shelf, a side compartment, twin doors and a cold drawer, with more frost
-at each step. The bottles in the upgraded cabinet show roughly how full it is.
+Every venue starts with a cabinet whose bottles show roughly how full it is.
+Buying a fridge upgrade reveals the new cabinet in the room. Beer bars can add
+a shelf, a side compartment, twin doors and a cold drawer. Hostess bars and
+gogos have the first two upgrades.
 
 Supplier levels 0/1 buy six drinks for ฿228. Levels 2/3/4/5 buy twelve for
 ฿432/408/384/360. The button shows the current quantity and total bill. Eleven empty
