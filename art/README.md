@@ -129,6 +129,15 @@ behind its original furnished terrace. Bar traffic caps at seven subdued walkers
 three scooters and two cars, scaled by distance. Room sources, runtime PNGs and
 property thumbnails remain unchanged.
 
+Foreground traffic approaches the room's adult scale: the 120px walkers grow
+from 0.27× to 1.25×, and vehicles from 0.20× to 1.05×. The smaller stage-three
+terrace retains its 0.42× distance multiplier. District scales stay unchanged.
+The preview includes `bar-traffic-scale-*` near/far, front/rear, charcoal-guest,
+scooter and car captures at all three beer-bar stages.
+Verified on 27 November 2026 with the complete isolated `tools/test.sh` suite
+and in-engine previews at 960×540 and 1280×720, including front/rear traffic,
+all nine venue apertures and the furnished terrace. Device play remains unverified.
+
 ```sh
 PATTAYA_PREVIEW_SCRIPT=tests/preview_street_activity.gd tools/preview-art.sh /tmp/pattaya-street-activity
 ```

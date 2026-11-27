@@ -109,6 +109,15 @@ func run() -> void:
 		app.city.clock = 4+frame*.15
 		app.city.queue_redraw()
 		await capture("bar-traffic-frame-%02d" % frame)
+	# Near/far front and rear silhouettes beside the parked scooter and patrons.
+	for stage in range(1,4):
+		app.model.street.selected().stage = stage
+		for sample in [["far",2.2],["front",19.36],["rear",24.64],["charcoal",107.36],["scooter",6.49],["car",4.2]]:
+			fill(app,10 if sample[0]=="car" else 3)
+			room(app)
+			app.city.clock = sample[1]
+			app.city.queue_redraw()
+			await capture("bar-traffic-scale-%d-%s" % [stage,sample[0]])
 	app.queue_free()
 	await process_frame
 	print("Captured district activity, closure/rain, bar clock/activity, all nine apertures and traffic frames: "+output)

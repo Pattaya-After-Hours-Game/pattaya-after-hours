@@ -47,7 +47,9 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 			if closeup:
 				foot = Vector2(190,266).lerp(Vector2(117,372),depth)
 				if kind==0: foot.x += 10 if forward else -9
-				scale_value = lerpf(.27,.59,depth) if kind==0 else lerpf(.20,.49,depth)
+				# The near end meets the room's floor plane: 120px walkers and
+				# 136px scooter/rider silhouettes should approach adult patron size.
+				scale_value = lerpf(.27,1.25,depth) if kind==0 else lerpf(.20,1.05,depth)
 				if terrace:
 					foot = Vector2(193,215).lerp(Vector2(183,281),depth)
 					scale_value *= .42
