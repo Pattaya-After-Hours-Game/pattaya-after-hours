@@ -129,6 +129,9 @@ static func atlas_specs() -> Dictionary:
 	specs["gabby"] = [Vector2(160,192),4]
 	specs["daisy"] = [Vector2(160,256),6]
 	specs["street-walkers"] = [Vector2(96,128),16]
+	specs["patrons-charcoal"] = [Vector2(160,192),16]
+	specs["street-charcoal"] = [Vector2(96,128),4]
+	specs["street-charcoal-depth"] = [Vector2(96,128),8]
 	specs["street-scooters"] = [Vector2(192,144),8]
 	specs["street-cars"] = [Vector2(224,112),4]
 	specs["street-walkers-depth"] = [Vector2(96,128),32]
@@ -140,7 +143,8 @@ static func atlas_specs() -> Dictionary:
 	for id in ["mali","juno","vega","orchid"]: specs["fight-"+id] = [Vector2(320,256),12]
 	return specs
 
-static func customer_sprite(customer_id: int) -> Array:
+static func customer_sprite(customer_id: int, appearance: String = "") -> Array:
+	if appearance=="charcoal": return ["patrons-charcoal",12]
 	# The companion sprites appear on opening orders and rotate back in later.
 	if customer_id%24==2: return ["patrons-capybara",0]
 	if customer_id%32==3: return ["patrons-rainbow-duo",0]
@@ -164,6 +168,8 @@ static func cobalt_frame(time: float) -> int:
 
 # Semantic animation catalog. Contact frames are selected by the combat simulator.
 static func animation_frames(id: String, state: String) -> Array:
+	if id=="patrons-charcoal":
+		return {"idle":[12],"walk":[0,1,2,3],"walk_front":[4,5,6,7],"walk_back":[8,9,10,11],"drinking":[13],"chat":[14],"pool":[15]}.get(state,[12])
 	# Customer-specific poses are selected by the street scene.
 	if id.begins_with("patrons"): return [0]
 	if id.begins_with("fight-"):

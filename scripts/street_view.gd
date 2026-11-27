@@ -58,13 +58,19 @@ static func traffic(level: int, time: float, closeup: bool = false, terrace: boo
 				if kind==0: foot.y -= 7+i%2*9
 				scale_value = [.30,.30,.31][kind]
 			var id: String = ["street-walkers","street-scooters","street-cars"][kind]
-			var row: int = i%4 if kind==0 else i%2 if kind==1 else 0
+			var row: int = i%5 if kind==0 else i%2 if kind==1 else 0
+			var charcoal: bool = kind==0 and row==4
 			if closeup:
 				id += "-depth"
 				# Front/rear are authored views, never mirrored side profiles.
 				# Change identity only at the invisible end of a crossing.
-				var identities: int = [4,2,1][kind]
-				row = posmod(i/2+cycle,identities)*2+(0 if forward else 1)
+				var identities: int = [5,2,1][kind]
+				var identity := posmod(i/2+cycle,identities)
+				charcoal = kind==0 and identity==4
+				row = (0 if charcoal else identity)*2+(0 if forward else 1)
+			if charcoal:
+				id = "street-charcoal-depth" if closeup else "street-charcoal"
+				if not closeup: row = 0
 			var frame := row*4+posmod(int(time*(7 if kind==0 else 5))+i,4)
 			var alpha := smoothstep(0,.07,phase)*(1-smoothstep(.93,1,phase))
 			var tint := Color(.48,.51,.59,alpha) if closeup and kind==0 else Color(1,1,1,alpha)

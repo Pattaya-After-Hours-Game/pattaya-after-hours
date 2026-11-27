@@ -388,9 +388,14 @@ func scene_people(bar: Dictionary) -> Array:
 				var player: int = game.players.find(bar.customers[i].id)
 				if player>=0: foot = Vector2(250+int(game.get("table",0))*200+player*205,355+int(game.get("table",0))*12)
 		var customer_id: int = int(bar.customers[i].id) if bar.has("customers") else i+1
-		var appearance := Art.customer_sprite(customer_id)
+		var appearance := Art.customer_sprite(customer_id,str(bar.customers[i].get("appearance","")) if bar.has("customers") else "")
 		var pose: int = appearance[1]
-		if appearance[0]=="patrons-capybara":
+		if appearance[0]=="patrons-charcoal" and bar.has("customers"):
+			var guest: Dictionary = bar.customers[i]
+			var now := float(street_state.get("elapsed",0))+float(street_state.get("tick_fraction",0.0))
+			var state := "pool" if guest.playing else "chat" if now<float(guest.get("chat_until",0)) else "drinking" if guest.get("visit_phase","")=="drinking" else "idle"
+			pose = Art.animation_frame("patrons-charcoal",state,clock)
+		elif appearance[0]=="patrons-capybara":
 			pose = Art.capybara_frame(clock+float(customer_id/24)*1.31)
 		elif appearance[0]=="patrons-men" and pose==Art.COBALT_IDLE:
 			pose = Art.cobalt_frame(clock+float(customer_id/Art.CUSTOMER_VARIANTS.size())*1.31)

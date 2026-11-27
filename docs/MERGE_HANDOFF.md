@@ -1,5 +1,18 @@
 # Current implementation and release handoff
 
+## Charcoal reference guest — 27 November 2026
+
+Adds the user's supplied adult likeness as an ordinary customer and fifth street
+walker. Sixteen authored frames cover side/front/rear walking, idle, drinking,
+Chat and pool. Built-in ImageGen source, exact prompt, deterministic packer and
+three runtime atlases are committed together. Existing production assets remain
+intact. New admissions alone receive the optional cosmetic appearance; old saved
+guests retain their look, budgets, plans and quotes. No prices, demand or RNG change.
+
+Sprite/save/scene regressions and two-resolution art review are documented in
+[TESTING](TESTING.md#charcoal-reference-guest--27-november-2026). Device play is
+unverified; source on main is not a receipt for published release downloads.
+
 ## Tour funding clarity — 27 November 2026
 
 Follow-up to `a64539e`: removed the extra Tours balance paragraph, instructions

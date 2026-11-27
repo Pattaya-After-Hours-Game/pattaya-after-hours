@@ -1,5 +1,13 @@
 # Developer setup and handover
 
+The optional customer `appearance: "charcoal"` field is cosmetic and remains
+compatible with schema 16. Only `economy.admit` assigns it to new ID-24-mod-48
+visits, without RNG; absent fields keep legacy looks. Campaign validation
+accepts only that identity. `city.scene_people` reads actual visit phase, saved
+Chat deadline and active pool state for poses. Packing and provenance are in
+[the art guide](art/README.md); `charcoal_guest_check.gd` covers save preservation
+and read-only presentation. Outdoor walkers remain ambient traffic, not admissions.
+
 For the premise and cast, see [story.md](story.md). For gameplay help, see the
 [player guide](docs/PLAYER_GUIDE.md). [Testing and release checks](docs/TESTING.md)
 records coverage and remaining platform verification.

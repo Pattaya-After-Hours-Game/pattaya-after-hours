@@ -107,7 +107,7 @@ func check_traffic(test: SceneTree) -> void:
 	for second in range(0,180,3):
 		for item in StreetView.traffic(7,second,true):
 			views["%s/%d" % [item.id,item.frame/4]] = true
-	test.check(views.size()==14,"All four walkers, two scooters and the car can appear in front and rear views")
+	test.check(views.size()==16,"All five walkers, two scooters and the car can appear in front and rear views")
 	var quiet_directions := {}
 	for second in range(0,60,3):
 		for item in StreetView.traffic(4,second,true):

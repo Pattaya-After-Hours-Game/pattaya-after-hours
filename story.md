@@ -143,6 +143,8 @@ The crowd includes familiar faces and visitors with different clothes and looks.
 Their appearance stays with them throughout a visit; it does not decide their
 budget or behaviour. A better bar changes in visible ways: buying fans installs
 fans, and buying a sports screen gives the regulars a match to argue over.
+The charcoal-suited reference guest joins that ordinary crowd, with walking,
+drinking, conversation and pool artwork rather than a separate quest or VIP economy.
 Renovating alone does not give away the equipment; fitted beer-bar screens
 stay dark until the sports upgrade is bought. Compact benches make room for
 twelve people without losing the pool table or fans. Bo starts with six-packs, then offers twelve-drink deliveries at a cheaper unit

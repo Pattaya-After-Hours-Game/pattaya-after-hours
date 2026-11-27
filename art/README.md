@@ -14,6 +14,19 @@ for purchased level-three beer-bar seating.
 
 ## Provenance
 
+The charcoal-suited supplied-reference guest has a 16-frame sheet: four side
+walks, four front walks, four rear walks, idle, drink, Chat and pool. The
+[receipt](recipes/customer-charcoal.json) contains the exact built-in ImageGen
+prompt and reference roles. `sources/customer-charcoal-sheet.png` is the
+generated source; `tools/prepare_charcoal_guest.py` packs the 160×192 bar atlas
+and 96×128 street atlases using authored transparent row separators and a
+shared scale. The full packer includes it. Existing runtime PNGs stay intact.
+Only new admissions receive the optional saved `appearance: charcoal` identity
+(one in 48 IDs); old guests retain their previous art. Street traffic adds this
+fifth walking identity. Indoor drink/Chat/cue poses follow model state.
+
+Preview with `PATTAYA_PREVIEW_SCRIPT=tests/preview_charcoal_guest.gd tools/preview-art.sh`.
+
 Artwork was generated with the built-in image-generation tool in this Codex
 session on 25 November 2026, using the project's generated Blue Hour and cast
 references. Exact prompts and returned source paths are saved in `recipes/`.

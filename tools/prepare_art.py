@@ -242,6 +242,8 @@ Image.open(SRC/'bed-race-beach.png').convert('RGB').resize((960,320),NEAREST).sa
 
 from prepare_street_art import prepare as prepare_street
 prepare_street()
+from prepare_charcoal_guest import prepare as prepare_charcoal
+prepare_charcoal()
 manifest={}
 for p in sorted(OUT.glob('*.png')):
     im=Image.open(p)

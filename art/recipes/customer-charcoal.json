@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: stylized-concept\nAsset type: production transparent 16-frame sprite atlas for existing Godot nightlife game.\nInput images: Image 1 is likeness and outfit reference for the adult man; Image 2 is rendering style reference only (existing game customers); Image 3 is walk cycle style reference only.\nPrimary request: Draw the man from Image 1 as a recognizable full-body game character, matching the pixel-painted illustrated game style of images 2 and 3. Broad stocky build, round face, short high black slick flat-top haircut with shaved sides, dark charcoal high-collared button jacket and matching trousers, plain black shoes. Preserve face and hairstyle throughout all directions. Full clothing, no insignia, no flags, no text.\nComposition: EXACTLY four columns and four rows of equal-sized cells on a transparent canvas. Each cell contains ONE full-body character, isolated with generous transparent space, centered on identical ground baselines. All characters same body size and height, no overlaps, no labels, no gridlines, no ground shadows. Clear small sprite readability with crisp painted pixel edges, limited warm shading, not photographic and not chibi.\nROW 1: four phases of walking toward screen RIGHT in side profile: left foot forward, passing, right foot forward, passing. Visible arm and leg motion.\nROW 2: four phases of walking toward the viewer, front view, alternating feet and arm swing.\nROW 3: four phases of walking AWAY from viewer, rear view, alternating feet and arm swing. Show the back of his hair and jacket, no face on rear views.\nROW 4: four bar interaction poses, all front three-quarter toward screen right: (1) standing idle empty hands, (2) drinking from a beer glass at his mouth, (3) friendly conversation one open hand gesturing, (4) standing holding a pool cue with tip raised upward, feet on same baseline. Cue must fit fully inside its cell.\nConstraints: exactly 16 sprites, 4 by 4 evenly spaced. Identical adult man in every cell. No other people or backdrop. Actual transparent alpha. Keep head and feet fully inside each cell.",
+  "source": "art/sources/customer-charcoal-sheet.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21abb-39f7-7441-aae5-1be5a86a64e9/exec-ccfa2fc4-bb29-4de7-9fb6-a1d421fca468.png",
+  "references": [
+    {
+      "role": "likeness and clothing",
+      "path": "/tmp/codex-clipboard-b0e57297-31d0-41ab-8bb9-bf0b9d9a88f3.png"
+    },
+    {
+      "role": "rendering style",
+      "path": "assets/art/patrons-men.png"
+    },
+    {
+      "role": "walking style",
+      "path": "assets/art/street-walkers.png"
+    }
+  ],
+  "packing": "tools/prepare_charcoal_guest.py",
+  "frames": {
+    "walk_side": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "idle": 12,
+    "drinking": 13,
+    "chat": 14,
+    "pool": 15
+  },
+  "seed": null,
+  "model_version": null
+}

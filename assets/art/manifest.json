@@ -838,5 +838,29 @@
       84
     ],
     "sha256": "b883a702177cad3bd4bc8cbc624bd53cb305e850d17b1ed014a07689acc4cbd9"
+  },
+  "patrons-charcoal": {
+    "file": "res://assets/art/patrons-charcoal.png",
+    "size": [
+      640,
+      768
+    ],
+    "sha256": "d5d8596bf40972915275256ad164fd131e7afe1981de09af045b8515951f76b1"
+  },
+  "street-charcoal": {
+    "file": "res://assets/art/street-charcoal.png",
+    "size": [
+      384,
+      128
+    ],
+    "sha256": "0f33d4efd442c684ab8ee21b9cc2603324ee2bd61b842f5c175831de2939c5cc"
+  },
+  "street-charcoal-depth": {
+    "file": "res://assets/art/street-charcoal-depth.png",
+    "size": [
+      384,
+      256
+    ],
+    "sha256": "5912393a9425a2eaf7b6df2769270614e077bdf9ba77b1a1bf609e50fc2d13f6"
   }
 }

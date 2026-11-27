@@ -953,6 +953,9 @@ func admit(bar: Dictionary, promoted: bool = false, opening: bool = false, audie
 	customer.planned_rounds = mini(3,rounds)
 	customer.budget = int(C.TYPES[int(bar.type)].drink)*int(customer.planned_rounds)+100
 	customer.visit_phase = "waiting"
+	# Cosmetic identity on new admissions only. Saved guests keep their old look;
+	# this consumes no RNG and cannot change traffic, orders or visit plans.
+	if int(customer.id)%48==24: customer.appearance = "charcoal"
 	customer.party_patience = C.CELEBRATION_PATIENCE if celebrating(bar) else 0
 	customer.commission_visit = C.COMMISSION_PERCENT>0 and promoter_bonus(bar)>0
 	s.street.next_customer += 1

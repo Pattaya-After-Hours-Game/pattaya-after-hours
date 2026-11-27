@@ -1,5 +1,24 @@
 # Testing and release checks
 
+## Charcoal reference guest — 27 November 2026
+
+The full isolated `tools/test.sh` suite passed on Godot 4.7.2, including pacing.
+A final isolated regression run also passed against the concurrent tour edits.
+
+`charcoal_guest_check.gd` covers ordinary admission, old-guest appearance,
+model-driven idle/drinking/Chat/pool poses, independent scene/model clocks,
+closure, pure reads and save/reload preservation of identity, quote, budget,
+visit plan and RNG. Street checks cover all five walkers and both depth views;
+art integrity checks include all 16 bar and twelve outdoor frames, alpha,
+atlas bounds and manifest hashes. Scoped packing is deterministic and preserves
+all previous runtime PNGs.
+
+`preview_charcoal_guest.gd`, run through `tools/preview-art.sh`, covers four
+bar poses in each venue type, district side walking and bar approach traffic.
+The affected states were inspected at 960×540 and 1280×720. Device play remains
+unverified. The exact prompt and built-in ImageGen receipt are in
+[the art recipe](../art/recipes/customer-charcoal.json).
+
 ## Tour funding clarity — 27 November 2026
 
 `tests/check.gd` reproduces a ฿670 venue till with an empty company bank.
