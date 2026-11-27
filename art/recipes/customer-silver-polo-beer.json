@@ -1,0 +1,72 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Transparent16frame production sprite sheet for Pattaya After Hours. Two references show EXACT elderly slender adult white man, swept silver hair, white moustache, black rectangular glasses, salmon polo cream trim, beige belted knee shorts, cream socks, brown leather sandals, wristwatch. Preserve identity, face/body/outfit and crisp illustrated pixel-painted style allframes. EXACT4columns4rows, generous transparent gutters, complete heads/shoes in every cell, same body scale. ONE modest clear amber beer glass with little white foam held in SAME RIGHT HAND throughout, steady elbowbent waist/chest carry, free left arm counter-swings; no floating/doubled glasses. Row1 SIDE walking RIGHT four distinct phases leftstride/passing/rightstride/oppositepassing. Row2 FRONT towardviewer four alternating arm/leg gait phases. Row3 BACK away four alternating gait phases nofaces, glass partiallyvisible at rightside attachedtohand. Row4: cell12 SEATED relaxed facingRIGHT, hips/knees bent90degrees, thighs nearhorizontal, lowerlegs down, beer LOWERED near knee/waist notmouth; cell13 sameSEATED sipping glassatmouth; cell14 STANDING FRONT threequarter facingRIGHT holding beer low, freehandrelaxed, bothfeetflat; cell15 STANDING STILL REAR holdingbeer byrightside BOTHfeetflat sidebyside, noface or gait. Samehead/body scale, seated shorter thanstanding notinflated. NO chair/furniture/table/screen/background/floor/shadows/glow/text/labels/grid. Genuinealpha; no cropping/overlaps, same adultandoutfit, plum outlines warm clustered shading notchibi/photo.",
+  "references": [
+    "art/sources/customer-silver-polo-motion.png",
+    "art/sources/customer-silver-polo-seated.png"
+  ],
+  "source": "art/sources/customer-silver-polo-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-aab71e6d-917d-4baa-b6d5-b77f6ffe884e.png",
+  "source_dimensions": [
+    1086,
+    1448
+  ],
+  "columns": [
+    0,
+    272,
+    543,
+    815,
+    1086
+  ],
+  "rows": [
+    0,
+    348,
+    710,
+    1060,
+    1448
+  ],
+  "frame_heights": [
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    140,
+    140,
+    180,
+    180
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watching_beer": 15
+  },
+  "model_version": null,
+  "seed": null
+}

@@ -1,5 +1,53 @@
 # Testing and release checks
 
+## Continuous customer motion and individual templates — 27 November 2026
+
+The real Serve path rebuilt City with the HUD, losing route/pose state and
+placing actors directly at new destinations. The live room now survives HUD
+redraws. `customer_continuity_check.gd` drives the actual enabled Serve button,
+refreshes the UI repeatedly during 480 motion frames, and checks exact position
+continuity, distance budgets, retained clocks, posture only after arrival,
+management navigation, repeat orders, pool rerouting, known-venue re-entry and
+bounded movement after a stalled frame. Full seated silhouettes, companions and
+beer poses have twelve-pixel clearance in all nine room layouts.
+
+Fifteen new generated sheets add 240 beer-carrying/rest/sip poses. A glass requires
+a real paid drinking phase; empty orders keep empty hands. Catalog tests cover
+named semantic lookup, all individual sheets, optional-pose fallback, walking
+with a paid beer, lowering/sipping while seated and no extra sales or timer
+changes. Existing capybara, sunglasses and kiss interactions remain covered.
+
+Every customer owns an independent complete runtime atlas and definition.
+`tests/test_customer_art_build.py` creates another person and adds a pose in a
+temporary tree, proving unrelated PNG bytes and modification times remain
+unchanged. A selected production rebuild also left the other fourteen PNGs
+untouched with identical hashes. The full packer uses the same definitions.
+A Linux resource-pack export was checked from outside the source checkout:
+the exported runtime catalog and all fifteen atlases load successfully.
+
+The isolated `tools/test.sh` suite passes gameplay/save/UI/art regressions and
+all pacing suites. The final source also preserves the concurrent AFK update;
+its combined checks pass. Target-device play remains unverified.
+
+Visual review covers eighteen counter/seated states in all nine rooms at both
+960×540 and 1280×720, all beer-pose identities on light/dark backgrounds, and a
+360-frame 30fps clip using the real Serve callback with a HUD rebuild every
+fifteen frames. Later floor-space refinements were recaptured at both sizes.
+The video preserves 30fps; the GIF is sampled for a smaller review artifact.
+
+```sh
+python3 tests/test_customer_art_build.py
+PATTAYA_PREVIEW_SCRIPT=tests/preview_customer_continuity.gd tools/preview-art.sh /tmp/pattaya-continuity
+python3 tools/review_customer_continuity.py /tmp/pattaya-review --captures /tmp/pattaya-continuity
+```
+
+[Return walk video](customer-return.webm) · [GIF](customer-return.gif) ·
+[Beer pose lineup](customer-beer-cast.png).
+Sources, exact prompts and the [individual template guide](../art/characters/README.md)
+are committed with the runtime assets. Source checks do not confirm release
+publication.
+
+
 ## AFK mode — 27 November 2026
 
 `tests/afk_check.gd` verifies exact incident prices, no duplicate payments after

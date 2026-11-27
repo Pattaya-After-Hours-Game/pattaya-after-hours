@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "id": "cobalt-evening",
+  "atlas": "customer-cobalt-evening",
+  "cell": [
+    160,
+    192
+  ],
+  "sources": [
+    {
+      "kind": "atlas",
+      "path": "assets/art/customer-motion-cobalt-evening.png",
+      "cell": [
+        160,
+        192
+      ],
+      "count": 16,
+      "animations": {
+        "walk": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "walk_front": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "walk_back": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "idle": [
+          12
+        ],
+        "drinking": [
+          13
+        ],
+        "chat": [
+          14
+        ],
+        "pool": [
+          15
+        ]
+      }
+    },
+    {
+      "kind": "atlas",
+      "path": "assets/art/customer-seated-cobalt-evening.png",
+      "cell": [
+        160,
+        192
+      ],
+      "count": 4,
+      "animations": {
+        "seated_idle": [
+          0
+        ],
+        "seated_drinking": [
+          1
+        ],
+        "seated_chat": [
+          2
+        ],
+        "watch": [
+          3
+        ]
+      }
+    },
+    {
+      "kind": "generated",
+      "recipe": "art/recipes/customer-cobalt-evening-beer.json",
+      "heights": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        140,
+        140,
+        180,
+        180
+      ],
+      "animations": {
+        "beer_walk": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "beer_walk_front": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "beer_walk_back": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "beer_seated_idle": [
+          12
+        ],
+        "beer_seated_drinking": [
+          13
+        ],
+        "beer_stand": [
+          14
+        ],
+        "beer_watch": [
+          15
+        ]
+      },
+      "scale_groups": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          8,
+          9,
+          10,
+          11
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          14,
+          15
+        ]
+      ]
+    },
+    {
+      "kind": "atlas",
+      "path": "assets/art/patrons-men.png",
+      "cell": [
+        160,
+        192
+      ],
+      "indices": [
+        6,
+        9,
+        10,
+        11
+      ],
+      "animations": {
+        "sunglasses": [
+          0,
+          1,
+          2,
+          3
+        ]
+      }
+    }
+  ],
+  "fallbacks": {
+    "beer_seated_chat": "beer_seated_idle",
+    "beer_chat": "beer_stand",
+    "rest": "idle"
+  },
+  "seat_span": 1
+}

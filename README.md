@@ -71,8 +71,11 @@ Every customer identity has side/front/rear walking, seated and bar poses,
 including both companion groups. Guests approach the counter for real orders,
 return to a reserved seat after service, mingle with available visitors and watch
 a purchased sports screen. Real pool players walk to their assigned table.
+HUD redraws preserve their positions and routes; served guests walk back with
+their beer before sitting. Seating leaves clear space for bodies and companions.
 Their orders remain available during walking. The same cast also appears in
-ambient street traffic. [See the bar routine](docs/customer-routines.gif) or
+ambient street traffic. [See the continuous return walk](docs/customer-return.webm) or
+[the bar routine](docs/customer-routines.gif) or
 [the walking cast](docs/customer-walks.gif).
 The capybara blinks and settles onto its haunches before standing again.
 Double-click the rainbow duo or tap them on a touchscreen to see them kiss.

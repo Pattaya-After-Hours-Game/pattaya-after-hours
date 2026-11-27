@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "id": "YOUR_CHARACTER_ID",
+  "atlas": "customer-YOUR_CHARACTER_ID",
+  "cell": [
+    160,
+    192
+  ],
+  "sources": [
+    {
+      "kind": "generated",
+      "recipe": "art/recipes/YOUR_CHARACTER_POSES.json",
+      "heights": [
+        180,
+        180
+      ],
+      "animations": {
+        "idle": [
+          0
+        ],
+        "YOUR_NEW_POSE": [
+          1
+        ]
+      }
+    }
+  ],
+  "fallbacks": {
+    "walk": "idle",
+    "YOUR_OPTIONAL_POSE": "idle"
+  }
+}

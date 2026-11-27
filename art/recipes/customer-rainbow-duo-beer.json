@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Transparent production sprite sheet EXACT4columns4rows16GROUPS. Same TWO ADULT MEN and smallorange fluffy dog from twoapprovedrefs. Short stocky brownhaired darkbeard blackglasses man rainbowshirt charcoaltee jeanshorts brownsandals ALWAYS carriesdog withbotharms. Taller broadginger man gingerhair/beard orange/navyplaidshirt bearpocket grey rainbowstripetee navyshorts blacksandals carriesONEclear glassamberbeer smallwhitefoam inhisRIGHTHAND EVERYframe. ONLYTALLMANholdsbeer shortmanholdsdog, noextraarms/hands. Preserve faces/clothes/proportions/heightdifference sharpillustratedpixelpainted plumoutline warmhighlightstyle.\nROW1 four GROUPSIDEwalksRIGHT leftstride/passing/rightstride/oppositepassing; tallman beeruprightwaist/chest elbowbent freearmcounterswing, shortmanwalkscarryingdog.\nROW2 fourGROUPFRONTwalkstowardviewer alternatinggaitphases.\nROW3 fourGROUPREARwalksaway alternatinggaitphases onlybacks nofaces, tallman glasspartlyvisible atrightside, shortman dogpartlyoccludedinfrontofbody.\nROW4 index12 BOTHMENSEATEDRIGHT tallman beerLOWEREDwaist/knee shortmanholdsdog; index13 BOTHSEATEDRIGHT tallmansipsbeerglassatmouth; index14 BOTHSTANDINGSTILL frontthreequarterRIGHT tallmanholdsbeerLOW shortmanholdsdog; index15 BOTHSTANDINGSTILLfullREAR bothfeetflatparallel nogait nofaces tallmanholdsbeerbyrightside shortmanstillholdsdog.\nFirst2row4 seatedbothadults hips/knees90degree thighsnearhorizontal lowerlegsdown shoesnearfloor invisiblebarstoolposture, naturallyshorter thansamebody/headstanding, nochairdrawn. Dogcarried EVERYcell nevergrounded/notholdingprops. Exactly16completegroups generousalphagutters outerpadding everyhead/shoe/dog/glassfullyinsidecell nocropping/overlap. Truealpha nofloor/shadow/backdrop/checkerboard/furniture/grid/text/labels.",
+  "references": [
+    "art/sources/customer-rainbow-duo-motion.png",
+    "art/sources/customer-rainbow-duo-seated.png"
+  ],
+  "source": "art/sources/customer-rainbow-duo-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-7075-72f2-8bfe-03874c2d6470/exec-92793afa-686d-4b30-b2b4-870afc9619d3.png",
+  "columns": [
+    0,
+    384,
+    768,
+    1152,
+    1536
+  ],
+  "rows": [
+    0,
+    255,
+    508,
+    765,
+    1024
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watch_beer": 15
+  },
+  "seed": null,
+  "model_version": null
+}

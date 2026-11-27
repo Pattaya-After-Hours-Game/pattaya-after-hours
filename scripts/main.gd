@@ -409,27 +409,43 @@ func render(keep_scroll: bool = false) -> void:
 	root_ui = Control.new()
 	root_ui.size = Vector2(960,540)
 	add_child(root_ui)
+	# A HUD rebuild must not rebuild the live room: its routes and animation
+	# clocks belong to the visible scene, not to buttons or management panels.
+	if is_instance_valid(city): city.reparent(root_ui)
 	if is_instance_valid(previous_ui):
 		# Keep the popup moving when a street refresh rebuilds the HUD.
 		if is_instance_valid(reputation_float): reputation_float.reparent(root_ui)
 		remove_child(previous_ui)
 		previous_ui.queue_free()
 	if boot_menu:
+		if is_instance_valid(city):
+			city.hide()
+			city.set_process(false)
 		duo_reaction.clear()
 		render_boot_menu()
 		return
 	var practicing := campaign_before_tutorial != null
 	var rats_active: bool = not practicing and not model.street.rat_targets().is_empty()
 	pane(root_ui,Rect2(0,0,960,540),Color("#170f18"))
-	city = City.new()
+	if not is_instance_valid(city):
+		city = City.new()
+		city.clock = scene_clock
+		root_ui.add_child(city)
+	else:
+		root_ui.move_child(city,root_ui.get_child_count()-1)
+	city.show()
+	city.set_process(not is_instance_valid(fight) and not is_instance_valid(district))
 	city.position = Vector2(0,48)
 	city.size = Vector2(960,540)
 	city.clip_contents = true
-	city.clock = scene_clock
+	if not is_same(city.street_state,model.s.street) or city.selected_bar!=int(model.s.street.selected):
+		city.fridge_install_flash = 0.0
 	city.duo_reaction = duo_reaction
 	city.service_flash = service_animation
 	city.night = model.s.phase in ["incident","fight","report","godzilla"]
-	city.godzilla = model.s.night.get("godzilla","")
+	var monster_state: String = model.s.night.get("godzilla","")
+	if city.godzilla.is_empty() and not monster_state.is_empty(): city.arrival_time = 0.0
+	city.godzilla = monster_state
 	city.guests = model.s.night.get("guests",0)
 	city.weather = int(model.s.weather)
 	city.level = int(model.s.level)
@@ -440,11 +456,11 @@ func render(keep_scroll: bool = false) -> void:
 	city.fridge_capacity = model.street.economy.stock_capacity(model.street.selected())
 	city.street_event = model.s.street.event
 	city.celebrating = model.street.economy.celebrating(model.street.selected())
-	root_ui.add_child(city)
+	city.update_customer_motion(0)
 	if rats_active:
 		city.focus_mode = Control.FOCUS_ALL
 		city.accessibility_name = "Catch rats"
-		city.rat_caught.connect(catch_rat)
+		if not city.rat_caught.is_connected(catch_rat): city.rat_caught.connect(catch_rat)
 	# Full-width scene, with all live text rendered at the UI resolution.
 	pane(root_ui,Rect2(0,0,960,48),Color("#21161ff5"))
 	var venue_name := abs_text(root_ui,Rect2(14,4,154 if windows_updates != null else 216,24),model.street.selected().name,19,GOLD)

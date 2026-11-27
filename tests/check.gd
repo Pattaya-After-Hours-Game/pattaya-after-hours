@@ -129,6 +129,8 @@ func run() -> void:
 	load("res://tests/charcoal_guest_check.gd").new().run(self)
 	load("res://tests/customer_motion_check.gd").new().run(self)
 	load("res://tests/customer_routine_check.gd").new().run(self)
+	load("res://tests/customer_catalog_check.gd").new().run(self)
+	await load("res://tests/customer_continuity_check.gd").new().run(self)
 	load("res://tests/scene_check.gd").new().run(self)
 	load("res://tests/street_activity_check.gd").new().run(self)
 	await load("res://tests/street_activity_check.gd").new().run_ui(self)

@@ -25,6 +25,22 @@ admission, patience, drinking, pool fees, service clocks, budgets and RNG are
 unchanged. `customer_routine_check.gd` checks those boundaries and state purity.
 `tools/prepare_customer_seated.py` packs the new authored seated/watch poses.
 
+`main.render` reparents the existing City into the rebuilt HUD. Serve, purchases
+and navigation must preserve that node, its route cache and animation phase.
+Only a campaign change resets the cache; seeding an existing venue never moves
+its existing actors. Frame budgets cap visual catch-up after a stall, and gait
+phase uses travelled distance. `customer_continuity_check.gd` exercises the real
+Serve button and repeated redraws throughout a return journey.
+
+Every customer now renders from an individual `customer-<id>.png` with named
+poses in `assets/art/customer-characters.json`. Definitions and the new-person
+example live in [art/characters](art/characters/README.md).
+`tools/prepare_customers.py --character <id>` rebuilds just that person;
+`--all` repacks a common pose extension. Approved source art remains independent.
+Runtime JSON is included explicitly in all export presets. Catalog normalization
+keeps frame indices integral after JSON parsing. `customer_catalog_check.gd` and
+the isolated Python authoring test cover the contract.
+
 For the premise and cast, see [story.md](story.md). For gameplay help, see the
 [player guide](docs/PLAYER_GUIDE.md). [Testing and release checks](docs/TESTING.md)
 records coverage and remaining platform verification.

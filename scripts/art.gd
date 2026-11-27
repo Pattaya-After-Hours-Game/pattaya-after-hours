@@ -19,6 +19,36 @@ const CUSTOMER_VARIANTS = [
 const CUSTOMER_MOTION_NAMES = ["sunfaded-regular","silver-polo","maroon-casual","plum-club","sage-holiday","ivory-club","cobalt-evening","amber-local","beard-glasses","navy-tourist","teal-dress","gold-blouse","capybara","rainbow-duo"]
 const COBALT_IDLE = 6
 static var textures: Dictionary = {}
+static var character_definitions: Dictionary = {}
+const CUSTOMER_CATALOG = "res://assets/art/customer-characters.json"
+
+static func customer_catalog() -> Dictionary:
+	if character_definitions.is_empty() and FileAccess.file_exists(CUSTOMER_CATALOG):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(CUSTOMER_CATALOG))
+		if parsed is Dictionary:
+			for definition: Dictionary in parsed.values():
+				for pose in definition.animations:
+					definition.animations[pose] = definition.animations[pose].map(func(frame: Variant) -> int: return int(frame))
+			character_definitions = parsed
+	return character_definitions
+
+static func customer_character_id(appearance: Array) -> String:
+	var id := str(appearance[0])
+	var catalog := customer_catalog()
+	if catalog.has(id): return id
+	var name := id.trim_prefix("customer-")
+	if catalog.has(name) and str(catalog[name].atlas)==id: return name
+	var motion_id := customer_motion_id(appearance)
+	return "charcoal" if motion_id=="patrons-charcoal" else motion_id.trim_prefix("customer-motion-")
+
+static func customer_visual(appearance: Array, state: String, time: float, fps: float = 8.0, phase: int = -1) -> Array:
+	var definition: Dictionary = customer_catalog().get(customer_character_id(appearance),{})
+	if definition.is_empty():
+		var legacy := customer_motion_id(appearance)
+		return [legacy,animation_frame(legacy,state,time,fps)]
+	var frames: Array = definition.animations.get(state,definition.animations.idle)
+	var index := phase if phase>=0 else int(time*fps)
+	return [str(definition.atlas),int(frames[posmod(index,frames.size())])]
 
 static func texture(id: String) -> Texture2D:
 	if not textures.has(id):
@@ -151,10 +181,13 @@ static func atlas_specs() -> Dictionary:
 	for name in CUSTOMER_MOTION_NAMES+["charcoal"]:
 		var width := 288 if name=="rainbow-duo" else 256 if name=="capybara" else 160
 		specs["customer-seated-"+name] = [Vector2(width,192),4]
+	for definition: Dictionary in customer_catalog().values():
+		specs[str(definition.atlas)] = [Vector2(definition.cell[0],definition.cell[1]),int(definition.frames)]
 	return specs
 
 static func customer_sprite(customer_id: int, appearance: String = "") -> Array:
 	if appearance=="charcoal": return ["patrons-charcoal",12]
+	if not appearance.is_empty() and customer_catalog().has(appearance): return [appearance,0]
 	# The companion sprites appear on opening orders and rotate back in later.
 	if customer_id%24==2: return ["patrons-capybara",0]
 	if customer_id%32==3: return ["patrons-rainbow-duo",0]
@@ -192,6 +225,8 @@ static func cobalt_frame(time: float) -> int:
 
 # Semantic animation catalog. Contact frames are selected by the combat simulator.
 static func animation_frames(id: String, state: String) -> Array:
+	var definition: Dictionary = customer_catalog().get(id.trim_prefix("customer-"),{})
+	if not definition.is_empty() and str(definition.atlas)==id: return definition.animations.get(state,definition.animations.idle)
 	if id.begins_with("customer-seated-"):
 		return {"idle":[0],"drinking":[1],"chat":[2],"watch":[3]}.get(state,[0])
 	if id=="patrons-charcoal" or id.begins_with("customer-motion-"):

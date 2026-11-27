@@ -248,6 +248,8 @@ from prepare_customer_motion import prepare as prepare_customer_motion
 prepare_customer_motion()
 from prepare_customer_seated import prepare as prepare_customer_seated
 prepare_customer_seated()
+from prepare_customers import prepare as prepare_customers
+prepare_customers()
 manifest={}
 for p in sorted(OUT.glob('*.png')):
     im=Image.open(p)

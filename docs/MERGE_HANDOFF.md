@@ -1,5 +1,30 @@
 # Current implementation and release handoff
 
+## Continuous motion, beer and customer templates — 27 November 2026
+
+Fixes the real Serve/HUD redraw path that recreated City and discarded walking
+state. The live room, route records and gait phase now survive redraws; existing
+records never reseed to destination feet. Frame budgets prevent catch-up jumps,
+small aisle adjustments retain facing and sitting starts after arrival. Physical
+silhouettes reserve chair clearance, and standing/conversation targets avoid
+seated bodies. Game capacity, visits, service and accounting remain unchanged.
+
+Fifteen new beer sheets add carrying walks, lowered/seated sipping and standing
+front/rear glass poses. Each customer now has one independent complete runtime
+atlas with a named-pose definition under `art/characters/`. Selected-character
+builds leave all other PNGs untouched; a shared pose can be appended and locally
+repacked across the cast without regenerating approved art. The runtime catalog
+is explicitly included in each export preset. Existing saved appearance mapping,
+companion poses and original source/packed assets stay intact.
+
+The complete combined isolated suite, real-Serve continuity regressions, Python
+authoring contracts and exported-resource checks pass. Visual review includes
+both resolutions and a 30fps real-button return clip; see
+[verification](TESTING.md#continuous-customer-motion-and-individual-templates--27-november-2026).
+The concurrent AFK implementation is preserved. Device play and publication
+remain unverified.
+
+
 ## AFK mode — 27 November 2026
 
 User-requested scope: unattended street-incident purchases and existing staff

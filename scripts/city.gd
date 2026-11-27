@@ -57,11 +57,13 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
 func _process(delta: float) -> void:
-	clock += delta
-	arrival_time += delta
+	# A slow render frame must not fast-forward visible walkers across the room.
+	var visual_delta := minf(maxf(delta,0),.05)
+	clock += visual_delta
+	arrival_time += visual_delta
 	service_flash = maxf(0,service_flash-delta)
 	fridge_install_flash = maxf(0,fridge_install_flash-delta)
-	update_customer_motion(delta)
+	update_customer_motion(visual_delta)
 	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
@@ -436,14 +438,9 @@ func scene_people(bar: Dictionary) -> Array:
 			person.activity = record.activity
 			person.partner = record.partner
 			if not record.moving:
-				var seated_id := Art.customer_seated_id(appearance)
 				if record.activity=="seat" or (record.activity=="chat" and record.get("seat",Vector2.ZERO)!=Vector2.ZERO and record.foot.distance_to(record.seat)<.5):
-					person.draw_who = seated_id
-					person.draw_pose = 2 if state=="chat" else 1 if state=="drinking" and fposmod(clock+customer_id*.37,6)<1.6 else 0
 					person.body_height = 140
 				elif record.activity=="watch":
-					person.draw_who = seated_id
-					person.draw_pose = 3
 					person.flip = false
 				elif record.activity=="mingle" and int(record.partner)>=0:
 					state = "chat" if fposmod(clock+customer_id*.7,4)<2 else "idle"
@@ -455,17 +452,41 @@ func scene_people(bar: Dictionary) -> Array:
 		# Keep companion idle reactions and sunglasses exactly as authored.
 		# A kiss is allowed only while stationary; it never interrupts a walk.
 		var kissing: bool = appearance[0]=="patrons-rainbow-duo" and pose==1
-		var keep_idle: bool = state=="idle" and (appearance[0] in ["patrons-capybara","patrons-rainbow-duo"] or (appearance[0]=="patrons-men" and int(appearance[1])==Art.COBALT_IDLE))
-		if not person.has("draw_who") and not keep_idle and not (kissing and not state.begins_with("walk")):
-			var motion_id := Art.customer_motion_id(appearance)
-			if not motion_id.is_empty():
-				person.draw_who = motion_id
-				person.draw_pose = Art.animation_frame(motion_id,state,clock+customer_id*.19,8)
-				if not state.begins_with("walk") and person.get("activity","")!="mingle": person.flip = customer_id%2==0
-		if kissing and not state.begins_with("walk"):
-			person.draw_who = "patrons-rainbow-duo"
-			person.draw_pose = 1
-			person.body_height = 180
+		if kissing and not state.begins_with("walk"): person.body_height = 180
+		# Named poses live in this customer's own definition/atlas. A paid drink
+		# stays visible on the return walk and between sips; an order is never a beer.
+		var phase := str(guest.get("visit_phase","legacy"))
+		var carrying: bool = not guest.get("order",false) and (phase=="drinking" or (phase=="legacy" and int(guest.get("drinks",0))>0 and float(guest.get("next",0))>0))
+		var visual_pose := state
+		var visual_time := clock+customer_id*.19
+		var visual_phase := -1
+		if state.begins_with("walk"):
+			visual_pose = ("beer_" if carrying else "")+state
+			visual_time = float(records[customer_id].get("walk_distance",0))/64.0
+		elif kissing:
+			visual_pose = "kiss"
+		elif person.get("body_height",180)==140:
+			if carrying: visual_pose = "beer_seated_drinking" if state=="drinking" and fposmod(clock+customer_id*.37,6)<1.6 else "beer_seated_idle"
+			else: visual_pose = "seated_chat" if state=="chat" else "seated_idle"
+		elif person.get("activity","")=="watch":
+			visual_pose = "beer_watch" if carrying else "watch"
+		elif state=="pool":
+			visual_pose = "pool"
+		elif carrying:
+			visual_pose = "beer_stand"
+		elif state=="idle" and appearance[0]=="patrons-capybara":
+			visual_pose = "companion_idle"
+			visual_phase = Art.capybara_frame(clock+float(customer_id/24)*1.31)
+		elif state=="idle" and appearance[0]=="patrons-rainbow-duo":
+			visual_pose = "companion_idle"
+		elif state=="idle" and appearance[0]=="patrons-men" and int(appearance[1])==Art.COBALT_IDLE:
+			visual_pose = "sunglasses"
+			visual_phase = [6,9,10,11].find(Art.cobalt_frame(clock+float(customer_id/Art.CUSTOMER_VARIANTS.size())*1.31))
+		var visual := Art.customer_visual(appearance,visual_pose,visual_time,8,visual_phase)
+		person.draw_who = visual[0]
+		person.draw_pose = visual[1]
+		person.visual_pose = visual_pose
+		person.carrying_drink = carrying
 		person.motion_state = state
 		people.back().visit_phase = bar.customers[i].get("visit_phase","legacy") if bar.has("customers") else "legacy"
 		people.back().costume = bar.has("customers") and bar.customers[i].get("costume",false)

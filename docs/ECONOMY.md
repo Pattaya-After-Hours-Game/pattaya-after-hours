@@ -9,7 +9,10 @@ are disposable visual routines. Pending orders send visitors toward the counter;
 real service sends them back to a seat. Active pool players retain their actual
 table. Orders remain serviceable while walking. Animation never changes admission,
 patience, drinking intervals, budgets, stock, finances, saves or gameplay RNG.
-It grants no extra visit time, sales, tips, loyalty or pool income.
+It grants no extra visit time, sales, tips, loyalty or pool income. Beer-carrying
+poses require an actual paid drinking phase; a pending order keeps empty hands.
+Physical room spacing affects presentation rather than the model seating cap.
+HUD rebuilds retain routes and never move actors to their destinations.
 
 The current account and growth rules are defined in
 [Finance and growth](design/FINANCE_AND_GROWTH.md). Schema 17 restores one shared

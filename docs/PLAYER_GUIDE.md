@@ -85,6 +85,8 @@ looks can appear in the street. Inside, guests approach the counter for real
 orders and return to reserved seats after service. Between rounds they can stand
 up to mingle with another available guest or watch your purchased sports screen.
 Pool players walk to their real table and keep their place during the game.
+A served guest carries the beer back and sits only after reaching the chair.
+Seated guests lower the glass between sips; neighbours keep clear body space.
 You can still serve a waiting order while its customer is walking. Their normal
 budgets, patience and drinking times keep running.
 

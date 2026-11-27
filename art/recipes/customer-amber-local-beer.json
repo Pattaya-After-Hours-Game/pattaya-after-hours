@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-27",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent 16-frame BEER-CARRYING sprite sheet for Pattaya After Hours. Both references depict exact same adult Thai man: greying short swept-back hair, neat moustache, amber short-sleeved shirt with small burgundy diamond pattern, navy trousers, brown slip-on shoes, silver wristwatch. Preserve exact identity, body/clothes and pixel-painted illustrated style, crisp plum outlines and warm amber highlights. Image1 walking reference, image2 approved seated posture. EXACT four columns and four rows, 16 complete full-body sprites with generous alpha gutters around every cell. Consistent adult body and head size, no cropping or crossing cells. Genuine transparent alpha, NO background, glow, floor, shadows, furniture, labels or text. A modest clear beer glass with amber beer and small white foam head remains held by SAME RIGHT HAND throughout. No extra glasses, no floating props. Rows1-3 walk carrying beer steadily at waist/chest with bent right elbow, free left arm counterswinging. Each row FOUR distinct gait phases: left stride, passing, right stride, opposite passing. Row1 SIDE PROFILE walking RIGHT. Row2 FRONT walking toward viewer. Row3 REAR walking away, back of head/clothes only, no face, glass partly visible at right side held by right hand. Row4 four special poses: index12 SEATED relaxed facing right, hips/knees bent90 degrees, holding glass LOWERED near waist or knee, not mouth; index13 SAME SEATED posture sipping beer glass at mouth; index14 STANDING STILL front three-quarter toward right, upright legs BOTH feet flat at rest, right hand holds glass LOW by waist, left free hand relaxed or making a small conversation gesture; index15 STANDING STILL REAR watching offcanvas, BOTH feet flat and parallel, glass held at right side, no frozen gait, no face. Seated first two must be visibly shorter than standing, correct same head/body scale; no stool/chair drawn. Keep entire shoes and head in every cell, one adult man per cell, no new character/outfit/logo.",
+  "references": [
+    "art/sources/customer-amber-local-motion.png",
+    "art/sources/customer-amber-local-seated.png"
+  ],
+  "source": "art/sources/customer-amber-local-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-5c3f-7802-a622-0e5e47fa4804/exec-6b67479f-af1a-46fc-a21f-cd5c5f420f27.png",
+  "source_size": [
+    1086,
+    1448
+  ],
+  "rows": [
+    0,
+    362,
+    724,
+    1086,
+    1448
+  ],
+  "columns": [
+    0,
+    272,
+    543,
+    814,
+    1086
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_front_beer": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_back_beer": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": [
+      12
+    ],
+    "seated_sip": [
+      13
+    ],
+    "standing_beer": [
+      14
+    ],
+    "watching_beer": [
+      15
+    ]
+  },
+  "seed": null,
+  "model_version": null
+}

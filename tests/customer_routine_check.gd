@@ -40,7 +40,7 @@ func run(test: SceneTree) -> void:
 	test.check(moving.activity=="seat" and moving.motion_state.begins_with("walk"),"A served guest leaves the bar for a seat")
 	view.update_customer_motion(8)
 	var seated := person(view,bar,first.id)
-	test.check(seated.activity=="seat" and seated.draw_who.begins_with("customer-seated-") and seated.body_height==140,"A guest genuinely sits using shorter bent-knee art")
+	test.check(seated.activity=="seat" and seated.get("visual_pose","").begins_with("beer_seated") and seated.body_height==140,"A guest genuinely sits using shorter bent-knee art")
 	var stable_seat: Vector2 = records(view,bar)[int(first.id)].seat
 	var duo: Dictionary = records(view,bar)[3]
 	test.check(duo.seat!=records(view,bar)[2].seat and duo.seat!=stable_seat,"The duo reserves two adjacent physical seats without displacing another guest")
@@ -62,7 +62,7 @@ func run(test: SceneTree) -> void:
 			if other.activity=="watch":
 				watchers += 1
 				if not other.motion_state.begins_with("walk"):
-					test.check(other.draw_pose==3 and not other.flip,"Watching uses a planted rear stance facing the real purchased screen")
+					test.check(other.get("visual_pose","") in ["watch","beer_watch"] and not other.flip,"Watching uses a planted rear stance facing the real purchased screen")
 			if other.activity=="mingle":
 				test.check(other.partner>=0 and records(view,bar).has(int(other.partner)),"Mingling always has a real available conversation partner")
 			test.check(other.order==g.order,"Walking and leisure keep exact order markers")

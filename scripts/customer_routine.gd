@@ -3,6 +3,8 @@ extends RefCounted
 const Art = preload("res://scripts/art.gd")
 const SPEED = 58.0
 const AISLE_Y = 368.0
+const SEAT_GAP = 12.0
+static var seated_shapes := {}
 
 static func seats(bar: Dictionary) -> Array[Vector2]:
 	# Cushion positions follow the production room plates. On tall bar stools
@@ -57,10 +59,40 @@ static func hosted_foot(bar: Dictionary, guest: Dictionary) -> Vector2:
 			return Vector2(599+(floor_index%3)*66,364-(floor_index/3)*12)
 	return Vector2.ZERO
 
+static func seat_envelope(appearance: Array, foot: Vector2, flip: bool) -> Rect2:
+	return actor_envelope(appearance,foot,flip,true)
+
+static func actor_envelope(appearance: Array, foot: Vector2, flip: bool, seated: bool = false) -> Rect2:
+	var definition: Dictionary = Art.customer_catalog().get(Art.customer_character_id(appearance),{})
+	var id: String = definition.get("atlas",Art.customer_seated_id(appearance))
+	var key := id+("#seated" if seated else "#standing")
+	if not seated_shapes.has(key):
+		var cell: Vector2 = Art.atlas_specs()[id][0]
+		var image := Art.texture(id).get_image()
+		var columns := int(image.get_width()/cell.x)
+		var frames: Array = [0,1,2]
+		if not definition.is_empty():
+			frames = []
+			var poses := ["seated_idle","seated_drinking","seated_chat","beer_seated_idle","beer_seated_drinking"] if seated else ["idle","chat","beer_stand"]
+			for pose in poses:
+				frames.append_array(definition.animations.get(pose,[]))
+		var bounds := Rect2i()
+		var first := true
+		for index in frames:
+			var origin := Vector2i(int(index)%columns,int(index)/columns)*Vector2i(cell)
+			var used := image.get_region(Rect2i(origin,Vector2i(cell))).get_used_rect()
+			bounds = used if first else bounds.merge(used)
+			first = false
+		seated_shapes[key] = Rect2(Vector2(bounds.position)-Vector2(cell.x*.5,cell.y-4),Vector2(bounds.size))
+	var shape: Rect2 = seated_shapes[key]
+	if flip: shape.position.x = -shape.end.x
+	var scale_value := clampf(.75+(foot.y-300)*.0022,.70,1.04)
+	return Rect2(foot+shape.position*scale_value,shape.size*scale_value).grow(SEAT_GAP*.5)
+
 static func plan_route(from: Vector2, to: Vector2) -> Array[Vector2]:
 	# Walk in front of the pool tables and counters instead of cutting across
 	# their tops. Short changes within a group need no trip around the room.
-	if from.distance_to(to)<26: return [to]
+	if from.distance_to(to)<26 or minf(from.y,to.y)>=365: return [to]
 	var result: Array[Vector2] = []
 	for point in [Vector2(from.x,AISLE_Y),Vector2(to.x,AISLE_Y),to]:
 		if (result.is_empty() and from.distance_to(point)>.5) or (not result.is_empty() and result.back().distance_to(point)>.5): result.append(point)
@@ -72,17 +104,19 @@ static func step(record: Dictionary, delta: float) -> void:
 	while not record.route.is_empty():
 		var point: Vector2 = record.route[0]
 		var offset: Vector2 = point-record.foot
-		if offset.length()<=.5:
+		if offset.length()<=.00001:
 			record.foot = point
 			record.route.pop_front()
 			continue
 		if distance<=0: break
-		record.direction = offset.normalized()
+		# Tiny final adjustments should not flash a front/rear pose for one frame.
+		if offset.length()>8 or Vector2(record.direction)==Vector2.ZERO: record.direction = offset.normalized()
 		record.moving = true
 		var used := minf(distance,offset.length())
 		record.foot = record.foot.move_toward(point,used)
 		distance -= used
-		if record.foot.distance_to(point)<=.5:
+		record.walk_distance = float(record.get("walk_distance",0))+used
+		if record.foot.distance_to(point)<=.00001:
 			record.foot = point
 			record.route.pop_front()
 		else: break
@@ -93,42 +127,59 @@ static func update(bar: Dictionary, records: Dictionary, delta: float, seed: boo
 	var guests: Array = bar.get("customers",[]).duplicate()
 	guests.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return int(a.id)<int(b.id))
 	var live := {}
-	for guest in guests: live[int(guest.id)] = true
+	var appearances := {}
+	for guest in guests:
+		live[int(guest.id)] = true
+		appearances[int(guest.id)] = Art.customer_sprite(int(guest.id),str(guest.get("appearance","")))
 	for id in records.keys():
 		if not live.has(id): records.erase(id)
+	var new_ids := {}
 	var occupied := {}
 	for record in records.values(): occupied[int(record.slot)] = true
 	for guest in guests:
 		var id := int(guest.id)
 		if not records.has(id):
+			new_ids[id] = true
 			var slot := 0
 			while occupied.has(slot): slot += 1
 			occupied[slot] = true
-			records[id] = {"slot":slot,"foot":Vector2(242,362),"direction":Vector2.RIGHT,"moving":false,"route":[],"target":Vector2(242,362),"activity":"enter","dwell":0.0,"choice":0,"was_order":false,"was_playing":false,"partner":-1}
+			records[id] = {"slot":slot,"foot":Vector2(242,362),"direction":Vector2.RIGHT,"moving":false,"route":[],"target":Vector2(242,362),"activity":"enter","dwell":0.0,"choice":0,"was_order":false,"was_playing":false,"partner":-1,"walk_distance":0.0}
 	# Stable occupied slots keep every survivor's seat through queue reordering.
 	guests.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return int(records[int(a.id)].slot)<int(records[int(b.id)].slot))
 	var chair_points := seats(bar)
 	var reserved := {}
+	var envelopes: Array[Rect2] = []
 	for guest in guests:
 		var record: Dictionary = records[int(guest.id)]
-		var appearance := Art.customer_sprite(int(guest.id),str(guest.get("appearance","")))
-		record.span = 2 if appearance[0]=="patrons-rainbow-duo" else 1
+		var appearance: Array = appearances[int(guest.id)]
+		record.span = int(Art.customer_catalog().get(Art.customer_character_id(appearance),{}).get("seat_span",1))
 		var index: int = record.get("chair",-1)
 		if index>=0 and index+int(record.span)<=chair_points.size():
-			for n in int(record.span): reserved[index+n] = true
+			var seat := (chair_points[index]+chair_points[index+int(record.span)-1])*.5
+			var envelope := seat_envelope(appearance,seat,int(guest.id)%2==0)
+			if envelopes.any(func(other: Rect2) -> bool: return other.intersects(envelope)):
+				record.chair = -1
+			else:
+				for n in int(record.span): reserved[index+n] = true
+				envelopes.append(envelope)
 		else: record.chair = -1
 	for guest in guests:
 		var record: Dictionary = records[int(guest.id)]
 		if int(record.get("chair",-1))>=0: continue
+		var appearance: Array = appearances[int(guest.id)]
 		for index in chair_points.size():
 			if index+int(record.span)>chair_points.size(): break
 			var available := true
 			for n in int(record.span):
 				if reserved.has(index+n): available = false
 			if record.span==2 and chair_points[index].distance_to(chair_points[index+1])>90: available = false
+			var seat := (chair_points[index]+chair_points[index+int(record.span)-1])*.5
+			var envelope := seat_envelope(appearance,seat,int(guest.id)%2==0)
+			if envelopes.any(func(other: Rect2) -> bool: return other.intersects(envelope)): available = false
 			if available:
 				record.chair = index
 				for n in int(record.span): reserved[index+n] = true
+				envelopes.append(envelope)
 				break
 	var pending := 0
 	var watchers := 0
@@ -186,25 +237,55 @@ static func update(bar: Dictionary, records: Dictionary, delta: float, seed: boo
 				activity = "seat"
 				target = seat
 		plans[id] = {"activity":activity,"target":target}
-	# Conversation requires another available, actual guest. Neither participant
-	# can be waiting at the counter, playing pool or busy with a host.
+	# Reserve body space for actual seated destinations, then place conversations
+	# and standing overflow in the remaining floor area rather than on their laps.
+	var floor_occupied: Array[Rect2] = []
+	for guest in guests:
+		var id := int(guest.id)
+		if plans[id].activity=="seat":
+			floor_occupied.append(seat_envelope(appearances[id],plans[id].target,id%2==0))
 	for i in range(0,minglers.size(),2):
 		var id: int = minglers[i]
-		if i+1>=minglers.size() or i>=6:
-			plans[id].activity = "stand"
-			if i+1<minglers.size(): plans[int(minglers[i+1])].activity = "stand"
-			continue
+		plans[id].activity = "stand"
+		if i+1>=minglers.size(): continue
 		var other: int = minglers[i+1]
-		var center := Vector2([350,545,725][i/2],363)
-		plans[id].target = center-Vector2(35,0)
-		plans[other].target = center+Vector2(35,0)
-		records[id].partner = other
-		records[other].partner = id
+		plans[other].activity = "stand"
+		if i>=6: continue
+		var left := actor_envelope(appearances[id],Vector2.ZERO,false)
+		var right := actor_envelope(appearances[other],Vector2.ZERO,true)
+		var separation := maxf(80,left.end.x-right.position.x)
+		var candidates: Array = [350.0,545.0,725.0]
+		for x in range(260,801,10): candidates.append(float(x))
+		for x: float in candidates:
+			var left_foot := Vector2(x-separation*.5,363)
+			var right_foot := Vector2(x+separation*.5,363)
+			var area := Rect2(left.position+left_foot,left.size).merge(Rect2(right.position+right_foot,right.size))
+			if area.position.x<240 or area.end.x>830: continue
+			if floor_occupied.any(func(occupied_area: Rect2) -> bool: return occupied_area.intersects(area)): continue
+			plans[id] = {"activity":"mingle","target":left_foot}
+			plans[other] = {"activity":"mingle","target":right_foot}
+			records[id].partner = other
+			records[other].partner = id
+			floor_occupied.append(area)
+			break
+	for guest in guests:
+		var id := int(guest.id)
+		if plans[id].activity!="stand": continue
+		var appearance: Array = appearances[id]
+		var candidates: Array[Vector2] = [plans[id].target]
+		for x in range(260,801,10): candidates.append(Vector2(x,363))
+		for point in candidates:
+			var area := actor_envelope(appearance,point,id%2==0)
+			if area.position.x<240 or area.end.x>830: continue
+			if floor_occupied.any(func(occupied_area: Rect2) -> bool: return occupied_area.intersects(area)): continue
+			plans[id].target = point
+			floor_occupied.append(area)
+			break
 	for guest in guests:
 		var id := int(guest.id)
 		var record: Dictionary = records[id]
 		var plan: Dictionary = plans[id]
-		if seed:
+		if seed and new_ids.has(id):
 			record.foot = plan.target
 			record.target = plan.target
 			record.route = []

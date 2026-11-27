@@ -1,0 +1,74 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Production transparent 16-frame sprite sheet for Pattaya After Hours Godot game. TWO approved references show EXACT adult stocky older white man: tanned skin, receding grey hair/stubble, faded teal vest with sunglasses at neck, beige cargo shorts, burgundy waist bag, wristwatch, brown flip-flops. Preserve exact identity/body/clothes/pixel-painted illustrated style. EXACT 4 columns × 4 rows, every cell one FULL BODY isolated at same scale, generous transparent gutters with head/shoes entirely contained. EVERY pose holds ONE clear modest amber beer glass with small white foam, physically gripped in SAME RIGHT HAND, steady bent elbow carrying at waist/chest. Glass never floating/doubled; free left arm swings. Row1 SIDE walking RIGHT four distinct gait phases left stride/passing/right stride/opposite passing. Row2 FRONT walking toward viewer four alternating gait phases. Row3 BACK walking away four alternating gait phases, only back of head/clothes no faces, beer visible partly at right side held in hand. Row4 EXACTLY: cell12 SEATED upright facing RIGHT hips/knees 90 degrees thighs horizontal lower legs down, HOLD BEER LOWERED near knee/waist NOT mouth; cell13 SAME SEATED sipping glass touching mouth; cell14 STANDING FRONT three-quarter RIGHT holding beer LOW, free hand relaxed BOTH FEET FLAT; cell15 STANDING STILL full REAR holding beer by right side, BOTH FEET FLAT side by side, no face or stride. Cell14 must be STANDING FRONT, never seated. Seated figures shorter than standing due bent legs, same head/body scale not inflated. No furniture/chair/table/screen. Actual transparent alpha no background/glow/shadow/floor/labels/text/gridlines. Crisp plum outlines, warm clustered painted pixel shading; same adult and outfit every cell; no clipping/overlap.",
+  "references": [
+    "art/sources/customer-sunfaded-regular-motion.png",
+    "art/sources/customer-sunfaded-regular-seated.png"
+  ],
+  "source": "art/sources/customer-sunfaded-regular-beer.png",
+  "generation_path": "/var/home/rebellionrumco/.codex/generated_images/01a21b73-4817-7262-bf28-aa9fb9412835/exec-b9dc7ef8-8c67-4ac3-abd9-d438e7b2b047.png",
+  "source_dimensions": [
+    1024,
+    1536
+  ],
+  "columns": [
+    0,
+    256,
+    512,
+    768,
+    1024
+  ],
+  "rows": [
+    0,
+    370,
+    760,
+    1140,
+    1536
+  ],
+  "frame_heights": [
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    180,
+    140,
+    140,
+    180,
+    180
+  ],
+  "frames": {
+    "walk_beer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "walk_beer_front": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "walk_beer_back": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "seated_beer": 12,
+    "seated_sip": 13,
+    "standing_beer": 14,
+    "watching_beer": 15
+  },
+  "supersedes": "art/sources/customer-sunfaded-regular-beer-v1.png",
+  "attempt": 2,
+  "model_version": null,
+  "seed": null
+}

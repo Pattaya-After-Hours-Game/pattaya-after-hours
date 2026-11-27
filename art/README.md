@@ -12,6 +12,48 @@ Existing room plates and cast artwork remain unchanged. Nida appears at the
 entrance only while contracted, scheduled on and trading; benches appear only
 for purchased level-three beer-bar seating.
 
+## Continuous motion, beer and individual sheets — 27 November 2026
+
+Fifteen additional built-in ImageGen sources provide carrying-beer walks in
+side/front/rear views, seated holding and sipping, and front/rear standing with
+a glass. Sources and exact prompts/provenance/cuts are in
+`sources/customer-<name>-beer.png` and `recipes/customer-<name>-beer.json`.
+Approved earlier images remain unchanged. The capybara keeps its harness/leash;
+the duo's shorter member keeps the dog while the taller member carries the beer.
+
+Each customer now has one complete runtime atlas, `customer-<name>.png`, owned
+by a [named-pose definition](characters/README.md). Ordinary/seated/beer poses
+and existing companion/sunglasses/kiss frames are packed into that person's
+sheet. Old runtime sheets remain available for street/compatibility references.
+Adding a person or pose can rebuild only selected sheets; `--all` handles a common
+pose addition without regenerating approved artwork. A new pose can be appended
+as a one-cell source rather than remaking the full generated reference sheet.
+
+The real Serve button previously rebuilt City and lost its visual cache. City
+now survives HUD rebuilds. Existing records are never reseeded to destinations;
+route changes begin at current feet. Gait phase follows travelled distance,
+small aisle adjustments keep their facing, and stalled frames have bounded
+visual catch-up. Actors walk to their destination before changing posture.
+
+Seating reservations measure all relevant pose silhouettes with a twelve-pixel
+clearance, including companions and lowered/raised glasses. Standing overflow
+and conversations use clear floor space around seated guests. The finite game
+seat capacity and all actual business rules remain model-owned.
+
+Paid drinking phases select carrying or seated-beer poses; orders alone do not
+create a glass. The seated glass lowers between sips. Rear watchers and standing
+conversations keep their already-paid drink. Real pool uses its existing cue pose.
+
+[Continuous return clip](../docs/customer-return.webm) · [GIF](../docs/customer-return.gif) ·
+[Beer pose cast](../docs/customer-beer-cast.png).
+
+```sh
+python3 tools/prepare_customers.py --character silver-polo
+python3 tests/test_customer_art_build.py
+PATTAYA_PREVIEW_SCRIPT=tests/preview_customer_continuity.gd tools/preview-art.sh /tmp/pattaya-continuity
+python3 tools/review_customer_continuity.py /tmp/pattaya-review --captures /tmp/pattaya-continuity
+```
+
 ## Customer social routines — 27 November 2026
 
 All fifteen customer identities have four additional authored poses: seated idle,
