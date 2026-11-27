@@ -1014,3 +1014,7 @@ estimates. The scene requests the model action; status reads stay pure.
 This is a hidden Easter egg: only the original ribs animation and “Shotgun BBQ!”
 shout appear. No bonus message, countdown or player-guide instructions reveal
 the mechanic. Existing owner and staff service clocks stay independent.
+
+Toybox combat hit pauses, knockback, uppercut launches, low sweeps and flying
+kicks run only in the optional fight simulation. They do not change customer
+service, street progression or the existing arcade reward rules.

@@ -589,3 +589,7 @@ Nida's ten-day fee remains ฿1,200, but drink commission is gone, including unp
 commitments on old visits. Past payments are history, not a new refund. New pool
 games run thirty seconds for the same ฿50 per table; Free Pool Night remains free.
 Shorter games free the table sooner, but still need two real customers.
+
+Toybox fights now give Mali a launching uppercut, low sweep and travelling flying
+kick alongside punches, roundhouses and Burst. These remain optional arcade
+contests with the existing cast and circuit rewards.

@@ -1441,3 +1441,23 @@ suite, including all pacing and lease routes. Affordable and unaffordable
 reopening screens were inspected at 960 × 540 and 1560 × 720. Device play remains
 unverified. The working-tree sixty-second recovery change is excluded from this
 verified commit and retains its separate pending cadence decision.
+
+## Toybox combat impact — 27 November 2026
+
+`fight_impact_check.gd` covers punches at CPU spacing in both directions,
+one-hit recovery, slow frames crossing contact, impact-pause clock/motion,
+uppercut launch/landing, sweep guard/damage, flying-kick input and airborne K.O.
+scoring without duplicate rounds. Existing transformed-input checks now expect
+Down + Kick to select the low kick; roundhouse remains Forward + Kick.
+
+`tests/preview_fight_impact.gd` through `tools/preview-art.sh` renders controls,
+contact, airborne reactions and landing for punches, low kicks, uppercuts,
+flying kicks and roundhouses. Reviewed at 960×540 and 1280×720 using existing
+production atlases. Android device play and human assessment of combat feel
+remain unverified.
+
+Verification: the full `tools/test.sh` suite passes for the combat patch applied
+to main in an isolated source copy. The combined working checkout's separate
+uncommitted recovery work produced one profit-cycle cadence failure (balanced
+seed 291, 128-second median); those changes were preserved and excluded from
+this combat commit. Documentation links and `git diff --check` pass.

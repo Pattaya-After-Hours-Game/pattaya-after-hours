@@ -595,3 +595,17 @@ labels, preventing a test build from offering an older public build as an update
 Source commits do not publish a release. A subsequent approved merge/push to
 main runs the existing signed multi-platform release workflow. Do not discard
 other working trees or replace current user saves as part of that handoff.
+
+## Toybox combat impact — 27 November 2026
+
+Punches now reach normal CPU spacing and retain contact across slow frames.
+Unblocked uppercuts launch rivals up/back through landing, including K.O.s.
+Down + Kick sweeps, airborne Kick flies forward, and Forward + Kick retains
+the roundhouse. Hit pauses, knockback, recoil, contact sparks and move labels
+reuse production fighter art. No campaign/save or arcade reward changes.
+
+The full isolated `tools/test.sh` suite passes with this patch on main; combat
+previews were inspected at 960×540 and 1280×720. Phone play remains unverified.
+Separate uncommitted recovery changes were preserved and excluded: their combined
+checkout still has one profit-cycle cadence failure, documented in TESTING.
+The main release workflow must finish before these moves are in public downloads.

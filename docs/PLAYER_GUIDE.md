@@ -639,10 +639,20 @@ jump, J to punch, K to kick and L for Burst when the meter is full.
 
 - Hold **S** or **Down** to crouch and guard. A crouching fighter can duck a
   roundhouse.
-- Hold crouch and press **J** for an uppercut, which can catch a jumping rival.
-- Hold crouch and press **K** for a slower, longer-reaching roundhouse kick.
+- Hold crouch and press **J** for an uppercut: an unblocked hit launches the
+  rival up and backward, including on a knockout. It can also catch a jumper.
+- Hold crouch and press **K** for a low kick that knocks an unguarded rival down.
+- Jump and press **K** for a travelling flying kick. Hold a direction while
+  jumping to carry momentum.
+- Hold **Forward** (toward the rival) and press **K** for the longer-reaching
+  roundhouse. Crouching ducks it.
 - On touchscreens, hold **Down** on the D-pad and tap **Punch** or **Kick**
-  with your other thumb for the same moves.
+  with your other thumb for the same moves. Jump + Kick and Forward + Kick
+  also work with the D-pad.
+
+Punches reach the rival at normal fighting distance. Hits have a brief impact
+pause, sparks, recoil and knockback; blocked strikes cause chip damage and
+smaller recoil. Airborne launches finish with a landing and recovery.
 
 <details>
 <summary>Toybox secret move</summary>

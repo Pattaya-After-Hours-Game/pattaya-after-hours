@@ -137,6 +137,7 @@ func run() -> void:
 	load("res://tests/street_activity_check.gd").new().run(self)
 	await load("res://tests/street_activity_check.gd").new().run_ui(self)
 	await load("res://tests/art_interaction_check.gd").new().run(self)
+	await load("res://tests/fight_impact_check.gd").new().run(self)
 	var local_checks = load("res://tests/local_events_check.gd").new()
 	local_checks.run(self)
 	await local_checks.run_ui(self)

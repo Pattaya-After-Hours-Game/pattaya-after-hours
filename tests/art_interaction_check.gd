@@ -315,7 +315,7 @@ func run(test: SceneTree) -> void:
 		fight_key(test,key,true)
 		fight_key(test,key,false)
 		fight._physics_process(.016)
-		test.check(fight.fighters[0].move == ("uppercut" if key == KEY_J else "roundhouse"),"The crouching modifier selects a distinct attack")
+		test.check(fight.fighters[0].move == ("uppercut" if key == KEY_J else "lowkick"),"The crouching modifier selects a distinct attack")
 		fight_key(test,KEY_DOWN,false)
 		fight_key(test,KEY_RIGHT,false)
 	fight.reset_round()
@@ -417,6 +417,9 @@ func run(test: SceneTree) -> void:
 	player.move = ""
 	rival.x = player.x + 28
 	rival.y = Fight.FLOOR
+	rival.vy = 0.0
+	rival.vx = 0.0
+	rival.launched = false
 	rival.crouch = true
 	fight._attack(player,"roundhouse")
 	fight._resolve(player,rival,.30)
