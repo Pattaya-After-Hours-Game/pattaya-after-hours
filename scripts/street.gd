@@ -64,6 +64,9 @@ func _init(state: Dictionary, fresh: bool = false) -> void:
 func celebration_info() -> Dictionary:
 	var active: bool = economy.celebration_window() and int(s.street.celebration.day)==economy.trading_day() and not s.street.celebration.report.is_empty()
 	var day := int(s.street.celebration.day) if active else maxi(7,ceili(float(s.day)/7.0)*7)
+	if not active:
+		for opening_day in C.OPENING_NIGHTS:
+			if (opening_day>s.day or (opening_day==s.day and s.street.minute<1320)) and int(s.street.celebration.day)!=opening_day: day = mini(day,opening_day)
 	if not active and day==economy.trading_day() and int(s.street.celebration.day)==day: day += 7
 	return {"day":day,"active":active,"name":Economy.celebration_name(day),"days_left":maxi(0,day-int(s.day))}
 
@@ -76,7 +79,7 @@ func celebration_tick() -> void:
 	if economy.celebration_window() and int(party.day)!=economy.trading_day():
 		party.day = economy.trading_day()
 		party.report = Economy.celebration_report(int(party.day))
-		record("TONIGHT AT THE BLUE HOUR · %s · %s" % [Economy.celebration_name(int(party.day)),C.CELEBRATIONS[Economy.celebration_index(int(party.day))][1]])
+		record("TONIGHT AT THE BLUE HOUR · %s · %s" % [Economy.celebration_name(int(party.day)),Economy.celebration_story(int(party.day))])
 
 func make_bar(kind: int, slot: int) -> Dictionary:
 	return {"type":kind, "stage":1, "name":C.NAMES[slot], "crew":0,
@@ -295,7 +298,7 @@ func action(id: String, index: int = 0) -> String:
 			if s.phase!="plan" or s.get("practice",false): return "Return to the live street to change AFK mode."
 			s.street.afk = not afk_enabled()
 			result = "AFK on: affordable incidents and existing contracts are automatic. Purchased service and deliveries still do the trading." if afk_enabled() else "AFK off: incident responses and renewals are manual again."
-		"serve","regulars_club","stock","buy_drink","return_drink","hire","hire_gabby","hire_daisy","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","close_and_count","recovery","host_drink","auto_host_drinks","bar_fine","train_host","auto_bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
+		"serve","regulars_club","stock","buy_drink","return_drink","hire","hire_gabby","hire_daisy","end_contract","welcome","chat","action_upgrade","equipment","promotion","rota","role","open","close_and_count","recovery","host_drink","auto_host_drinks","bar_fine","train_host","auto_bar_fine","clean","emergency_stock","rehire","train_staff","train_audience","auto_serve":
 			result = economy.action(bar,id,index)
 		"late":
 			if bar.late_open:
@@ -750,7 +753,7 @@ func next_calendar_day() -> void:
 		s.last_week = s.weekly.duplicate()
 		s.weekly = {"revenue":0,"costs":0,"guests":0,"tours":0,"nights":0,"weeks":int(s.day/7.0)+1}
 	s.day += 1
-	if int(s.day)%C.CELEBRATION_INTERVAL==C.CELEBRATION_INTERVAL-1:
+	if Economy.celebration_day(int(s.day)+1):
 		record("Tomorrow: %s at the Blue Hour." % Economy.celebration_name(int(s.day)+1))
 
 func reconcile_closures() -> void:

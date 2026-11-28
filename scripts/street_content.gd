@@ -245,3 +245,10 @@ const CELEBRATIONS = [
 	["The Regulars' Reunion", "Mali: The regulars have invited their regulars. Apparently that's a thing."],
 	["Pim's Mixtape Party", "Pim: One night, no requests for the same song six times. Five is negotiable."],
 	["Bo's Thank-You Night", "Bo: The drinks arrived on time. We thought that deserved a party."]]
+
+# Short opening-week previews of the birthday loop; no offline or retroactive rewards.
+const OPENING_NIGHTS = {
+	3:{"name":"Pim's Soundcheck","line":"Pim: Invite the neighbours. If the speakers survive tonight, we call it a music programme.","traffic":1.2,"appeal":1.0,"orders":0.85},
+	5:{"name":"The Locals' Warm-Up","line":"Anong: They came for one. Give them a reason to tell their friends before my birthday.","traffic":1.3,"appeal":1.5,"orders":0.8}
+}
+const CONTRACT_EXIT_KEEP_PERCENT = 80

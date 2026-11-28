@@ -115,21 +115,22 @@ House lager stock begins at ฿38 each: ฿228 for six. Supplier upgrades switch
 on improvements. A new game starts with twelve drinks and ฿228; updating an
 existing campaign does not change its cash, stock, waiting tabs or paid stock costs.
 
-## Hire Gabby
+## Discover Gabby
 
-In **Service → Team → Hire floor staff**, choose **Hire Gabby · ฿1,200** when a floor
-position is free. She has the standard ten-day bartender contract, wages and
+In **Service → Team → Hire floor staff**, choose **Hire bartender · ฿1,200** when a floor
+position is free. Gabby has an initial 10% discovery chance; she cannot be selected directly. She has the standard ten-day bartender contract, wages and
 25-second service, improved through normal training. Each real drink she serves
 earns an extra ฿5 in the nightly tip jar. Owner service and offline estimates
 do not earn her bonus. Existing matched-drink bonuses still apply. Gabby keeps
 her identity and training through expiry and renewal; renew her at her assigned
 venue. There is one Gabby across the street, and she works as a bartender.
 
-## Hire Daisy
+## Discover Daisy
 
-At a **Hostess bar**, open **Service → Team → Hire floor staff → Hire Daisy · ฿4,500**.
+At a **Hostess bar**, choose **Service → Team → Hire floor staff → Hire adult host · ฿4,500**.
+Daisy has an initial 10% discovery chance in that pool.
 Daisy is a separate adult entertainer with a ten-day host contract, normal host
-wages and one floor position. Keep the next shift's payroll after hiring.
+wages and one floor position. Budget for payroll after hiring.
 She attracts visitors and uses the existing host training and booking controls;
 she does not pour drinks or earn Gabby's service bonus. Her rota, expiry and
 bookings control whether she appears in the room. Only one Daisy can be hired
@@ -867,3 +868,24 @@ Entertainers improve appeal and tips from actual drinks, without serving orders.
 Tap the hiring **?** for current odds. Contracts and wages cost the normal amount;
 renewal retains your discovery. Tips pay when you close and count the jar.
 See [all eight profiles](design/STAFF_TALENTS.md).
+
+
+## A livelier first week and changing your team
+
+Check Events on days two and four for tomorrow’s gathering: **Pim’s Soundcheck
+on day three**, then **The Locals’ Warm-Up on day five**. Both run 6–10pm at the
+Blue Hour, with free entry, extra traffic and faster drinking. Fill the fridge
+and prepare service; the full birthday remains on day seven. Events records
+actual sales and costs. These evenings happen once, never offline.
+
+In Upgrades, open the question-mark help for estimated before/after baht per
+second, both with you serving and with automatic service. These are forecasts,
+not guaranteed income; stock interruptions and the purchase price are excluded.
+
+In Team, select a floor worker to see **End contract** and the refund. Eight
+days left on a ten-day ฿1,200 contract returns ฿768: unused value ฿960 minus
+20%. Training costs are not refundable. Busy hosts and absent workers must
+finish their commitments first. The next hire is random and costs the full
+contract price. Named workers keep training if rediscovered; renewing an expired
+worker still keeps that person without a roll. Nida uses her existing off-duty
+and renewal controls. AFK never replaces staff whose contracts you ended.

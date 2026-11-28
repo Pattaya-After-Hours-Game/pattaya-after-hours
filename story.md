@@ -221,10 +221,36 @@ Host development earns stronger appeal and higher future fees: ฿750, then
 handles the same eligible requests while the street is live; it cannot change
 anyone's preferences or invent a customer who can afford the booking.
 
+## The first week finds its rhythm
+
+Day three, 6–10pm: **Pim’s Soundcheck**. Pim borrows enough equipment to invite
+the neighbours over. “If the speakers crackle, call it vintage.” More passersby
+consider the Blue Hour, and visitors finish their rounds a little faster. The
+player still has to keep the fridge stocked and the queue moving.
+
+Day five, 6–10pm: **The Locals’ Warm-Up**. Anong persuades the first regulars to
+bring a friend. “A full room is lovely. A full room holding empty glasses is a
+complaint waiting to happen.” It is a bigger evening, but day seven’s birthday
+remains the first full-day celebration. Both early evenings are free, one-off
+opportunities, with actual trading reports rather than a cash prize.
+
+Hiring brings a new face through the door. Gabby might be the next bartender;
+Daisy might answer a hostess-bar vacancy. Their abilities come with their saved
+identity, and training develops that person. Neither is a guaranteed direct hire.
+Anong reminds you that recruitment is a business decision: end a ten-day
+contract with eight days left and you recover 80% of its unused value—64% of
+the original fee. The rest pays for the disruption. A replacement costs the full
+fee and may be a better or worse fit. Returning named staff remember their
+training. Nobody’s earned tips disappear when they leave.
+
+The new upgrade estimates put Anong’s advice into numbers: “Before buying faster
+hands, check whether anybody’s waiting.” More seats, better service, stronger
+appeal and another seating expansion remain the repeating business decisions.
+
 ## Something to look forward to: Anong's birthday
 
 By day six, the Blue Hour should feel like a place the player knows. The next
-reason to open is personal: **Anong's Birthday on day seven**. One day ahead,
+full-day reason to open is personal: **Anong's Birthday on day seven**. One day ahead,
 the street banner, Events and the Journal announce **Tomorrow: Anong's Birthday**.
 The celebration goes live at noon.
 

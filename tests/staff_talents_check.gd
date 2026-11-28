@@ -91,7 +91,7 @@ func run(test: SceneTree) -> void:
 		m.street.action("hire",0)
 		var id: String = b.team[0].get("identity","")
 		counts[id] = int(counts.get(id,0))+1
-	test.check(counts.size()==5 and counts.get("",0)>600 and counts.get("staff-platinum",0)>=3 and counts.get("staff-platinum",0)<30,"Paid hiring produces common crew, both uncommon hires, rares and a small legendary tail")
+	test.check(counts.size()==6 and counts.get("",0)+counts.get("gabby",0)>600 and counts.get("staff-platinum",0)>=3 and counts.get("staff-platinum",0)<30,"Paid hiring produces common crew, both uncommon hires, rares and a small legendary tail")
 	# Actual service is the only source of bartender talent tips.
 	m = fresh()
 	b = m.street.selected()

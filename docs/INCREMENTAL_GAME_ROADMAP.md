@@ -22,17 +22,17 @@ must not independently start two roadmap items.
 
 | Field | Current value |
 | --- | --- |
-| Active feature | Opt-in AFK incident handling and existing staff renewals |
-| Status | DONE — implementation, regressions, pacing and visual checks passed |
+| Active feature | Opening-week momentum and random recruitment with contract exits |
+| Status | IMPLEMENTED · local verification passed; release CI is the final handoff |
 | Implementer | Codex in shared main |
 | Reviewer / playtester | Automated regression, pacing and visual checks; device play pending |
 | Shared claim location | This table |
-| Working branch / chat / PR | main, synced through 7745ea7 |
-| Scope and owned files | Street/economy/save, scoped main UI and tutorial edits, AFK tests/previews and documentation; preserve concurrent graphics/title work |
-| Acceptance | Pay affordable incident responses, finish rats and prepared Godzilla without input, renew existing staff, suppress popups; no upgrades or leases; menu/offline remain inert |
+| Working branch / chat / PR | main, synced through 1b7bc68 |
+| Scope and owned files | Economy/street/save/UI, recruitment and first-week balance tests, documentation; preserve latest Team and Toybox changes |
+| Acceptance | Day-three/five opportunity without free sales; random named recruits; exact repeat-safe 80% unused-value refund; saved skills; unchanged expansion bounds |
 | Next handoff / blocker | Publish through main release workflow; device play remains unverified |
 | Recommended next, when free | Await user direction |
-| Last updated | 2026-11-27 |
+| Last updated | 2026-11-28 |
 
 An empty or stale table is **not evidence that the other contributor is idle**.
 Never overwrite an existing claim or abandon another contributor's unfinished work.

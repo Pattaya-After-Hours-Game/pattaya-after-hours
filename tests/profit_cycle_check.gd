@@ -111,7 +111,7 @@ func run(test: SceneTree) -> void:
 	b.equipment.seating = 7
 	b.equipment.pool = 2
 	test.check(e.seats(b)==32,"Stage-three maximum furnished capacity is thirty-two")
-	m.street.action("hire_gabby")
+	load("res://tests/recruit_fixture.gd").named(m.street,"gabby")
 	var person: Dictionary = b.team[0]
 	person.training = 4
 	person.service_ready = 17.25

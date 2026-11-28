@@ -1,5 +1,27 @@
 # Current implementation and release handoff
 
+## Opening-week momentum and recruitment — 28 November 2026
+
+Current change is based on main `1b7bc68`, retaining the latest Team roster,
+member and hiring pages. It supersedes historical direct Gabby/Daisy hire
+instructions below. They now appear in paid random recruitment; Nida retains
+her direct frontage hire. Floor contracts can be ended for **80% of unused paid
+value**: 20% elapsed on ฿1,200 returns ฿768. Named training/history survives
+rediscovery, tips remain payable, and AFK does not replace dismissed workers.
+
+Days three and five add short free 6–10pm gatherings before the day-seven
+birthday. Upgrade help compares estimated active/automatic trading income.
+See [the plan and measured results](design/FIRST_WEEK_AND_RECRUITMENT.md),
+[story](../story.md), [economy](ECONOMY.md) and [testing](TESTING.md).
+No production assets or existing owned progress are replaced. Optional schema-17
+fields preserve contracts and departed named staff without migration rewards.
+Local verification passed: `tools/test.sh` (all pacing suites), final model/UI
+regression, 960×540 and 1280×720 previews, Linux export/startup, changed-document
+links and `git diff --check`.
+The main-push workflow builds and publishes signed downloads after its tests;
+physical-device play and a human first-week replay remain unverified.
+
+
 ## Discoverable staff integration — 27 November 2026
 
 Eight new animated recruits now enter normal paid hiring, with 70/24/5/1%

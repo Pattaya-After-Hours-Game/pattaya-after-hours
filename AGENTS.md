@@ -299,3 +299,22 @@ Milestone pacing targets use nearest-minute comparisons; exact run times remain
 reported. Saving-gap ceilings remain exact. Preserve Ryan's per-drink stock,
 audience/price choices, paid-cost returns and matched-drink bonus tips alongside
 the standard house-beer price ladder. Other drinks retain their own supply costs.
+
+## Opening-week momentum and contract exits — 28 November 2026
+
+See [the plan](docs/design/FIRST_WEEK_AND_RECRUITMENT.md). Days 3 and 5 have
+18:00–22:00 flagship gatherings using the shared celebration ledger: traffic
+×1.20/1.30, appeal +1/+1.5, drinking duration ×0.85/0.80. Existing celebration
+extra-round/patience rules apply; day seven remains the full birthday. No free
+sales, gifts, offline replay or retroactive events. Preserve plans and deadlines.
+
+Gabby and Daisy are random common discoveries, not direct purchases. Bartender
+and host pools split the existing 70% common into 60% ordinary +10% Gabby/Daisy;
+other talent odds remain unchanged. Nida keeps the direct frontage hire.
+Floor contract exits return floor(paid × unused fraction × 0.80). Bind the person
+for stale UI protection; preserve other roster references; block busy/away staff.
+No training refund. Named staff retain archived skills/deadlines/history on random
+rediscovery. AFK never replaces deliberately ended contracts. Earned tips remain
+payable once. Optional schema-17 paid-contract/archive/Gabby-tip-ceiling fields
+must validate; they grant no migration rewards. Upgrade impact is a pure forecast
+comparison, never an action or payout. Keep all existing pacing acceptance bounds.

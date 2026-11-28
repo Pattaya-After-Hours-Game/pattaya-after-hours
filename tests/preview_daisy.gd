@@ -21,10 +21,10 @@ func run() -> void:
 	app.open_team_page("hire")
 	app.drawer_open = true
 	await capture(app,"daisy-hire","Hire Daisy")
-	app.model.street.action("hire_daisy")
+	load("res://tests/recruit_fixture.gd").named(app.model.street,"daisy")
 	app.open_team_page("member",0)
 	await capture(app,"daisy-roster")
-	app.model.street.action("hire_gabby")
+	load("res://tests/recruit_fixture.gd").named(app.model.street,"gabby")
 	var b: Dictionary = app.model.street.selected()
 	app.drawer_open = false
 	for stage in range(1,4):

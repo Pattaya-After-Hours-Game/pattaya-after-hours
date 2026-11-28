@@ -968,7 +968,7 @@ The date already advanced at midnight, so the jump does not add another day.
 
 ## Gabby's service tips
 
-Gabby is an optional named adult bartender: ฿1,200 for ten game days, standard
+Gabby is a random common bartender discovery (initial 10% of paid bartender hires): ฿1,200 for ten game days, standard
 bartender wages, training and floor-slot limits. Only one roster place
 across the street can belong to her, including expired contracts. She remains
 a bartender; renewal preserves her identity, training and service deadline.
@@ -983,7 +983,8 @@ campaigns receive no hire, identity replacement or retroactive tips.
 
 ## Daisy's host contract
 
-Daisy is an optional named adult entertainer available only in Hostess bars.
+Daisy is a random common host discovery available only in Hostess bars
+(initial 10% of paid host hires).
 Her ฿4,500 ten-day contract delegates to normal host hiring: one floor slot,
 host wages and exact contract price. She uses existing host attraction,
 training, consent and booking rules, with Chat as her hosted-drink topic.
@@ -1028,3 +1029,23 @@ manager margins; attraction still competes for bounded street traffic.
 Toybox combat hit pauses, knockback, uppercut launches, low sweeps and flying
 kicks run only in the optional fight simulation. They do not change customer
 service, street progression or the existing arcade reward rules.
+
+
+## Opening-week momentum and contract exits — 28 November 2026
+
+The [implementation plan](design/FIRST_WEEK_AND_RECRUITMENT.md) defines day-three
+and day-five gatherings, random Gabby/Daisy recruitment, contract refunds and
+read-only upgrade comparisons. Day three uses 1.20× shared traffic, +1 flagship
+appeal and 0.85× drinking duration; day five uses 1.30×, +1.5 and 0.80×. Both run
+18:00–22:00 only on that date, with the existing extra planned round (max three)
+and ten seconds of extra patience. Day seven remains 1.40×/+2/0.75× for its full
+normal trading day. No cash award, free stock or offline replay is added.
+
+A floor contract exit refunds floor(paid × remaining/14,400 × 0.8). It removes
+the roster slot and attributes a refund transaction, excluded from net trading,
+manager bonuses, tips and sales. No refund for training; no refund after expiry.
+Nida is excluded. Away/hosting commitments block exits. Old contracts lacking a
+saved paid price use their existing role’s listed contract fee. New hires and
+renewals save the actual fee; paid role-change supplements join that paid basis.
+Named staff retain skills/history in an archive and can be randomly rediscovered;
+renewing a retained expired worker never rolls. No migration cash is granted.

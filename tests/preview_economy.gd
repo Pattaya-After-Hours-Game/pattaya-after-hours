@@ -99,6 +99,40 @@ func run() -> void:
 	app.music.stop()
 	app.start_new_game()
 	app.model = Campaign.new(72)
+	if filter.begins_with("first-week-"):
+		app.show_tutorial_hint = false
+		app.model.s.cash = 20000
+		preload("res://tests/recruit_fixture.gd").named(app.model.street,"gabby")
+		var worker: Dictionary = app.model.street.selected().team[0]
+		worker.contract_left = 11520
+		app.tab = 0
+		app.drawer_open = true
+		app.service_section = "team"
+		app.team_page = "member"
+		app.team_member = 0
+		await capture(app,"first-week-contract","End contract")
+		app.team_page = "hire"
+		await capture(app,"first-week-hiring","Hire bartender")
+		app.upgrades_open = true
+		app.render()
+		await process_frame
+		var card = app.column.find_child("Upgrade_seating",true,false)
+		card.get_parent().get_children().back().pressed.emit()
+		await process_frame
+		for help in app.inline_help.values():
+			if help.visible: app.scroll.ensure_control_visible(help)
+		await capture(app,"first-week-upgrade","",false)
+		app.upgrades_open = false
+
+		app.model.s.day = 3
+		app.model.s.street.minute = 1080
+		app.model.street.celebration_tick()
+		app.tab = 1
+		await capture(app,"first-week-soundcheck")
+		app.queue_free()
+		await process_frame
+		quit()
+		return
 	if filter.begins_with("reopen-"):
 		app.show_tutorial_hint = false
 		app.drawer_open = false
@@ -378,7 +412,7 @@ func run() -> void:
 	app.model.s.cash = 10000
 	app.model.s.street.hiring_seed = 100
 	app.model.street.action("hire",0)
-	app.model.street.action("hire_gabby")
+	load("res://tests/recruit_fixture.gd").named(app.model.street,"gabby")
 	app.model.street.action("hire",3)
 	await capture(app,"service-team-roster","FLOOR STAFF")
 	app.model = Campaign.new(72)
@@ -530,7 +564,7 @@ func run() -> void:
 	app.model = Campaign.new(72)
 	app.model.s.cash = 10000
 	await capture(app,"gabby-hire","Hire Gabby")
-	app.model.street.action("hire_gabby")
+	load("res://tests/recruit_fixture.gd").named(app.model.street,"gabby")
 	await capture(app,"gabby-roster")
 	app.drawer_open = false
 	for kind in 3:
@@ -656,7 +690,7 @@ func run() -> void:
 	app.model.s.cash = 100000
 	var hud_bar: Dictionary = app.model.street.selected()
 	hud_bar.stage = 3
-	app.model.street.action("hire_gabby")
+	load("res://tests/recruit_fixture.gd").named(app.model.street,"gabby")
 	for i in 5: app.model.street.action("hire",0)
 	hud_bar.team[0].training = 6
 	app.model.street.economy.staff_service(hud_bar)

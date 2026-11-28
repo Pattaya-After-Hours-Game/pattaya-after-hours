@@ -134,7 +134,7 @@ func run_ui(test: SceneTree) -> void:
 	var bar: Dictionary = app.model.street.selected()
 	var eco = app.model.street.economy
 	bar.stage = 3
-	app.model.street.action("hire_gabby")
+	load("res://tests/recruit_fixture.gd").named(app.model.street,"gabby")
 	for i in 5: eco.hire_staff(bar,0)
 	app.model.street.action("hire",3)
 	eco.staff_service(bar)

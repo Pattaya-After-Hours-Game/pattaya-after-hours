@@ -135,7 +135,7 @@ func run_ui(test: SceneTree) -> void:
 		var banner := app.root_ui.find_child("CelebrationBanner",false,false) as Button
 		var headings: Array[Node] = app.column.find_children("*","Label",true,false)
 		if day==5:
-			test.check(banner==null and not headings.any(func(label: Label) -> bool: return label.text.contains(party_name)),"Day five shows no birthday promotion in the street or Events")
+			test.check((banner==null or not banner.text.contains(party_name)) and not headings.any(func(label: Label) -> bool: return label.text.contains(party_name)),"Day five shows no birthday promotion in the street or Events")
 		else:
 			var title := ("Tomorrow: " if day==6 else "Today: ")+party_name
 			test.check(banner!=null and banner.text.begins_with(title) and headings.any(func(label: Label) -> bool: return label.text==title),"Street and Events show the expected celebration heading on day %d" % day)

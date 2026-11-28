@@ -1560,3 +1560,22 @@ to main in an isolated source copy. The combined working checkout's separate
 uncommitted recovery work produced one profit-cycle cadence failure (balanced
 seed 291, 128-second median); those changes were preserved and excluded from
 this combat commit. Documentation links and `git diff --check` pass.
+
+## Opening week and contract exits
+
+`tools/test.sh` includes `first_week_check.gd` in the normal model/UI regression
+and runs `first_week_balance.gd` for 80 matched four-hour evenings over 20 seeds.
+Checks cover refund rounding, repeat input, stale selection, busy workers, roster
+index repair, preserved tips and training on reload/rediscovery, malformed
+archives, Nida's separate slot and no AFK replacement hiring. Opening-night
+checks cover timing, no free money, pure forecasts and persisted reports.
+The existing full fresh-campaign pacing and profit-cycle suites still apply.
+
+```sh
+PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='first-week-*' tools/preview-art.sh /tmp/first-week-960
+PATTAYA_PREVIEW_SCRIPT=tests/preview_economy.gd PATTAYA_PREVIEW_FILTER='first-week-*' PATTAYA_PREVIEW_RESOLUTION=1280x720 tools/preview-art.sh /tmp/first-week-1280
+```
+
+Inspect Team's random-hiring page, live contract refund, and Soundcheck banner
+and event details. A build and these desktop captures are not an Android device
+playtest. See [the measured comparison](design/FIRST_WEEK_AND_RECRUITMENT.md).

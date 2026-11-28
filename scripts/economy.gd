@@ -478,7 +478,10 @@ func talent_owned(identity: String) -> bool:
 	return false
 
 func hiring_odds(role: int) -> Array:
-	var choices := [{"identity":"","name":"Regular crew","rarity":"Common","chance":70}]
+	var extra := "gabby" if role==0 else "daisy" if role==1 else ""
+	var available := not extra.is_empty() and (gabby_venue().is_empty() if role==0 else daisy_venue().is_empty())
+	var choices := [{"identity":"","name":"Regular crew","rarity":"Common","chance":60 if available else 70}]
+	if available: choices.append({"identity":extra,"name":"Gabby" if role==0 else "Daisy","rarity":"Common","chance":10})
 	for identity in C.STAFF_TALENTS:
 		var profile: Dictionary = C.STAFF_TALENTS[identity]
 		if not role in profile.roles: continue
@@ -513,7 +516,12 @@ func hire_staff(bar: Dictionary, role: int, identity: String = "", random_recrui
 	if random_recruit and role!=3 and not s.get("practice",false): identity = roll_recruit(role)
 	var profile: Dictionary = C.STAFF_TALENTS.get(identity,{})
 	var host := int(profile.host) if role==1 and not profile.is_empty() else C.DAISY_HOST if identity=="daisy" else free_host(bar) if role==1 else -1
-	var person := {"role":role,"on":true,"host":host,"training":0,"audience_training":0,"host_training":0,"host_return":0.0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES}
+	var person := {"role":role,"on":true,"host":host,"training":0,"audience_training":0,"host_training":0,"host_return":0.0,"service_clock":0,"contract_left":C.STAFF_CONTRACT_MINUTES,"contract_paid":int(offer.price)}
+	if s.street.get("former_staff",{}).has(identity):
+		var former: Dictionary = s.street.former_staff[identity]
+		for key in ["training","audience_training","host_training","service_ready","last_served","drinks_served"]:
+			if former.has(key): person[key] = former[key]
+		s.street.former_staff.erase(identity)
 	if not identity.is_empty() and identity!="daisy": person.identity = identity
 	bar.team.append(person)
 	ensure_staff_service(person)
@@ -621,12 +629,54 @@ func staff_service(bar: Dictionary) -> void:
 		if not contracted(person) or not person.on or person.role!=0 or i in bar.away: continue
 		if action_time()<float(person.service_ready): continue
 		if serve(bar,1)>0:
-			if person.get("identity","")=="gabby": bar.bonus_tips += C.GABBY_TIP_PER_DRINK
+			if person.get("identity","")=="gabby":
+				bar.bonus_tips += C.GABBY_TIP_PER_DRINK
+				if bar.has("gabby_tip_ceiling"): bar.gabby_tip_ceiling += C.GABBY_TIP_PER_DRINK
 			bar.talent_tips = int(bar.get("talent_tips",0))+int(talent(person).get("tip",0))
 			person.service_ready = action_time()+service_seconds(person)
 			person.last_served = action_time()
 			person.drinks_served += 1
 			person.service_clock = 0 # Retained only for old-save compatibility.
+
+func end_contract_offer(bar: Dictionary, index: int) -> Dictionary:
+	if index<0 or index>=bar.team.size(): return {"enabled":false,"reason":"Choose a team member.","refund":0,"remaining":0,"paid":0}
+	var person: Dictionary = bar.team[index]
+	var remaining := clampi(int(person.get("contract_left",0)),0,C.STAFF_CONTRACT_MINUTES)
+	var paid := int(person.get("contract_paid",contract_cost(int(person.role))))
+	var refund := floori(float(paid)*remaining/C.STAFF_CONTRACT_MINUTES*C.CONTRACT_EXIT_KEEP_PERCENT/100.0)
+	var reason := ""
+	if person.role==3: reason = "Nida keeps the frontage slot. Use Off duty instead."
+	elif index in bar.away or not hosted_round(bar,index).is_empty(): reason = "Wait until this worker returns or finishes hosting."
+	return {"enabled":reason.is_empty(),"reason":reason,"refund":refund,"remaining":remaining,"paid":paid}
+
+func end_contract(bar: Dictionary, index: int, expected: Dictionary = {}) -> String:
+	if not s.phase in ["plan","guided"] or s.get("practice",false): return "Finish the current decision first."
+	var offer := end_contract_offer(bar,index)
+	if not offer.enabled: return offer.reason
+	var person: Dictionary = bar.team[index]
+	if not expected.is_empty() and not is_same(person,expected): return "The roster changed. Review this contract again."
+	var name_text := staff_name(person,index)
+	var identity := str(person.get("identity",""))
+	if person.role==1 and int(person.host)==C.DAISY_HOST: identity = "daisy"
+	if not identity.is_empty():
+		if not s.street.has("former_staff"): s.street.former_staff = {}
+		var saved := {}
+		for key in ["training","audience_training","host_training","service_ready","last_served","drinks_served"]:
+			if person.has(key): saved[key] = person[key]
+		s.street.former_staff[identity] = saved
+	if identity=="gabby": bar.gabby_tip_ceiling = maxi(int(bar.get("gabby_tip_ceiling",0)),int(person.get("drinks_served",0))*C.GABBY_TIP_PER_DRINK)
+	bar.team.remove_at(index)
+	var away := []
+	for slot in bar.away: away.append(int(slot)-1 if slot>index else int(slot))
+	bar.away = away
+	for round in bar.get("host_rounds",[]):
+		if round.host>index: round.host -= 1
+	var event: Dictionary = s.street.event
+	if event.get("runner",-1)>index and s.street.bars[int(event.get("venue",0))]==bar: event.runner -= 1
+	bar.crew = bar.team.size()
+	Finance.change(s,int(offer.refund),"Unused contract refund (20% fee)",str(bar.name))
+	s.weekly.costs -= int(offer.refund)
+	return "%s's contract ended. ฿%d refunded after the 20%% unused-value fee. The next hire is random." % [name_text,offer.refund]
 
 func rehire_offer(bar: Dictionary, index: int) -> Dictionary:
 	if index<0 or index>=bar.team.size(): return {"enabled":false,"reason":"Unknown team member.","price":0,"reserve":0,"required":0}
@@ -735,8 +785,18 @@ func drink_demand_hint(bar: Dictionary, drink: int, popularity: float) -> String
 func trading_day() -> int:
 	return int(s.day)-(1 if int(s.street.minute)<C.OPEN_MINUTE else 0)
 
+static func celebration_day(day: int) -> bool:
+	return day>0 and (day%7==0 or C.OPENING_NIGHTS.has(day))
+
+static func celebration_story(day: int) -> String:
+	return C.OPENING_NIGHTS[day].line if C.OPENING_NIGHTS.has(day) else C.CELEBRATIONS[celebration_index(day)][1]
+
+func party_setting(key: String, fallback: float) -> float:
+	return float(C.OPENING_NIGHTS[trading_day()][key]) if C.OPENING_NIGHTS.has(trading_day()) else fallback
+
 func celebration_window() -> bool:
-	return trading_day()>0 and trading_day()%C.CELEBRATION_INTERVAL==0 and (s.street.minute>=C.OPEN_MINUTE or s.street.minute<C.CLOSE_MINUTE)
+	if C.OPENING_NIGHTS.has(trading_day()): return s.street.minute>=1080 and s.street.minute<1320
+	return celebration_day(trading_day()) and (s.street.minute>=C.OPEN_MINUTE or s.street.minute<C.CLOSE_MINUTE)
 
 func celebrating(bar: Dictionary, offline: bool = false) -> bool:
 	return not offline and celebration_window() and int(s.street.celebration.day)==trading_day() and not s.street.celebration.report.is_empty() and bar.name==s.street.bars[0].name and is_trading(bar)
@@ -748,7 +808,7 @@ static func celebration_report(day: int) -> Dictionary:
 	return {"day":day,"arrivals":0,"sales":0,"drink_income":0,"drink_cost":0,"commission":0,"pool_income":0,"operating":0,"promo_cost":0,"fines":0,"happy":0,"regulars":0,"lost_full":0,"lost_service":0,"lost_stock":0}
 
 static func celebration_name(day: int) -> String:
-	return str(C.CELEBRATIONS[celebration_index(day)][0])
+	return str(C.OPENING_NIGHTS[day].name) if C.OPENING_NIGHTS.has(day) else str(C.CELEBRATIONS[celebration_index(day)][0])
 
 static func celebration_index(day: int) -> int:
 	return 0 if day<=7 else 1+(int(day/7)-2)%3
@@ -758,7 +818,7 @@ static func celebration_contribution(report: Dictionary) -> int:
 
 func repeat_order_seconds(bar: Dictionary) -> int:
 	var normal: int = C.MUSIC_INTERVALS[clampi(int(bar.equipment.get("music",0)),0,C.MUSIC_INTERVALS.size()-1)]
-	return roundi(normal*C.CELEBRATION_ORDER_FACTOR) if celebrating(bar) else normal
+	return roundi(normal*party_setting("orders",C.CELEBRATION_ORDER_FACTOR)) if celebrating(bar) else normal
 
 func event_id() -> int:
 	return int(s.street.event.get("id",-1)) if s.street.event.get("phase","") == "active" else -1
@@ -800,7 +860,7 @@ func traffic_rate(offline: bool = false, replacement: Dictionary = {}, marketing
 				rate *= (2.4 if wave>35 or wave<16 else .75) if s.street.event.encore else 2.0
 		C.Local.ZOMBIES, C.Local.BED: rate *= 1.45
 		C.Local.DINO: rate *= 1.25
-	if celebrating(s.street.bars[0]): rate = minf(rate*C.CELEBRATION_TRAFFIC,(base_traffic(replacement)+marketing_extra+maxi(0,kinds.size()-1)*C.AUDIENCE_TRAFFIC_BONUS)*C.CELEBRATION_TRAFFIC_CAP)
+	if celebrating(s.street.bars[0]): rate = minf(rate*party_setting("traffic",C.CELEBRATION_TRAFFIC),(base_traffic(replacement)+marketing_extra+maxi(0,kinds.size()-1)*C.AUDIENCE_TRAFFIC_BONUS)*C.CELEBRATION_TRAFFIC_CAP)
 	if s.weather >= 5: rate *= .8
 	return rate*walk_in_scale
 
@@ -824,7 +884,7 @@ func attraction(bar: Dictionary, offline: bool = false, audience: int = -1, minu
 	value += maxf(0.0 if offline else int(bar.welcome)*.4,promoter_bonus(bar,offset))
 	if not offline:
 		if float(bar.get("host_buzz_until",0))>action_time(): value += C.HOST_BUZZ_APPEAL
-		if celebrating(bar): value += C.CELEBRATION_ATTRACTION
+		if celebrating(bar): value += party_setting("appeal",C.CELEBRATION_ATTRACTION)
 		if not bar.promo.is_empty(): value += float(C.PROMOTIONS[int(bar.promo.kind)].boost)/int(bar.promo.repetition)
 		if event_id() == 6: value *= .95 if bar.type == 0 else .55
 		if event_id() == 7: value *= 1.2 if s.street.event.prepared else .65
@@ -879,7 +939,7 @@ func forecast(bar: Dictionary, offline: bool = false, promotion: int = -1, minut
 	var rounds := round_total/maxf(.001,arrivals)+(1.0 if party else club_share)
 	var service := service_rate(bar,offset)+(60.0/action_cooldown(bar,"serve") if automatic_service(bar) or (owner_active and not offline) else 0.0)
 	var drinking: float = C.MUSIC_INTERVALS[int(bar.equipment.music)]
-	if party: drinking = roundi(drinking*C.CELEBRATION_ORDER_FACTOR)
+	if party: drinking = roundi(drinking*party_setting("orders",C.CELEBRATION_ORDER_FACTOR))
 	# A visit occupies a seat while being served and drinking every round, including its last.
 	var duration := rounds*(drinking+60.0/maxf(1.0,service))
 	var space_limit := seats(bar)*60.0/maxf(1.0,duration)
@@ -1593,21 +1653,17 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			if person.role==3: return "Promoters have their own frontage contract and cannot change role."
 			var fee := role_change_fee(bar,index)
 			if fee>0 and s.cash<role_change_required_cash(bar,index): return "Role change costs ฿%d." % fee
+			person.contract_paid = int(person.get("contract_paid",contract_cost(int(person.role))))+int(fee)
 			Finance.change(s,-int(fee),"Staff contract role adjustment",str(bar.name))
 			s.weekly.costs += fee
 			person.service_clock = 0
 			person.role = int(bar.type) if person.role==0 else 0
 			person.host = free_host(bar) if person.role==1 else -1
 			return "Role changed to %s. Contract adjustment ฿%d; remaining term and training retained." % [C.ROLE_NAMES[int(person.role)],fee]
-		"hire_daisy":
-			if bar.type!=1: return "Daisy works in Hostess bars."
-			var venue := daisy_venue()
-			if not venue.is_empty(): return "Daisy already has a roster place at %s. Renew her existing contract there." % venue
-			return hire_staff(bar,1,"daisy")
-		"hire_gabby":
-			var venue := gabby_venue()
-			if not venue.is_empty(): return "Gabby already has a roster place at %s. Renew her existing contract there." % venue
-			return hire_staff(bar,0,"gabby")
+		"hire_daisy","hire_gabby":
+			return "Named staff are discovered through normal random hiring."
+		"end_contract":
+			return end_contract(bar,index)
 		"hire":
 			return hire_staff(bar,index,"",true)
 		"rehire":
@@ -1620,6 +1676,7 @@ func action(bar: Dictionary, id: String, index: int) -> String:
 			Finance.change(s,-int(amount),"Renew "+str(C.ROLE_NAMES[int(person.role)])+" contract",str(bar.name))
 			s.weekly.costs += amount
 			person.contract_left = C.STAFF_CONTRACT_MINUTES
+			person.contract_paid = amount
 			person.on = true
 			person.service_clock = 0
 			commit_orders(bar)
@@ -2225,3 +2282,30 @@ func auto_hosted(bar: Dictionary) -> void:
 func hosted_buzz_text(bar: Dictionary) -> String:
 	var left := maxf(0,float(bar.get("host_buzz_until",0))-action_time())
 	return "ROOM BUZZ · +2 appeal · %ds" % ceili(left) if left>0 and is_trading(bar) else "Room Buzz · %d/3 rounds finished" % int(bar.get("host_cheers",0))
+
+# Read-only comparison, never a purchase or payout. Existing deadlines remain untouched.
+func upgrade_impact(bar: Dictionary, id: String, index: int) -> String:
+	var proposed := bar.duplicate(true)
+	match id:
+		"equipment": proposed.equipment[C.EQUIPMENT[index].id] += 1
+		"manager":
+			proposed.manager = true
+			proposed.manager_level += 1
+		"regulars_club": proposed.club_level += 1
+		"restock":
+			proposed.supplier_level += 1
+			proposed.restock = true
+		"auto_serve": proposed.auto_serve = true
+		"train_staff": proposed.team[index].training += 1
+		"train_audience": proposed.team[index].audience_training += 1
+		"train_host": proposed.team[index].host_training += 1
+		"action_upgrade":
+			if index==1: return "Welcome helps only while Nida is off duty or expired. It does not boost her attraction."
+			proposed.action_levels.pouring += 1
+		"upgrade": proposed.stage += 1
+		_: return "Automation saves input; it still needs eligible customers and staff."
+	var before := forecast(bar,false,-1,-1,0,true)
+	var after := forecast(proposed,false,-1,-1,0,true,{"original":bar,"bar":proposed})
+	var auto_before := forecast(bar)
+	var auto_after := forecast(proposed,false,-1,-1,0,false,{"original":bar,"bar":proposed})
+	return "Estimated customer trading with you serving: %+.2f → %+.2f baht/s.\nAutomatic trading: %+.2f → %+.2f baht/s.\n%s\nEstimates exclude tips, purchase cost and stock interruptions. A near-zero gain means another bottleneck needs attention." % [before.net/60.0,after.net/60.0,auto_before.net/60.0,auto_after.net/60.0,after.reason]

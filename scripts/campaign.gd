@@ -745,11 +745,15 @@ func _valid_tip_bonus(value: Variant, visits: Variant, bar: Dictionary) -> bool:
 	# including repeat/hosted rounds. Her saved actual-sale counter bounds both
 	# pending jars and older paid receipts without rejecting legitimately earned tips.
 	var maximum := float(visits)*Street.C.DRINK_TIP_BONUS
+	var gabby_max := 0.0
+	var saved_max: Variant = bar.get("gabby_tip_ceiling",0)
+	if not _finite_number(saved_max,0,1e15) or fmod(float(saved_max),5.0)!=0: return false
 	for person in bar.team:
 		if person.get("identity","")!="gabby": continue
 		var served: Variant = person.get("drinks_served",0)
 		if not _finite_number(served,0,1e15) or float(served)!=floorf(float(served)): return false
-		maximum += float(served)*Street.C.GABBY_TIP_PER_DRINK
+		gabby_max += float(served)*Street.C.GABBY_TIP_PER_DRINK
+	maximum += maxf(gabby_max,float(saved_max))
 	return _finite_number(value,0,minf(1e15,maximum)) and fmod(float(value),Street.C.DRINK_TIP_BONUS)==0
 
 func _finite_number(value: Variant, minimum: float, maximum: float) -> bool:
@@ -767,6 +771,16 @@ func _read(path: String) -> Variant:
 		if parsed.version >= 2:
 			if not parsed.get("street") is Dictionary: return null
 			var data: Dictionary = parsed.street
+			if data.has("former_staff"):
+				if not data.former_staff is Dictionary or data.former_staff.size()>10: return null
+				for identity in data.former_staff:
+					if not identity in ["gabby","daisy"] and not Street.C.STAFF_TALENTS.has(identity): return null
+					var former: Variant = data.former_staff[identity]
+					if not former is Dictionary: return null
+					for key in former:
+						if not key in ["training","audience_training","host_training","service_ready","last_served","drinks_served"]: return null
+						if not _finite_number(former[key],-1000000 if key=="last_served" else 0,6 if key=="training" else 2 if key in ["audience_training","host_training"] else 1e15): return null
+						if key in ["training","audience_training","host_training","drinks_served"] and float(former[key])!=floorf(float(former[key])): return null
 			if data.has("hiring_seed") and (not _finite_number(data.hiring_seed,1,2147483646) or float(data.hiring_seed)!=floorf(float(data.hiring_seed))): return null
 			if data.has("afk") and not data.afk is bool: return null
 			if data.has("shotgun_ready") and not _finite_number(data.shotgun_ready,0,1.0e15): return null
@@ -874,6 +888,7 @@ func _read(path: String) -> Variant:
 						else: return null
 					if int(person.role)==1 and int(person.host)>Street.C.DAISY_HOST and not person.has("identity"): return null
 					if not int(person.role) in ([0,1,2,3] if int(parsed.version)>=6 else [0,1,2]) or (int(person.role)==1 and not int(person.host) in range(Street.C.HOSTS.size())): return null
+					if person.has("contract_paid") and (not _finite_number(person.contract_paid,0,1e15) or float(person.contract_paid)!=floorf(float(person.contract_paid))): return null
 					if person.has("renew_on") and not person.renew_on is bool: return null
 					for key in ["training","service_clock","contract_left"]:
 						if person.has(key) and (not (person[key] is int or person[key] is float) or person[key]<0): return null
@@ -952,14 +967,14 @@ func _read(path: String) -> Variant:
 					if not _finite_number(customer.get("party_patience"),0,Street.C.CELEBRATION_PATIENCE): return null
 			var party: Variant = parsed.street.get("celebration")
 			if not party is Dictionary or not _finite_number(party.get("day"),0,1e9): return null
-			if float(party.day)!=floorf(party.day) or int(party.day)%7!=0: return null
+			if float(party.day)!=floorf(party.day) or (int(party.day)!=0 and not Street.Economy.celebration_day(int(party.day))): return null
 			for field in ["report","last_report"]:
 				if not party.get(field) is Dictionary: return null
 				if party[field].is_empty(): continue
 				for key in Street.Economy.celebration_report(0):
 					if not _finite_number(party[field].get(key),0,1e15): return null
 					if float(party[field][key])!=floorf(party[field][key]): return null
-				if int(party[field].day)%7!=0 or int(party[field].day)<=0: return null
+				if not Street.Economy.celebration_day(int(party[field].day)) or int(party[field].day)<=0: return null
 			if not party.report.is_empty() and party.report.day!=party.day: return null
 		if int(parsed.version)>=17:
 			if not parsed.street.get("cashbook") is Array or parsed.street.cashbook.size()>60: return null

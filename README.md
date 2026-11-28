@@ -1,5 +1,21 @@
 # Pattaya After Hours
 
+## Opening-week momentum and recruitment
+
+Day three brings **Pim’s Soundcheck** and day five **The Locals’ Warm-Up**,
+6–10pm at the Blue Hour. These free evenings bring more potential visitors and
+quicker rounds before day seven’s full birthday party. Real customers, stock,
+service and expenses still determine the profit. Upgrade help now compares
+estimated income with owner service and with automation, exposing the next bottleneck.
+
+Gabby and Daisy join the random hiring pools; Nida keeps her separate frontage
+hire. Team → select a worker shows **End contract** and the live refund:
+**paid contract × remaining fraction × 80%, rounded down**. A ฿1,200 contract
+with eight days left returns ฿768. Ending frees the slot; another hire costs the
+full price and rolls again. Named staff retain training if rediscovered.
+See [the plan and rules](docs/design/FIRST_WEEK_AND_RECRUITMENT.md).
+
+
 Start with six stools and a warm fridge. Build the Blue Hour into a thriving beer bar, then own a mixed street of hostess bars and gogos. Anong wants a business that lasts. Anton wants a bigger LED screen. Godzilla wants a cold one.
 
 **[Get it on Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522io.github.rknell.pattayaafterhours%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FPattaya-After-Hours-Game%252Fpattaya-after-hours%2522%252C%2522author%2522%253A%2522Pattaya-After-Hours-Game%2522%252C%2522name%2522%253A%2522Pattaya%2520After%2520Hours%2522%257D)** · **[Android APK](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest/download/PattayaAfterHours.apk)** · **[Desktop downloads](https://github.com/Pattaya-After-Hours-Game/pattaya-after-hours/releases/latest)**
@@ -421,12 +437,12 @@ For a signed Android export, set `ANDROID_HOME`, `JAVA_HOME`, `GODOT_ANDROID_KEY
 
 The streets, businesses, characters, artwork, and arcade moves are original fictional content. The game and original assets are [MIT licensed](LICENSE). Godot and the bundled [DejaVu font](assets/DejaVu-LICENSE.txt) have their own notices.
 
-Gabby is available in **Service → Team → Hire floor staff → Hire Gabby**. Her ฿1,200
+Gabby can appear from **Service → Team → Hire floor staff → Hire bartender**. Her ฿1,200
 ten-day bartender contract uses a normal team slot. Each drink she actually
 serves adds ฿5 to the nightly tip jar, alongside existing visit and drink bonuses.
 
 Daisy is a separate fictional adult entertainer in a red bikini, available at
-Hostess bars through **Service → Team → Hire floor staff → Hire Daisy · ฿4,500**.
+Hostess bars through a random **Hire adult host · ฿4,500** contract.
 Her ten-day contract uses a normal host slot, wages, training and availability.
 She attracts visitors; bartenders serve their orders.
 

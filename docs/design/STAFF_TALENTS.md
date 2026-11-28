@@ -7,7 +7,7 @@ hires use the bartender pool; Hostess bar host and gogo dancer hires share the
 entertainer pool. Contracts still cost ฿1,200 / ฿4,500 and last ten game days.
 Normal wages, venue capacity, training gates and shared cash apply.
 
-Before any discoveries, each pool contains 70% regular crew, 24% uncommon,
+Before any discoveries, each pool contains 70% common crew, 24% uncommon,
 5% rare and 1% legendary. Each uncommon character has a 12% chance. Team's
 hiring help shows the current exact odds. There is no additional roll fee.
 
@@ -53,8 +53,15 @@ Each named discovery occupies one roster slot across the entire street,
 including after expiry. Owned characters' probability returns to regular crew;
 it does not increase the other rare chances. Renewal keeps identity, training,
 rota behavior and service deadlines. Specialists retain their original role.
-Gabby, Daisy and Nida keep their direct hiring controls. Existing workers are
-never rerolled, and the isolated practice tutorial keeps ordinary recruits.
+The bartender common pool is 60% ordinary crew + 10% Gabby; the host common
+pool is 60% ordinary crew + 10% Daisy. Dancers keep 70% ordinary crew. These
+named chances also return to ordinary crew while owned. Only Nida retains a
+direct hire. Existing workers are never rerolled; practice keeps ordinary recruits.
+
+Floor contracts can be ended for 80% of unused paid value, rounded down. This
+frees the slot and makes the identity discoverable again. Named workers retain
+their training and service history if rediscovered; the new full-price contract
+is still random. See [contract exits](FIRST_WEEK_AND_RECRUITMENT.md).
 
 Recruitment advances a separate saved `street.hiring_seed` only after a valid,
 affordable hire. Save/reload gives the same next result. Menus, forecasts, failed

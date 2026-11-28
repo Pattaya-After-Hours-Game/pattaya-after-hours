@@ -672,3 +672,18 @@ the roundhouse. Active-window overlap prevents a slow frame skipping contact.
 All damage still needs range/contact, with one hit per move and guarded chip.
 `fight_impact_check.gd` checks real-tick spacing, frame skips, launch recovery,
 guard, flying-kick input and K.O. scoring. No campaign/save fields are added.
+
+## Opening-week events and contract exits
+
+See [the feature plan](docs/design/FIRST_WEEK_AND_RECRUITMENT.md).
+`OPENING_NIGHTS` is data in street content. The street owns event timing and
+reports; economy forecasts remain read-only. `end_contract_offer` owns the live
+quote and `end_contract` checks commitments, removes the person, repairs indices
+and settles the refund. UI callbacks bind the person to reject stale selection.
+
+Schema 17 adds optional `person.contract_paid`, `street.former_staff`, and
+`bar.gabby_tip_ceiling`. The last is validation metadata for earned Gabby tips
+after she leaves, never an earning source. Archived skills/counters are integers;
+service deadlines retain fractions. Saves receive no free staff, tips or money.
+Tests use `tests/recruit_fixture.gd` to select a deterministic random draw through
+the real paid hiring action; production UI cannot directly hire named floor staff.

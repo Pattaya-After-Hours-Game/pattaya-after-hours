@@ -86,6 +86,7 @@ func run() -> void:
 		model.next_day()
 	check(clean_days == 365 and model.s.phase == "plan" and model.s.day == 366,"Street continues beyond the first year")
 	check(saw_week and saw_rush and saw_flood and model.s.wins > 0,"Weekly ledger and anchor incidents")
+	load("res://tests/first_week_check.gd").new().run(self)
 	load("res://tests/finance_check.gd").new().run(self)
 	load("res://tests/street_check.gd").new().run(self)
 	load("res://tests/clock_check.gd").new().run(self)

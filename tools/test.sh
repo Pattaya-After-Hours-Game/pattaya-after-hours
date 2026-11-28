@@ -14,8 +14,9 @@ godot_bin="${GODOT_BIN:-godot}"
 "$godot_bin" --headless --path . --script tests/celebration_balance.gd 2>&1 | tee "$scratch/celebration-balance.log"
 "$godot_bin" --headless --path . --script tests/regulars_club_balance.gd 2>&1 | tee "$scratch/club-balance.log"
 "$godot_bin" --headless --path . --script tests/profit_cycle_balance.gd 2>&1 | tee "$scratch/profit-cycle-balance.log"
+"$godot_bin" --headless --path . --script tests/first_week_balance.gd 2>&1 | tee "$scratch/first-week.log"
 "$godot_bin" --headless --path . --script tests/lease_balance.gd 2>&1 | tee "$scratch/lease-balance.log"
-if grep -Eq 'SCRIPT ERROR:|^ERROR:|Parse Error:|Compile Error:' "$scratch/import.log" "$scratch/test.log" "$scratch/balance.log" "$scratch/promoter-balance.log" "$scratch/automation-balance.log" "$scratch/celebration-balance.log" "$scratch/club-balance.log" "$scratch/profit-cycle-balance.log" "$scratch/lease-balance.log"; then
+if grep -Eq 'SCRIPT ERROR:|^ERROR:|Parse Error:|Compile Error:' "$scratch/import.log" "$scratch/test.log" "$scratch/balance.log" "$scratch/promoter-balance.log" "$scratch/automation-balance.log" "$scratch/celebration-balance.log" "$scratch/club-balance.log" "$scratch/profit-cycle-balance.log" "$scratch/lease-balance.log" "$scratch/first-week.log"; then
   echo "Godot reported an error; checks failed." >&2
   exit 1
 fi

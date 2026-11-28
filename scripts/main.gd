@@ -2152,7 +2152,7 @@ func upgrade_card(offer: Dictionary) -> void:
 			return status.reason
 		blocker.text = explain.call()
 		live_labels.append([blocker,explain])
-	inline_detail(row,key,offer.name,func() -> String: return offer.help,12,false)
+	inline_detail(row,key,offer.name,func() -> String: return offer.help+"\n\n"+model.street.economy.upgrade_impact(model.street.selected(),offer.action,offer.index),12,false)
 
 func street_panel() -> void:
 	var bar: Dictionary = model.street.selected()
@@ -2371,18 +2371,6 @@ func team_hiring(bar: Dictionary) -> void:
 			var impact := "Regular crew serves every 25s. Discoveries can be faster or earn more tips." if role==0 else "Attracts visitors without serving drinks."
 			return "%s\n\n10-day contract · ฿%d/min on duty. %s" % [eco.hiring_help(role),StreetContent.ROLE_WAGES[role],impact])
 		watch_purchase(hire,caption,eco.hire_offer.bind(bar,role))
-	if eco.gabby_venue().is_empty():
-		var gabby := service_option("Hire Gabby · ฿1,200",street_action.bind("hire_gabby"),"pouring",func() -> String:
-			return "Gabby is a bartender. She earns an extra ฿%d in tips per drink she serves. Tips pay out at closing. The contract lasts ten game days." % StreetContent.GABBY_TIP_PER_DRINK)
-		gabby.icon = Art.texture("portrait-gabby")
-		gabby.add_theme_constant_override("icon_max_width",28)
-		watch_purchase(gabby,gabby.text,eco.hire_offer.bind(bar,0))
-	if bar.type==1 and eco.daisy_venue().is_empty():
-		var daisy := service_option("Hire Daisy · ฿4,500",street_action.bind("hire_daisy"),"audience",func() -> String:
-			return "Daisy is an adult entertainer. She attracts visitors and hosts sponsored drinks; she does not serve drinks. Normal host wages and training apply. The contract lasts ten game days and uses one team position.")
-		daisy.icon = Art.texture("portrait-daisy")
-		daisy.add_theme_constant_override("icon_max_width",28)
-		watch_purchase(daisy,daisy.text,eco.hire_offer.bind(bar,1))
 
 func team_roster_row(bar: Dictionary, i: int) -> void:
 	var eco = model.street.economy
@@ -2436,6 +2424,7 @@ func team_member_panel(bar: Dictionary, i: int) -> void:
 		return "%s · Training %d/%d" % [term,level,limit],GOLD,13)
 	if not eco.contracted(person):
 		team_rehire(bar,i,name_text)
+		team_exit_controls(bar,i)
 		return
 	match role:
 		0:
@@ -2463,6 +2452,30 @@ func team_member_panel(bar: Dictionary, i: int) -> void:
 			var reason: String = "Wait until this team member returns or finishes hosting." if i in bar.away or not eco.hosted_round(bar,i).is_empty() else ""
 			return cash_offer(eco.role_change_required_cash(bar,i),reason))
 
+	team_exit_controls(bar,i)
+
+func team_exit_controls(bar: Dictionary, i: int) -> void:
+	var eco = model.street.economy
+	var person: Dictionary = bar.team[i]
+	var role: int = person.role
+	if role!=3:
+		var end := row_button("",func() -> void:
+			message = eco.end_contract(bar,i,person)
+			team_page = "roster"
+			team_member = -1
+			commit(true))
+		end.name = "EndContract"
+		var update_exit := func() -> String:
+			var offer: Dictionary = eco.end_contract_offer(bar,i)
+			end.disabled = not offer.enabled
+			end.tooltip_text = offer.reason
+			return "End contract · refund "+cash(offer.refund)
+		end.text = update_exit.call()
+		live_labels.append([end,update_exit])
+		live_body(func() -> String:
+			var offer: Dictionary = eco.end_contract_offer(bar,i)
+			return "%.1f%% of the term remains. Refund = paid contract × unused term × 80%%, rounded down. Training is not refunded. Ending frees the slot; the next hire is random. Named staff keep their training if rediscovered." % (100.0*offer.remaining/StreetContent.STAFF_CONTRACT_MINUTES),MUTED,12)
+
 func shift_report(bar: Dictionary) -> void:
 	if bar.last_shift.is_empty(): return
 	var report: Dictionary = bar.last_shift
@@ -2476,15 +2489,18 @@ func celebration_title(info: Dictionary) -> String:
 	return "%s: %s" % ["Tomorrow" if info.days_left==1 else "Today",info.name]
 
 func celebration_details(info: Dictionary, compact: bool) -> void:
-	var story_copy: String = StreetContent.CELEBRATIONS[model.street.Economy.celebration_index(int(info.day))][1]
+	var story_copy: String = model.street.Economy.celebration_story(int(info.day))
 	var effects := "+40% shared street traffic and extra Blue Hour appeal. One extra planned round, up to 3 if budgets allow. Drinking takes 26/19/14/11/8s by music tier, including the final round. Visitors wait 10s longer for orders. Traffic boosts cap at 2.4× normal. Normal prices, pool fees and wages still apply."
+	if StreetContent.OPENING_NIGHTS.has(int(info.day)):
+		var opening: Dictionary = StreetContent.OPENING_NIGHTS[int(info.day)]
+		effects = "+%d%% shared traffic, extra Blue Hour appeal and one extra planned round (maximum three). Drinks finish %d%% faster. Normal prices, wages and stock apply. Day seven remains the big party." % [roundi((opening.traffic-1.0)*100),roundi((1.0-opening.orders)*100)]
 	var prep := "Prepare: clean the bar, fill the fridge, check staff contracts and leave room for deliveries. Serve the queue or use Chat before advertising harder. No entry fee or paid preparation; offline time cannot use up the party."
 	if compact:
 		var heading := body(celebration_title(info),PINK,18)
 		event_detail(heading,info.name,func() -> String: return story_copy+"\n\n"+effects+"\n\n"+prep)
 	else:
 		title(celebration_title(info),PINK)
-	var timing := "Live until 1am" if info.active else "Opens at noon"
+	var timing := ("Live until 10pm" if info.active else "6pm–10pm") if StreetContent.OPENING_NIGHTS.has(int(info.day)) else "Live until 1am" if info.active else "Opens at noon"
 	body("Free · Blue Hour · "+timing,GOLD,13 if compact else 14)
 	if not compact:
 		body(story_copy,WHITE,14)
